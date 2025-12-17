@@ -1,65 +1,156 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useCallback } from "react";
+import { Sidebar } from "@/components/sidebar";
+import { ChatList } from "@/components/chat-list";
+import { ChatView } from "@/components/chat-view";
+import { DashboardView } from "@/components/dashboard/dashboard-view";
+import { mockClients, mockMessages } from "@/data/mock-data";
+import { mockAgentAttention, mockTodos, suggestedActions } from "@/data/dashboard-data";
+import { Message } from "@/types/chat";
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+  const [activeView, setActiveView] = useState("dashboard");
+  const [selectedClientId, setSelectedClientId] = useState<string | null>("4");
+  const [messages, setMessages] = useState<Record<string, Message[]>>(mockMessages);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const selectedClient = mockClients.find((c) => c.id === selectedClientId);
+  const currentMessages = selectedClientId ? messages[selectedClientId] || [] : [];
+
+  const handleSendMessage = useCallback(
+    async (content: string) => {
+      if (!selectedClientId || !selectedClient) return;
+
+      const userMessage: Message = {
+        id: `msg-${Date.now()}`,
+        role: "user",
+        content,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => ({
+        ...prev,
+        [selectedClientId]: [...(prev[selectedClientId] || []), userMessage],
+      }));
+
+      setIsLoading(true);
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [...(messages[selectedClientId] || []), userMessage].map(
+              (m) => ({ role: m.role, content: m.content })
+            ),
+            clientName: selectedClient.name,
+          }),
+        });
+
+        const data = await response.json();
+
+        const assistantMessage: Message = {
+          id: `msg-${Date.now() + 1}`,
+          role: "assistant",
+          content: data.content,
+          timestamp: new Date(),
+        };
+
+        setMessages((prev) => ({
+          ...prev,
+          [selectedClientId]: [...(prev[selectedClientId] || []), assistantMessage],
+        }));
+      } catch (error) {
+        console.error("Failed to send message:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [selectedClientId, selectedClient, messages]
+  );
+
+  const handleApprove = useCallback(
+    (messageId: string) => {
+      if (!selectedClientId) return;
+
+      setMessages((prev) => ({
+        ...prev,
+        [selectedClientId]: prev[selectedClientId].map((msg) =>
+          msg.id === messageId ? { ...msg, approved: true } : msg
+        ),
+      }));
+    },
+    [selectedClientId]
+  );
+
+  const handleAgentClick = (agentId: string) => {
+    // Map agent to client and switch to chats view
+    const agentClientMap: Record<string, string> = {
+      "agent-1": "1", // Payroll Runner -> Silly Circuits (placeholder)
+      "agent-2": "2", // Powerpoint Builder -> Geeky Grotto
+      "agent-3": "5", // Party Planner -> Clever Components
+      "agent-4": "3", // CX Oracle -> Widget Wizards
+    };
+    const clientId = agentClientMap[agentId] || "1";
+    setSelectedClientId(clientId);
+    setActiveView("chats");
+  };
+
+  const handleDashboardMessage = (message: string) => {
+    // For now, just log it - we'll implement this later
+    console.log("Dashboard message:", message);
+  };
+
+  const renderMainContent = () => {
+    if (activeView === "dashboard") {
+      return (
+        <DashboardView
+          agents={mockAgentAttention}
+          initialTodos={mockTodos}
+          suggestedActions={suggestedActions}
+          onAgentClick={handleAgentClick}
+          onSendMessage={handleDashboardMessage}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      );
+    }
+
+    if (activeView === "chats") {
+      return (
+        <>
+          <ChatList
+            clients={mockClients}
+            selectedClientId={selectedClientId}
+            onSelectClient={setSelectedClientId}
+          />
+          {selectedClient ? (
+            <ChatView
+              client={selectedClient}
+              messages={currentMessages}
+              onSendMessage={handleSendMessage}
+              onApprove={handleApprove}
+              isLoading={isLoading}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+          ) : (
+            <div className="flex flex-1 items-center justify-center text-muted-foreground">
+              Select a client to start chatting
+            </div>
+          )}
+        </>
+      );
+    }
+
+    return (
+      <div className="flex flex-1 items-center justify-center text-muted-foreground">
+        {activeView.charAt(0).toUpperCase() + activeView.slice(1)} view coming soon
+      </div>
+    );
+  };
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar activeView={activeView} onViewChange={setActiveView} />
+      {renderMainContent()}
     </div>
   );
 }
