@@ -1,15 +1,15 @@
 import { Client, Message } from "@/types/chat";
 
 export const mockClients: Client[] = [
-  { id: "1", name: "Silly Circuits Corp.", unreadCount: 6 },
-  { id: "2", name: "Geeky Grotto Solutions", unreadCount: 0 },
-  { id: "3", name: "Widget Wizards LLC", unreadCount: 1 },
+  { id: "1", name: "Aperture Science", unreadCount: 6 },
+  { id: "2", name: "Umbrella Corporation", unreadCount: 0 },
+  { id: "3", name: "Weyland-Yutani", unreadCount: 1 },
   { id: "4", name: "Black Mesa Inc.", unreadCount: 4 },
-  { id: "5", name: "Clever Components Inc.", unreadCount: 0 },
-  { id: "6", name: "Techy Tacos Solutions", unreadCount: 0 },
-  { id: "7", name: "Circuit Shenanigans Co.", unreadCount: 0 },
-  { id: "8", name: "Java Jokesters Enterprises", unreadCount: 0 },
-  { id: "9", name: "Firmware Follies Inc.", unreadCount: 2 },
+  { id: "5", name: "Cyberdyne Systems", unreadCount: 0 },
+  { id: "6", name: "Tyrell Corporation", unreadCount: 0 },
+  { id: "7", name: "Oscorp Industries", unreadCount: 0 },
+  { id: "8", name: "Massive Dynamic", unreadCount: 0 },
+  { id: "9", name: "Soylent Corporation", unreadCount: 2 },
 ];
 
 export const mockMessages: Record<string, Message[]> = {
