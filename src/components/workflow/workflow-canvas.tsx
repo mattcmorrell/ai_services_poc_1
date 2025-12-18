@@ -36,6 +36,10 @@ export function WorkflowCanvas({ workflow, onOpenExternal }: WorkflowCanvasProps
     setEditingStepId((prev) => (prev === stepId ? null : stepId));
   }, []);
 
+  const handlePaneClick = useCallback(() => {
+    setEditingStepId(null);
+  }, []);
+
   const initialNodes: Node[] = useMemo(() => {
     const nodes: Node[] = [
       {
@@ -132,6 +136,7 @@ export function WorkflowCanvas({ workflow, onOpenExternal }: WorkflowCanvasProps
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onPaneClick={handlePaneClick}
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{ padding: 0.2 }}
@@ -144,7 +149,7 @@ export function WorkflowCanvas({ workflow, onOpenExternal }: WorkflowCanvasProps
         <Controls
           position="top-right"
           showInteractive={false}
-          className="!bg-white !border-stone-300 !shadow-sm"
+          className="!bg-white dark:!bg-stone-700 !border-stone-300 dark:!border-stone-600 !shadow-sm [&>button]:!bg-white dark:[&>button]:!bg-stone-700 [&>button]:!border-stone-300 dark:[&>button]:!border-stone-600 [&>button]:!text-stone-700 dark:[&>button]:!text-stone-200 [&>button:hover]:!bg-stone-100 dark:[&>button:hover]:!bg-stone-600"
         />
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} className="!bg-stone-100 dark:!bg-stone-900" color="#78716c" />
       </ReactFlow>

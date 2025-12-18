@@ -118,7 +118,7 @@ function WorkflowStepNode({ data }: WorkflowStepNodeProps) {
             <Button
               type="submit"
               size="icon"
-              className="h-7 w-7 rounded-full bg-stone-800 hover:bg-stone-900"
+              className="h-7 w-7 rounded-full bg-stone-100 hover:bg-white dark:bg-stone-500 dark:hover:bg-stone-400 text-stone-800 dark:text-stone-100"
             >
               <ArrowUp className="h-4 w-4" />
             </Button>
