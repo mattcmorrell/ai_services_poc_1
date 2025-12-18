@@ -7,9 +7,11 @@ import { ChatView } from "@/components/chat-view";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { AgentsView } from "@/components/agents/agents-view";
 import { ClientSelectDialog } from "@/components/agents/client-select-dialog";
+import { WorkflowPanel } from "@/components/workflow/workflow-panel";
 import { mockClients, mockMessages } from "@/data/mock-data";
 import { mockAgentAttention, mockTodos, suggestedActions } from "@/data/dashboard-data";
 import { mockAgents } from "@/data/agents-data";
+import { defaultPayrollWorkflow } from "@/data/workflow-data";
 import { Message } from "@/types/chat";
 import { Agent } from "@/types/agent";
 
@@ -21,6 +23,7 @@ export default function Home() {
   const [agents, setAgents] = useState<Agent[]>(mockAgents);
   const [clientSelectOpen, setClientSelectOpen] = useState(false);
   const [selectedAgentForClient, setSelectedAgentForClient] = useState<Agent | null>(null);
+  const [workflowPanelOpen, setWorkflowPanelOpen] = useState(false);
 
   const selectedClient = mockClients.find((c) => c.id === selectedClientId);
   const currentMessages = selectedClientId ? messages[selectedClientId] || [] : [];
@@ -133,6 +136,10 @@ export default function Home() {
     );
   };
 
+  const handleWorkflowClick = useCallback((workflowId: string) => {
+    setWorkflowPanelOpen(true);
+  }, []);
+
   const renderMainContent = () => {
     if (activeView === "dashboard") {
       return (
@@ -160,12 +167,19 @@ export default function Home() {
               messages={currentMessages}
               onSendMessage={handleSendMessage}
               onApprove={handleApprove}
+              onWorkflowClick={handleWorkflowClick}
               isLoading={isLoading}
             />
           ) : (
             <div className="flex flex-1 items-center justify-center text-muted-foreground">
               Select a client to start chatting
             </div>
+          )}
+          {workflowPanelOpen && (
+            <WorkflowPanel
+              workflow={defaultPayrollWorkflow}
+              onClose={() => setWorkflowPanelOpen(false)}
+            />
           )}
         </>
       );
