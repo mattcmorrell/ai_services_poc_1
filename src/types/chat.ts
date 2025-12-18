@@ -22,5 +22,8 @@ export interface Message {
 export interface Chat {
   id: string;
   clientId: string;
+  title: string;
+  hasUnread: boolean;
+  updatedAt: Date;
   messages: Message[];
 }

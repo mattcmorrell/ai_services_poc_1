@@ -1,36 +1,43 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Sidebar } from "@/components/sidebar";
-import { ChatList } from "@/components/chat-list";
+import { ChatListPanel } from "@/components/chat-list-panel";
 import { ChatView } from "@/components/chat-view";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { AgentsView } from "@/components/agents/agents-view";
 import { ClientSelectDialog } from "@/components/agents/client-select-dialog";
 import { WorkflowPanel } from "@/components/workflow/workflow-panel";
-import { mockClients, mockMessages } from "@/data/mock-data";
+import { mockClients, mockChats } from "@/data/mock-data";
 import { mockAgentAttention, mockTodos, suggestedActions } from "@/data/dashboard-data";
 import { mockAgents } from "@/data/agents-data";
 import { defaultPayrollWorkflow } from "@/data/workflow-data";
-import { Message } from "@/types/chat";
+import { Message, Chat } from "@/types/chat";
 import { Agent } from "@/types/agent";
 
 export default function Home() {
   const [activeView, setActiveView] = useState("dashboard");
-  const [selectedClientId, setSelectedClientId] = useState<string | null>("4");
-  const [messages, setMessages] = useState<Record<string, Message[]>>(mockMessages);
+  const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
+  const [chats, setChats] = useState<Chat[]>(mockChats);
   const [isLoading, setIsLoading] = useState(false);
   const [agents, setAgents] = useState<Agent[]>(mockAgents);
   const [clientSelectOpen, setClientSelectOpen] = useState(false);
   const [selectedAgentForClient, setSelectedAgentForClient] = useState<Agent | null>(null);
   const [workflowPanelOpen, setWorkflowPanelOpen] = useState(false);
 
-  const selectedClient = mockClients.find((c) => c.id === selectedClientId);
-  const currentMessages = selectedClientId ? messages[selectedClientId] || [] : [];
+  const selectedChat = useMemo(
+    () => chats.find((c) => c.id === selectedChatId),
+    [chats, selectedChatId]
+  );
+  const selectedClient = useMemo(
+    () => mockClients.find((c) => c.id === selectedChat?.clientId),
+    [selectedChat]
+  );
+  const currentMessages = selectedChat?.messages || [];
 
   const handleSendMessage = useCallback(
     async (content: string) => {
-      if (!selectedClientId || !selectedClient) return;
+      if (!selectedChatId || !selectedChat || !selectedClient) return;
 
       const userMessage: Message = {
         id: `msg-${Date.now()}`,
@@ -39,10 +46,13 @@ export default function Home() {
         timestamp: new Date(),
       };
 
-      setMessages((prev) => ({
-        ...prev,
-        [selectedClientId]: [...(prev[selectedClientId] || []), userMessage],
-      }));
+      setChats((prev) =>
+        prev.map((chat) =>
+          chat.id === selectedChatId
+            ? { ...chat, messages: [...chat.messages, userMessage], updatedAt: new Date() }
+            : chat
+        )
+      );
 
       setIsLoading(true);
 
@@ -51,7 +61,7 @@ export default function Home() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: [...(messages[selectedClientId] || []), userMessage].map(
+            messages: [...(selectedChat.messages || []), userMessage].map(
               (m) => ({ role: m.role, content: m.content })
             ),
             clientName: selectedClient.name,
@@ -67,43 +77,78 @@ export default function Home() {
           timestamp: new Date(),
         };
 
-        setMessages((prev) => ({
-          ...prev,
-          [selectedClientId]: [...(prev[selectedClientId] || []), assistantMessage],
-        }));
+        setChats((prev) =>
+          prev.map((chat) =>
+            chat.id === selectedChatId
+              ? { ...chat, messages: [...chat.messages, assistantMessage], updatedAt: new Date() }
+              : chat
+          )
+        );
       } catch (error) {
         console.error("Failed to send message:", error);
       } finally {
         setIsLoading(false);
       }
     },
-    [selectedClientId, selectedClient, messages]
+    [selectedChatId, selectedChat, selectedClient]
   );
 
   const handleApprove = useCallback(
     (messageId: string) => {
-      if (!selectedClientId) return;
+      if (!selectedChatId) return;
 
-      setMessages((prev) => ({
-        ...prev,
-        [selectedClientId]: prev[selectedClientId].map((msg) =>
-          msg.id === messageId ? { ...msg, approved: true } : msg
-        ),
-      }));
+      setChats((prev) =>
+        prev.map((chat) =>
+          chat.id === selectedChatId
+            ? {
+                ...chat,
+                messages: chat.messages.map((msg) =>
+                  msg.id === messageId ? { ...msg, approved: true } : msg
+                ),
+              }
+            : chat
+        )
+      );
     },
-    [selectedClientId]
+    [selectedChatId]
+  );
+
+  const handleNewChat = useCallback(
+    (clientId: string) => {
+      const client = mockClients.find((c) => c.id === clientId);
+      const newChat: Chat = {
+        id: `chat-${Date.now()}`,
+        clientId,
+        title: `New Chat with ${client?.name || "Client"}`,
+        hasUnread: false,
+        updatedAt: new Date(),
+        messages: [],
+      };
+      setChats((prev) => [newChat, ...prev]);
+      setSelectedChatId(newChat.id);
+    },
+    []
   );
 
   const handleAgentClick = (agentId: string) => {
     // Map agent to client and switch to chats view
     const agentClientMap: Record<string, string> = {
-      "agent-1": "1", // Payroll Runner -> Silly Circuits (placeholder)
-      "agent-2": "2", // Powerpoint Builder -> Geeky Grotto
-      "agent-3": "5", // Party Planner -> Clever Components
-      "agent-4": "3", // CX Oracle -> Widget Wizards
+      "agent-1": "1", // Payroll Runner -> Aperture Science
+      "agent-2": "2", // Powerpoint Builder -> Umbrella Corporation
+      "agent-3": "5", // Party Planner -> Cyberdyne Systems
+      "agent-4": "3", // CX Oracle -> Weyland-Yutani
     };
     const clientId = agentClientMap[agentId] || "1";
-    setSelectedClientId(clientId);
+    // Find most recent chat for this client or create new one
+    const clientChats = chats.filter((c) => c.clientId === clientId);
+    if (clientChats.length > 0) {
+      const mostRecent = clientChats.sort(
+        (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
+      )[0];
+      setSelectedChatId(mostRecent.id);
+    } else {
+      handleNewChat(clientId);
+    }
     setActiveView("chats");
   };
 
@@ -122,7 +167,16 @@ export default function Home() {
   };
 
   const handleClientSelectedForAgent = (clientId: string) => {
-    setSelectedClientId(clientId);
+    // Find most recent chat for this client or create new one
+    const clientChats = chats.filter((c) => c.clientId === clientId);
+    if (clientChats.length > 0) {
+      const mostRecent = clientChats.sort(
+        (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
+      )[0];
+      setSelectedChatId(mostRecent.id);
+    } else {
+      handleNewChat(clientId);
+    }
     setClientSelectOpen(false);
     setSelectedAgentForClient(null);
     setActiveView("chats");
@@ -156,12 +210,14 @@ export default function Home() {
     if (activeView === "chats") {
       return (
         <>
-          <ChatList
+          <ChatListPanel
             clients={mockClients}
-            selectedClientId={selectedClientId}
-            onSelectClient={setSelectedClientId}
+            chats={chats}
+            selectedChatId={selectedChatId}
+            onSelectChat={setSelectedChatId}
+            onNewChat={handleNewChat}
           />
-          {selectedClient ? (
+          {selectedChat && selectedClient ? (
             <ChatView
               client={selectedClient}
               messages={currentMessages}
@@ -172,7 +228,7 @@ export default function Home() {
             />
           ) : (
             <div className="flex flex-1 items-center justify-center text-muted-foreground">
-              Select a client to start chatting
+              Select a chat to start messaging
             </div>
           )}
           {workflowPanelOpen && (

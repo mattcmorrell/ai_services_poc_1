@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Navigation Layout Options</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .mockup-container {
+      height: 500px;
+    }
+  </style>
+</head>
+<body class="bg-stone-900 text-stone-100 p-8">
+  <h1 class="text-3xl font-bold mb-8 text-center">Navigation Layout Options</h1>
+  
+  <div class="grid grid-cols-2 gap-8 max-w-7xl mx-auto">
+    
+    <!-- Option A: Two-level nav -->
+    <div class="bg-stone-800 rounded-lg overflow-hidden">
+      <div class="bg-stone-700 px-4 py-2 font-semibold">Option A: Two-level Nav</div>
+      <div class="mockup-container flex">
+        <!-- Icon sidebar -->
+        <div class="w-14 bg-stone-950 flex flex-col items-center py-4 gap-4">
+          <div class="w-8 h-8 bg-stone-700 rounded"></div>
+          <div class="w-8 h-8 bg-blue-600 rounded"></div>
+          <div class="w-8 h-8 bg-stone-700 rounded"></div>
+        </div>
+        
+        <!-- Client list (level 1) -->
+        <div class="w-48 bg-stone-850 border-r border-stone-700 flex flex-col">
+          <div class="p-3 border-b border-stone-700 text-sm font-semibold text-stone-400">Clients</div>
+          <div class="flex-1 overflow-auto">
+            <div class="p-3 bg-stone-700 border-l-2 border-blue-500 flex justify-between items-center">
+              <span>Black Mesa</span>
+              <span class="bg-blue-600 text-xs px-1.5 py-0.5 rounded-full">4</span>
+            </div>
+            <div class="p-3 hover:bg-stone-750 flex justify-between items-center">
+              <span>Aperture Science</span>
+              <span class="bg-blue-600 text-xs px-1.5 py-0.5 rounded-full">6</span>
+            </div>
+            <div class="p-3 hover:bg-stone-750">Umbrella Corp</div>
+            <div class="p-3 hover:bg-stone-750 flex justify-between items-center">
+              <span>Weyland-Yutani</span>
+              <span class="bg-blue-600 text-xs px-1.5 py-0.5 rounded-full">1</span>
+            </div>
+            <div class="p-3 hover:bg-stone-750">Cyberdyne</div>
+            <div class="p-3 hover:bg-stone-750">Tyrell Corp</div>
+          </div>
+        </div>
+        
+        <!-- Chat list (level 2) -->
+        <div class="w-56 bg-stone-800 border-r border-stone-700 flex flex-col">
+          <div class="p-3 border-b border-stone-700 flex justify-between items-center">
+            <span class="text-sm font-semibold text-stone-400">Black Mesa Chats</span>
+            <button class="text-blue-400 text-xl leading-none">+</button>
+          </div>
+          <div class="flex-1 overflow-auto">
+            <div class="p-3 bg-stone-700 border-l-2 border-blue-500">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span class="font-medium">January Payroll</span>
+              </div>
+              <div class="text-xs text-stone-400 mt-1">2 min ago</div>
+            </div>
+            <div class="p-3 hover:bg-stone-750">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>Benefits Enrollment</span>
+              </div>
+              <div class="text-xs text-stone-400 mt-1">1 hour ago</div>
+            </div>
+            <div class="p-3 hover:bg-stone-750">
+              <div>Tax Forms Review</div>
+              <div class="text-xs text-stone-400 mt-1">Yesterday</div>
+            </div>
+            <div class="p-3 hover:bg-stone-750">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>New Hire Onboarding</span>
+              </div>
+              <div class="text-xs text-stone-400 mt-1">2 days ago</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Chat area -->
+        <div class="flex-1 bg-stone-900 flex items-center justify-center text-stone-500">
+          Chat Content
+        </div>
+      </div>
+      <div class="p-3 bg-stone-800 text-sm text-stone-400 border-t border-stone-700">
+        <strong>Pros:</strong> Clear hierarchy, easy to find all chats for a client<br>
+        <strong>Cons:</strong> Extra click to reach chat, wider sidebar
+      </div>
+    </div>
+
+    <!-- Option C1: Collapsible sections -->
+    <div class="bg-stone-800 rounded-lg overflow-hidden">
+      <div class="bg-stone-700 px-4 py-2 font-semibold">Option C1: Collapsible Sections</div>
+      <div class="mockup-container flex">
+        <!-- Icon sidebar -->
+        <div class="w-14 bg-stone-950 flex flex-col items-center py-4 gap-4">
+          <div class="w-8 h-8 bg-stone-700 rounded"></div>
+          <div class="w-8 h-8 bg-blue-600 rounded"></div>
+          <div class="w-8 h-8 bg-stone-700 rounded"></div>
+        </div>
+        
+        <!-- Combined list with collapsible clients -->
+        <div class="w-64 bg-stone-850 border-r border-stone-700 flex flex-col">
+          <div class="p-3 border-b border-stone-700 flex justify-between items-center">
+            <span class="text-sm font-semibold text-stone-400">Chats</span>
+            <button class="text-blue-400 text-xl leading-none">+</button>
+          </div>
+          <div class="flex-1 overflow-auto">
+            <!-- Expanded client -->
+            <div class="border-b border-stone-700">
+              <div class="p-3 bg-stone-750 flex justify-between items-center cursor-pointer">
+                <div class="flex items-center gap-2">
+                  <span class="text-stone-400">▼</span>
+                  <span class="font-medium">Black Mesa</span>
+                </div>
+                <span class="bg-blue-600 text-xs px-1.5 py-0.5 rounded-full">4</span>
+              </div>
+              <div class="pl-6">
+                <div class="p-2 bg-stone-700 border-l-2 border-blue-500 flex items-center gap-2">
+                  <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <div>
+                    <div class="text-sm">January Payroll</div>
+                    <div class="text-xs text-stone-500">2 min ago</div>
+                  </div>
+                </div>
+                <div class="p-2 hover:bg-stone-750 flex items-center gap-2">
+                  <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <div>
+                    <div class="text-sm">Benefits Enrollment</div>
+                    <div class="text-xs text-stone-500">1 hour ago</div>
+                  </div>
+                </div>
+                <div class="p-2 hover:bg-stone-750">
+                  <div class="text-sm">Tax Forms Review</div>
+                  <div class="text-xs text-stone-500">Yesterday</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Expanded client 2 -->
+            <div class="border-b border-stone-700">
+              <div class="p-3 bg-stone-750 flex justify-between items-center cursor-pointer">
+                <div class="flex items-center gap-2">
+                  <span class="text-stone-400">▼</span>
+                  <span class="font-medium">Aperture Science</span>
+                </div>
+                <span class="bg-blue-600 text-xs px-1.5 py-0.5 rounded-full">6</span>
+              </div>
+              <div class="pl-6">
+                <div class="p-2 hover:bg-stone-750 flex items-center gap-2">
+                  <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <div>
+                    <div class="text-sm">Portal Gun Safety</div>
+                    <div class="text-xs text-stone-500">30 min ago</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Collapsed clients -->
+            <div class="p-3 flex justify-between items-center cursor-pointer hover:bg-stone-750">
+              <div class="flex items-center gap-2">
+                <span class="text-stone-400">▶</span>
+                <span>Umbrella Corp</span>
+              </div>
+            </div>
+            <div class="p-3 flex justify-between items-center cursor-pointer hover:bg-stone-750">
+              <div class="flex items-center gap-2">
+                <span class="text-stone-400">▶</span>
+                <span>Weyland-Yutani</span>
+              </div>
+              <span class="bg-blue-600 text-xs px-1.5 py-0.5 rounded-full">1</span>
+            </div>
+            <div class="p-3 flex justify-between items-center cursor-pointer hover:bg-stone-750">
+              <div class="flex items-center gap-2">
+                <span class="text-stone-400">▶</span>
+                <span>Cyberdyne</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Chat area -->
+        <div class="flex-1 bg-stone-900 flex items-center justify-center text-stone-500">
+          Chat Content
+        </div>
+      </div>
+      <div class="p-3 bg-stone-800 text-sm text-stone-400 border-t border-stone-700">
+        <strong>Pros:</strong> Single panel, expand multiple clients, compact<br>
+        <strong>Cons:</strong> Can get long, nested indentation
+      </div>
+    </div>
+
+    <!-- Option C2: Client tabs + chat list -->
+    <div class="bg-stone-800 rounded-lg overflow-hidden">
+      <div class="bg-stone-700 px-4 py-2 font-semibold">Option C2: Client Tabs + Chat List</div>
+      <div class="mockup-container flex">
+        <!-- Icon sidebar -->
+        <div class="w-14 bg-stone-950 flex flex-col items-center py-4 gap-4">
+          <div class="w-8 h-8 bg-stone-700 rounded"></div>
+          <div class="w-8 h-8 bg-blue-600 rounded"></div>
+          <div class="w-8 h-8 bg-stone-700 rounded"></div>
+        </div>
+        
+        <!-- Chat panel with client tabs -->
+        <div class="w-64 bg-stone-850 border-r border-stone-700 flex flex-col">
+          <!-- Client tabs row -->
+          <div class="flex border-b border-stone-700 overflow-x-auto">
+            <div class="px-3 py-2 bg-stone-700 border-b-2 border-blue-500 text-sm whitespace-nowrap flex items-center gap-1">
+              Black Mesa
+              <span class="bg-blue-600 text-xs px-1 rounded-full">4</span>
+            </div>
+            <div class="px-3 py-2 text-sm text-stone-400 whitespace-nowrap flex items-center gap-1 hover:bg-stone-750">
+              Aperture
+              <span class="bg-blue-600 text-xs px-1 rounded-full">6</span>
+            </div>
+            <div class="px-3 py-2 text-sm text-stone-400 whitespace-nowrap hover:bg-stone-750">
+              Umbrella
+            </div>
+            <div class="px-3 py-2 text-sm text-stone-400 whitespace-nowrap hover:bg-stone-750">
+              +3
+            </div>
+          </div>
+          
+          <!-- Chat list for selected client -->
+          <div class="p-2 border-b border-stone-700 flex justify-between items-center">
+            <span class="text-xs text-stone-500">4 chats</span>
+            <button class="text-blue-400 text-sm">+ New</button>
+          </div>
+          <div class="flex-1 overflow-auto">
+            <div class="p-3 bg-stone-700 border-l-2 border-blue-500">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span class="font-medium">January Payroll</span>
+              </div>
+              <div class="text-xs text-stone-400 mt-1">2 min ago</div>
+            </div>
+            <div class="p-3 hover:bg-stone-750">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>Benefits Enrollment</span>
+              </div>
+              <div class="text-xs text-stone-400 mt-1">1 hour ago</div>
+            </div>
+            <div class="p-3 hover:bg-stone-750">
+              <div>Tax Forms Review</div>
+              <div class="text-xs text-stone-400 mt-1">Yesterday</div>
+            </div>
+            <div class="p-3 hover:bg-stone-750">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>New Hire Onboarding</span>
+              </div>
+              <div class="text-xs text-stone-400 mt-1">2 days ago</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Chat area -->
+        <div class="flex-1 bg-stone-900 flex items-center justify-center text-stone-500">
+          Chat Content
+        </div>
+      </div>
+      <div class="p-3 bg-stone-800 text-sm text-stone-400 border-t border-stone-700">
+        <strong>Pros:</strong> Fast client switching, compact, familiar tab pattern<br>
+        <strong>Cons:</strong> Tabs overflow with many clients, less visible client list
+      </div>
+    </div>
+
+    <!-- Option C3: Recent + drill-down -->
+    <div class="bg-stone-800 rounded-lg overflow-hidden">
+      <div class="bg-stone-700 px-4 py-2 font-semibold">Option C3: Recent Chats + Filter</div>
+      <div class="mockup-container flex">
+        <!-- Icon sidebar -->
+        <div class="w-14 bg-stone-950 flex flex-col items-center py-4 gap-4">
+          <div class="w-8 h-8 bg-stone-700 rounded"></div>
+          <div class="w-8 h-8 bg-blue-600 rounded"></div>
+          <div class="w-8 h-8 bg-stone-700 rounded"></div>
+        </div>
+        
+        <!-- Chat list with filter -->
+        <div class="w-64 bg-stone-850 border-r border-stone-700 flex flex-col">
+          <!-- Filter/search bar -->
+          <div class="p-2 border-b border-stone-700">
+            <select class="w-full bg-stone-700 border border-stone-600 rounded px-2 py-1.5 text-sm">
+              <option>All Clients</option>
+              <option>Black Mesa</option>
+              <option>Aperture Science</option>
+              <option>Umbrella Corp</option>
+            </select>
+          </div>
+          <div class="p-2 border-b border-stone-700 flex justify-between items-center">
+            <span class="text-xs text-stone-500">Recent chats</span>
+            <button class="text-blue-400 text-sm">+ New</button>
+          </div>
+          
+          <!-- Mixed recent chats -->
+          <div class="flex-1 overflow-auto">
+            <div class="p-3 bg-stone-700 border-l-2 border-blue-500">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <span class="font-medium">January Payroll</span>
+                </div>
+              </div>
+              <div class="text-xs text-stone-500 mt-1">Black Mesa · 2 min ago</div>
+            </div>
+            <div class="p-3 hover:bg-stone-750">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>Portal Gun Safety</span>
+              </div>
+              <div class="text-xs text-stone-500 mt-1">Aperture Science · 30 min ago</div>
+            </div>
+            <div class="p-3 hover:bg-stone-750">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>Benefits Enrollment</span>
+              </div>
+              <div class="text-xs text-stone-500 mt-1">Black Mesa · 1 hour ago</div>
+            </div>
+            <div class="p-3 hover:bg-stone-750">
+              <div>Virus Containment</div>
+              <div class="text-xs text-stone-500 mt-1">Umbrella Corp · 2 hours ago</div>
+            </div>
+            <div class="p-3 hover:bg-stone-750">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>Replicant Benefits</span>
+              </div>
+              <div class="text-xs text-stone-500 mt-1">Tyrell Corp · 3 hours ago</div>
+            </div>
+            <div class="p-3 hover:bg-stone-750">
+              <div>Tax Forms Review</div>
+              <div class="text-xs text-stone-500 mt-1">Black Mesa · Yesterday</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Chat area -->
+        <div class="flex-1 bg-stone-900 flex items-center justify-center text-stone-500">
+          Chat Content
+        </div>
+      </div>
+      <div class="p-3 bg-stone-800 text-sm text-stone-400 border-t border-stone-700">
+        <strong>Pros:</strong> See what needs attention across all clients, compact<br>
+        <strong>Cons:</strong> Client context less prominent, need to filter to focus
+      </div>
+    </div>
+
+  </div>
+  
+  <div class="mt-8 max-w-3xl mx-auto text-stone-400 text-sm">
+    <h2 class="text-xl font-semibold text-stone-200 mb-4">Summary</h2>
+    <ul class="space-y-2">
+      <li><strong class="text-stone-200">Option A:</strong> Best for "I'm working on this client" mental model. Clear but wider.</li>
+      <li><strong class="text-stone-200">Option C1:</strong> Best for working on 2-3 clients at once. Like Slack/VS Code.</li>
+      <li><strong class="text-stone-200">Option C2:</strong> Best for fast client switching. Familiar browser-tab pattern.</li>
+      <li><strong class="text-stone-200">Option C3:</strong> Best for "what needs attention now" workflow. Activity-focused.</li>
+    </ul>
+  </div>
+</body>
+</html>
