@@ -42,13 +42,13 @@ function ChatItem({ chat, clientName, isSelected, onSelect }: ChatItemProps) {
     <div
       onClick={onSelect}
       className={cn(
-        "p-3 cursor-pointer",
+        "p-3 cursor-pointer border-l-2",
         isSelected
-          ? "bg-accent border-l-2 border-primary"
-          : "hover:bg-accent/50"
+          ? "bg-accent border-primary"
+          : "border-transparent hover:bg-accent/50"
       )}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 min-w-0">
         <span
           className={cn(
             "w-2 h-2 flex-shrink-0 rounded-full",
@@ -59,7 +59,7 @@ function ChatItem({ chat, clientName, isSelected, onSelect }: ChatItemProps) {
           {chat.title}
         </span>
       </div>
-      <div className="text-xs text-muted-foreground mt-1 ml-4">
+      <div className="text-xs text-muted-foreground mt-1 ml-4 truncate">
         {clientName ? `${clientName} · ` : ""}
         {formatTimeAgo(chat.updatedAt)}
       </div>
@@ -123,10 +123,10 @@ function ClientSection({
               key={chat.id}
               onClick={() => onSelectChat(chat.id)}
               className={cn(
-                "p-2.5 pl-7 flex items-center gap-2 cursor-pointer",
+                "p-2.5 pl-7 flex items-center gap-2 cursor-pointer border-l-2",
                 selectedChatId === chat.id
-                  ? "bg-accent border-l-2 border-primary"
-                  : "hover:bg-accent/50"
+                  ? "bg-accent border-primary"
+                  : "border-transparent hover:bg-accent/50"
               )}
             >
               <span
@@ -266,7 +266,7 @@ export function ChatListPanel({
         </>
       ) : (
         /* Clients view */
-        <ScrollArea className="flex-1">
+        <div className="flex-1 overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
           {clients.map((client) => (
             <ClientSection
               key={client.id}
@@ -279,7 +279,7 @@ export function ChatListPanel({
               onToggleExpand={() => toggleClientExpanded(client.id)}
             />
           ))}
-        </ScrollArea>
+        </div>
       )}
     </div>
   );

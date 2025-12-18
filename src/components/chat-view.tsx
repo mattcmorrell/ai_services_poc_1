@@ -137,9 +137,9 @@ export function ChatView({
               </div>
 
               {message.workflow && (
-                <button
+                <div
                   onClick={() => onWorkflowClick(message.workflow!.id)}
-                  className="mt-4 flex w-full items-center gap-3 rounded-lg border border-border p-3 text-left transition-colors hover:bg-accent"
+                  className="mt-4 flex w-full items-center gap-3 rounded-lg border border-border p-3 text-left transition-colors hover:bg-accent cursor-pointer"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
                     <ArrowUpDown className="h-5 w-5" />
@@ -153,7 +153,7 @@ export function ChatView({
                   <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
-                </button>
+                </div>
               )}
 
               {message.requiresApproval && (
