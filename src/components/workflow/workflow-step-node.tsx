@@ -37,25 +37,25 @@ function WorkflowStepNode({ data }: WorkflowStepNodeProps) {
       <Handle
         type="target"
         position={Position.Top}
-        className="!bg-stone-400 !w-2 !h-2 !border-0"
+        className="!bg-stone-400 dark:!bg-stone-500 !w-2 !h-2 !border-0"
       />
       
       <div
         className={cn(
-          "bg-stone-200 rounded-lg px-4 py-3 min-w-[280px] max-w-[320px] cursor-pointer transition-all",
-          "border-2 border-transparent hover:border-stone-300",
-          isExpanded && "border-stone-400"
+          "bg-stone-200 dark:bg-stone-800 rounded-lg px-4 py-3 min-w-[280px] max-w-[320px] cursor-pointer transition-all",
+          "border-2 border-transparent hover:border-stone-300 dark:hover:border-stone-600",
+          isExpanded && "border-stone-400 dark:border-stone-500"
         )}
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-stone-800 text-sm">
+          <h3 className="font-semibold text-stone-800 dark:text-stone-100 text-sm">
             {stepNumber}. {step.title}
           </h3>
           {isExpanded ? (
-            <ChevronUp className="h-4 w-4 text-stone-500" />
+            <ChevronUp className="h-4 w-4 text-stone-500 dark:text-stone-400" />
           ) : (
-            <ChevronDown className="h-4 w-4 text-stone-500" />
+            <ChevronDown className="h-4 w-4 text-stone-500 dark:text-stone-400" />
           )}
         </div>
 
@@ -65,7 +65,7 @@ function WorkflowStepNode({ data }: WorkflowStepNodeProps) {
               e.stopPropagation();
               onEdit(step.id);
             }}
-            className="flex items-center gap-1 text-stone-600 hover:text-stone-900 underline"
+            className="flex items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 underline"
           >
             <Pencil className="h-3 w-3" />
             Edit
@@ -75,7 +75,7 @@ function WorkflowStepNode({ data }: WorkflowStepNodeProps) {
               e.stopPropagation();
               onOpenExternal(step.id, step.title);
             }}
-            className="flex items-center gap-1 text-stone-600 hover:text-stone-900"
+            className="flex items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100"
           >
             <span className="w-3 h-3 rounded-full bg-green-600 flex items-center justify-center text-white text-[8px] font-bold">B</span>
             <span className="underline">Open in BambooHR</span>
@@ -83,9 +83,9 @@ function WorkflowStepNode({ data }: WorkflowStepNodeProps) {
         </div>
 
         {isExpanded && step.metadata && (
-          <div className="mt-3 pt-3 border-t border-stone-300 text-xs text-stone-600 space-y-1">
+          <div className="mt-3 pt-3 border-t border-stone-300 dark:border-stone-600 text-xs text-stone-600 dark:text-stone-400 space-y-1">
             {step.description && (
-              <p className="text-stone-700 mb-2">{step.description}</p>
+              <p className="text-stone-700 dark:text-stone-300 mb-2">{step.description}</p>
             )}
             {step.metadata.duration && (
               <div><span className="font-medium">Duration:</span> {step.metadata.duration}</div>
@@ -105,13 +105,13 @@ function WorkflowStepNode({ data }: WorkflowStepNodeProps) {
 
       {isEditing && (
         <form onSubmit={handleEditSubmit} className="mt-2">
-          <div className="flex items-center gap-2 bg-white rounded-full border border-stone-300 px-4 py-2 shadow-sm">
+          <div className="flex items-center gap-2 bg-white dark:bg-stone-700 rounded-full border border-stone-300 dark:border-stone-600 px-4 py-2 shadow-sm">
             <input
               type="text"
               value={editInput}
               onChange={(e) => setEditInput(e.target.value)}
               placeholder="Ask for changes"
-              className="flex-1 text-sm outline-none bg-transparent"
+              className="flex-1 text-sm outline-none bg-transparent text-stone-900 dark:text-stone-100 placeholder:text-stone-500 dark:placeholder:text-stone-400"
               autoFocus
               onClick={(e) => e.stopPropagation()}
             />
@@ -129,7 +129,7 @@ function WorkflowStepNode({ data }: WorkflowStepNodeProps) {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="!bg-stone-400 !w-2 !h-2 !border-0"
+        className="!bg-stone-400 dark:!bg-stone-500 !w-2 !h-2 !border-0"
       />
     </div>
   );

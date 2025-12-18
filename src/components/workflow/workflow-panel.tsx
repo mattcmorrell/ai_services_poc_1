@@ -64,19 +64,19 @@ export function WorkflowPanel({ workflow, onClose }: WorkflowPanelProps) {
   const activeTab = tabs.find((t) => t.id === activeTabId);
 
   return (
-    <div className="flex h-full w-[600px] flex-col border-l border-stone-300 bg-stone-50">
+    <div className="flex h-full w-[600px] flex-col border-l border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-900">
       {/* Tab Bar */}
-      <div className="flex items-center border-b border-stone-300 bg-stone-100">
+      <div className="flex items-center border-b border-stone-300 dark:border-stone-700 bg-stone-100 dark:bg-stone-800">
         <div className="flex flex-1 items-center overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTabId(tab.id)}
               className={cn(
-                "flex items-center gap-2 border-r border-stone-300 px-4 py-2 text-sm transition-colors",
+                "flex items-center gap-2 border-r border-stone-300 dark:border-stone-700 px-4 py-2 text-sm transition-colors",
                 activeTabId === tab.id
-                  ? "bg-stone-50 text-stone-900"
-                  : "bg-stone-200 text-stone-600 hover:bg-stone-150"
+                  ? "bg-stone-50 dark:bg-stone-900 text-stone-900 dark:text-stone-100"
+                  : "bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-150 dark:hover:bg-stone-600"
               )}
             >
               {tab.type === "workflow" ? (
@@ -89,7 +89,7 @@ export function WorkflowPanel({ workflow, onClose }: WorkflowPanelProps) {
               <span className="max-w-[150px] truncate">{tab.title}</span>
               <button
                 onClick={(e) => handleCloseTab(tab.id, e)}
-                className="ml-1 rounded p-0.5 hover:bg-stone-300"
+                className="ml-1 rounded p-0.5 hover:bg-stone-300 dark:hover:bg-stone-600"
               >
                 <X className="h-3 w-3" />
               </button>

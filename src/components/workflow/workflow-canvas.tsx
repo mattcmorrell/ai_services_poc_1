@@ -126,7 +126,7 @@ export function WorkflowCanvas({ workflow, onOpenExternal }: WorkflowCanvasProps
   }, [editingStepId, setNodes]);
 
   return (
-    <div className="h-full w-full bg-stone-100">
+    <div className="h-full w-full bg-stone-100 dark:bg-stone-900">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -146,7 +146,7 @@ export function WorkflowCanvas({ workflow, onOpenExternal }: WorkflowCanvasProps
           showInteractive={false}
           className="!bg-white !border-stone-300 !shadow-sm"
         />
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#d6d3d1" />
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} className="!bg-stone-100 dark:!bg-stone-900" color="#78716c" />
       </ReactFlow>
     </div>
   );

@@ -11,17 +11,17 @@ export function BambooHRView({ stepTitle }: BambooHRViewProps) {
   return (
     <div className="flex h-full flex-col bg-white">
       {/* Browser Chrome */}
-      <div className="flex items-center gap-2 border-b border-stone-200 px-3 py-2">
-        <Button variant="ghost" size="icon" className="h-8 w-8">
+      <div className="flex items-center gap-2 border-b border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 px-3 py-2">
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-600 dark:text-stone-400">
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-600 dark:text-stone-400">
           <ArrowRight className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-600 dark:text-stone-400">
           <RotateCw className="h-4 w-4" />
         </Button>
-        <div className="flex-1 rounded-full bg-stone-100 px-4 py-1.5 text-sm text-stone-600">
+        <div className="flex-1 rounded-full bg-stone-100 dark:bg-stone-700 px-4 py-1.5 text-sm text-stone-600 dark:text-stone-300">
           www.bamboohr.com/payroll
         </div>
       </div>
