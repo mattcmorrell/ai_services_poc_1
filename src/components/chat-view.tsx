@@ -20,8 +20,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { Client, Message, Artifact } from "@/types/chat";
+import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactCard } from "@/components/artifacts/artifact-card";
+import { ActionCard } from "@/components/chat/action-card";
 
 interface ChatViewProps {
   client: Client | null;
@@ -31,6 +32,7 @@ interface ChatViewProps {
   selectedArtifactId: string | null;
   onSendMessage: (content: string) => void;
   onApprove: (messageId: string) => void;
+  onDecline: (messageId: string) => void;
   onWorkflowClick: (workflowId: string) => void;
   onArtifactClick: (artifactId: string) => void;
   isLoading: boolean;
@@ -53,6 +55,7 @@ export function ChatView({
   selectedArtifactId,
   onSendMessage,
   onApprove,
+  onDecline,
   onWorkflowClick,
   onArtifactClick,
   isLoading,
@@ -150,6 +153,19 @@ export function ChatView({
                 />
               </div>
 
+              {/* Action Plan Card */}
+              {message.actionPlan && (
+                <div className="mt-4">
+                  <ActionCard
+                    plan={message.actionPlan}
+                    workflow={message.workflow}
+                    onApprove={() => onApprove(message.id)}
+                    onDecline={() => onDecline(message.id)}
+                    onWorkflowClick={onWorkflowClick}
+                  />
+                </div>
+              )}
+
               {/* Artifact cards */}
               {message.artifactIds && message.artifactIds.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -168,7 +184,8 @@ export function ChatView({
                 </div>
               )}
 
-              {message.workflow && (
+              {/* Standalone workflow card (only if no actionPlan) */}
+              {message.workflow && !message.actionPlan && (
                 <div
                   onClick={() => onWorkflowClick(message.workflow!.id)}
                   className="mt-4 flex w-full items-center gap-3 rounded-lg border border-border p-3 text-left transition-colors hover:bg-accent cursor-pointer"

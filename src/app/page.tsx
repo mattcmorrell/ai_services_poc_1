@@ -12,9 +12,10 @@ import { mockClients, mockChats } from "@/data/mock-data";
 import { mockAgentAttention, mockTodos, suggestedActions } from "@/data/dashboard-data";
 import { mockAgents } from "@/data/agents-data";
 import { defaultPayrollWorkflow } from "@/data/workflow-data";
-import { Message, Chat, Client, Artifact } from "@/types/chat";
+import { Message, Chat, Client, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactPanel } from "@/components/artifacts/artifact-panel";
 import { parseArtifacts } from "@/lib/artifact-parser";
+import { parseActionPlan } from "@/lib/action-plan-parser";
 import { Agent } from "@/types/agent";
 
 export default function Home() {
@@ -76,27 +77,47 @@ export default function Home() {
         const data = await response.json();
 
         // Parse artifacts from LLM response
-        const { content: parsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
+        const { content: artifactParsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
+
+        // Parse action plan from LLM response
+        const actionPlanResult = parseActionPlan(artifactParsedContent);
+        const finalContent = actionPlanResult?.cleanedContent || artifactParsedContent;
+        const actionPlan = actionPlanResult?.plan;
 
         const assistantMessage: Message = {
           id: `msg-${Date.now() + 1}`,
           role: "assistant",
-          content: parsedContent,
+          content: finalContent,
           artifactIds: newArtifacts.map((a) => a.id),
+          actionPlan,
           timestamp: new Date(),
         };
 
         setChats((prev) =>
-          prev.map((chat) =>
-            chat.id === selectedChatId
-              ? {
-                  ...chat,
-                  messages: [...chat.messages, assistantMessage],
-                  artifacts: [...chat.artifacts, ...newArtifacts],
-                  updatedAt: new Date(),
+          prev.map((chat) => {
+            if (chat.id !== selectedChatId) return chat;
+
+            // If new action plan, auto-decline any pending plans in previous messages
+            let updatedMessages = chat.messages;
+            if (actionPlan) {
+              updatedMessages = chat.messages.map((msg) => {
+                if (msg.actionPlan && msg.actionPlan.status === "pending") {
+                  return {
+                    ...msg,
+                    actionPlan: { ...msg.actionPlan, status: "declined" as const },
+                  };
                 }
-              : chat
-          )
+                return msg;
+              });
+            }
+
+            return {
+              ...chat,
+              messages: [...updatedMessages, assistantMessage],
+              artifacts: [...chat.artifacts, ...newArtifacts],
+              updatedAt: new Date(),
+            };
+          })
         );
       } catch (error) {
         console.error("Failed to send message:", error);
@@ -116,13 +137,143 @@ export default function Home() {
           chat.id === selectedChatId
             ? {
                 ...chat,
-                messages: chat.messages.map((msg) =>
-                  msg.id === messageId ? { ...msg, approved: true } : msg
-                ),
+                messages: chat.messages.map((msg) => {
+                  if (msg.id !== messageId) return msg;
+                  if (msg.actionPlan) {
+                    // Start execution simulation
+                    const updatedPlan = { ...msg.actionPlan, status: "approved" as const };
+                    simulateExecution(messageId, updatedPlan);
+                    return { ...msg, actionPlan: updatedPlan, approved: true };
+                  }
+                  return { ...msg, approved: true };
+                }),
               }
             : chat
         )
       );
+    },
+    [selectedChatId]
+  );
+
+  const handleDecline = useCallback(
+    (messageId: string) => {
+      if (!selectedChatId) return;
+
+      setChats((prev) =>
+        prev.map((chat) =>
+          chat.id === selectedChatId
+            ? {
+                ...chat,
+                messages: chat.messages.map((msg) => {
+                  if (msg.id !== messageId) return msg;
+                  if (msg.actionPlan) {
+                    return {
+                      ...msg,
+                      actionPlan: { ...msg.actionPlan, status: "declined" as const },
+                    };
+                  }
+                  return msg;
+                }),
+              }
+            : chat
+        )
+      );
+    },
+    [selectedChatId]
+  );
+
+  const simulateExecution = useCallback(
+    (messageId: string, plan: ActionPlan) => {
+      const steps = plan.steps;
+      let currentStep = 0;
+
+      const executeStep = () => {
+        if (currentStep >= steps.length) {
+          // All steps completed
+          setChats((prev) =>
+            prev.map((chat) =>
+              chat.id === selectedChatId
+                ? {
+                    ...chat,
+                    messages: chat.messages.map((msg) => {
+                      if (msg.id !== messageId || !msg.actionPlan) return msg;
+                      return {
+                        ...msg,
+                        actionPlan: {
+                          ...msg.actionPlan,
+                          status: "completed" as const,
+                          completionSummary: `${plan.metadata?.affectedCount || 0} ${plan.metadata?.affectedLabel || "items"} processed successfully.`,
+                        },
+                      };
+                    }),
+                  }
+                : chat
+            )
+          );
+          return;
+        }
+
+        // Update current step to in_progress
+        setChats((prev) =>
+          prev.map((chat) =>
+            chat.id === selectedChatId
+              ? {
+                  ...chat,
+                  messages: chat.messages.map((msg) => {
+                    if (msg.id !== messageId || !msg.actionPlan) return msg;
+                    return {
+                      ...msg,
+                      actionPlan: {
+                        ...msg.actionPlan,
+                        status: "executing" as const,
+                        steps: msg.actionPlan.steps.map((step, idx) => ({
+                          ...step,
+                          status:
+                            idx < currentStep
+                              ? "completed"
+                              : idx === currentStep
+                              ? "in_progress"
+                              : "pending",
+                        })),
+                      },
+                    };
+                  }),
+                }
+              : chat
+          )
+        );
+
+        // After delay, mark step as completed and move to next
+        setTimeout(() => {
+          setChats((prev) =>
+            prev.map((chat) =>
+              chat.id === selectedChatId
+                ? {
+                    ...chat,
+                    messages: chat.messages.map((msg) => {
+                      if (msg.id !== messageId || !msg.actionPlan) return msg;
+                      return {
+                        ...msg,
+                        actionPlan: {
+                          ...msg.actionPlan,
+                          steps: msg.actionPlan.steps.map((step, idx) => ({
+                            ...step,
+                            status: idx <= currentStep ? "completed" : step.status,
+                          })),
+                        },
+                      };
+                    }),
+                  }
+                : chat
+            )
+          );
+          currentStep++;
+          executeStep();
+        }, 1000);
+      };
+
+      // Start execution after a brief delay
+      setTimeout(executeStep, 500);
     },
     [selectedChatId]
   );
@@ -206,13 +357,19 @@ export default function Home() {
         const data = await response.json();
 
         // Parse artifacts from LLM response
-        const { content: parsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
+        const { content: artifactParsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
+
+        // Parse action plan from LLM response
+        const actionPlanResult = parseActionPlan(artifactParsedContent);
+        const finalContent = actionPlanResult?.cleanedContent || artifactParsedContent;
+        const actionPlan = actionPlanResult?.plan;
 
         const assistantMessage: Message = {
           id: `msg-${Date.now() + 1}`,
           role: "assistant",
-          content: parsedContent,
+          content: finalContent,
           artifactIds: newArtifacts.map((a) => a.id),
+          actionPlan,
           timestamp: new Date(),
         };
 
@@ -307,6 +464,7 @@ export default function Home() {
               selectedArtifactId={selectedArtifactId}
               onSendMessage={handleSendMessage}
               onApprove={handleApprove}
+              onDecline={handleDecline}
               onWorkflowClick={handleWorkflowClick}
               onArtifactClick={setSelectedArtifactId}
               isLoading={isLoading}

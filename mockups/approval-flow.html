@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approval Flow Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: 'hsl(240 10% 3.9%)',
+            foreground: 'hsl(0 0% 98%)',
+            card: 'hsl(240 10% 3.9%)',
+            'card-foreground': 'hsl(0 0% 98%)',
+            primary: 'hsl(0 0% 98%)',
+            'primary-foreground': 'hsl(240 5.9% 10%)',
+            secondary: 'hsl(240 3.7% 15.9%)',
+            'secondary-foreground': 'hsl(0 0% 98%)',
+            muted: 'hsl(240 3.7% 15.9%)',
+            'muted-foreground': 'hsl(240 5% 64.9%)',
+            accent: 'hsl(240 3.7% 15.9%)',
+            'accent-foreground': 'hsl(0 0% 98%)',
+            destructive: 'hsl(0 62.8% 30.6%)',
+            'destructive-foreground': 'hsl(0 0% 98%)',
+            border: 'hsl(240 3.7% 15.9%)',
+            ring: 'hsl(240 4.9% 83.9%)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: hsl(240 10% 3.9%);
+      color: hsl(0 0% 98%);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    
+    .action-card {
+      background: hsl(240 3.7% 10%);
+      border: 1px solid hsl(240 3.7% 20%);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 500px;
+    }
+    
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 8px 0;
+    }
+    
+    .step-number {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: hsl(240 3.7% 20%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    
+    .step-number.completed {
+      background: hsl(142 76% 36%);
+      color: white;
+    }
+    
+    .step-number.in-progress {
+      background: hsl(217 91% 60%);
+      color: white;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    .btn-approve {
+      background: hsl(0 0% 98%);
+      color: hsl(240 5.9% 10%);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+    }
+    
+    .btn-approve:hover {
+      opacity: 0.9;
+    }
+    
+    .btn-decline {
+      background: transparent;
+      color: hsl(240 5% 64.9%);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border: 1px solid hsl(240 3.7% 25%);
+      transition: all 0.2s;
+    }
+    
+    .btn-decline:hover {
+      background: hsl(0 62.8% 20%);
+      border-color: hsl(0 62.8% 30%);
+      color: hsl(0 0% 98%);
+    }
+    
+    .btn-approved {
+      background: hsl(142 76% 36%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: default;
+      border: none;
+    }
+    
+    .btn-declined {
+      background: hsl(0 62.8% 30.6%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: default;
+      border: none;
+    }
+    
+    .metadata-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: hsl(240 5% 64.9%);
+    }
+    
+    .workflow-card {
+      background: hsl(240 3.7% 10%);
+      border: 1px solid hsl(240 3.7% 20%);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      max-width: 500px;
+    }
+    
+    .workflow-card:hover {
+      background: hsl(240 3.7% 15%);
+    }
+    
+    .workflow-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: hsl(240 3.7% 20%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .declined-prompt {
+      background: hsl(240 3.7% 8%);
+      border: 1px solid hsl(240 3.7% 20%);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 12px;
+      font-size: 14px;
+      color: hsl(240 5% 64.9%);
+    }
+    
+    .success-banner {
+      background: hsl(142 76% 20%);
+      border: 1px solid hsl(142 76% 30%);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: hsl(142 76% 80%);
+    }
+    
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid hsl(240 3.7% 20%);
+    }
+  </style>
+</head>
+<body class="p-8">
+  <div class="max-w-4xl mx-auto space-y-16">
+    
+    <!-- STATE 1: Pending Approval -->
+    <section>
+      <h2 class="section-title">State 1: Pending Approval</h2>
+      
+      <div class="action-card">
+        <div class="flex items-start justify-between mb-3">
+          <h3 class="text-lg font-semibold">Run January Payroll</h3>
+          <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        
+        <p class="text-sm text-muted-foreground mb-4">
+          Process payroll for all active employees at Black Mesa for the January pay period.
+        </p>
+        
+        <div class="flex gap-4 mb-4">
+          <div class="metadata-item">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span>47 employees</span>
+          </div>
+          <div class="metadata-item">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>~5 min</span>
+          </div>
+        </div>
+        
+        <div class="border-t border-border pt-4 mb-4">
+          <div class="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Steps</div>
+          
+          <div class="step-item">
+            <div class="step-number">1</div>
+            <div class="text-sm">Collect and validate employee hours and salary data</div>
+          </div>
+          
+          <div class="step-item">
+            <div class="step-number">2</div>
+            <div class="text-sm">Calculate gross pay, deductions, and net pay</div>
+          </div>
+          
+          <div class="step-item">
+            <div class="step-number">3</div>
+            <div class="text-sm">Process direct deposits and generate pay stubs</div>
+          </div>
+          
+          <div class="step-item">
+            <div class="step-number">4</div>
+            <div class="text-sm">Report and remit payroll taxes</div>
+          </div>
+        </div>
+        
+        <div class="flex gap-3">
+          <button class="btn-approve">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Approve
+          </button>
+          <button class="btn-decline">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            Decline
+          </button>
+        </div>
+      </div>
+      
+      <div class="workflow-card mt-4">
+        <div class="workflow-icon">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <div class="font-medium text-sm">Black Mesa Payroll Workflow</div>
+          <div class="text-xs text-muted-foreground">View detailed workflow</div>
+        </div>
+        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+    </section>
+    
+    <!-- STATE 2: Executing (In Progress) -->
+    <section>
+      <h2 class="section-title">State 2: Executing (In Progress)</h2>
+      
+      <div class="action-card">
+        <div class="flex items-start justify-between mb-3">
+          <h3 class="text-lg font-semibold">Run January Payroll</h3>
+          <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        
+        <p class="text-sm text-muted-foreground mb-4">
+          Process payroll for all active employees at Black Mesa for the January pay period.
+        </p>
+        
+        <div class="flex gap-4 mb-4">
+          <div class="metadata-item">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span>47 employees</span>
+          </div>
+          <div class="metadata-item">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>~5 min</span>
+          </div>
+        </div>
+        
+        <div class="border-t border-border pt-4 mb-4">
+          <div class="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Steps</div>
+          
+          <div class="step-item">
+            <div class="step-number completed">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div class="text-sm">Collect and validate employee hours and salary data</div>
+          </div>
+          
+          <div class="step-item">
+            <div class="step-number completed">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div class="text-sm">Calculate gross pay, deductions, and net pay</div>
+          </div>
+          
+          <div class="step-item">
+            <div class="step-number in-progress">3</div>
+            <div class="text-sm">Process direct deposits and generate pay stubs</div>
+          </div>
+          
+          <div class="step-item">
+            <div class="step-number">4</div>
+            <div class="text-sm text-muted-foreground">Report and remit payroll taxes</div>
+          </div>
+        </div>
+        
+        <div class="flex gap-3">
+          <button class="btn-approved">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Approved
+          </button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- STATE 3: Completed -->
+    <section>
+      <h2 class="section-title">State 3: Completed</h2>
+      
+      <div class="action-card">
+        <div class="flex items-start justify-between mb-3">
+          <h3 class="text-lg font-semibold">Run January Payroll</h3>
+          <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        
+        <p class="text-sm text-muted-foreground mb-4">
+          Process payroll for all active employees at Black Mesa for the January pay period.
+        </p>
+        
+        <div class="flex gap-4 mb-4">
+          <div class="metadata-item">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span>47 employees</span>
+          </div>
+          <div class="metadata-item">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Completed in 4m 32s</span>
+          </div>
+        </div>
+        
+        <div class="border-t border-border pt-4 mb-4">
+          <div class="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Steps</div>
+          
+          <div class="step-item">
+            <div class="step-number completed">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div class="text-sm">Collect and validate employee hours and salary data</div>
+          </div>
+          
+          <div class="step-item">
+            <div class="step-number completed">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div class="text-sm">Calculate gross pay, deductions, and net pay</div>
+          </div>
+          
+          <div class="step-item">
+            <div class="step-number completed">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div class="text-sm">Process direct deposits and generate pay stubs</div>
+          </div>
+          
+          <div class="step-item">
+            <div class="step-number completed">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div class="text-sm">Report and remit payroll taxes</div>
+          </div>
+        </div>
+        
+        <div class="success-banner">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>Payroll completed successfully. 47 employees paid, $284,392.18 total disbursed.</span>
+        </div>
+      </div>
+    </section>
+    
+    <!-- STATE 4: Declined -->
+    <section>
+      <h2 class="section-title">State 4: Declined</h2>
+      
+      <div class="action-card" style="opacity: 0.7;">
+        <div class="flex items-start justify-between mb-3">
+          <h3 class="text-lg font-semibold">Run January Payroll</h3>
+          <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        
+        <p class="text-sm text-muted-foreground mb-4">
+          Process payroll for all active employees at Black Mesa for the January pay period.
+        </p>
+        
+        <div class="flex gap-4 mb-4">
+          <div class="metadata-item">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span>47 employees</span>
+          </div>
+          <div class="metadata-item">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>~5 min</span>
+          </div>
+        </div>
+        
+        <div class="border-t border-border pt-4 mb-4">
+          <div class="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Steps</div>
+          
+          <div class="step-item opacity-50">
+            <div class="step-number">1</div>
+            <div class="text-sm">Collect and validate employee hours and salary data</div>
+          </div>
+          
+          <div class="step-item opacity-50">
+            <div class="step-number">2</div>
+            <div class="text-sm">Calculate gross pay, deductions, and net pay</div>
+          </div>
+          
+          <div class="step-item opacity-50">
+            <div class="step-number">3</div>
+            <div class="text-sm">Process direct deposits and generate pay stubs</div>
+          </div>
+          
+          <div class="step-item opacity-50">
+            <div class="step-number">4</div>
+            <div class="text-sm">Report and remit payroll taxes</div>
+          </div>
+        </div>
+        
+        <div class="flex gap-3">
+          <button class="btn-declined">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            Declined
+          </button>
+        </div>
+        
+        <div class="declined-prompt">
+          <p>This plan was declined. What would you like me to change?</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Interactive Demo -->
+    <section>
+      <h2 class="section-title">Interactive Demo</h2>
+      
+      <div class="action-card" id="demo-card">
+        <div class="flex items-start justify-between mb-3">
+          <h3 class="text-lg font-semibold">Run January Payroll</h3>
+          <svg id="demo-status-icon" class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        
+        <p class="text-sm text-muted-foreground mb-4">
+          Process payroll for all active employees at Black Mesa for the January pay period.
+        </p>
+        
+        <div class="flex gap-4 mb-4">
+          <div class="metadata-item">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span>47 employees</span>
+          </div>
+          <div class="metadata-item" id="demo-time">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>~5 min</span>
+          </div>
+        </div>
+        
+        <div class="border-t border-border pt-4 mb-4">
+          <div class="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Steps</div>
+          
+          <div class="step-item" id="demo-step-1">
+            <div class="step-number" id="demo-step-1-num">1</div>
+            <div class="text-sm">Collect and validate employee hours and salary data</div>
+          </div>
+          
+          <div class="step-item" id="demo-step-2">
+            <div class="step-number" id="demo-step-2-num">2</div>
+            <div class="text-sm">Calculate gross pay, deductions, and net pay</div>
+          </div>
+          
+          <div class="step-item" id="demo-step-3">
+            <div class="step-number" id="demo-step-3-num">3</div>
+            <div class="text-sm">Process direct deposits and generate pay stubs</div>
+          </div>
+          
+          <div class="step-item" id="demo-step-4">
+            <div class="step-number" id="demo-step-4-num">4</div>
+            <div class="text-sm">Report and remit payroll taxes</div>
+          </div>
+        </div>
+        
+        <div id="demo-buttons" class="flex gap-3">
+          <button class="btn-approve" onclick="handleApprove()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Approve
+          </button>
+          <button class="btn-decline" onclick="handleDecline()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            Decline
+          </button>
+        </div>
+        
+        <div id="demo-declined-prompt" class="declined-prompt" style="display: none;">
+          <p>This plan was declined. What would you like me to change?</p>
+        </div>
+        
+        <div id="demo-success-banner" class="success-banner" style="display: none; margin-top: 16px;">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>Payroll completed successfully. 47 employees paid, $284,392.18 total disbursed.</span>
+        </div>
+      </div>
+      
+      <button onclick="resetDemo()" class="mt-4 text-sm text-muted-foreground hover:text-foreground underline">
+        Reset Demo
+      </button>
+    </section>
+    
+  </div>
+  
+  <script>
+    const checkmarkSvg = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+    </svg>`;
+    
+    function handleApprove() {
+      const buttonsDiv = document.getElementById('demo-buttons');
+      buttonsDiv.innerHTML = `
+        <button class="btn-approved">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Approved
+        </button>
+      `;
+      
+      // Animate steps
+      setTimeout(() => completeStep(1), 500);
+      setTimeout(() => completeStep(2), 1500);
+      setTimeout(() => {
+        setStepInProgress(3);
+      }, 1500);
+      setTimeout(() => completeStep(3), 3000);
+      setTimeout(() => {
+        setStepInProgress(4);
+      }, 3000);
+      setTimeout(() => {
+        completeStep(4);
+        showSuccess();
+      }, 4500);
+    }
+    
+    function completeStep(num) {
+      const stepNum = document.getElementById(`demo-step-${num}-num`);
+      stepNum.classList.add('completed');
+      stepNum.classList.remove('in-progress');
+      stepNum.innerHTML = checkmarkSvg;
+    }
+    
+    function setStepInProgress(num) {
+      const stepNum = document.getElementById(`demo-step-${num}-num`);
+      stepNum.classList.add('in-progress');
+    }
+    
+    function showSuccess() {
+      document.getElementById('demo-success-banner').style.display = 'flex';
+      document.getElementById('demo-status-icon').outerHTML = `
+        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      `;
+      document.getElementById('demo-time').innerHTML = `
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Completed in 4m 32s</span>
+      `;
+    }
+    
+    function handleDecline() {
+      const card = document.getElementById('demo-card');
+      card.style.opacity = '0.7';
+      
+      const buttonsDiv = document.getElementById('demo-buttons');
+      buttonsDiv.innerHTML = `
+        <button class="btn-declined">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          Declined
+        </button>
+      `;
+      
+      document.getElementById('demo-declined-prompt').style.display = 'block';
+      
+      // Dim steps
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById(`demo-step-${i}`).style.opacity = '0.5';
+      }
+      
+      document.getElementById('demo-status-icon').outerHTML = `
+        <svg id="demo-status-icon" class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      `;
+    }
+    
+    function resetDemo() {
+      const card = document.getElementById('demo-card');
+      card.style.opacity = '1';
+      
+      const buttonsDiv = document.getElementById('demo-buttons');
+      buttonsDiv.innerHTML = `
+        <button class="btn-approve" onclick="handleApprove()">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Approve
+        </button>
+        <button class="btn-decline" onclick="handleDecline()">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          Decline
+        </button>
+      `;
+      
+      document.getElementById('demo-declined-prompt').style.display = 'none';
+      document.getElementById('demo-success-banner').style.display = 'none';
+      
+      // Reset steps
+      for (let i = 1; i <= 4; i++) {
+        const step = document.getElementById(`demo-step-${i}`);
+        step.style.opacity = '1';
+        const stepNum = document.getElementById(`demo-step-${i}-num`);
+        stepNum.className = 'step-number';
+        stepNum.innerHTML = i;
+      }
+      
+      document.getElementById('demo-status-icon').outerHTML = `
+        <svg id="demo-status-icon" class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      `;
+      
+      document.getElementById('demo-time').innerHTML = `
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>~5 min</span>
+      `;
+    }
+  </script>
+</body>
+</html>

@@ -4,6 +4,26 @@ export interface Client {
   unreadCount: number;
 }
 
+export interface ActionPlanStep {
+  id: string;
+  description: string;
+  status: "pending" | "in_progress" | "completed";
+}
+
+export interface ActionPlan {
+  id: string;
+  title: string;
+  description: string;
+  steps: ActionPlanStep[];
+  metadata?: {
+    affectedCount?: number;
+    affectedLabel?: string; // e.g., "employees", "records"
+    estimatedTime?: string; // e.g., "~5 min"
+  };
+  status: "pending" | "approved" | "executing" | "completed" | "declined";
+  completionSummary?: string; // e.g., "47 employees paid, $284,392.18 total disbursed"
+}
+
 export interface Message {
   id: string;
   role: "user" | "assistant";
@@ -14,6 +34,7 @@ export interface Message {
     name: string;
     description: string;
   };
+  actionPlan?: ActionPlan;
   artifactIds?: string[]; // References to artifacts created in this message
   requiresApproval?: boolean;
   approved?: boolean;

@@ -1,4 +1,4 @@
-import { Client, Message, Chat, Artifact } from "@/types/chat";
+import { Client, Message, Chat, Artifact, ActionPlan } from "@/types/chat";
 
 export const mockClients: Client[] = [
   { id: "1", name: "Aperture Science", unreadCount: 6 },
@@ -42,37 +42,48 @@ const onboardingArtifact: Artifact = {
   updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
 };
 
+const payrollActionPlan: ActionPlan = {
+  id: "plan-1",
+  title: "Run January Payroll",
+  description: "Process payroll for all active employees at Black Mesa for the January pay period.",
+  steps: [
+    { id: "step-1", description: "Collect and validate employee hours and salary data", status: "pending" },
+    { id: "step-2", description: "Calculate gross pay, deductions, and net pay", status: "pending" },
+    { id: "step-3", description: "Process direct deposits and generate pay stubs", status: "pending" },
+    { id: "step-4", description: "Report and remit payroll taxes", status: "pending" },
+  ],
+  metadata: {
+    affectedCount: 47,
+    affectedLabel: "employees",
+    estimatedTime: "~5 min",
+  },
+  status: "pending",
+};
+
 const payrollMessages: Message[] = [
+  {
+    id: "msg-0",
+    role: "user",
+    content: "Run payroll for January",
+    timestamp: new Date(Date.now() - 5 * 60 * 1000),
+  },
   {
     id: "msg-1",
     role: "assistant",
-    content: `I'm ready to run payroll for Black Mesa. Here's my plan:
-
-1. **Collect and Validate Data.** Gather all necessary input for the pay period, including employee hours worked, any changes in salary, and information about bonuses or commissions. This step also requires confirming that all tax withholding forms (like the W-4) and benefit deductions are accurate and current.
-
-2. **Calculate Gross and Net Pay.** Determine the employee's gross pay before any deductions are taken out. Subsequently, calculate and subtract all mandatory deductions (federal/state taxes, FICA) and voluntary deductions (401(k), health insurance) to arrive at the final net pay.
-
-3. **Disburse Payments and Provide Stubs.** Process the payment of the calculated net pay to the employees, usually through direct deposit or a physical check. Simultaneously, distribute a detailed pay stub to each employee showing a breakdown of their gross pay, all deductions, and final take-home amount.
-
-4. **Report and Remit Taxes.** Deposit the withheld employee taxes and the employer's share of payroll taxes (like FICA match and unemployment taxes) to the proper government agencies by their deadlines. Finally, complete and file all required reports, such as quarterly Form 941 and annual W-2 forms.
-
-Double check my work if you want, and approve when you're ready. I'll start as soon as it's approved.`,
+    content: "I'll run the January payroll for Black Mesa. Here's my plan - please review and approve when ready:",
     thinking: `The user is asking me to run payroll for Black Mesa Inc. This is a complex multi-step process that involves:
 1. Data collection and validation
 2. Payroll calculations
 3. Payment processing
 4. Tax reporting
 
-I should break this down into clear steps and present a plan for approval before executing. This gives the HR consultant visibility into what I'm about to do and allows them to catch any issues before they become problems.
-
-Let me structure this as a numbered list with clear explanations of each step...`,
+I should break this down into clear steps and present a plan for approval before executing. This gives the HR consultant visibility into what I'm about to do and allows them to catch any issues before they become problems.`,
+    actionPlan: payrollActionPlan,
     workflow: {
       id: "wf-1",
       name: "Black Mesa Payroll Workflow",
-      description: "See workflow",
+      description: "View detailed workflow",
     },
-    requiresApproval: true,
-    approved: false,
     timestamp: new Date(),
   },
 ];
