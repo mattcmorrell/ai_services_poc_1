@@ -1,4 +1,4 @@
-import { Client, Message, Chat } from "@/types/chat";
+import { Client, Message, Chat, Artifact } from "@/types/chat";
 
 export const mockClients: Client[] = [
   { id: "1", name: "Aperture Science", unreadCount: 6 },
@@ -8,6 +8,39 @@ export const mockClients: Client[] = [
   { id: "5", name: "Cyberdyne Systems", unreadCount: 0 },
   { id: "6", name: "Tyrell Corporation", unreadCount: 2 },
 ];
+
+const onboardingArtifact: Artifact = {
+  id: "artifact-1",
+  title: "New Employee Onboarding Checklist",
+  type: "list",
+  content: `## Pre-Start Date
+- [ ] Send offer letter and employment contract
+- [ ] Initiate background check
+- [ ] Set up workstation and equipment
+- [ ] Create email and system accounts
+- [ ] Prepare welcome packet
+
+## First Day
+- [ ] Office tour and introductions
+- [ ] Review company policies and handbook
+- [ ] Complete I-9 and W-4 forms
+- [ ] Set up direct deposit
+- [ ] Assign mentor/buddy
+
+## First Week
+- [ ] Benefits enrollment orientation
+- [ ] IT systems training
+- [ ] Department-specific onboarding
+- [ ] Schedule 30/60/90 day check-ins
+- [ ] Review job responsibilities and expectations
+
+## First Month
+- [ ] Complete all required compliance training
+- [ ] First performance check-in
+- [ ] Gather initial feedback`,
+  createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+  updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+};
 
 const payrollMessages: Message[] = [
   {
@@ -41,6 +74,26 @@ Let me structure this as a numbered list with clear explanations of each step...
     requiresApproval: true,
     approved: false,
     timestamp: new Date(),
+  },
+];
+
+const newHireMessages: Message[] = [
+  {
+    id: "msg-nh-1",
+    role: "user",
+    content: "Can you create an onboarding checklist for Dr. Freeman?",
+    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
+  },
+  {
+    id: "msg-nh-2",
+    role: "assistant",
+    content: `I've created a comprehensive onboarding checklist for Dr. Freeman. This covers everything from pre-start preparations through the first month of employment.
+
+[ARTIFACT:artifact-1]
+
+Let me know if you'd like me to customize any of these items for Dr. Freeman's specific role in the research department.`,
+    artifactIds: ["artifact-1"],
+    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
   },
 ];
 
@@ -78,9 +131,9 @@ export const mockChats: Chat[] = [
     clientId: "4",
     title: "New Hire: Dr. Freeman",
     hasUnread: true,
-    updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-    messages: [],
-    artifacts: [],
+    updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+    messages: newHireMessages,
+    artifacts: [onboardingArtifact],
   },
   // Aperture Science chats
   {
