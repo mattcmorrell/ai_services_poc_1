@@ -48,13 +48,18 @@ export function DashboardInput({ clients, onSend }: DashboardInputProps) {
         text += node.textContent || "";
       } else if ((node as HTMLElement).classList?.contains("inline-client-chip")) {
         chipPosition = text.length;
+        // Include the client name in the text
+        const chipName = (node as HTMLElement).querySelector(".chip-name");
+        if (chipName && selectedClient) {
+          text += selectedClient.name;
+        }
       } else {
         text += node.textContent || "";
       }
     });
     
     return { text: text.trim(), chipPosition };
-  }, []);
+  }, [selectedClient]);
 
   // Detect @ mention at cursor
   const getAtMentionSearch = useCallback(() => {

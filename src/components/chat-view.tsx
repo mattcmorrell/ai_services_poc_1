@@ -23,7 +23,8 @@ import { cn } from "@/lib/utils";
 import { Client, Message } from "@/types/chat";
 
 interface ChatViewProps {
-  client: Client;
+  client: Client | null;
+  chatTitle: string;
   messages: Message[];
   onSendMessage: (content: string) => void;
   onApprove: (messageId: string) => void;
@@ -42,6 +43,7 @@ const models = [
 
 export function ChatView({
   client,
+  chatTitle,
   messages,
   onSendMessage,
   onApprove,
@@ -86,7 +88,12 @@ export function ChatView({
     <div className="flex h-full flex-1 flex-col bg-background">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border px-6 py-4">
-        <h1 className="text-2xl font-semibold">{client.name}</h1>
+        <div>
+          <h1 className="text-2xl font-semibold">{chatTitle}</h1>
+          {client && (
+            <p className="text-sm text-muted-foreground">{client.name}</p>
+          )}
+        </div>
         <Button variant="ghost" size="icon">
           <MoreHorizontal className="h-5 w-5" />
         </Button>

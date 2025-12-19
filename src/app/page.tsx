@@ -37,7 +37,7 @@ export default function Home() {
 
   const handleSendMessage = useCallback(
     async (content: string) => {
-      if (!selectedChatId || !selectedChat || !selectedClient) return;
+      if (!selectedChatId || !selectedChat) return;
 
       const userMessage: Message = {
         id: `msg-${Date.now()}`,
@@ -64,7 +64,7 @@ export default function Home() {
             messages: [...(selectedChat.messages || []), userMessage].map(
               (m) => ({ role: m.role, content: m.content })
             ),
-            clientName: selectedClient.name,
+            clientName: selectedClient?.name || "Unknown Client",
           }),
         });
 
@@ -152,10 +152,65 @@ export default function Home() {
     setActiveView("chats");
   };
 
-  const handleDashboardMessage = (message: string, client: Client | null, chipPosition: number) => {
-    // For now, just log it - we'll implement this later
-    console.log("Dashboard message:", message, "Client:", client?.name, "Position:", chipPosition);
-  };
+  const handleDashboardMessage = useCallback(
+    async (message: string, client: Client | null, chipPosition: number) => {
+      // Create a new chat
+      const newChatId = `chat-${Date.now()}`;
+      const userMessage: Message = {
+        id: `msg-${Date.now()}`,
+        role: "user",
+        content: message,
+        timestamp: new Date(),
+      };
+
+      const newChat: Chat = {
+        id: newChatId,
+        clientId: client?.id || null,
+        title: "New Chat",
+        hasUnread: false,
+        updatedAt: new Date(),
+        messages: [userMessage],
+      };
+
+      setChats((prev) => [newChat, ...prev]);
+      setSelectedChatId(newChatId);
+      setActiveView("chats");
+      setIsLoading(true);
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: message }],
+            clientName: client?.name || "Unknown Client",
+          }),
+        });
+
+        const data = await response.json();
+
+        const assistantMessage: Message = {
+          id: `msg-${Date.now() + 1}`,
+          role: "assistant",
+          content: data.content,
+          timestamp: new Date(),
+        };
+
+        setChats((prev) =>
+          prev.map((chat) =>
+            chat.id === newChatId
+              ? { ...chat, messages: [...chat.messages, assistantMessage], updatedAt: new Date() }
+              : chat
+          )
+        );
+      } catch (error) {
+        console.error("Failed to send message:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   const handleAgentFromAgentsView = (agentId: string) => {
     // Open client selection dialog
@@ -218,9 +273,10 @@ export default function Home() {
             onSelectChat={setSelectedChatId}
             onNewChat={handleNewChat}
           />
-          {selectedChat && selectedClient ? (
+          {selectedChat ? (
             <ChatView
-              client={selectedClient}
+              client={selectedClient || null}
+              chatTitle={selectedChat.title}
               messages={currentMessages}
               onSendMessage={handleSendMessage}
               onApprove={handleApprove}

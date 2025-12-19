@@ -174,7 +174,7 @@ export function ChatListPanel({
   }, [clients]);
 
   const chatsByClient = useMemo(() => {
-    const map = new Map<string, Chat[]>();
+    const map = new Map<string | null, Chat[]>();
     chats.forEach((chat) => {
       const existing = map.get(chat.clientId) || [];
       existing.push(chat);
@@ -257,7 +257,7 @@ export function ChatListPanel({
               <ChatItem
                 key={chat.id}
                 chat={chat}
-                clientName={clientsMap.get(chat.clientId)?.name}
+                clientName={chat.clientId ? clientsMap.get(chat.clientId)?.name : undefined}
                 isSelected={selectedChatId === chat.id}
                 onSelect={() => onSelectChat(chat.id)}
               />

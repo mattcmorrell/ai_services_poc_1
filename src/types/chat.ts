@@ -21,7 +21,7 @@ export interface Message {
 
 export interface Chat {
   id: string;
-  clientId: string;
+  clientId: string | null;
   title: string;
   hasUnread: boolean;
   updatedAt: Date;
