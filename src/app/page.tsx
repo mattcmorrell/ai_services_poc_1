@@ -12,7 +12,7 @@ import { mockClients, mockChats } from "@/data/mock-data";
 import { mockAgentAttention, mockTodos, suggestedActions } from "@/data/dashboard-data";
 import { mockAgents } from "@/data/agents-data";
 import { defaultPayrollWorkflow } from "@/data/workflow-data";
-import { Message, Chat } from "@/types/chat";
+import { Message, Chat, Client } from "@/types/chat";
 import { Agent } from "@/types/agent";
 
 export default function Home() {
@@ -152,9 +152,9 @@ export default function Home() {
     setActiveView("chats");
   };
 
-  const handleDashboardMessage = (message: string) => {
+  const handleDashboardMessage = (message: string, client: Client | null, chipPosition: number) => {
     // For now, just log it - we'll implement this later
-    console.log("Dashboard message:", message);
+    console.log("Dashboard message:", message, "Client:", client?.name, "Position:", chipPosition);
   };
 
   const handleAgentFromAgentsView = (agentId: string) => {
@@ -198,6 +198,7 @@ export default function Home() {
     if (activeView === "dashboard") {
       return (
         <DashboardView
+          clients={mockClients}
           agents={mockAgentAttention}
           initialTodos={mockTodos}
           suggestedActions={suggestedActions}

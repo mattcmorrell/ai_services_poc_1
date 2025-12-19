@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Chat Input Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .autocomplete-item:hover, .autocomplete-item.selected {
+      background-color: rgb(63 63 70);
+    }
+    .chip {
+      animation: chipIn 0.2s ease-out;
+    }
+    @keyframes chipIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    .message-appear {
+      animation: messageIn 0.3s ease-out;
+    }
+    @keyframes messageIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /* Placeholder for contenteditable */
+    #editable-input:empty:before {
+      content: attr(data-placeholder);
+      color: rgb(120 113 108);
+      pointer-events: none;
+    }
+    /* Style for inline chip */
+    .inline-client-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(37, 99, 235, 0.2);
+      color: rgb(147, 197, 253);
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      font-weight: 600;
+      white-space: nowrap;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+    .inline-client-chip button {
+      display: inline-flex;
+      align-items: center;
+      color: rgb(96, 165, 250);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    .inline-client-chip button:hover {
+      color: rgb(191, 219, 254);
+    }
+  </style>
+</head>
+<body class="bg-stone-900 text-stone-100 min-h-screen p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-2">Dashboard Chat Input Mockup</h1>
+    <p class="text-stone-400 mb-8">Type <span class="text-blue-400">@</span> to mention a client. Press Enter to send and see simulated LLM response with agent.</p>
+
+    <!-- Chat Messages Area -->
+    <div id="messages-container" class="mb-4 space-y-4 min-h-[200px] max-h-[400px] overflow-y-auto">
+      <!-- Messages will appear here -->
+    </div>
+
+    <!-- Chat Input Container -->
+    <div class="bg-stone-800 rounded-xl border border-stone-700 p-4">
+      
+      <!-- Input Area with inline client chip -->
+      <div class="relative">
+        <div id="editable-input" contenteditable="true" class="min-h-[48px] text-stone-100 outline-none text-base" data-placeholder="Ask anything... (type @ to mention a client)"></div>
+        <textarea id="chat-input" class="hidden"></textarea>
+
+        <!-- Autocomplete Dropdown -->
+        <div id="autocomplete-dropdown" class="hidden absolute left-0 right-0 bottom-full mb-2 bg-stone-800 border border-stone-600 rounded-lg shadow-xl overflow-hidden z-50">
+          <div class="text-xs text-stone-400 px-3 py-2 border-b border-stone-700">Clients</div>
+          <div id="autocomplete-list" class="max-h-48 overflow-y-auto">
+            <!-- Autocomplete items will be inserted here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="flex items-center justify-between mt-3 pt-3 border-t border-stone-700">
+        <button class="text-stone-400 hover:text-stone-200 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+        </button>
+        <div class="flex items-center gap-3">
+          <button class="text-stone-400 hover:text-stone-200 text-sm flex items-center gap-1">
+            Gemini 3.0 Thinking
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <button id="send-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium">
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mt-8 p-4 bg-stone-800/50 rounded-lg border border-stone-700">
+      <h2 class="font-semibold mb-2">How to test:</h2>
+      <ul class="text-stone-400 text-sm space-y-1">
+        <li>• Type <span class="text-blue-400">@</span> followed by letters to trigger client autocomplete (e.g., "@Bl" for Black Mesa)</li>
+        <li>• Use <span class="text-blue-400">↑↓</span> arrow keys to navigate, <span class="text-blue-400">Enter</span> or click to select</li>
+        <li>• <span class="text-blue-400">Escape</span> to close dropdown</li>
+        <li>• Click the <span class="text-blue-400">×</span> on the client chip to remove it</li>
+        <li>• Only <span class="text-blue-400">ONE</span> client can be selected at a time</li>
+        <li>• Press <span class="text-blue-400">Enter</span> (without autocomplete open) or click Send to submit</li>
+        <li>• LLM response may include an <span class="text-amber-400">agent indicator</span> - click × to dismiss it</li>
+      </ul>
+    </div>
+
+    <!-- State Display -->
+    <div class="mt-4 p-4 bg-stone-800/50 rounded-lg border border-stone-700">
+      <h2 class="font-semibold mb-2">Current State:</h2>
+      <div class="text-sm font-mono">
+        <div>Selected Client: <span id="state-client" class="text-green-400">null</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock data
+    const clients = [
+      { id: '1', name: 'Aperture Science', icon: '🔬' },
+      { id: '2', name: 'Black Mesa', icon: '🏢' },
+      { id: '3', name: 'Umbrella Corporation', icon: '☂️' },
+      { id: '4', name: 'Weyland-Yutani', icon: '🚀' },
+      { id: '5', name: 'Cyberdyne Systems', icon: '🤖' },
+      { id: '6', name: 'Tyrell Corporation', icon: '👁️' },
+      { id: '7', name: 'Acme Corp', icon: '💥' },
+    ];
+
+    const agents = [
+      { id: 'payroll', name: 'Payroll Runner', icon: '💰', keywords: ['payroll', 'pay', 'salary', 'wages', 'run payroll'] },
+      { id: 'benefits', name: 'Benefits Manager', icon: '🏥', keywords: ['benefits', 'insurance', 'health', '401k', 'enrollment'] },
+      { id: 'onboarding', name: 'Onboarding Assistant', icon: '👋', keywords: ['onboard', 'new hire', 'hire', 'employee', 'orientation'] },
+      { id: 'reports', name: 'Report Generator', icon: '📊', keywords: ['report', 'analytics', 'data', 'metrics', 'summary'] },
+    ];
+
+    // State
+    let selectedClient = null;
+    let autocompleteVisible = false;
+    let selectedIndex = 0;
+    let filteredClients = [];
+    let messages = [];
+
+    // DOM elements
+    const editableInput = document.getElementById('editable-input');
+    const dropdown = document.getElementById('autocomplete-dropdown');
+    const autocompleteList = document.getElementById('autocomplete-list');
+    const messagesContainer = document.getElementById('messages-container');
+    const stateClient = document.getElementById('state-client');
+    const sendBtn = document.getElementById('send-btn');
+
+    // Track the current @ mention range for replacement
+    let atMentionRange = null;
+
+    // Get text content with placeholder for chip position
+    function getTextContentWithChipPosition() {
+      let text = '';
+      let chipPosition = -1;
+      editableInput.childNodes.forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          text += node.textContent;
+        } else if (node.classList?.contains('inline-client-chip')) {
+          chipPosition = text.length;
+          // Don't add chip text to the plain text
+        } else {
+          text += node.textContent;
+        }
+      });
+      return { text: text.trim(), chipPosition };
+    }
+
+    // Detect @ mention pattern at cursor position
+    function getAtMentionSearch() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return null;
+      
+      const range = selection.getRangeAt(0);
+      if (!editableInput.contains(range.startContainer)) return null;
+      
+      // Get text before cursor
+      const node = range.startContainer;
+      if (node.nodeType !== Node.TEXT_NODE) return null;
+      
+      const textBeforeCursor = node.textContent.substring(0, range.startOffset);
+      const match = textBeforeCursor.match(/@([A-Za-z]*)$/);
+      
+      if (match) {
+        // Store the range for later replacement
+        atMentionRange = {
+          node: node,
+          start: range.startOffset - match[0].length,
+          end: range.startOffset
+        };
+        return match[1] || '';
+      }
+      return null;
+    }
+
+    // Filter clients based on search term
+    function filterClients(searchTerm) {
+      if (!searchTerm) return clients;
+      const term = searchTerm.toLowerCase();
+      return clients.filter(c => c.name.toLowerCase().includes(term));
+    }
+
+    // Simulate LLM deciding if an agent is needed
+    function inferAgentFromMessage(text) {
+      const lowerText = text.toLowerCase();
+      for (const agent of agents) {
+        for (const keyword of agent.keywords) {
+          if (lowerText.includes(keyword)) {
+            return agent;
+          }
+        }
+      }
+      return null;
+    }
+
+    // Generate mock LLM response
+    function generateResponse(userMessage, client) {
+      const agent = inferAgentFromMessage(userMessage);
+      
+      if (agent) {
+        // Response with agent
+        const responses = {
+          'payroll': `I'll help you run payroll for ${client ? client.name : 'your client'}. Let me pull up the payroll details and verify everything is ready.`,
+          'benefits': `I can help with benefits management for ${client ? client.name : 'your client'}. Let me check the current enrollment status and options.`,
+          'onboarding': `I'll assist with onboarding for ${client ? client.name : 'your client'}. Let me prepare the necessary documentation and checklists.`,
+          'reports': `I'll generate that report for ${client ? client.name : 'your client'}. Give me a moment to compile the data.`,
+        };
+        return {
+          text: responses[agent.id] || `I'll help you with that for ${client ? client.name : 'your client'}.`,
+          agent: agent
+        };
+      } else {
+        // General response without agent
+        const generalResponses = [
+          `For ${client ? client.name : 'your question'}, here's what I found...`,
+          `Looking at ${client ? client.name + "'s" : 'the'} situation, I'd recommend...`,
+          `Based on ${client ? client.name + "'s" : 'the'} current status, the most important things to focus on are...`,
+        ];
+        return {
+          text: generalResponses[Math.floor(Math.random() * generalResponses.length)],
+          agent: null
+        };
+      }
+    }
+
+    // Render autocomplete dropdown
+    function renderAutocomplete() {
+      autocompleteList.innerHTML = filteredClients.map((client, index) => `
+        <div 
+          class="autocomplete-item px-3 py-2 cursor-pointer flex items-center gap-2 ${index === selectedIndex ? 'selected' : ''}"
+          data-index="${index}"
+        >
+          <span class="text-lg">${client.icon}</span>
+          <span>${client.name}</span>
+        </div>
+      `).join('');
+
+      // Add click handlers
+      autocompleteList.querySelectorAll('.autocomplete-item').forEach(item => {
+        item.addEventListener('click', () => {
+          selectClient(filteredClients[parseInt(item.dataset.index)]);
+        });
+      });
+    }
+
+    // Show autocomplete
+    function showAutocomplete(searchTerm) {
+      filteredClients = filterClients(searchTerm);
+      if (filteredClients.length === 0) {
+        hideAutocomplete();
+        return;
+      }
+      selectedIndex = 0;
+      renderAutocomplete();
+      dropdown.classList.remove('hidden');
+      autocompleteVisible = true;
+    }
+
+    // Hide autocomplete
+    function hideAutocomplete() {
+      dropdown.classList.add('hidden');
+      autocompleteVisible = false;
+      selectedIndex = 0;
+    }
+
+    // Select a client from autocomplete
+    function selectClient(client) {
+      if (!atMentionRange) return;
+      
+      // Remove existing chip if any
+      const existingChip = editableInput.querySelector('.inline-client-chip');
+      if (existingChip) {
+        existingChip.remove();
+      }
+
+      // Replace the @mention text with the chip
+      const { node, start, end } = atMentionRange;
+      const beforeText = node.textContent.substring(0, start);
+      const afterText = node.textContent.substring(end);
+      
+      // Create chip element
+      const chip = document.createElement('span');
+      chip.className = 'inline-client-chip';
+      chip.contentEditable = 'false';
+      chip.innerHTML = `
+        ${client.name}
+        <button onclick="removeClient(event)">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      `;
+      
+      // Replace text node with: beforeText + chip + afterText
+      const beforeNode = document.createTextNode(beforeText);
+      const afterNode = document.createTextNode(afterText + ' ');
+      
+      node.parentNode.insertBefore(beforeNode, node);
+      node.parentNode.insertBefore(chip, node);
+      node.parentNode.insertBefore(afterNode, node);
+      node.remove();
+      
+      // Place cursor after the chip
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.setStart(afterNode, 1);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      selectedClient = client;
+      atMentionRange = null;
+      hideAutocomplete();
+      updateState();
+    }
+
+    // Remove client chip
+    function removeClient(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      const chip = editableInput.querySelector('.inline-client-chip');
+      if (chip) {
+        chip.remove();
+      }
+      selectedClient = null;
+      updateState();
+      editableInput.focus();
+    }
+
+    // Render messages
+    function renderMessages() {
+      messagesContainer.innerHTML = messages.map((msg, index) => {
+        if (msg.role === 'user') {
+          // Reconstruct message with client name inline at the position it was typed
+          let displayText = msg.text;
+          if (msg.client && msg.chipPosition >= 0) {
+            // Insert client name at the exact position where the chip was
+            const before = msg.text.substring(0, msg.chipPosition);
+            const after = msg.text.substring(msg.chipPosition);
+            // Add space before client name if needed
+            const spaceBefore = before.length > 0 && !before.endsWith(' ') ? ' ' : '';
+            displayText = `${before}${spaceBefore}<span class="font-semibold">${msg.client.name}</span>${after}`;
+          } else if (msg.client) {
+            // Fallback: put client at start
+            displayText = `<span class="font-semibold">${msg.client.name}</span> ${msg.text}`;
+          }
+          return `
+            <div class="message-appear flex justify-end">
+              <div class="bg-blue-600 text-white px-4 py-2 rounded-2xl rounded-br-md max-w-[80%]">
+                ${displayText}
+              </div>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="message-appear flex justify-start">
+              <div class="bg-stone-700 text-stone-100 px-4 py-3 rounded-2xl rounded-bl-md max-w-[80%]">
+                ${msg.agent ? `
+                  <div class="flex items-center gap-2 mb-2 pb-2 border-b border-stone-600" id="agent-indicator-${index}">
+                    <span class="text-lg">${msg.agent.icon}</span>
+                    <span class="text-amber-400 text-sm font-medium">${msg.agent.name}</span>
+                    <button onclick="dismissAgent(${index})" class="ml-auto text-stone-400 hover:text-stone-200">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    </button>
+                  </div>
+                ` : ''}
+                ${msg.text}
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+      
+      // Scroll to bottom
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Dismiss agent from a message
+    function dismissAgent(messageIndex) {
+      if (messages[messageIndex]) {
+        messages[messageIndex].agent = null;
+        renderMessages();
+      }
+    }
+
+    // Send message
+    function sendMessage() {
+      const { text, chipPosition } = getTextContentWithChipPosition();
+      if (!text && !selectedClient) return;
+
+      // Add user message with chip position for inline rendering
+      messages.push({
+        role: 'user',
+        text: text || '(no message)',
+        client: selectedClient,
+        chipPosition: chipPosition
+      });
+      renderMessages();
+
+      // Clear input
+      const messageText = text;
+      const messageClient = selectedClient;
+      editableInput.innerHTML = '';
+      selectedClient = null;
+      updateState();
+
+      // Simulate LLM response after delay
+      setTimeout(() => {
+        const response = generateResponse(messageText, messageClient);
+        messages.push({
+          role: 'assistant',
+          text: response.text,
+          agent: response.agent
+        });
+        renderMessages();
+      }, 800);
+    }
+
+    // Update state display
+    function updateState() {
+      stateClient.textContent = selectedClient ? `"${selectedClient.name}"` : 'null';
+    }
+
+    // Input event handler for contenteditable
+    editableInput.addEventListener('input', (e) => {
+      // Check for @ mention
+      const searchTerm = getAtMentionSearch();
+      if (searchTerm !== null && !selectedClient) {
+        showAutocomplete(searchTerm);
+      } else {
+        hideAutocomplete();
+      }
+    });
+
+    // Keyboard navigation
+    editableInput.addEventListener('keydown', (e) => {
+      if (autocompleteVisible) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          selectedIndex = Math.min(selectedIndex + 1, filteredClients.length - 1);
+          renderAutocomplete();
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          selectedIndex = Math.max(selectedIndex - 1, 0);
+          renderAutocomplete();
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (filteredClients[selectedIndex]) {
+            selectClient(filteredClients[selectedIndex]);
+          }
+        } else if (e.key === 'Escape') {
+          hideAutocomplete();
+        }
+      } else {
+        // Send on Enter (without shift)
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      }
+    });
+
+    // Send button click
+    sendBtn.addEventListener('click', sendMessage);
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#editable-input') && !e.target.closest('#autocomplete-dropdown')) {
+        hideAutocomplete();
+      }
+    });
+
+    // Make functions available globally for onclick handlers
+    window.removeClient = removeClient;
+    window.dismissAgent = dismissAgent;
+  </script>
+</body>
+</html>

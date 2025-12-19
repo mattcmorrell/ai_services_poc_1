@@ -7,16 +7,19 @@ import { SuggestedActions } from "./suggested-actions";
 import { AgentsAttention } from "./agents-attention";
 import { TodoList } from "./todo-list";
 import { AgentAttention, TodoItem, SuggestedAction } from "@/types/dashboard";
+import { Client } from "@/types/chat";
 
 interface DashboardViewProps {
+  clients: Client[];
   agents: AgentAttention[];
   initialTodos: TodoItem[];
   suggestedActions: SuggestedAction[];
   onAgentClick: (agentId: string) => void;
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, client: Client | null, chipPosition: number) => void;
 }
 
 export function DashboardView({
+  clients,
   agents,
   initialTodos,
   suggestedActions,
@@ -57,14 +60,14 @@ export function DashboardView({
 
         {/* Input */}
         <div className="mb-4 w-full max-w-2xl">
-          <DashboardInput onSend={onSendMessage} />
+          <DashboardInput clients={clients} onSend={onSendMessage} />
         </div>
 
         {/* Suggested Actions */}
         <div className="mb-8">
           <SuggestedActions
             actions={suggestedActions}
-            onActionClick={onSendMessage}
+            onActionClick={(prompt) => onSendMessage(prompt, null, -1)}
           />
         </div>
 

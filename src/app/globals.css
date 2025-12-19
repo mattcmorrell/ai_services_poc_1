@@ -148,3 +148,37 @@
   scrollbar-width: thin;
   scrollbar-color: oklch(0.4 0 0) transparent;
 }
+
+/* Inline client chip styles */
+.inline-client-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: oklch(0.3 0.1 250 / 0.3);
+  color: oklch(0.8 0.1 250);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid oklch(0.5 0.1 250 / 0.3);
+  font-weight: 600;
+  white-space: nowrap;
+  vertical-align: middle;
+  margin: 0 2px;
+}
+
+.inline-client-chip .chip-name {
+  font-weight: 600;
+}
+
+.inline-client-chip .chip-remove {
+  display: inline-flex;
+  align-items: center;
+  color: oklch(0.7 0.1 250);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.inline-client-chip .chip-remove:hover {
+  color: oklch(0.9 0.1 250);
+}
