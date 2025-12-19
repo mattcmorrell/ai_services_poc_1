@@ -53,6 +53,7 @@ export const mockChats: Chat[] = [
     hasUnread: true,
     updatedAt: new Date(Date.now() - 2 * 60 * 1000), // 2 min ago
     messages: payrollMessages,
+    artifacts: [],
   },
   {
     id: "chat-2",
@@ -61,6 +62,7 @@ export const mockChats: Chat[] = [
     hasUnread: true,
     updatedAt: new Date(Date.now() - 60 * 60 * 1000), // 1 hour ago
     messages: [],
+    artifacts: [],
   },
   {
     id: "chat-3",
@@ -69,6 +71,7 @@ export const mockChats: Chat[] = [
     hasUnread: false,
     updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
     messages: [],
+    artifacts: [],
   },
   {
     id: "chat-4",
@@ -77,6 +80,7 @@ export const mockChats: Chat[] = [
     hasUnread: true,
     updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
     messages: [],
+    artifacts: [],
   },
   // Aperture Science chats
   {
@@ -86,6 +90,7 @@ export const mockChats: Chat[] = [
     hasUnread: true,
     updatedAt: new Date(Date.now() - 30 * 60 * 1000), // 30 min ago
     messages: [],
+    artifacts: [],
   },
   {
     id: "chat-6",
@@ -94,6 +99,7 @@ export const mockChats: Chat[] = [
     hasUnread: false,
     updatedAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
     messages: [],
+    artifacts: [],
   },
   // Umbrella Corporation chats
   {
@@ -103,6 +109,7 @@ export const mockChats: Chat[] = [
     hasUnread: false,
     updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
     messages: [],
+    artifacts: [],
   },
   // Tyrell Corporation chats
   {
@@ -112,6 +119,7 @@ export const mockChats: Chat[] = [
     hasUnread: true,
     updatedAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
     messages: [],
+    artifacts: [],
   },
   // Cyberdyne chats
   {
@@ -121,6 +129,7 @@ export const mockChats: Chat[] = [
     hasUnread: false,
     updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
     messages: [],
+    artifacts: [],
   },
   // Weyland-Yutani chats
   {
@@ -130,6 +139,7 @@ export const mockChats: Chat[] = [
     hasUnread: true,
     updatedAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
     messages: [],
+    artifacts: [],
   },
 ];
 

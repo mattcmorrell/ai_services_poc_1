@@ -12,7 +12,9 @@ import { mockClients, mockChats } from "@/data/mock-data";
 import { mockAgentAttention, mockTodos, suggestedActions } from "@/data/dashboard-data";
 import { mockAgents } from "@/data/agents-data";
 import { defaultPayrollWorkflow } from "@/data/workflow-data";
-import { Message, Chat, Client } from "@/types/chat";
+import { Message, Chat, Client, Artifact } from "@/types/chat";
+import { ArtifactPanel } from "@/components/artifacts/artifact-panel";
+import { parseArtifacts } from "@/lib/artifact-parser";
 import { Agent } from "@/types/agent";
 
 export default function Home() {
@@ -24,6 +26,7 @@ export default function Home() {
   const [clientSelectOpen, setClientSelectOpen] = useState(false);
   const [selectedAgentForClient, setSelectedAgentForClient] = useState<Agent | null>(null);
   const [workflowPanelOpen, setWorkflowPanelOpen] = useState(false);
+  const [selectedArtifactId, setSelectedArtifactId] = useState<string | null>(null);
 
   const selectedChat = useMemo(
     () => chats.find((c) => c.id === selectedChatId),
@@ -34,6 +37,8 @@ export default function Home() {
     [selectedChat]
   );
   const currentMessages = selectedChat?.messages || [];
+  const currentArtifacts = selectedChat?.artifacts || [];
+  const selectedArtifact = currentArtifacts.find((a) => a.id === selectedArtifactId) || null;
 
   const handleSendMessage = useCallback(
     async (content: string) => {
@@ -70,17 +75,26 @@ export default function Home() {
 
         const data = await response.json();
 
+        // Parse artifacts from LLM response
+        const { content: parsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
+
         const assistantMessage: Message = {
           id: `msg-${Date.now() + 1}`,
           role: "assistant",
-          content: data.content,
+          content: parsedContent,
+          artifactIds: newArtifacts.map((a) => a.id),
           timestamp: new Date(),
         };
 
         setChats((prev) =>
           prev.map((chat) =>
             chat.id === selectedChatId
-              ? { ...chat, messages: [...chat.messages, assistantMessage], updatedAt: new Date() }
+              ? {
+                  ...chat,
+                  messages: [...chat.messages, assistantMessage],
+                  artifacts: [...chat.artifacts, ...newArtifacts],
+                  updatedAt: new Date(),
+                }
               : chat
           )
         );
@@ -123,6 +137,7 @@ export default function Home() {
         hasUnread: false,
         updatedAt: new Date(),
         messages: [],
+        artifacts: [],
       };
       setChats((prev) => [newChat, ...prev]);
       setSelectedChatId(newChat.id);
@@ -170,6 +185,7 @@ export default function Home() {
         hasUnread: false,
         updatedAt: new Date(),
         messages: [userMessage],
+        artifacts: [],
       };
 
       setChats((prev) => [newChat, ...prev]);
@@ -189,17 +205,26 @@ export default function Home() {
 
         const data = await response.json();
 
+        // Parse artifacts from LLM response
+        const { content: parsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
+
         const assistantMessage: Message = {
           id: `msg-${Date.now() + 1}`,
           role: "assistant",
-          content: data.content,
+          content: parsedContent,
+          artifactIds: newArtifacts.map((a) => a.id),
           timestamp: new Date(),
         };
 
         setChats((prev) =>
           prev.map((chat) =>
             chat.id === newChatId
-              ? { ...chat, messages: [...chat.messages, assistantMessage], updatedAt: new Date() }
+              ? {
+                  ...chat,
+                  messages: [...chat.messages, assistantMessage],
+                  artifacts: [...chat.artifacts, ...newArtifacts],
+                  updatedAt: new Date(),
+                }
               : chat
           )
         );
@@ -278,9 +303,12 @@ export default function Home() {
               client={selectedClient || null}
               chatTitle={selectedChat.title}
               messages={currentMessages}
+              artifacts={currentArtifacts}
+              selectedArtifactId={selectedArtifactId}
               onSendMessage={handleSendMessage}
               onApprove={handleApprove}
               onWorkflowClick={handleWorkflowClick}
+              onArtifactClick={setSelectedArtifactId}
               isLoading={isLoading}
             />
           ) : (
@@ -288,7 +316,27 @@ export default function Home() {
               Select a chat to start messaging
             </div>
           )}
-          {workflowPanelOpen && (
+          {selectedArtifact && (
+            <ArtifactPanel
+              artifact={selectedArtifact}
+              onClose={() => setSelectedArtifactId(null)}
+              onUpdate={(updatedArtifact) => {
+                setChats((prev) =>
+                  prev.map((chat) =>
+                    chat.id === selectedChatId
+                      ? {
+                          ...chat,
+                          artifacts: chat.artifacts.map((a) =>
+                            a.id === updatedArtifact.id ? updatedArtifact : a
+                          ),
+                        }
+                      : chat
+                  )
+                );
+              }}
+            />
+          )}
+          {workflowPanelOpen && !selectedArtifact && (
             <WorkflowPanel
               workflow={defaultPayrollWorkflow}
               onClose={() => setWorkflowPanelOpen(false)}

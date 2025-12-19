@@ -20,15 +20,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { Client, Message } from "@/types/chat";
+import { Client, Message, Artifact } from "@/types/chat";
+import { ArtifactCard } from "@/components/artifacts/artifact-card";
 
 interface ChatViewProps {
   client: Client | null;
   chatTitle: string;
   messages: Message[];
+  artifacts: Artifact[];
+  selectedArtifactId: string | null;
   onSendMessage: (content: string) => void;
   onApprove: (messageId: string) => void;
   onWorkflowClick: (workflowId: string) => void;
+  onArtifactClick: (artifactId: string) => void;
   isLoading: boolean;
 }
 
@@ -45,9 +49,12 @@ export function ChatView({
   client,
   chatTitle,
   messages,
+  artifacts,
+  selectedArtifactId,
   onSendMessage,
   onApprove,
   onWorkflowClick,
+  onArtifactClick,
   isLoading,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
@@ -142,6 +149,24 @@ export function ChatView({
                   }}
                 />
               </div>
+
+              {/* Artifact cards */}
+              {message.artifactIds && message.artifactIds.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {message.artifactIds.map((artifactId) => {
+                    const artifact = artifacts.find((a) => a.id === artifactId);
+                    if (!artifact) return null;
+                    return (
+                      <ArtifactCard
+                        key={artifact.id}
+                        artifact={artifact}
+                        isSelected={selectedArtifactId === artifact.id}
+                        onClick={() => onArtifactClick(artifact.id)}
+                      />
+                    );
+                  })}
+                </div>
+              )}
 
               {message.workflow && (
                 <div
