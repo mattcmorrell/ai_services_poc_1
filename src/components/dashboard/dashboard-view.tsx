@@ -8,19 +8,22 @@ import { AgentsAttention } from "./agents-attention";
 import { TodoList } from "./todo-list";
 import { AgentAttention, TodoItem, SuggestedAction } from "@/types/dashboard";
 import { Client } from "@/types/chat";
+import { Agent } from "@/types/agent";
 
 interface DashboardViewProps {
   clients: Client[];
   agents: AgentAttention[];
+  allAgents: Agent[];
   initialTodos: TodoItem[];
   suggestedActions: SuggestedAction[];
   onAgentClick: (agentId: string) => void;
-  onSendMessage: (message: string, client: Client | null, chipPosition: number) => void;
+  onSendMessage: (message: string, client: Client | null, chipPosition: number, agentName?: string) => void;
 }
 
 export function DashboardView({
   clients,
   agents,
+  allAgents,
   initialTodos,
   suggestedActions,
   onAgentClick,
@@ -60,7 +63,7 @@ export function DashboardView({
 
         {/* Input */}
         <div className="mb-4 w-full max-w-2xl">
-          <DashboardInput clients={clients} onSend={onSendMessage} />
+          <DashboardInput clients={clients} agents={allAgents} onSend={onSendMessage} />
         </div>
 
         {/* Suggested Actions */}

@@ -319,7 +319,7 @@ export default function Home() {
   };
 
   const handleDashboardMessage = useCallback(
-    async (message: string, client: Client | null, chipPosition: number) => {
+    async (message: string, client: Client | null, chipPosition: number, agentName?: string) => {
       // Create a new chat
       const newChatId = `chat-${Date.now()}`;
       const userMessage: Message = {
@@ -332,7 +332,7 @@ export default function Home() {
       const newChat: Chat = {
         id: newChatId,
         clientId: client?.id || null,
-        title: "New Chat",
+        title: agentName || "New Chat",
         hasUnread: false,
         updatedAt: new Date(),
         messages: [userMessage],
@@ -437,6 +437,7 @@ export default function Home() {
         <DashboardView
           clients={mockClients}
           agents={mockAgentAttention}
+          allAgents={agents}
           initialTodos={mockTodos}
           suggestedActions={suggestedActions}
           onAgentClick={handleAgentClick}
