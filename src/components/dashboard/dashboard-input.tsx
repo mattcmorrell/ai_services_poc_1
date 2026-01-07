@@ -1,40 +1,78 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { Plus, Mic, ChevronDown, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Plus,
+  Mic,
+  X,
+  Search,
+  Banknote,
+  BookOpen,
+  Palmtree,
+  TrendingUp,
+  Users,
+  Calculator,
+  Sparkles,
+  Heart,
+  Clock,
+  Smile,
+  Wrench,
+  Bot,
+  Presentation,
+  Pizza,
+  GraduationCap,
+  PartyPopper,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Client } from "@/types/chat";
+import { Agent } from "@/types/agent";
 import { cn } from "@/lib/utils";
 
 interface DashboardInputProps {
   clients: Client[];
-  onSend: (message: string, client: Client | null, chipPosition: number) => void;
+  agents: Agent[];
+  onSend: (message: string, client: Client | null, chipPosition: number, agentName?: string) => void;
 }
 
-const models = [
-  "GPT-4o",
-  "GPT-4 Turbo",
-  "Claude 3.5 Sonnet",
-  "Claude 3 Opus",
-  "Gemini 1.5 Pro",
-  "Gemini 2.0 Flash",
-];
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  banknote: Banknote,
+  "book-open": BookOpen,
+  "palm-tree": Palmtree,
+  "trending-up": TrendingUp,
+  users: Users,
+  calculator: Calculator,
+  sparkles: Sparkles,
+  heart: Heart,
+  clock: Clock,
+  smile: Smile,
+  wrench: Wrench,
+  bot: Bot,
+  presentation: Presentation,
+  pizza: Pizza,
+  "graduation-cap": GraduationCap,
+  "party-popper": PartyPopper,
+};
 
-export function DashboardInput({ clients, onSend }: DashboardInputProps) {
-  const [selectedModel, setSelectedModel] = useState("GPT-4o");
+export function DashboardInput({ clients, agents, onSend }: DashboardInputProps) {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [autocompleteVisible, setAutocompleteVisible] = useState(false);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [agentSearchQuery, setAgentSearchQuery] = useState("");
   
   const editableRef = useRef<HTMLDivElement>(null);
   const atMentionRangeRef = useRef<{ node: Node; start: number; end: number } | null>(null);
+
+  const filteredAgents = useMemo(() => {
+    if (!agentSearchQuery.trim()) return agents;
+    const query = agentSearchQuery.toLowerCase();
+    return agents.filter((agent) =>
+      agent.name.toLowerCase().includes(query)
+    );
+  }, [agents, agentSearchQuery]);
 
   // Get text content with chip position
   const getTextContentWithChipPosition = useCallback(() => {
@@ -212,15 +250,16 @@ export function DashboardInput({ clients, onSend }: DashboardInputProps) {
   const handleSubmit = useCallback(() => {
     const { text, chipPosition } = getTextContentWithChipPosition();
     if (!text && !selectedClient) return;
-    
-    onSend(text, selectedClient, chipPosition);
-    
+
+    onSend(text, selectedClient, chipPosition, selectedAgent?.name);
+
     // Clear input
     if (editableRef.current) {
       editableRef.current.innerHTML = "";
     }
     setSelectedClient(null);
-  }, [getTextContentWithChipPosition, selectedClient, onSend]);
+    setSelectedAgent(null);
+  }, [getTextContentWithChipPosition, selectedClient, selectedAgent, onSend]);
 
   // Close autocomplete on outside click
   useEffect(() => {
@@ -272,34 +311,107 @@ export function DashboardInput({ clients, onSend }: DashboardInputProps) {
         </div>
         
         <div className="mt-2 flex items-center justify-between">
-          <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
-            <Plus className="h-4 w-4" />
-          </Button>
           <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
-                  {selectedModel}
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {models.map((model) => (
-                  <DropdownMenuItem
-                    key={model}
-                    onClick={() => setSelectedModel(model)}
-                  >
-                    {model}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
-              <Mic className="h-4 w-4" />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setIsAgentModalOpen(true)}
+            >
+              <Plus className="h-4 w-4" />
             </Button>
+            {selectedAgent && (
+              <div className="flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-sm">
+                <span>{selectedAgent.name}</span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedAgent(null)}
+                  className="ml-1 rounded-full hover:bg-muted-foreground/20 p-0.5"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
           </div>
+          <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
+            <Mic className="h-4 w-4" />
+          </Button>
         </div>
       </div>
+
+      {/* Agent Selection Modal */}
+      {isAgentModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={() => {
+            setIsAgentModalOpen(false);
+            setAgentSearchQuery("");
+          }}
+        >
+          <div
+            className="w-full max-w-2xl max-h-[80vh] bg-card border border-border rounded-xl shadow-xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-border px-6 py-4">
+              <h2 className="text-lg font-semibold">Select an Agent</h2>
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={agentSearchQuery}
+                    onChange={(e) => setAgentSearchQuery(e.target.value)}
+                    placeholder="Filter agents..."
+                    className="w-48 pl-9"
+                    autoFocus
+                  />
+                </div>
+                <button
+                  onClick={() => {
+                    setIsAgentModalOpen(false);
+                    setAgentSearchQuery("");
+                  }}
+                  className="rounded-full p-1 hover:bg-muted"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Agent Grid */}
+            <div className="overflow-y-auto p-6 max-h-[60vh]">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+                {filteredAgents.map((agent) => {
+                  const IconComponent = iconMap[agent.icon] || Bot;
+                  return (
+                    <button
+                      key={agent.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedAgent(agent);
+                        setIsAgentModalOpen(false);
+                        setAgentSearchQuery("");
+                      }}
+                      className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 text-left transition-colors hover:bg-accent"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted">
+                        <IconComponent className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-medium text-sm">{agent.name}</div>
+                        <div className="truncate text-xs text-muted-foreground">
+                          {agent.description}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 }
