@@ -17,7 +17,8 @@ interface DashboardViewProps {
   initialTodos: TodoItem[];
   suggestedActions: SuggestedAction[];
   onAgentClick: (agentId: string) => void;
-  onSendMessage: (message: string, client: Client | null, chipPosition: number, agentName?: string) => void;
+  onSendMessage: (message: string, client: Client | null, chipPosition: number) => void;
+  onAgentSelected: (agent: Agent) => void;
 }
 
 export function DashboardView({
@@ -28,6 +29,7 @@ export function DashboardView({
   suggestedActions,
   onAgentClick,
   onSendMessage,
+  onAgentSelected,
 }: DashboardViewProps) {
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos);
 
@@ -63,7 +65,7 @@ export function DashboardView({
 
         {/* Input */}
         <div className="mb-4 w-full max-w-2xl">
-          <DashboardInput clients={clients} agents={allAgents} onSend={onSendMessage} />
+          <DashboardInput clients={clients} agents={allAgents} onSend={onSendMessage} onAgentSelected={onAgentSelected} />
         </div>
 
         {/* Suggested Actions */}

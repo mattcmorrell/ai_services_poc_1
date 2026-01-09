@@ -54,6 +54,7 @@ export interface Artifact {
 export interface Chat {
   id: string;
   clientId: string | null;
+  agentId?: string | null;
   title: string;
   hasUnread: boolean;
   updatedAt: Date;

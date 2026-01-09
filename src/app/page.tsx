@@ -71,6 +71,7 @@ export default function Home() {
               (m) => ({ role: m.role, content: m.content })
             ),
             clientName: selectedClient?.name || "Unknown Client",
+            agentId: selectedChat.agentId,
           }),
         });
 
@@ -319,7 +320,7 @@ export default function Home() {
   };
 
   const handleDashboardMessage = useCallback(
-    async (message: string, client: Client | null, chipPosition: number, agentName?: string) => {
+    async (message: string, client: Client | null, chipPosition: number) => {
       // Create a new chat
       const newChatId = `chat-${Date.now()}`;
       const userMessage: Message = {
@@ -332,7 +333,7 @@ export default function Home() {
       const newChat: Chat = {
         id: newChatId,
         clientId: client?.id || null,
-        title: agentName || "New Chat",
+        title: "New Chat",
         hasUnread: false,
         updatedAt: new Date(),
         messages: [userMessage],
@@ -403,17 +404,56 @@ export default function Home() {
     }
   };
 
-  const handleClientSelectedForAgent = (clientId: string) => {
-    // Find most recent chat for this client or create new one
-    const clientChats = chats.filter((c) => c.clientId === clientId);
-    if (clientChats.length > 0) {
-      const mostRecent = clientChats.sort(
-        (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
-      )[0];
-      setSelectedChatId(mostRecent.id);
-    } else {
-      handleNewChat(clientId);
+  // Handler for when agent is selected from dashboard input
+  const handleAgentSelectedFromDashboard = (agent: Agent) => {
+    setSelectedAgentForClient(agent);
+    setClientSelectOpen(true);
+  };
+
+  const handleClientSelectedForAgent = async (clientId: string) => {
+    const client = mockClients.find((c) => c.id === clientId);
+    const agent = selectedAgentForClient;
+
+    if (agent && client) {
+      // Create new chat with agent greeting
+      const newChatId = `chat-${Date.now()}`;
+
+      // Fetch the agent greeting
+      let greeting = `Hi! I'm here to help with ${agent.name}.`;
+      try {
+        const response = await fetch(`/api/agent-greeting?agentId=${agent.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.greeting) {
+            greeting = data.greeting;
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch agent greeting:", error);
+      }
+
+      const greetingMessage: Message = {
+        id: `msg-${Date.now()}`,
+        role: "assistant",
+        content: greeting,
+        timestamp: new Date(),
+      };
+
+      const newChat: Chat = {
+        id: newChatId,
+        clientId: client.id,
+        agentId: agent.id,
+        title: `${agent.name} - ${client.name}`,
+        hasUnread: false,
+        updatedAt: new Date(),
+        messages: [greetingMessage],
+        artifacts: [],
+      };
+
+      setChats((prev) => [newChat, ...prev]);
+      setSelectedChatId(newChatId);
     }
+
     setClientSelectOpen(false);
     setSelectedAgentForClient(null);
     setActiveView("chats");
@@ -442,6 +482,7 @@ export default function Home() {
           suggestedActions={suggestedActions}
           onAgentClick={handleAgentClick}
           onSendMessage={handleDashboardMessage}
+          onAgentSelected={handleAgentSelectedFromDashboard}
         />
       );
     }

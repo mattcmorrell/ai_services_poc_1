@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { loadAgentPrompt } from "@/lib/prompt-loader";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const systemPrompt = `You are an AI assistant helping BambooHR consultants manage their clients' HR practices. You are knowledgeable about:
+const defaultSystemPrompt = `You are an AI assistant helping BambooHR consultants manage their clients' HR practices. You are knowledgeable about:
 - Payroll processing and tax compliance
 - Employee onboarding and offboarding
 - Benefits administration
@@ -74,7 +75,16 @@ Keep artifact titles concise but descriptive. You can include text before/after 
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, clientName } = await request.json();
+    const { messages, clientName, agentId } = await request.json();
+
+    // Load agent-specific prompt if agentId is provided
+    let systemPrompt = defaultSystemPrompt;
+    if (agentId) {
+      const agentPrompt = loadAgentPrompt(agentId);
+      if (agentPrompt?.systemPrompt) {
+        systemPrompt = agentPrompt.systemPrompt;
+      }
+    }
 
     const formattedMessages = [
       { role: "system" as const, content: systemPrompt + `\n\nYou are currently assisting with the client: ${clientName}` },

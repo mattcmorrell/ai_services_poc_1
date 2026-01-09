@@ -32,7 +32,8 @@ import { cn } from "@/lib/utils";
 interface DashboardInputProps {
   clients: Client[];
   agents: Agent[];
-  onSend: (message: string, client: Client | null, chipPosition: number, agentName?: string) => void;
+  onSend: (message: string, client: Client | null, chipPosition: number) => void;
+  onAgentSelected: (agent: Agent) => void;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -54,13 +55,12 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   "party-popper": PartyPopper,
 };
 
-export function DashboardInput({ clients, agents, onSend }: DashboardInputProps) {
+export function DashboardInput({ clients, agents, onSend, onAgentSelected }: DashboardInputProps) {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [autocompleteVisible, setAutocompleteVisible] = useState(false);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
-  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [agentSearchQuery, setAgentSearchQuery] = useState("");
   
   const editableRef = useRef<HTMLDivElement>(null);
@@ -251,15 +251,14 @@ export function DashboardInput({ clients, agents, onSend }: DashboardInputProps)
     const { text, chipPosition } = getTextContentWithChipPosition();
     if (!text && !selectedClient) return;
 
-    onSend(text, selectedClient, chipPosition, selectedAgent?.name);
+    onSend(text, selectedClient, chipPosition);
 
     // Clear input
     if (editableRef.current) {
       editableRef.current.innerHTML = "";
     }
     setSelectedClient(null);
-    setSelectedAgent(null);
-  }, [getTextContentWithChipPosition, selectedClient, selectedAgent, onSend]);
+  }, [getTextContentWithChipPosition, selectedClient, onSend]);
 
   // Close autocomplete on outside click
   useEffect(() => {
@@ -311,29 +310,15 @@ export function DashboardInput({ clients, agents, onSend }: DashboardInputProps)
         </div>
         
         <div className="mt-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setIsAgentModalOpen(true)}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-            {selectedAgent && (
-              <div className="flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-sm">
-                <span>{selectedAgent.name}</span>
-                <button
-                  type="button"
-                  onClick={() => setSelectedAgent(null)}
-                  className="ml-1 rounded-full hover:bg-muted-foreground/20 p-0.5"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
-            )}
-          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setIsAgentModalOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
           <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
             <Mic className="h-4 w-4" />
           </Button>
@@ -389,9 +374,9 @@ export function DashboardInput({ clients, agents, onSend }: DashboardInputProps)
                       key={agent.id}
                       type="button"
                       onClick={() => {
-                        setSelectedAgent(agent);
                         setIsAgentModalOpen(false);
                         setAgentSearchQuery("");
+                        onAgentSelected(agent);
                       }}
                       className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 text-left transition-colors hover:bg-accent"
                     >
