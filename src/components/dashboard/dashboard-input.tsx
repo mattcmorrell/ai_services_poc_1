@@ -6,6 +6,7 @@ import {
   Mic,
   X,
   Search,
+  Settings,
   Banknote,
   BookOpen,
   Palmtree,
@@ -309,19 +310,32 @@ export function DashboardInput({ clients, agents, onSend, onAgentSelected }: Das
           )}
         </div>
         
-        <div className="mt-2 flex items-center justify-between">
+        <div className="mt-2 flex items-center gap-2">
           <Button
             type="button"
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => setIsAgentModalOpen(true)}
+            onClick={() => {
+              // TODO: Implement file uploader
+            }}
           >
             <Plus className="h-4 w-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
-            <Mic className="h-4 w-4" />
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-8 gap-1.5 px-2"
+            onClick={() => setIsAgentModalOpen(true)}
+          >
+            <Settings className="h-4 w-4" />
+            <span className="text-sm">Tools</span>
           </Button>
+          <div className="ml-auto">
+            <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
+              <Mic className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
