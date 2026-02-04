@@ -33,7 +33,13 @@ import { cn } from "@/lib/utils";
 interface DashboardInputProps {
   clients: Client[];
   agents: Agent[];
-  onSend: (message: string, client: Client | null, chipPosition: number) => void;
+  onSend: (
+    message: string,
+    client: Client | null,
+    chipPosition: number,
+    agentId?: string | null,
+    confidence?: number
+  ) => void;
   onAgentSelected: (agent: Agent) => void;
 }
 
@@ -248,11 +254,38 @@ export function DashboardInput({ clients, agents, onSend, onAgentSelected }: Das
   }, [autocompleteVisible, filteredClients, selectedIndex, selectClient, hideAutocomplete]);
 
   // Handle submit
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     const { text, chipPosition } = getTextContentWithChipPosition();
     if (!text && !selectedClient) return;
 
-    onSend(text, selectedClient, chipPosition);
+    // Call classification API if there's text
+    let agentId: string | null = null;
+    let confidence: number = 0;
+
+    if (text) {
+      try {
+        const response = await fetch("/api/classify-agent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: text, threshold: 0.6 }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          agentId = result.agentId;
+          confidence = result.confidence;
+
+          if (agentId) {
+            console.log(`Auto-selected agent: ${agentId} (confidence: ${confidence.toFixed(2)})`);
+          }
+        }
+      } catch (error) {
+        console.error("Error classifying query:", error);
+        // Continue without agent selection on error
+      }
+    }
+
+    onSend(text, selectedClient, chipPosition, agentId, confidence);
 
     // Clear input
     if (editableRef.current) {

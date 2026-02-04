@@ -12,10 +12,10 @@ export const mockAgentAttention: AgentAttention[] = [
   },
   {
     id: "agent-2",
-    agentName: "Powerpoint Builder",
-    agentIcon: "presentation",
+    agentName: "Time Off Policies",
+    agentIcon: "palm-tree",
     clientName: "Acme Corp.",
-    message: 'The deck "Super Important Q4 Thing" is ready.',
+    message: "Time off policies are ready to be approved",
     timestamp: new Date(Date.now() - 1000 * 60 * 90), // 4:30 AM equivalent
     isUrgent: true,
   },

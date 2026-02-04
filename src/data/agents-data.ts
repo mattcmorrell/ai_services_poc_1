@@ -30,10 +30,10 @@ export const mockAgents: Agent[] = [
     isFavorite: true,
   },
   {
-    id: "agent-double",
-    name: "Double Agent",
-    description: "Handles dual responsibilities",
-    icon: "users",
+    id: "agent-customfields",
+    name: "Custom Fields",
+    description: "Create custom fields and tables",
+    icon: "table",
     isFavorite: true,
   },
   {

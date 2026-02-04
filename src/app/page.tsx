@@ -320,7 +320,13 @@ export default function Home() {
   };
 
   const handleDashboardMessage = useCallback(
-    async (message: string, client: Client | null, chipPosition: number) => {
+    async (
+      message: string,
+      client: Client | null,
+      chipPosition: number,
+      agentId?: string | null,
+      confidence?: number
+    ) => {
       // Create a new chat
       const newChatId = `chat-${Date.now()}`;
       const userMessage: Message = {
@@ -333,6 +339,7 @@ export default function Home() {
       const newChat: Chat = {
         id: newChatId,
         clientId: client?.id || null,
+        agentId: agentId || undefined,
         title: "New Chat",
         hasUnread: false,
         updatedAt: new Date(),
@@ -352,6 +359,7 @@ export default function Home() {
           body: JSON.stringify({
             messages: [{ role: "user", content: message }],
             clientName: client?.name || "Unknown Client",
+            agentId: agentId || undefined,
           }),
         });
 

@@ -72,6 +72,23 @@ export function ChatView({
     }
   }, [messages]);
 
+  // Auto-expand textarea as user types
+  useEffect(() => {
+    if (inputRef.current) {
+      // Reset height to auto to get accurate scrollHeight
+      inputRef.current.style.height = 'auto';
+
+      // Calculate new height based on content
+      const scrollHeight = inputRef.current.scrollHeight;
+
+      // Max height: ~7.5 lines (text-sm is 14px line-height, so 7.5 * 20px ≈ 150px)
+      const maxHeight = 150;
+
+      // Set height to content or max, whichever is smaller
+      inputRef.current.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
+    }
+  }, [input]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
@@ -256,8 +273,7 @@ export function ChatView({
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Ask anything..."
-                rows={1}
-                className="w-full resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                className="w-full resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground overflow-y-auto"
               />
               <div className="mt-2 flex items-center justify-between">
                 <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
