@@ -2,9 +2,12 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { Sidebar } from "@/components/sidebar";
-import { ChatListPanel } from "@/components/chat-list-panel";
-import { ChatView } from "@/components/chat-view";
-import { DashboardView } from "@/components/dashboard/dashboard-view";
+import { ChatListPanel as ChatListPanelOriginal } from "@/components/chat-list-panel";
+import { ChatView as ChatViewOriginal } from "@/components/chat-view";
+import { DashboardView as DashboardViewOriginal } from "@/components/dashboard/dashboard-view";
+import { ChatListPanel as ChatListPanelV1 } from "@/components/chat-list-panel-v1";
+import { ChatView as ChatViewV1 } from "@/components/chat-view-v1";
+import { DashboardView as DashboardViewV1 } from "@/components/dashboard/dashboard-view-v1";
 import { AgentsView } from "@/components/agents/agents-view";
 import { ClientSelectDialog } from "@/components/agents/client-select-dialog";
 import { WorkflowPanel } from "@/components/workflow/workflow-panel";
@@ -18,7 +21,18 @@ import { parseArtifacts } from "@/lib/artifact-parser";
 import { parseActionPlan } from "@/lib/action-plan-parser";
 import { Agent } from "@/types/agent";
 
+const VARIANTS = ["original", "v1"] as const;
+type Variant = (typeof VARIANTS)[number];
+
+const variantMap = {
+  original: { DashboardView: DashboardViewOriginal, ChatListPanel: ChatListPanelOriginal, ChatView: ChatViewOriginal },
+  v1: { DashboardView: DashboardViewV1, ChatListPanel: ChatListPanelV1, ChatView: ChatViewV1 },
+};
+
 export default function Home() {
+  const [designVariant, setDesignVariant] = useState<Variant>("v1");
+  const { DashboardView, ChatListPanel, ChatView } = variantMap[designVariant];
+
   const [activeView, setActiveView] = useState("dashboard");
   const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
   const [chats, setChats] = useState<Chat[]>(mockChats);
@@ -574,6 +588,23 @@ export default function Home() {
         clients={mockClients}
         onSelectClient={handleClientSelectedForAgent}
       />
+
+      {/* Design variant toggle */}
+      <div className="fixed bottom-4 right-4 z-[100] flex items-center gap-1 rounded-full border border-[oklch(1_0_0_/_0.1)] bg-[oklch(0.15_0_0_/_0.9)] px-1.5 py-1 shadow-2xl backdrop-blur-md">
+        {VARIANTS.map((v) => (
+          <button
+            key={v}
+            onClick={() => setDesignVariant(v)}
+            className={`rounded-full px-3 py-1 text-[11px] font-medium tracking-wide transition-all ${
+              designVariant === v
+                ? "bg-[oklch(0.7_0.15_65)] text-[oklch(0.1_0_0)] shadow-sm"
+                : "text-[oklch(0.55_0_0)] hover:text-[oklch(0.8_0_0)]"
+            }`}
+          >
+            {v === "original" ? "Original" : v.toUpperCase()}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
