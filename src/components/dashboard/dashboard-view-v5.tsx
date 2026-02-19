@@ -43,19 +43,27 @@ const glassVars: Record<string, string> = {
 };
 
 const glassCard: React.CSSProperties = {
-  background: "rgba(255, 255, 255, 0.03)",
-  border: "1px solid rgba(255, 255, 255, 0.06)",
+  background: "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.05) 100%)",
+  borderTop: "1px solid rgba(255, 255, 255, 0.15)",
+  borderLeft: "1px solid rgba(255, 255, 255, 0.10)",
+  borderRight: "1px solid rgba(255, 255, 255, 0.05)",
+  borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
   borderRadius: "24px",
-  backdropFilter: "blur(40px)",
-  WebkitBackdropFilter: "blur(40px)",
+  backdropFilter: "blur(60px) saturate(1.2)",
+  WebkitBackdropFilter: "blur(60px) saturate(1.2)",
+  boxShadow: "inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.4)",
 };
 
 const glassCardInner: React.CSSProperties = {
-  background: "rgba(255, 255, 255, 0.03)",
-  border: "1px solid rgba(255, 255, 255, 0.04)",
+  background: "linear-gradient(160deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%)",
+  borderTop: "1px solid rgba(255, 255, 255, 0.10)",
+  borderLeft: "1px solid rgba(255, 255, 255, 0.07)",
+  borderRight: "1px solid rgba(255, 255, 255, 0.03)",
+  borderBottom: "1px solid rgba(255, 255, 255, 0.03)",
   borderRadius: "20px",
-  backdropFilter: "blur(20px)",
-  WebkitBackdropFilter: "blur(20px)",
+  backdropFilter: "blur(40px)",
+  WebkitBackdropFilter: "blur(40px)",
+  boxShadow: "inset 0 1px 0 0 rgba(255, 255, 255, 0.06)",
 };
 
 export function DashboardView({
@@ -98,7 +106,7 @@ export function DashboardView({
     >
       <style>{`
         .v5-glass *, .v5-glass *::before, .v5-glass *::after {
-          border-color: rgba(255, 255, 255, 0.06) !important;
+          border-color: rgba(255, 255, 255, 0.08) !important;
         }
         .v5-glass [class*="rounded-xl"],
         .v5-glass [class*="rounded-lg"] {
@@ -107,9 +115,39 @@ export function DashboardView({
         .v5-glass [class*="rounded-full"] {
           border-radius: 9999px !important;
         }
+        .v5-glass .glass-highlight {
+          position: relative;
+        }
+        .v5-glass .glass-highlight::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, transparent 60%);
+          pointer-events: none;
+        }
       `}</style>
 
-      <div className="flex flex-1 flex-col items-center overflow-auto px-8 py-12">
+      {/* Ambient glow orbs — give the frost something to blur */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div style={{
+          position: "absolute", top: "15%", left: "30%", width: "500px", height: "500px",
+          background: "radial-gradient(circle, rgba(100, 120, 200, 0.06) 0%, transparent 70%)",
+          filter: "blur(80px)",
+        }} />
+        <div style={{
+          position: "absolute", top: "50%", right: "20%", width: "400px", height: "400px",
+          background: "radial-gradient(circle, rgba(150, 100, 180, 0.05) 0%, transparent 70%)",
+          filter: "blur(80px)",
+        }} />
+        <div style={{
+          position: "absolute", bottom: "10%", left: "15%", width: "350px", height: "350px",
+          background: "radial-gradient(circle, rgba(80, 160, 140, 0.04) 0%, transparent 70%)",
+          filter: "blur(80px)",
+        }} />
+      </div>
+
+      <div className="relative z-10 flex flex-1 flex-col items-center overflow-auto px-8 py-12">
         {/* Logo */}
         <div className="mb-3 flex flex-col items-center">
           <Image

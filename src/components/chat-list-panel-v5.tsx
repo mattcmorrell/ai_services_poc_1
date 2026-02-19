@@ -67,10 +67,12 @@ function ChatItem({ chat, clientName, isSelected, onSelect }: ChatItemProps) {
       )}
       style={{
         background: isSelected
-          ? "rgba(255, 255, 255, 0.06)"
+          ? "linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.05) 100%)"
           : "transparent",
-        borderRadius: "12px",
+        borderRadius: "14px",
         margin: "2px 8px",
+        border: isSelected ? "1px solid rgba(255, 255, 255, 0.10)" : "1px solid transparent",
+        boxShadow: isSelected ? "inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 16px rgba(0, 0, 0, 0.3)" : "none",
       }}
     >
       <div className="flex items-center gap-2.5 min-w-0">
@@ -290,17 +292,18 @@ export function ChatListPanel({
     <div
       className="v5-glass flex w-72 flex-col"
       style={{
-        background: "rgba(255, 255, 255, 0.02)",
-        borderRight: "1px solid rgba(255, 255, 255, 0.06)",
-        backdropFilter: "blur(40px)",
-        WebkitBackdropFilter: "blur(40px)",
+        background: "linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%)",
+        borderRight: "1px solid rgba(255, 255, 255, 0.10)",
+        backdropFilter: "blur(60px) saturate(1.2)",
+        WebkitBackdropFilter: "blur(60px) saturate(1.2)",
         fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        boxShadow: "inset -1px 0 0 rgba(255, 255, 255, 0.04)",
         ...glassVars,
       } as React.CSSProperties}
     >
       <style>{`
         .v5-glass *, .v5-glass *::before, .v5-glass *::after {
-          border-color: rgba(255, 255, 255, 0.06) !important;
+          border-color: rgba(255, 255, 255, 0.08) !important;
         }
         .v5-glass [class*="rounded-xl"],
         .v5-glass [class*="rounded-lg"] {
@@ -316,9 +319,10 @@ export function ChatListPanel({
         <div
           className="flex p-0.5"
           style={{
-            background: "rgba(255, 255, 255, 0.03)",
+            background: "rgba(255, 255, 255, 0.04)",
             borderRadius: "9999px",
-            border: "1px solid rgba(255, 255, 255, 0.04)",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+            boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.06)",
           }}
         >
           <button
@@ -326,7 +330,8 @@ export function ChatListPanel({
             className="flex-1 py-1.5 px-3 text-xs transition-all duration-300 tracking-wide"
             style={{
               borderRadius: "9999px",
-              background: viewMode === "recent" ? "rgba(255, 255, 255, 0.08)" : "transparent",
+              background: viewMode === "recent" ? "rgba(255, 255, 255, 0.10)" : "transparent",
+              boxShadow: viewMode === "recent" ? "inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 2px 8px rgba(0, 0, 0, 0.3)" : "none",
               color: viewMode === "recent" ? "rgba(255, 255, 255, 0.8)" : "rgba(255, 255, 255, 0.3)",
               fontWeight: viewMode === "recent" ? 400 : 300,
             }}
@@ -338,7 +343,8 @@ export function ChatListPanel({
             className="flex-1 py-1.5 px-3 text-xs transition-all duration-300 tracking-wide"
             style={{
               borderRadius: "9999px",
-              background: viewMode === "clients" ? "rgba(255, 255, 255, 0.08)" : "transparent",
+              background: viewMode === "clients" ? "rgba(255, 255, 255, 0.10)" : "transparent",
+              boxShadow: viewMode === "clients" ? "inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 2px 8px rgba(0, 0, 0, 0.3)" : "none",
               color: viewMode === "clients" ? "rgba(255, 255, 255, 0.8)" : "rgba(255, 255, 255, 0.3)",
               fontWeight: viewMode === "clients" ? 400 : 300,
             }}

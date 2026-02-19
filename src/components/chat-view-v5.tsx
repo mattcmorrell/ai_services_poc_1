@@ -127,7 +127,7 @@ export function ChatView({
     >
       <style>{`
         .v5-glass *, .v5-glass *::before, .v5-glass *::after {
-          border-color: rgba(255, 255, 255, 0.06) !important;
+          border-color: rgba(255, 255, 255, 0.08) !important;
         }
         .v5-glass [class*="rounded-xl"],
         .v5-glass [class*="rounded-lg"] {
@@ -138,10 +138,24 @@ export function ChatView({
         }
       `}</style>
 
+      {/* Ambient glow orbs */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div style={{
+          position: "absolute", top: "20%", right: "25%", width: "400px", height: "400px",
+          background: "radial-gradient(circle, rgba(100, 130, 200, 0.05) 0%, transparent 70%)",
+          filter: "blur(80px)",
+        }} />
+        <div style={{
+          position: "absolute", bottom: "15%", left: "20%", width: "350px", height: "350px",
+          background: "radial-gradient(circle, rgba(140, 100, 170, 0.04) 0%, transparent 70%)",
+          filter: "blur(80px)",
+        }} />
+      </div>
+
       {/* Header */}
       <div
-        className="flex items-center justify-between px-8 py-5"
-        style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.04)" }}
+        className="relative z-10 flex items-center justify-between px-8 py-5"
+        style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.06)" }}
       >
         <div>
           <h1
@@ -172,7 +186,7 @@ export function ChatView({
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 px-8" ref={scrollRef}>
+      <ScrollArea className="relative z-10 flex-1 px-8" ref={scrollRef}>
         <div className="mx-auto max-w-3xl py-8">
           {messages.map((message) => (
             <div key={message.id} className="mb-8">
@@ -223,12 +237,17 @@ export function ChatView({
                   style={
                     message.role === "user"
                       ? {
-                          background: "rgba(255, 255, 255, 0.08)",
-                          border: "1px solid rgba(255, 255, 255, 0.06)",
+                          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%)",
+                          borderTop: "1px solid rgba(255, 255, 255, 0.15)",
+                          borderLeft: "1px solid rgba(255, 255, 255, 0.10)",
+                          borderRight: "1px solid rgba(255, 255, 255, 0.05)",
+                          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
                           borderRadius: "20px",
-                          backdropFilter: "blur(40px)",
-                          color: "rgba(255, 255, 255, 0.85)",
+                          backdropFilter: "blur(60px) saturate(1.2)",
+                          WebkitBackdropFilter: "blur(60px) saturate(1.2)",
+                          color: "rgba(255, 255, 255, 0.9)",
                           fontWeight: 300,
+                          boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 4px 20px rgba(0, 0, 0, 0.3)",
                         }
                       : {
                           color: "rgba(255, 255, 255, 0.6)",
@@ -389,17 +408,21 @@ export function ChatView({
       </ScrollArea>
 
       {/* Input */}
-      <div className="px-8 py-5" style={{ borderTop: "1px solid rgba(255, 255, 255, 0.04)" }}>
+      <div className="relative z-10 px-8 py-5" style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
         <div className="mx-auto max-w-3xl">
           <form onSubmit={handleSubmit}>
             <div
               className="p-3"
               style={{
-                background: "rgba(255, 255, 255, 0.03)",
-                border: "1px solid rgba(255, 255, 255, 0.06)",
+                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.03) 100%)",
+                borderTop: "1px solid rgba(255, 255, 255, 0.14)",
+                borderLeft: "1px solid rgba(255, 255, 255, 0.09)",
+                borderRight: "1px solid rgba(255, 255, 255, 0.04)",
+                borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
                 borderRadius: "24px",
-                backdropFilter: "blur(40px)",
-                WebkitBackdropFilter: "blur(40px)",
+                backdropFilter: "blur(60px) saturate(1.2)",
+                WebkitBackdropFilter: "blur(60px) saturate(1.2)",
+                boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.4)",
               }}
             >
               <textarea
