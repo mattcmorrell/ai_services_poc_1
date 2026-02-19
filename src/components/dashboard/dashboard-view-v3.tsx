@@ -57,6 +57,27 @@ export function DashboardView({
     setTodos((prev) => [newTodo, ...prev]);
   };
 
+  const lightVars: Record<string, string> = {
+    "--background": "#FAF7F2",
+    "--foreground": "#3D3529",
+    "--card": "#FFFFFF",
+    "--card-foreground": "#3D3529",
+    "--popover": "#FFFFFF",
+    "--popover-foreground": "#3D3529",
+    "--primary": "#8B6F47",
+    "--primary-foreground": "#FAF7F2",
+    "--secondary": "#F5F0E8",
+    "--secondary-foreground": "#3D3529",
+    "--muted": "#F0EBE3",
+    "--muted-foreground": "#9C9486",
+    "--accent": "#F0EBE3",
+    "--accent-foreground": "#3D3529",
+    "--destructive": "#C45D4A",
+    "--border": "#E5DFD5",
+    "--input": "#E5DFD5",
+    "--ring": "#8B6F47",
+  };
+
   return (
     <div
       className="flex h-full flex-1 flex-col"
@@ -64,7 +85,8 @@ export function DashboardView({
         background: "linear-gradient(180deg, #FAF7F2 0%, #F5F0E8 50%, #FBF8F4 100%)",
         color: "#3D3529",
         fontFamily: "Georgia, 'Times New Roman', serif",
-      }}
+        ...lightVars,
+      } as React.CSSProperties}
     >
       <style>{`
         .v3-editorial * { color: inherit; }

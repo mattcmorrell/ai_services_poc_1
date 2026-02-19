@@ -117,7 +117,28 @@ export function ChatView({
   return (
     <div
       className="flex h-full flex-1 flex-col"
-      style={{ background: c.bg, color: c.text }}
+      style={{
+        background: c.bg,
+        color: c.text,
+        "--background": "#FAF7F2",
+        "--foreground": "#3D3529",
+        "--card": "#FFFFFF",
+        "--card-foreground": "#3D3529",
+        "--popover": "#FFFFFF",
+        "--popover-foreground": "#3D3529",
+        "--primary": "#8B6F47",
+        "--primary-foreground": "#FAF7F2",
+        "--secondary": "#F5F0E8",
+        "--secondary-foreground": "#3D3529",
+        "--muted": "#F0EBE3",
+        "--muted-foreground": "#9C9486",
+        "--accent": "#F0EBE3",
+        "--accent-foreground": "#3D3529",
+        "--destructive": "#C45D4A",
+        "--border": "#E5DFD5",
+        "--input": "#E5DFD5",
+        "--ring": "#8B6F47",
+      } as React.CSSProperties}
     >
       <style>{`
         .v3-chat-view * { color: inherit; }

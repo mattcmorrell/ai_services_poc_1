@@ -274,6 +274,27 @@ export function ChatListPanel({
     });
   };
 
+  const lightVars: Record<string, string> = {
+    "--background": "#FAF7F2",
+    "--foreground": "#3D3529",
+    "--card": "#FFFFFF",
+    "--card-foreground": "#3D3529",
+    "--popover": "#FFFFFF",
+    "--popover-foreground": "#3D3529",
+    "--primary": "#8B6F47",
+    "--primary-foreground": "#FAF7F2",
+    "--secondary": "#F5F0E8",
+    "--secondary-foreground": "#3D3529",
+    "--muted": "#F0EBE3",
+    "--muted-foreground": "#9C9486",
+    "--accent": "#F0EBE3",
+    "--accent-foreground": "#3D3529",
+    "--destructive": "#C45D4A",
+    "--border": "#E5DFD5",
+    "--input": "#E5DFD5",
+    "--ring": "#8B6F47",
+  };
+
   return (
     <div
       className="w-72 flex flex-col"
@@ -281,7 +302,8 @@ export function ChatListPanel({
         background: c.bg,
         borderRight: `1px solid ${c.border}`,
         color: c.text,
-      }}
+        ...lightVars,
+      } as React.CSSProperties}
     >
       {/* Header label */}
       <div
