@@ -313,7 +313,7 @@ export function ChatListPanel({
 
   return (
     <div
-      className="w-72 flex flex-col"
+      className="v4-list w-72 flex flex-col"
       style={{
         background: "#FFFFFF",
         borderRight: "2px solid #000000",
@@ -322,6 +322,11 @@ export function ChatListPanel({
         ...lightVars,
       } as React.CSSProperties}
     >
+      <style>{`
+        .v4-list * {
+          border-radius: 0 !important;
+        }
+      `}</style>
       {/* Header */}
       <div
         className="px-4 pt-6 pb-1"

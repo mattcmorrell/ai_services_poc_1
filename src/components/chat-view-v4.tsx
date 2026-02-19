@@ -129,15 +129,16 @@ export function ChatView({
       } as React.CSSProperties}
     >
       <style>{`
-        .v4-chat * { color: inherit; }
+        .v4-chat * {
+          color: inherit;
+          border-radius: 0 !important;
+        }
         .v4-chat textarea {
           color: #000000 !important;
-          border-radius: 0 !important;
         }
         .v4-chat textarea::placeholder {
           color: #666666 !important;
         }
-        .v4-chat button { border-radius: 0 !important; }
       `}</style>
 
       {/* Header */}

@@ -84,15 +84,16 @@ export function DashboardView({
       } as React.CSSProperties}
     >
       <style>{`
-        .v4-swiss * { color: inherit; }
+        .v4-swiss * {
+          color: inherit;
+          border-radius: 0 !important;
+        }
         .v4-swiss input, .v4-swiss textarea, .v4-swiss select {
           color: #000000 !important;
-          border-radius: 0 !important;
         }
         .v4-swiss input::placeholder, .v4-swiss textarea::placeholder {
           color: #666666 !important;
         }
-        .v4-swiss button { border-radius: 0 !important; }
       `}</style>
 
       <div className="v4-swiss flex flex-1 flex-col items-center overflow-auto px-8 py-16">
