@@ -26,6 +26,9 @@ import { DashboardView as DashboardViewV6 } from "@/components/dashboard/dashboa
 import { ChatListPanel as ChatListPanelV7 } from "@/components/chat-list-panel-v7";
 import { ChatView as ChatViewV7 } from "@/components/chat-view-v7";
 import { DashboardView as DashboardViewV7 } from "@/components/dashboard/dashboard-view-v7";
+import { ChatListPanel as ChatListPanelV8 } from "@/components/chat-list-panel-v8";
+import { ChatView as ChatViewV8 } from "@/components/chat-view-v8";
+import { DashboardView as DashboardViewV8 } from "@/components/dashboard/dashboard-view-v8";
 import { AgentsView } from "@/components/agents/agents-view";
 import { ClientSelectDialog } from "@/components/agents/client-select-dialog";
 import { WorkflowPanel } from "@/components/workflow/workflow-panel";
@@ -40,7 +43,7 @@ import { parseActionPlan } from "@/lib/action-plan-parser";
 import { Agent } from "@/types/agent";
 import { ClientsView } from "@/components/clients/clients-view";
 
-const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7"] as const;
+const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8"] as const;
 type Variant = (typeof VARIANTS)[number];
 
 const variantMap = {
@@ -52,6 +55,7 @@ const variantMap = {
   v5: { DashboardView: DashboardViewV5, ChatListPanel: ChatListPanelV5, ChatView: ChatViewV5 },
   v6: { DashboardView: DashboardViewV6, ChatListPanel: ChatListPanelV6, ChatView: ChatViewV6 },
   v7: { DashboardView: DashboardViewV7, ChatListPanel: ChatListPanelV7, ChatView: ChatViewV7 },
+  v8: { DashboardView: DashboardViewV8, ChatListPanel: ChatListPanelV8, ChatView: ChatViewV8 },
 };
 
 export default function Home() {
