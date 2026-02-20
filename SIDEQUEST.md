@@ -89,14 +89,38 @@ Built 4 of the 6 possible directions in a single pass:
 - **Expand/collapse branches** (direction #1) — would be nice but tree is small enough it's not needed yet
 - **Timeline dimension** (direction #2) — could add `dateAdded`/`dateUpdated` fields to JSON later
 
+## V3 Upgrades (COMPLETE) — Inline Editing
+
+Made the decision tree a **living document** — all card content is editable directly in the browser.
+
+### What was built:
+
+1. **Double-click to edit name/note** — card names and notes become contenteditable on double-click. Enter commits, Esc reverts. Visual affordances: dashed underline on hover, blue underline + subtle blue background when focused.
+
+2. **Click status badge to cycle** — clicking any status badge cycles through: exploring → new → filed → parked → abandoned. Stats bar, card styling, and status dots all update instantly. Tooltip says "Click to cycle status".
+
+3. **localStorage persistence** — all edits are stored in `localStorage` under the key `decision-tree-edits`. Edits survive page refresh. Applied on top of the base JSON data on load.
+
+4. **Save bar** — a bottom bar slides up when unsaved changes exist:
+   - **Discard** — reverts all changes to original JSON data, clears localStorage
+   - **Download JSON** — exports the full modified `decision-tree-data.json` with updated `lastUpdated` date. Clears localStorage after download (since the downloaded file IS the new source of truth).
+
+5. **Keyboard hints updated** — bottom-right hints now show: `Esc` clear filter · `Double-click` edit text · `Click status` cycle
+
+6. **Esc key scoping** — Escape only clears filter when not actively editing a field. During editing, Esc reverts the field text without clearing the filter.
+
+### UX decisions made:
+- **Always-editable** (no edit mode toggle) — the dashed underline on hover is subtle enough to not clutter the view, but clear enough to signal editability.
+- **localStorage + download** (not auto-save to file) — browser can't write to the filesystem, so we persist in localStorage for session continuity and offer download when the user wants to commit changes to the JSON file.
+- **Status badges use labels** from the JSON status definitions (e.g., "Exploring", "Filed for later") instead of raw keys.
+
 ## What the User Might Want Next
 
-Remaining directions + new ideas:
+### Directions still on the table (lower priority):
 1. **Expand/collapse branches** — click to hide children, useful as tree grows
 2. **Timeline dimension** — add dates to JSON, show when decisions happened
-3. **Inline status editing** — click a status badge to cycle through statuses (updates JSON in-memory, would need a save mechanism)
-4. **Search** — filter by name/note text
-5. **Export** — download current tree state as JSON or image
+3. **Search** — filter by name/note text
+4. **Export as image** — download current tree as PNG/SVG for sharing
 
 ## Files You Own
 - `decision-tree.html` — the interactive visualization (v2)

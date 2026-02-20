@@ -279,6 +279,68 @@
     color: #71717a;
   }
 
+  /* Editable fields */
+  .card-name[data-editable],
+  .card-note[data-editable] {
+    cursor: text;
+    border-bottom: 1px dashed transparent;
+    transition: border-color 0.15s, background 0.15s;
+    border-radius: 2px;
+    padding: 0 2px;
+    margin: 0 -2px;
+  }
+  .card-name[data-editable]:hover,
+  .card-note[data-editable]:hover {
+    border-bottom-color: #52525b;
+  }
+  .card-name[data-editable]:focus,
+  .card-note[data-editable]:focus {
+    outline: none;
+    border-bottom-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.08);
+  }
+  .card-status[data-editable] {
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.15s;
+  }
+  .card-status[data-editable]:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 8px rgba(255,255,255,0.1);
+  }
+
+  /* Save indicator */
+  .save-indicator {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #2a2a35;
+    background: #141419;
+    font-size: 12px;
+    color: #a1a1aa;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    opacity: 0;
+    z-index: 100;
+    pointer-events: none;
+  }
+  .save-indicator.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  .save-indicator.success {
+    border-color: #22c55e44;
+    color: #4ade80;
+  }
+  .save-indicator.error {
+    border-color: #ef444444;
+    color: #f87171;
+  }
+
   @media (max-width: 700px) {
     body { padding: 20px; }
     .card-note, .card-links { display: none; }
@@ -299,29 +361,97 @@
 
 <div class="tree" id="tree"></div>
 
+<div class="save-indicator" id="saveIndicator"></div>
+
 <div class="kbd-hints">
   <span class="kbd"><code>Esc</code> clear filter</span>
+  <span class="kbd"><code>Double-click</code> edit text</span>
+  <span class="kbd"><code>Click status</code> cycle</span>
 </div>
 
 <script>
 // ── Load data and render ──
 let DATA = null;
+let ORIGINAL_DATA = null;
 let activeFilter = null;
+let hasUnsavedChanges = false;
 
 async function loadData() {
   try {
     const resp = await fetch('decision-tree-data.json');
     DATA = await resp.json();
   } catch (e) {
-    // Fallback: data is embedded below if fetch fails (for file:// protocol)
     console.warn('Could not fetch JSON, using embedded data');
     DATA = EMBEDDED_DATA;
   }
+  ORIGINAL_DATA = JSON.parse(JSON.stringify(DATA));
   render();
 }
 
-// Embedded copy for file:// usage
 const EMBEDDED_DATA = null;
+
+// ── Auto-save to disk ──
+let saveTimeout = null;
+
+function findNode(nodes, id) {
+  for (const node of nodes) {
+    if (node.phase && node.children) {
+      const found = findNode(node.children, id);
+      if (found) return found;
+      continue;
+    }
+    if (node.id === id) return node;
+    if (node.children) {
+      const found = findNode(node.children, id);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function scheduleSave() {
+  // Debounce — save 300ms after the last edit
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(saveToFile, 300);
+}
+
+async function saveToFile() {
+  DATA.lastUpdated = new Date().toISOString().slice(0, 10);
+  try {
+    const resp = await fetch('/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(DATA, null, 2),
+    });
+    if (!resp.ok) throw new Error('Save failed');
+    showSaveIndicator('Saved', 'success');
+  } catch (e) {
+    showSaveIndicator('Save failed — is the server running?', 'error');
+  }
+}
+
+function showSaveIndicator(text, type) {
+  const el = document.getElementById('saveIndicator');
+  el.textContent = (type === 'success' ? '✓ ' : '✗ ') + text;
+  el.className = 'save-indicator visible ' + type;
+  clearTimeout(el._hideTimer);
+  el._hideTimer = setTimeout(() => {
+    el.className = 'save-indicator';
+  }, 1500);
+}
+
+// ── Status cycling ──
+const STATUS_ORDER = ['exploring', 'new', 'filed', 'parked', 'abandoned'];
+
+function cycleStatus(nodeId) {
+  const node = findNode(DATA.tree, nodeId);
+  if (!node) return;
+  const idx = STATUS_ORDER.indexOf(node.status);
+  const next = STATUS_ORDER[(idx + 1) % STATUS_ORDER.length];
+  node.status = next;
+  scheduleSave();
+  render();
+}
 
 function collectStatuses(nodes, counts) {
   for (const node of nodes) {
@@ -468,10 +598,22 @@ function renderNode(node, depth, isLast, parentLines) {
   html += `<div class="card status-${statusClass}">`;
   html += `<div class="status-dot ${statusClass}"></div>`;
   if (node.id) html += `<span class="card-id">${node.id}</span>`;
-  html += `<span class="card-name">${node.name}</span>`;
+  if (node.id && node.status !== 'root') {
+    html += `<span class="card-name" data-editable data-node-id="${node.id}" data-field="name" contenteditable="false">${node.name}</span>`;
+  } else {
+    html += `<span class="card-name">${node.name}</span>`;
+  }
   html += renderVersionChain(node.versions, node.currentVersion);
-  html += `<span class="card-status ${statusClass}">${statusClass}</span>`;
-  if (node.note) html += `<span class="card-note">${node.note}</span>`;
+  if (node.id && node.status !== 'root') {
+    html += `<span class="card-status ${statusClass}" data-editable data-node-id="${node.id}" title="Click to cycle status">${DATA.statuses[statusClass]?.label || statusClass}</span>`;
+  } else {
+    html += `<span class="card-status ${statusClass}">${statusClass}</span>`;
+  }
+  if (node.note !== undefined && node.id && node.status !== 'root') {
+    html += `<span class="card-note" data-editable data-node-id="${node.id}" data-field="note" contenteditable="false">${node.note || ''}</span>`;
+  } else if (node.note) {
+    html += `<span class="card-note">${node.note}</span>`;
+  }
   html += renderLinks(node);
   html += `</div>`;
   html += `</div>`;
@@ -510,10 +652,65 @@ function render() {
   renderStats();
   renderTree();
   updateFilterHint();
+  bindEditables();
+}
+
+// ── Inline editing ──
+function bindEditables() {
+  // Double-click to edit name/note
+  document.querySelectorAll('[data-editable][data-field]').forEach(el => {
+    el.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      el.contentEditable = 'true';
+      el.focus();
+      // Select all text
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    });
+
+    el.addEventListener('blur', () => {
+      el.contentEditable = 'false';
+      const nodeId = el.dataset.nodeId;
+      const field = el.dataset.field;
+      const value = el.textContent.trim();
+      const node = findNode(DATA.tree, nodeId);
+      if (node && node[field] !== value) {
+        node[field] = value;
+        scheduleSave();
+      }
+    });
+
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        el.blur();
+      }
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        // Revert to current data value
+        const node = findNode(DATA.tree, el.dataset.nodeId);
+        if (node) el.textContent = node[el.dataset.field] || '';
+        el.contentEditable = 'false';
+      }
+    });
+  });
+
+  // Click to cycle status
+  document.querySelectorAll('.card-status[data-editable]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cycleStatus(el.dataset.nodeId);
+    });
+  });
 }
 
 // ── Keyboard shortcuts ──
 document.addEventListener('keydown', (e) => {
+  // Don't intercept when editing
+  if (e.target.contentEditable === 'true') return;
   if (e.key === 'Escape') {
     activeFilter = null;
     renderStats();
