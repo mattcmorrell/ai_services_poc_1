@@ -51,7 +51,7 @@ const lightVars: Record<string, string> = {
   "--secondary": "#EDF2EE",
   "--secondary-foreground": "#2C3E2D",
   "--muted": "#E8EFE9",
-  "--muted-foreground": "#7A8F7E",
+  "--muted-foreground": "#4A6150",
   "--accent": "#E8EFE9",
   "--accent-foreground": "#2C3E2D",
   "--destructive": "#C4725A",
@@ -149,7 +149,7 @@ export function ChatView({
           font-family: 'DM Sans', sans-serif !important;
         }
         .v7-chat input::placeholder, .v7-chat textarea::placeholder {
-          color: #9AAF9E !important;
+          color: #6B8068 !important;
         }
         .v7-chat button {
           font-family: 'DM Sans', sans-serif !important;
@@ -199,7 +199,7 @@ export function ChatView({
               className="mt-0.5 text-xs tracking-wide"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
-                color: "#9AAF9E",
+                color: "#5A7360",
                 fontWeight: 400,
               }}
             >
@@ -215,7 +215,7 @@ export function ChatView({
             border: "1px solid rgba(107, 143, 114, 0.1)",
           }}
         >
-          <MoreHorizontal className="h-4 w-4" style={{ color: "#9AAF9E" }} />
+          <MoreHorizontal className="h-4 w-4" style={{ color: "#5A7360" }} />
         </button>
       </div>
 
@@ -230,7 +230,7 @@ export function ChatView({
                   onClick={() => toggleThinking(message.id)}
                   className="mb-2 flex items-center gap-1.5 text-xs tracking-wide transition-colors duration-200"
                   style={{
-                    color: "#9AAF9E",
+                    color: "#5A7360",
                     fontFamily: "'DM Sans', sans-serif",
                     fontWeight: 400,
                   }}
@@ -252,10 +252,10 @@ export function ChatView({
                     background: "rgba(107, 143, 114, 0.04)",
                     border: "1px solid rgba(107, 143, 114, 0.1)",
                     borderRadius: "18px",
-                    color: "#7A8F7E",
+                    color: "#3D5340",
                     fontStyle: "italic",
                     fontFamily: "'Crimson Pro', serif",
-                    fontWeight: 300,
+                    fontWeight: 400,
                     lineHeight: 1.7,
                   }}
                 >
@@ -286,7 +286,7 @@ export function ChatView({
                           fontFamily: "'DM Sans', sans-serif",
                         }
                       : {
-                          color: "#4A6B4E",
+                          color: "#1E2E1F",
                           fontWeight: 400,
                           fontFamily: "'DM Sans', sans-serif",
                           lineHeight: 1.7,
@@ -296,7 +296,7 @@ export function ChatView({
                     __html: message.content
                       .replace(
                         /\*\*(.*?)\*\*/g,
-                        '<strong style="color: #2C3E2D; font-weight: 600">$1</strong>'
+                        '<strong style="color: #1A2A1B; font-weight: 600">$1</strong>'
                       )
                       .replace(/\n/g, "<br />"),
                   }}
@@ -365,7 +365,7 @@ export function ChatView({
                     </div>
                     <div
                       className="text-xs"
-                      style={{ color: "#9AAF9E", fontWeight: 400 }}
+                      style={{ color: "#5A7360", fontWeight: 400 }}
                     >
                       {message.workflow.description}
                     </div>
@@ -378,7 +378,7 @@ export function ChatView({
                     }}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <MoreHorizontal className="h-4 w-4" style={{ color: "#9AAF9E" }} />
+                    <MoreHorizontal className="h-4 w-4" style={{ color: "#6B8068" }} />
                   </button>
                 </div>
               )}
@@ -439,7 +439,7 @@ export function ChatView({
               />
               <div
                 className="h-1.5 w-1.5 animate-pulse rounded-full [animation-delay:0.4s]"
-                style={{ background: "#9AAF9E" }}
+                style={{ background: "#6B8068" }}
               />
             </div>
           )}
@@ -485,7 +485,7 @@ export function ChatView({
                     borderRadius: "9999px",
                   }}
                 >
-                  <Plus className="h-4 w-4" style={{ color: "#9AAF9E" }} />
+                  <Plus className="h-4 w-4" style={{ color: "#5A7360" }} />
                 </button>
                 <div className="flex items-center gap-1.5">
                   <DropdownMenu>
@@ -494,7 +494,7 @@ export function ChatView({
                         type="button"
                         className="flex h-8 items-center gap-1 px-3 text-[10px] tracking-wide transition-colors duration-200"
                         style={{
-                          color: "#9AAF9E",
+                          color: "#5A7360",
                           background: "rgba(107, 143, 114, 0.06)",
                           borderRadius: "9999px",
                           fontFamily: "'DM Sans', sans-serif",
@@ -524,7 +524,7 @@ export function ChatView({
                       borderRadius: "9999px",
                     }}
                   >
-                    <Mic className="h-4 w-4" style={{ color: "#9AAF9E" }} />
+                    <Mic className="h-4 w-4" style={{ color: "#5A7360" }} />
                   </button>
                   {input.trim() && (
                     <button

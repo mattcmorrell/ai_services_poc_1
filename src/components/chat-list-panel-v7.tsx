@@ -28,7 +28,7 @@ const lightVars: Record<string, string> = {
   "--secondary": "#EDF2EE",
   "--secondary-foreground": "#2C3E2D",
   "--muted": "#E8EFE9",
-  "--muted-foreground": "#7A8F7E",
+  "--muted-foreground": "#4A6150",
   "--accent": "#E8EFE9",
   "--accent-foreground": "#2C3E2D",
   "--destructive": "#C4725A",
@@ -85,7 +85,7 @@ function ChatItem({ chat, clientName, isSelected, onSelect }: ChatItemProps) {
           className="truncate text-sm"
           style={{
             fontFamily: "'DM Sans', sans-serif",
-            color: isSelected ? "#2C3E2D" : "#7A8F7E",
+            color: isSelected ? "#1E2E1F" : "#3D5340",
             fontWeight: isSelected ? 500 : 400,
           }}
         >
@@ -94,7 +94,7 @@ function ChatItem({ chat, clientName, isSelected, onSelect }: ChatItemProps) {
       </div>
       <div
         className="mt-1 flex items-center gap-1.5 text-[11px] ml-4"
-        style={{ color: "#9AAF9E", fontFamily: "'DM Sans', sans-serif" }}
+        style={{ color: "#5A7360", fontFamily: "'DM Sans', sans-serif" }}
       >
         {clientName && <span>{clientName}</span>}
         {clientName && <span style={{ color: "#C5D5C8" }}>·</span>}
@@ -140,7 +140,7 @@ function ClientSection({
           <span
             className="text-[10px] transition-transform duration-400"
             style={{
-              color: "#9AAF9E",
+              color: "#5A7360",
               transform: isExpanded ? "rotate(90deg)" : "rotate(0deg)",
               display: "inline-block",
             }}
@@ -151,7 +151,7 @@ function ClientSection({
             className="text-sm tracking-wide"
             style={{
               fontFamily: "'DM Sans', sans-serif",
-              color: "#4A6B4E",
+              color: "#2C3E2D",
               fontWeight: 500,
             }}
           >
@@ -180,7 +180,7 @@ function ClientSection({
               onNewChat();
             }}
             className="flex cursor-pointer items-center gap-1.5 py-2 pl-9 text-sm transition-colors duration-200"
-            style={{ color: "#9AAF9E" }}
+            style={{ color: "#5A7360" }}
           >
             <Plus className="w-3 h-3" />
             <span className="text-xs font-light tracking-wide" style={{ fontFamily: "'DM Sans', sans-serif" }}>New chat</span>
@@ -222,7 +222,7 @@ function ClientSection({
                   </div>
                   <div
                     className="text-[11px]"
-                    style={{ color: "#9AAF9E", fontFamily: "'DM Sans', sans-serif" }}
+                    style={{ color: "#5A7360", fontFamily: "'DM Sans', sans-serif" }}
                   >
                     {formatTimeAgo(chat.updatedAt)}
                   </div>
@@ -335,7 +335,7 @@ export function ChatListPanel({
               fontFamily: "'DM Sans', sans-serif",
               background: viewMode === "recent" ? "rgba(255, 255, 255, 0.9)" : "transparent",
               boxShadow: viewMode === "recent" ? "0 1px 4px rgba(107, 143, 114, 0.12)" : "none",
-              color: viewMode === "recent" ? "#2C3E2D" : "#9AAF9E",
+              color: viewMode === "recent" ? "#2C3E2D" : "#5A7360",
               fontWeight: viewMode === "recent" ? 500 : 400,
             }}
           >
@@ -349,7 +349,7 @@ export function ChatListPanel({
               fontFamily: "'DM Sans', sans-serif",
               background: viewMode === "clients" ? "rgba(255, 255, 255, 0.9)" : "transparent",
               boxShadow: viewMode === "clients" ? "0 1px 4px rgba(107, 143, 114, 0.12)" : "none",
-              color: viewMode === "clients" ? "#2C3E2D" : "#9AAF9E",
+              color: viewMode === "clients" ? "#2C3E2D" : "#5A7360",
               fontWeight: viewMode === "clients" ? 500 : 400,
             }}
           >
@@ -369,7 +369,7 @@ export function ChatListPanel({
                 }
               }}
               className="flex items-center gap-2 text-xs tracking-wide transition-colors duration-200"
-              style={{ color: "#9AAF9E", fontFamily: "'DM Sans', sans-serif", fontWeight: 400 }}
+              style={{ color: "#5A7360", fontFamily: "'DM Sans', sans-serif", fontWeight: 400 }}
             >
               <Plus className="w-3.5 h-3.5" />
               New Chat
