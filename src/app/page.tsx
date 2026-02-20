@@ -17,6 +17,7 @@ import { ArtifactPanel } from "@/components/artifacts/artifact-panel";
 import { parseArtifacts } from "@/lib/artifact-parser";
 import { parseActionPlan } from "@/lib/action-plan-parser";
 import { Agent } from "@/types/agent";
+import { ClientsView } from "@/components/clients/clients-view";
 
 export default function Home() {
   const [activeView, setActiveView] = useState("dashboard");
@@ -554,6 +555,10 @@ export default function Home() {
           onToggleFavorite={handleToggleFavorite}
         />
       );
+    }
+
+    if (activeView === "clients") {
+      return <ClientsView />;
     }
 
     return (
