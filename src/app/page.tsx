@@ -29,6 +29,12 @@ import { DashboardView as DashboardViewV7 } from "@/components/dashboard/dashboa
 import { ChatListPanel as ChatListPanelV8 } from "@/components/chat-list-panel-v8";
 import { ChatView as ChatViewV8 } from "@/components/chat-view-v8";
 import { DashboardView as DashboardViewV8 } from "@/components/dashboard/dashboard-view-v8";
+import { ChatListPanel as ChatListPanelV9 } from "@/components/chat-list-panel-v9";
+import { ChatView as ChatViewV9 } from "@/components/chat-view-v9";
+import { DashboardView as DashboardViewV9 } from "@/components/dashboard/dashboard-view-v9";
+import { ChatListPanel as ChatListPanelV10 } from "@/components/chat-list-panel-v10";
+import { ChatView as ChatViewV10 } from "@/components/chat-view-v10";
+import { DashboardView as DashboardViewV10 } from "@/components/dashboard/dashboard-view-v10";
 import { AgentsView } from "@/components/agents/agents-view";
 import { ClientSelectDialog } from "@/components/agents/client-select-dialog";
 import { WorkflowPanel } from "@/components/workflow/workflow-panel";
@@ -43,7 +49,7 @@ import { parseActionPlan } from "@/lib/action-plan-parser";
 import { Agent } from "@/types/agent";
 import { ClientsView } from "@/components/clients/clients-view";
 
-const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8"] as const;
+const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10"] as const;
 type Variant = (typeof VARIANTS)[number];
 
 const variantMap = {
@@ -56,6 +62,8 @@ const variantMap = {
   v6: { DashboardView: DashboardViewV6, ChatListPanel: ChatListPanelV6, ChatView: ChatViewV6 },
   v7: { DashboardView: DashboardViewV7, ChatListPanel: ChatListPanelV7, ChatView: ChatViewV7 },
   v8: { DashboardView: DashboardViewV8, ChatListPanel: ChatListPanelV8, ChatView: ChatViewV8 },
+  v9: { DashboardView: DashboardViewV9, ChatListPanel: ChatListPanelV9, ChatView: ChatViewV9 },
+  v10: { DashboardView: DashboardViewV10, ChatListPanel: ChatListPanelV10, ChatView: ChatViewV10 },
 };
 
 export default function Home() {
