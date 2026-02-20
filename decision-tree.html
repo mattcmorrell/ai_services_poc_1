@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Selection UX — Decision Tree</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #e4e4e7;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    padding: 40px;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  h1 { font-size: 20px; font-weight: 600; }
+  .last-updated {
+    font-size: 11px;
+    color: #52525b;
+  }
+  .subtitle { font-size: 13px; color: #a1a1aa; margin-bottom: 24px; }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #a1a1aa;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #1e1e26;
+    background: #111116;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s;
+  }
+  .stat:hover {
+    border-color: #3a3a48;
+    background: #1a1a22;
+  }
+  .stat.active {
+    border-color: var(--stat-color);
+    background: var(--stat-bg);
+  }
+  .stat .count {
+    font-weight: 700;
+    font-size: 14px;
+    color: #e4e4e7;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .stat .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Filter hint */
+  .filter-hint {
+    font-size: 11px;
+    color: #52525b;
+    margin-bottom: 20px;
+    height: 16px;
+    transition: opacity 0.15s;
+  }
+  .filter-hint.visible {
+    color: #a1a1aa;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex; gap: 20px; margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: #71717a;
+  }
+  .legend-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+
+  /* Tree layout */
+  .tree {
+    position: relative;
+    padding-left: 0;
+  }
+
+  .node {
+    position: relative;
+    margin-bottom: 6px;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .node.hidden {
+    display: none;
+  }
+  .node.dimmed {
+    opacity: 0.2;
+  }
+
+  .node-row {
+    display: flex;
+    align-items: stretch;
+    min-height: 40px;
+  }
+
+  .indent {
+    width: 32px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .indent .vline {
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #3a3a48;
+  }
+  .indent .hline {
+    position: absolute;
+    left: 15px;
+    top: 19px;
+    width: 17px;
+    height: 2px;
+    background: #3a3a48;
+  }
+
+  /* Card */
+  .card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    border-radius: 8px;
+    border: 1px solid #2a2a35;
+    background: #141419;
+    flex: 1;
+    max-width: 800px;
+    transition: border-color 0.15s, background 0.15s, opacity 0.15s;
+    cursor: default;
+    position: relative;
+  }
+  .card:hover {
+    border-color: #3a3a45;
+    background: #1a1a22;
+  }
+
+  .card.status-exploring { border-color: #3b82f6; background: rgba(59, 130, 246, 0.08); }
+  .card.status-new       { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.08); }
+  .card.status-filed     { border-color: #f59e0b; background: rgba(245, 158, 11, 0.05); }
+  .card.status-parked    { border-color: #2a2a35; background: #111116; opacity: 0.75; }
+  .card.status-abandoned { border-color: #2a2a35; background: #0d0d12; opacity: 0.55; }
+
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .status-dot.exploring { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.4); }
+  .status-dot.new       { background: #8b5cf6; box-shadow: 0 0 6px rgba(139,92,246,0.4); }
+  .status-dot.filed     { background: #f59e0b; }
+  .status-dot.parked    { background: #52525b; }
+  .status-dot.abandoned { background: #3f3f46; }
+  .status-dot.root      { background: #e4e4e7; }
+
+  .card-id {
+    font-size: 11px; font-weight: 700; color: #a1a1aa;
+    background: #1e1e26; padding: 2px 6px; border-radius: 4px;
+    flex-shrink: 0; font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .card-name {
+    font-size: 13px; font-weight: 600; color: #f4f4f5; white-space: nowrap;
+  }
+  .card-status {
+    font-size: 11px; font-weight: 500; padding: 2px 8px;
+    border-radius: 10px; flex-shrink: 0;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .card-status.exploring { background: rgba(59,130,246,0.15); color: #93c5fd; }
+  .card-status.new       { background: rgba(139,92,246,0.15); color: #c4b5fd; }
+  .card-status.filed     { background: rgba(245,158,11,0.15); color: #fcd34d; }
+  .card-status.parked    { background: rgba(82,82,91,0.3); color: #a1a1aa; }
+  .card-status.abandoned { background: rgba(63,63,70,0.3); color: #71717a; }
+
+  .card-note {
+    font-size: 11px; color: #a1a1aa; flex-basis: 100%;
+    padding-top: 2px; line-height: 1.4;
+  }
+
+  /* Links row */
+  .card-links {
+    display: flex;
+    gap: 8px;
+    flex-basis: 100%;
+    padding-top: 4px;
+  }
+  .card-link {
+    font-size: 10px;
+    color: #71717a;
+    text-decoration: none;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #1a1a22;
+    border: 1px solid #2a2a35;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .card-link:hover {
+    color: #e4e4e7;
+    border-color: #52525b;
+    background: #22222a;
+  }
+  .card-link .link-icon {
+    font-size: 11px;
+  }
+
+  /* Version chain */
+  .version-chain {
+    display: flex; align-items: center; gap: 4px;
+    margin-left: 8px; flex-shrink: 0;
+  }
+  .version-pip {
+    font-size: 10px; font-weight: 600; padding: 1px 6px;
+    border-radius: 4px; background: #1e1e26; color: #a1a1aa;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .version-pip.current { background: rgba(59,130,246,0.2); color: #93c5fd; }
+  .version-arrow { color: #71717a; font-size: 10px; }
+
+  .spawn-label {
+    font-size: 10px; color: #8b5cf6; font-style: italic; padding-left: 4px;
+  }
+
+  .section-gap { height: 16px; }
+  .phase-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 1px; color: #a1a1aa; padding: 16px 0 8px 0;
+  }
+
+  /* Keyboard hint */
+  .kbd-hints {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    color: #52525b;
+  }
+  .kbd {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .kbd code {
+    background: #1e1e26;
+    border: 1px solid #2a2a35;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 10px;
+    color: #71717a;
+  }
+
+  @media (max-width: 700px) {
+    body { padding: 20px; }
+    .card-note, .card-links { display: none; }
+    .kbd-hints { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1 id="title"></h1>
+  <span class="last-updated" id="lastUpdated"></span>
+</div>
+<p class="subtitle" id="subtitle"></p>
+
+<div class="stats-bar" id="statsBar"></div>
+<div class="filter-hint" id="filterHint">Click a status to filter · Click again to clear</div>
+
+<div class="tree" id="tree"></div>
+
+<div class="kbd-hints">
+  <span class="kbd"><code>Esc</code> clear filter</span>
+</div>
+
+<script>
+// ── Load data and render ──
+let DATA = null;
+let activeFilter = null;
+
+async function loadData() {
+  try {
+    const resp = await fetch('decision-tree-data.json');
+    DATA = await resp.json();
+  } catch (e) {
+    // Fallback: data is embedded below if fetch fails (for file:// protocol)
+    console.warn('Could not fetch JSON, using embedded data');
+    DATA = EMBEDDED_DATA;
+  }
+  render();
+}
+
+// Embedded copy for file:// usage
+const EMBEDDED_DATA = null;
+
+function collectStatuses(nodes, counts) {
+  for (const node of nodes) {
+    if (node.phase && node.children) {
+      collectStatuses(node.children, counts);
+      continue;
+    }
+    if (node.status && node.status !== 'root') {
+      counts[node.status] = (counts[node.status] || 0) + 1;
+    }
+    if (node.children) collectStatuses(node.children, counts);
+  }
+  return counts;
+}
+
+function renderStats() {
+  const counts = collectStatuses(DATA.tree, {});
+  const bar = document.getElementById('statsBar');
+  bar.innerHTML = '';
+
+  const order = ['exploring', 'new', 'filed', 'parked', 'abandoned'];
+  let total = 0;
+
+  for (const key of order) {
+    const count = counts[key] || 0;
+    total += count;
+    const cfg = DATA.statuses[key];
+    const isActive = activeFilter === key;
+
+    const stat = document.createElement('div');
+    stat.className = 'stat' + (isActive ? ' active' : '');
+    stat.style.setProperty('--stat-color', cfg.color);
+    stat.style.setProperty('--stat-bg', cfg.color + '15');
+    stat.dataset.status = key;
+    stat.innerHTML = `
+      <div class="dot" style="background:${cfg.color};${cfg.glow ? 'box-shadow:0 0 6px ' + cfg.color + '66' : ''}"></div>
+      <span class="count">${count}</span>
+      <span>${cfg.label}</span>
+    `;
+    stat.addEventListener('click', () => toggleFilter(key));
+    bar.appendChild(stat);
+  }
+
+  // Total
+  const totalStat = document.createElement('div');
+  totalStat.className = 'stat';
+  totalStat.style.cursor = 'default';
+  totalStat.innerHTML = `<span class="count">${total}</span><span>Total ideas</span>`;
+  bar.appendChild(totalStat);
+}
+
+function toggleFilter(status) {
+  activeFilter = activeFilter === status ? null : status;
+  renderStats();
+  applyFilter();
+  updateFilterHint();
+}
+
+function updateFilterHint() {
+  const hint = document.getElementById('filterHint');
+  if (activeFilter) {
+    const label = DATA.statuses[activeFilter].label;
+    hint.textContent = `Showing: ${label} · Click again or press Esc to clear`;
+    hint.className = 'filter-hint visible';
+  } else {
+    hint.textContent = 'Click a status to filter · Click again to clear';
+    hint.className = 'filter-hint';
+  }
+}
+
+function applyFilter() {
+  const nodes = document.querySelectorAll('.node[data-status]');
+  nodes.forEach(node => {
+    const status = node.dataset.status;
+    if (!activeFilter) {
+      node.classList.remove('dimmed', 'hidden');
+    } else if (status === activeFilter || status === 'root') {
+      node.classList.remove('dimmed', 'hidden');
+    } else {
+      node.classList.add('dimmed');
+      node.classList.remove('hidden');
+    }
+  });
+}
+
+function renderVersionChain(versions, current) {
+  if (!versions) return '';
+  return `<div class="version-chain">` +
+    versions.map((v, i) => {
+      const cls = v === current ? 'version-pip current' : 'version-pip';
+      const arrow = i < versions.length - 1 ? '<span class="version-arrow">→</span>' : '';
+      return `<span class="${cls}">${v}</span>${arrow}`;
+    }).join('') +
+    `</div>`;
+}
+
+function renderLinks(node) {
+  const links = [];
+  if (node.mockup) {
+    links.push(`<a class="card-link" href="${node.mockup}" target="_blank"><span class="link-icon">◻</span> Mockup</a>`);
+  }
+  if (node.prototype) {
+    links.push(`<a class="card-link" href="http://${node.prototype}" target="_blank"><span class="link-icon">▶</span> Prototype</a>`);
+  }
+  if (links.length === 0) return '';
+  return `<div class="card-links">${links.join('')}</div>`;
+}
+
+function renderNode(node, depth, isLast, parentLines) {
+  let html = '';
+
+  if (node.phase) {
+    html += `<div class="phase-label">${node.phase}</div>`;
+    if (node.children) {
+      node.children.forEach((child, i) => {
+        html += renderNode(child, depth, i === node.children.length - 1, parentLines);
+      });
+    }
+    return html;
+  }
+
+  const statusClass = node.status || 'root';
+
+  html += `<div class="node" data-status="${statusClass}" data-id="${node.id || ''}">`;
+  html += `<div class="node-row">`;
+
+  for (let d = 0; d < depth; d++) {
+    html += `<div class="indent">`;
+    if (parentLines[d]) html += `<div class="vline"></div>`;
+    html += `</div>`;
+  }
+
+  if (depth > 0) {
+    html += `<div class="indent">`;
+    if (!isLast) {
+      html += `<div class="vline"></div>`;
+    } else {
+      html += `<div class="vline" style="bottom:50%"></div>`;
+    }
+    html += `<div class="hline"></div>`;
+    html += `</div>`;
+  }
+
+  html += `<div class="card status-${statusClass}">`;
+  html += `<div class="status-dot ${statusClass}"></div>`;
+  if (node.id) html += `<span class="card-id">${node.id}</span>`;
+  html += `<span class="card-name">${node.name}</span>`;
+  html += renderVersionChain(node.versions, node.currentVersion);
+  html += `<span class="card-status ${statusClass}">${statusClass}</span>`;
+  if (node.note) html += `<span class="card-note">${node.note}</span>`;
+  html += renderLinks(node);
+  html += `</div>`;
+  html += `</div>`;
+
+  if (node.children && node.children.length > 0) {
+    const newParentLines = [...parentLines];
+    if (depth >= 0) {
+      newParentLines[depth] = !isLast;
+    }
+    node.children.forEach((child, i) => {
+      if (child.spawn) {
+        html += `<div class="node-row" style="padding-left:${(depth + 1) * 32 + 32}px">`;
+        html += `<span class="spawn-label">↳ ${child.spawn}</span>`;
+        html += `</div>`;
+      }
+      html += renderNode(child, depth + 1, i === node.children.length - 1, newParentLines);
+    });
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function renderTree() {
+  const container = document.getElementById('tree');
+  container.innerHTML = '';
+  DATA.tree.forEach((node, i) => {
+    container.innerHTML += renderNode(node, 0, i === DATA.tree.length - 1, []);
+  });
+}
+
+function render() {
+  document.getElementById('title').textContent = DATA.title;
+  document.getElementById('subtitle').textContent = DATA.subtitle;
+  document.getElementById('lastUpdated').textContent = `Updated ${DATA.lastUpdated}`;
+  renderStats();
+  renderTree();
+  updateFilterHint();
+}
+
+// ── Keyboard shortcuts ──
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    activeFilter = null;
+    renderStats();
+    applyFilter();
+    updateFilterHint();
+  }
+});
+
+// ── Init ──
+// For file:// protocol, fetch won't work, so embed the data inline as fallback
+loadData().catch(() => {
+  // If the async load completely fails, try inline
+  if (!DATA) {
+    document.getElementById('tree').innerHTML = '<p style="color:#f87171">Could not load decision-tree-data.json. Open via a local server (e.g., npx serve) or place the JSON in the same directory.</p>';
+  }
+});
+</script>
+
+</body>
+</html>

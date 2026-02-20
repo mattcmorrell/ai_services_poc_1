@@ -1,0 +1,139 @@
+{
+  "title": "Client Selection UX — Decision Tree",
+  "subtitle": "Tracing every idea from brainstorm → prototype → iteration → verdict",
+  "lastUpdated": "2026-02-20",
+  "statuses": {
+    "exploring": { "label": "Exploring", "color": "#3b82f6", "glow": true },
+    "new":       { "label": "New / Untested", "color": "#8b5cf6", "glow": true },
+    "filed":     { "label": "Filed for later", "color": "#f59e0b", "glow": false },
+    "parked":    { "label": "Parked", "color": "#52525b", "glow": false },
+    "abandoned": { "label": "Abandoned", "color": "#3f3f46", "glow": false }
+  },
+  "tree": [
+    {
+      "id": "root",
+      "name": "Client Selection UX Problem",
+      "status": "root",
+      "note": "How does a consultant select which client they're working with?",
+      "children": [
+        {
+          "phase": "Brainstorm → Prototype (Top 4)",
+          "children": [
+            {
+              "id": "A",
+              "name": "Card Grid",
+              "status": "parked",
+              "note": "Mode-switch friction — must leave workspace to switch clients",
+              "versions": ["v1", "v2", "v3"],
+              "currentVersion": "v3",
+              "mockup": "mockup-01-card-grid.html",
+              "prototype": "localhost:3001",
+              "children": []
+            },
+            {
+              "id": "B",
+              "name": "Dropdown Switcher",
+              "status": "parked",
+              "note": "Compact and functional, but user moved on to other concepts",
+              "versions": ["v1", "v2", "v3"],
+              "currentVersion": "v3",
+              "mockup": "mockup-02-dropdown.html",
+              "prototype": "localhost:3001",
+              "children": []
+            },
+            {
+              "id": "C",
+              "name": "Sidebar Client List",
+              "status": "exploring",
+              "note": "Favorite so far — width concern → try collapsed-by-default",
+              "versions": ["v1", "v2", "v3"],
+              "currentVersion": "v3",
+              "mockup": "mockup-03-sidebar.html",
+              "prototype": "localhost:3001",
+              "children": [
+                {
+                  "id": "F",
+                  "name": "Client Tabs Row",
+                  "status": "new",
+                  "note": "Horizontal version of C's collapsed mode — vertical space instead of horizontal",
+                  "spawn": "inspired by C collapsed + idea #9",
+                  "versions": ["v1"],
+                  "currentVersion": "v1",
+                  "prototype": "localhost:3001",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "D",
+              "name": "Breadcrumb Navigation",
+              "status": "parked",
+              "note": "Best triage/data tool, but too many clicks for daily switching",
+              "versions": ["v1", "v2", "v3"],
+              "currentVersion": "v3",
+              "mockup": "mockup-04-breadcrumb.html",
+              "prototype": "localhost:3001",
+              "children": []
+            }
+          ]
+        },
+        {
+          "phase": "Brainstorm → Not Initially Prototyped",
+          "children": [
+            {
+              "id": "5",
+              "name": "Command Palette",
+              "status": "filed",
+              "note": "Power user quick-switch — will revisit as supplement",
+              "mockup": "mockup-05-command-palette.html",
+              "children": []
+            },
+            {
+              "id": "7→E",
+              "name": "Tab Groups",
+              "status": "new",
+              "note": "No client selection step — tabs grouped by client. Just prototyped.",
+              "versions": ["v1"],
+              "currentVersion": "v1",
+              "mockup": "mockup-07-tab-groups.html",
+              "prototype": "localhost:3001",
+              "children": []
+            },
+            {
+              "id": "8",
+              "name": "Sliding Drawer",
+              "status": "parked",
+              "note": "Interesting but not the most interesting",
+              "mockup": "mockup-08-sliding-drawer.html",
+              "children": []
+            },
+            {
+              "id": "9",
+              "name": "Recent + Favorites Bar",
+              "status": "parked",
+              "note": "Interesting concept → evolved into Approach F (Client Tabs Row)",
+              "mockup": "mockup-09-recent-favorites.html",
+              "children": []
+            },
+            {
+              "id": "6",
+              "name": "Floating Pill",
+              "status": "abandoned",
+              "note": "Too hidden for primary navigation",
+              "mockup": "mockup-06-floating-pill.html",
+              "children": []
+            },
+            {
+              "id": "10",
+              "name": "Avatar Row",
+              "status": "abandoned",
+              "note": "Scales poorly, lacks context",
+              "mockup": "mockup-10-avatar-row.html",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
