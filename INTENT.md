@@ -363,3 +363,49 @@ A separate Claude Code session was launched (via `/sidequest`) to evolve the dec
 2. **Capture F screenshot** — start dev server, screenshot Client Tabs Row approach
 3. **Sidequest progress** — check what the design decision history session produced
 4. **Consider merging gallery + decision history features** — the sidequest may have evolved the HTML/JSON in parallel
+
+---
+
+# INTENT — Visual Design Exploration
+
+## Goal
+Explore multiple visual design variants for the BambooHR consultant app. Each variant is a complete set of 3 files (dashboard-view, chat-list-panel, chat-view) that can be swapped via a floating toggle. The aim is to find the perfect aesthetic direction — warm, professional, and distinctive — before committing to a final design system.
+
+## Current Direction
+Building and comparing design variants side-by-side in the browser using a floating pill toggle (bottom-right corner). Each variant has a distinct aesthetic personality. Using the `/frontend-design` skill for high-quality, non-generic designs.
+
+## What's Done
+13 variants created and wired into the toggle system:
+
+| Variant | Name | Mode | Accent | Fonts | Vibe |
+|---------|------|------|--------|-------|------|
+| OG | Original | Dark | Blue | System | Default shadcn |
+| V1 | Bold & Classy | Dark | Gold/Amber | — | Luxury dark |
+| V2 | Brutalist Industrial | Dark | Red | Monospace | Terminal/raw |
+| V3 | Soft Editorial | Light | Warm tones | Serif | Magazine |
+| V4 | Swiss Typography | Light | Red/Black | Sans | Poster |
+| V5 | Liquid Glass | Dark | Glass | — | Frosted on black |
+| V6 | Cyberpunk Neon City | Dark | Cyan/Magenta | — | Neon noir |
+| V7 | Zen Garden | Light | Sage green | — | Calming (contrast fixed) |
+| V8 | Obsidian & Champagne | Dark | Champagne gold | Playfair Display + Plus Jakarta Sans | Warm luxury |
+| V9 | Soft Studio | Light | Dusty violet | Fraunces + Outfit | Pillowy lavender |
+| V10 | Paper & Ink | Light | Salmon coral | Spectral + Karla | Notebook/ruled |
+| V11 | Midnight Editorial | Dark | Burnt orange | Newsreader + Satoshi | Bloomberg meets Conde Nast |
+
+Toggle system in `page.tsx`: `VARIANTS` array, `variantMap` object, `designVariant` state, floating toggle UI.
+
+## Rejected Approaches
+- V7 initially had poor contrast on the chats page — fixed by darkening all text colors significantly.
+
+## Open Questions
+- Which variant(s) to move forward with as the final design?
+- Any more aesthetic directions to explore?
+- When to stop exploring and commit to a direction?
+
+## To-Do
+- [ ] **Finish visual design exploration** — continue trying new variants or refining existing ones until we're ready to pick a winner
+
+## Next Steps
+- User to review all 13 variants in browser and identify favorites
+- Potentially create more variants or refine top picks
+- Eventually select a final design direction and remove the toggle system
