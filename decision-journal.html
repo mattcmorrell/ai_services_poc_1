@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Decision Journal</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #e4e4e7;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Top bar ── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid #1e1e26;
+    background: #0d0d14;
+    flex-shrink: 0;
+  }
+  .top-bar-left {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .top-bar h1 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #f4f4f5;
+  }
+  .top-bar .project {
+    font-size: 11px;
+    color: #52525b;
+  }
+  .top-bar .updated {
+    font-size: 11px;
+    color: #3f3f46;
+  }
+
+  /* ── Tab bar ── */
+  .tab-bar {
+    display: flex;
+    gap: 2px;
+    padding: 8px 32px;
+    border-bottom: 1px solid #1e1e26;
+    background: #0d0d14;
+    flex-shrink: 0;
+  }
+  .tab {
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #71717a;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    background: transparent;
+    user-select: none;
+  }
+  .tab:hover {
+    color: #a1a1aa;
+    background: #141419;
+  }
+  .tab.active {
+    color: #e4e4e7;
+    background: #1a1a22;
+    border-color: #2a2a35;
+  }
+  .tab-desc {
+    font-size: 10px;
+    color: #3f3f46;
+    font-weight: 400;
+    margin-left: 6px;
+  }
+
+  /* ── Views container ── */
+  .view { display: none; flex: 1; overflow: hidden; }
+  .view.active { display: flex; }
+
+  /* ── Type colors ── */
+  :root {
+    --outcome: #34d399;
+    --opportunity: #60a5fa;
+    --solution: #a78bfa;
+    --experiment: #fbbf24;
+    --decision: #22d3ee;
+    --question: #f472b6;
+  }
+
+  /* ── Status styling ── */
+  .status-badge {
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .status-active     { background: rgba(59,130,246,0.15); color: #93c5fd; }
+  .status-exploring  { background: rgba(139,92,246,0.15); color: #c4b5fd; }
+  .status-chosen     { background: rgba(34,197,94,0.15); color: #86efac; }
+  .status-rejected   { background: rgba(82,82,91,0.25); color: #71717a; }
+  .status-deferred   { background: rgba(245,158,11,0.15); color: #fcd34d; }
+  .status-open       { background: rgba(244,114,182,0.15); color: #f9a8d4; }
+
+  /* ── Type badge ── */
+  .type-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    flex-shrink: 0;
+  }
+  .type-outcome    { background: rgba(52,211,153,0.12); color: var(--outcome); }
+  .type-opportunity { background: rgba(96,165,250,0.12); color: var(--opportunity); }
+  .type-solution   { background: rgba(167,139,250,0.12); color: var(--solution); }
+  .type-experiment { background: rgba(251,191,36,0.12); color: var(--experiment); }
+  .type-decision   { background: rgba(34,211,238,0.12); color: var(--decision); }
+  .type-question   { background: rgba(244,114,182,0.12); color: var(--question); }
+
+  /* ── Mono ── */
+  .mono { font-family: 'SF Mono', 'Fira Code', monospace; }
+
+  /* ════════════════════════════════════════
+     VIEW A: Tree + Detail (two-panel)
+     ════════════════════════════════════════ */
+  #view-tree {
+    flex-direction: row;
+  }
+  .tree-panel {
+    width: 420px;
+    min-width: 320px;
+    border-right: 1px solid #1e1e26;
+    overflow-y: auto;
+    padding: 20px 0;
+  }
+  .tree-panel::-webkit-scrollbar { width: 4px; }
+  .tree-panel::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 2px; }
+
+  .detail-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 40px;
+  }
+  .detail-panel::-webkit-scrollbar { width: 4px; }
+  .detail-panel::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 2px; }
+
+  /* Tree nodes */
+  .tree-section {
+    margin-bottom: 16px;
+  }
+  .tree-section-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #52525b;
+    padding: 4px 24px;
+    margin-bottom: 4px;
+  }
+  .tree-node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 24px;
+    cursor: pointer;
+    transition: background 0.1s;
+    border-left: 2px solid transparent;
+  }
+  .tree-node:hover {
+    background: #141419;
+  }
+  .tree-node.selected {
+    background: rgba(96,165,250,0.06);
+    border-left-color: #60a5fa;
+  }
+  .tree-node .node-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .tree-node .node-id {
+    font-size: 10px;
+    font-weight: 700;
+    color: #52525b;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    flex-shrink: 0;
+    min-width: 24px;
+  }
+  .tree-node .node-title {
+    font-size: 12px;
+    color: #a1a1aa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tree-node.selected .node-title {
+    color: #e4e4e7;
+  }
+  .tree-node .node-status {
+    margin-left: auto;
+  }
+  .tree-indent-1 { padding-left: 40px; }
+  .tree-indent-2 { padding-left: 56px; }
+  .tree-indent-3 { padding-left: 72px; }
+
+  /* Detail panel content */
+  .detail-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #3f3f46;
+    font-size: 13px;
+  }
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .detail-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #f4f4f5;
+  }
+  .detail-date {
+    font-size: 11px;
+    color: #52525b;
+    margin-bottom: 24px;
+  }
+  .detail-section {
+    margin-bottom: 24px;
+  }
+  .detail-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #52525b;
+    margin-bottom: 8px;
+  }
+  .detail-reasoning {
+    font-size: 13px;
+    color: #a1a1aa;
+    line-height: 1.7;
+  }
+  .detail-evidence {
+    border-left: 2px solid #2a2a35;
+    padding: 8px 16px;
+    margin-bottom: 8px;
+    border-radius: 0 4px 4px 0;
+    background: #111116;
+  }
+  .detail-evidence .quote {
+    font-size: 12px;
+    color: #a1a1aa;
+    font-style: italic;
+    line-height: 1.6;
+  }
+  .detail-evidence .attribution {
+    font-size: 10px;
+    color: #52525b;
+    margin-top: 4px;
+  }
+  .detail-related {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .detail-related-link {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    border: 1px solid #2a2a35;
+    background: #141419;
+    color: #a1a1aa;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .detail-related-link:hover {
+    border-color: #3a3a48;
+    color: #e4e4e7;
+  }
+  .detail-artifact {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid #2a2a35;
+    background: #141419;
+    color: #60a5fa;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .detail-artifact:hover {
+    border-color: #60a5fa44;
+    background: rgba(96,165,250,0.06);
+  }
+  .detail-open-items {
+    list-style: none;
+  }
+  .detail-open-items li {
+    font-size: 12px;
+    color: #a1a1aa;
+    padding: 4px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+  .detail-open-items li::before {
+    content: '?';
+    position: absolute;
+    left: 0;
+    color: var(--question);
+    font-weight: 700;
+    font-size: 11px;
+  }
+
+  /* ════════════════════════════════════════
+     VIEW B: Graph (node-and-edge)
+     ════════════════════════════════════════ */
+  #view-graph {
+    position: relative;
+  }
+  #graph-canvas {
+    width: 100%;
+    height: 100%;
+  }
+  #graph-canvas svg {
+    width: 100%;
+    height: 100%;
+  }
+  .graph-node {
+    cursor: pointer;
+  }
+  .graph-node rect {
+    rx: 6;
+    ry: 6;
+    stroke-width: 1.5;
+    transition: stroke-width 0.15s;
+  }
+  .graph-node:hover rect {
+    stroke-width: 2.5;
+  }
+  .graph-node text {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    fill: #e4e4e7;
+  }
+  .graph-edge path {
+    fill: none;
+    stroke-width: 1.5;
+  }
+  .graph-edge.parent path {
+    stroke: #2a2a35;
+  }
+  .graph-edge.related path {
+    stroke: #2a2a3566;
+    stroke-dasharray: 4 3;
+  }
+  .graph-edge marker path {
+    fill: #2a2a35;
+  }
+  .graph-tooltip {
+    position: absolute;
+    max-width: 360px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #2a2a35;
+    background: #141419;
+    font-size: 12px;
+    color: #a1a1aa;
+    line-height: 1.5;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 10;
+  }
+  .graph-tooltip.visible { opacity: 1; }
+  .graph-tooltip .tt-title {
+    font-weight: 600;
+    color: #f4f4f5;
+    margin-bottom: 4px;
+  }
+  .graph-tooltip .tt-status {
+    margin-bottom: 6px;
+  }
+  .graph-controls {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    gap: 4px;
+  }
+  .graph-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid #2a2a35;
+    background: #141419;
+    color: #71717a;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .graph-btn:hover {
+    color: #e4e4e7;
+    border-color: #3a3a48;
+  }
+
+  /* ════════════════════════════════════════
+     VIEW C: Timeline
+     ════════════════════════════════════════ */
+  #view-timeline {
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 32px 48px;
+  }
+  #view-timeline::-webkit-scrollbar { width: 4px; }
+  #view-timeline::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 2px; }
+
+  .timeline-container {
+    max-width: 720px;
+    margin: 0 auto;
+    position: relative;
+    padding-left: 40px;
+  }
+  .timeline-line {
+    position: absolute;
+    left: 11px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #1e1e26;
+  }
+  .timeline-group {
+    margin-bottom: 32px;
+  }
+  .timeline-date {
+    font-size: 11px;
+    font-weight: 700;
+    color: #52525b;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .timeline-date::before {
+    content: '';
+    position: absolute;
+    left: -33px;
+    top: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3a3a48;
+    border: 2px solid #0a0a0f;
+  }
+  .timeline-entry {
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #2a2a35;
+    background: #141419;
+    margin-bottom: 8px;
+    position: relative;
+    transition: border-color 0.15s;
+  }
+  .timeline-entry:hover {
+    border-color: #3a3a48;
+  }
+  .timeline-entry::before {
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 18px;
+    width: 10px;
+    height: 2px;
+    background: #1e1e26;
+  }
+  .timeline-entry-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .timeline-entry-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f4f4f5;
+  }
+  .timeline-entry-reasoning {
+    font-size: 12px;
+    color: #a1a1aa;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+  .timeline-entry-evidence {
+    border-left: 2px solid #2a2a35;
+    padding: 6px 12px;
+    margin-top: 8px;
+    background: #0d0d14;
+    border-radius: 0 4px 4px 0;
+  }
+  .timeline-entry-evidence .quote {
+    font-size: 11px;
+    color: #a1a1aa;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .timeline-entry-evidence .attribution {
+    font-size: 10px;
+    color: #52525b;
+    margin-top: 2px;
+  }
+
+  /* ════════════════════════════════════════
+     VIEW D: Reader
+     ════════════════════════════════════════ */
+  #view-reader {
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 40px 48px;
+  }
+  #view-reader::-webkit-scrollbar { width: 4px; }
+  #view-reader::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 2px; }
+
+  .reader-container {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .reader-section {
+    margin-bottom: 40px;
+  }
+  .reader-section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1e1e26;
+  }
+  .reader-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .reader-section-count {
+    font-size: 11px;
+    color: #52525b;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .reader-card {
+    padding: 16px 20px;
+    border-radius: 8px;
+    border: 1px solid #2a2a35;
+    background: #141419;
+    margin-bottom: 10px;
+    transition: border-color 0.15s;
+  }
+  .reader-card:hover {
+    border-color: #3a3a48;
+  }
+  .reader-card.rejected {
+    opacity: 0.55;
+  }
+  .reader-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .reader-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f4f4f5;
+  }
+  .reader-card-date {
+    font-size: 10px;
+    color: #3f3f46;
+    margin-left: auto;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .reader-card-reasoning {
+    font-size: 12px;
+    color: #a1a1aa;
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .reader-card-evidence {
+    border-left: 2px solid #2a2a35;
+    padding: 8px 14px;
+    margin-bottom: 8px;
+    background: #0d0d14;
+    border-radius: 0 4px 4px 0;
+  }
+  .reader-card-evidence .quote {
+    font-size: 11px;
+    color: #a1a1aa;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .reader-card-evidence .attribution {
+    font-size: 10px;
+    color: #52525b;
+    margin-top: 3px;
+  }
+  .reader-card-meta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  /* ── Stats summary ── */
+  .stats-row {
+    display: flex;
+    gap: 8px;
+    padding: 8px 32px;
+    border-bottom: 1px solid #1e1e26;
+    background: #0d0d14;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #71717a;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #111116;
+    border: 1px solid #1e1e26;
+  }
+  .stat-chip .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  .stat-chip .count {
+    font-weight: 700;
+    color: #a1a1aa;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-bar-left">
+    <h1 id="title">Product Decision Journal</h1>
+    <span class="project" id="project"></span>
+  </div>
+  <span class="updated" id="updated"></span>
+</div>
+
+<div class="tab-bar" id="tabBar">
+  <div class="tab active" data-view="tree" onclick="switchView('tree')">
+    Tree<span class="tab-desc">explore hierarchy</span>
+  </div>
+  <div class="tab" data-view="graph" onclick="switchView('graph')">
+    Graph<span class="tab-desc">see connections</span>
+  </div>
+  <div class="tab" data-view="timeline" onclick="switchView('timeline')">
+    Timeline<span class="tab-desc">follow the story</span>
+  </div>
+  <div class="tab" data-view="reader" onclick="switchView('reader')">
+    Reader<span class="tab-desc">read everything</span>
+  </div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<!-- View A: Tree + Detail -->
+<div class="view active" id="view-tree">
+  <div class="tree-panel" id="treePanel"></div>
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-empty">Select a node to view details</div>
+  </div>
+</div>
+
+<!-- View B: Graph -->
+<div class="view" id="view-graph">
+  <div id="graph-canvas"></div>
+  <div class="graph-tooltip" id="graphTooltip"></div>
+  <div class="graph-controls">
+    <button class="graph-btn" onclick="graphZoom(1.3)" title="Zoom in">+</button>
+    <button class="graph-btn" onclick="graphZoom(0.7)" title="Zoom out">-</button>
+    <button class="graph-btn" onclick="graphFit()" title="Fit to view">&#8718;</button>
+  </div>
+</div>
+
+<!-- View C: Timeline -->
+<div class="view" id="view-timeline">
+  <div class="timeline-container" id="timelineContainer">
+    <div class="timeline-line"></div>
+  </div>
+</div>
+
+<!-- View D: Reader -->
+<div class="view" id="view-reader">
+  <div class="reader-container" id="readerContainer"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let DATA = null;
+let allNodes = [];
+let selectedNodeId = null;
+let currentView = 'tree';
+let graphZoomBehavior = null;
+let graphSvgGroup = null;
+
+const TYPE_COLORS = {
+  outcome: '#34d399',
+  opportunity: '#60a5fa',
+  solution: '#a78bfa',
+  experiment: '#fbbf24',
+  decision: '#22d3ee',
+  question: '#f472b6',
+};
+const STATUS_COLORS = {
+  active: '#3b82f6',
+  exploring: '#8b5cf6',
+  chosen: '#22c55e',
+  rejected: '#52525b',
+  deferred: '#f59e0b',
+  open: '#f472b6',
+};
+
+// ══════════════════════════════════════════
+// DATA LOADING
+// ══════════════════════════════════════════
+async function loadData() {
+  try {
+    const resp = await fetch('product-decisions.json');
+    DATA = await resp.json();
+  } catch (e) {
+    document.body.innerHTML = '<p style="color:#f87171;padding:40px">Could not load product-decisions.json</p>';
+    return;
+  }
+  buildNodeIndex();
+  renderAll();
+}
+
+function buildNodeIndex() {
+  allNodes = [];
+  const sections = ['outcomes', 'opportunities', 'solutions', 'experiments', 'decisions', 'openQuestions'];
+  const typeMap = {
+    outcomes: 'outcome',
+    opportunities: 'opportunity',
+    solutions: 'solution',
+    experiments: 'experiment',
+    decisions: 'decision',
+    openQuestions: 'question',
+  };
+  for (const section of sections) {
+    if (!DATA[section]) continue;
+    for (const item of DATA[section]) {
+      allNodes.push({ ...item, _type: typeMap[section] });
+    }
+  }
+}
+
+function getNode(id) {
+  return allNodes.find(n => n.id === id);
+}
+
+function getChildren(id) {
+  return allNodes.filter(n => n.parentId === id);
+}
+
+// ══════════════════════════════════════════
+// VIEW SWITCHING
+// ══════════════════════════════════════════
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + view));
+  if (view === 'graph') renderGraph();
+}
+
+// ══════════════════════════════════════════
+// STATS BAR
+// ══════════════════════════════════════════
+function renderStats() {
+  const row = document.getElementById('statsRow');
+  const typeCounts = {};
+  const statusCounts = {};
+  for (const n of allNodes) {
+    typeCounts[n._type] = (typeCounts[n._type] || 0) + 1;
+    if (n.status) statusCounts[n.status] = (statusCounts[n.status] || 0) + 1;
+  }
+  let html = '';
+  for (const [type, count] of Object.entries(typeCounts)) {
+    html += `<div class="stat-chip"><div class="dot" style="background:${TYPE_COLORS[type]}"></div><span class="count">${count}</span>${type}s</div>`;
+  }
+  html += '<div style="width:1px;background:#1e1e26;margin:0 4px"></div>';
+  for (const [status, count] of Object.entries(statusCounts)) {
+    html += `<div class="stat-chip"><div class="dot" style="background:${STATUS_COLORS[status] || '#52525b'}"></div><span class="count">${count}</span>${status}</div>`;
+  }
+  row.innerHTML = html;
+}
+
+// ══════════════════════════════════════════
+// VIEW A: TREE + DETAIL
+// ══════════════════════════════════════════
+function renderTree() {
+  const panel = document.getElementById('treePanel');
+  let html = '';
+
+  // Build the tree: outcomes → opportunities → solutions → experiments
+  const outcomes = allNodes.filter(n => n._type === 'outcome');
+  const decisions = allNodes.filter(n => n._type === 'decision');
+  const questions = allNodes.filter(n => n._type === 'question');
+
+  // Render outcomes and their descendants
+  for (const o of outcomes) {
+    html += treeNodeHTML(o, 0);
+    html += renderDescendants(o.id, 1);
+  }
+
+  // Decisions section
+  if (decisions.length) {
+    html += `<div class="tree-section"><div class="tree-section-label">Decisions</div>`;
+    for (const d of decisions) {
+      html += treeNodeHTML(d, 0);
+    }
+    html += `</div>`;
+  }
+
+  // Open questions
+  if (questions.length) {
+    html += `<div class="tree-section"><div class="tree-section-label">Open Questions</div>`;
+    for (const q of questions) {
+      html += treeNodeHTML(q, 0);
+    }
+    html += `</div>`;
+  }
+
+  panel.innerHTML = html;
+  panel.querySelectorAll('.tree-node').forEach(el => {
+    el.addEventListener('click', () => selectNode(el.dataset.id));
+  });
+}
+
+function renderDescendants(parentId, depth) {
+  const children = getChildren(parentId);
+  let html = '';
+  for (const child of children) {
+    html += treeNodeHTML(child, depth);
+    html += renderDescendants(child.id, depth + 1);
+  }
+  return html;
+}
+
+function treeNodeHTML(node, depth) {
+  const indent = depth > 0 ? ` tree-indent-${Math.min(depth, 3)}` : '';
+  const color = TYPE_COLORS[node._type] || '#52525b';
+  const statusColor = STATUS_COLORS[node.status] || '#52525b';
+  const statusLabel = node.status || '';
+  return `<div class="tree-node${indent}" data-id="${node.id}">
+    <div class="node-dot" style="background:${color};${node.status === 'active' || node.status === 'exploring' ? 'box-shadow:0 0 5px ' + color + '66' : ''}"></div>
+    <span class="node-id">${node.id}</span>
+    <span class="node-title">${node.title}</span>
+    <span class="status-badge status-${node.status}">${statusLabel}</span>
+  </div>`;
+}
+
+function selectNode(id) {
+  selectedNodeId = id;
+  document.querySelectorAll('.tree-node').forEach(el => el.classList.toggle('selected', el.dataset.id === id));
+  renderDetail(id);
+}
+
+function renderDetail(id) {
+  const panel = document.getElementById('detailPanel');
+  const node = getNode(id);
+  if (!node) {
+    panel.innerHTML = '<div class="detail-empty">Node not found</div>';
+    return;
+  }
+
+  const typeColor = TYPE_COLORS[node._type] || '#52525b';
+  let html = '';
+
+  // Header
+  html += `<div class="detail-header">`;
+  html += `<span class="type-badge type-${node._type}">${node._type}</span>`;
+  html += `<span class="status-badge status-${node.status}">${node.status}</span>`;
+  html += `</div>`;
+  html += `<div class="detail-title" style="color:${typeColor}">${node.title}</div>`;
+  html += `<div class="detail-date">${node.id}${node.date ? ' · ' + node.date : ''}</div>`;
+
+  // Reasoning
+  if (node.reasoning) {
+    html += `<div class="detail-section">`;
+    html += `<div class="detail-section-label">Reasoning</div>`;
+    html += `<div class="detail-reasoning">${node.reasoning}</div>`;
+    html += `</div>`;
+  }
+
+  // Context (for questions)
+  if (node.context) {
+    html += `<div class="detail-section">`;
+    html += `<div class="detail-section-label">Context</div>`;
+    html += `<div class="detail-reasoning">${node.context}</div>`;
+    html += `</div>`;
+  }
+
+  // Evidence
+  if (node.evidence && node.evidence.length) {
+    html += `<div class="detail-section">`;
+    html += `<div class="detail-section-label">Evidence</div>`;
+    for (const ev of node.evidence) {
+      html += `<div class="detail-evidence">`;
+      html += `<div class="quote">"${ev.quote}"</div>`;
+      html += `<div class="attribution">${ev.type} — ${ev.source}</div>`;
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Open items
+  if (node.openItems && node.openItems.length) {
+    html += `<div class="detail-section">`;
+    html += `<div class="detail-section-label">Open Items</div>`;
+    html += `<ul class="detail-open-items">`;
+    for (const item of node.openItems) {
+      html += `<li>${item}</li>`;
+    }
+    html += `</ul></div>`;
+  }
+
+  // Artifact link
+  if (node.artifact) {
+    html += `<div class="detail-section">`;
+    html += `<div class="detail-section-label">Artifact</div>`;
+    html += `<a class="detail-artifact" href="${node.artifact}" target="_blank">&#9654; ${node.artifact}</a>`;
+    html += `</div>`;
+  }
+
+  // Related
+  const relatedIds = node.relatedIds || [];
+  const children = getChildren(node.id);
+  const parent = node.parentId ? getNode(node.parentId) : null;
+
+  if (parent || relatedIds.length || children.length) {
+    html += `<div class="detail-section">`;
+    html += `<div class="detail-section-label">Connections</div>`;
+    html += `<div class="detail-related">`;
+    if (parent) {
+      html += `<div class="detail-related-link" onclick="selectNode('${parent.id}')" style="border-color:${TYPE_COLORS[parent._type]}33">&#8593; ${parent.id}: ${parent.title}</div>`;
+    }
+    for (const rid of relatedIds) {
+      const rn = getNode(rid);
+      if (rn) html += `<div class="detail-related-link" onclick="selectNode('${rid}')" style="border-color:${TYPE_COLORS[rn._type]}33">&#8596; ${rn.id}: ${rn.title}</div>`;
+    }
+    for (const child of children) {
+      html += `<div class="detail-related-link" onclick="selectNode('${child.id}')" style="border-color:${TYPE_COLORS[child._type]}33">&#8595; ${child.id}: ${child.title}</div>`;
+    }
+    html += `</div></div>`;
+  }
+
+  panel.innerHTML = html;
+}
+
+// ══════════════════════════════════════════
+// VIEW B: GRAPH
+// ══════════════════════════════════════════
+function renderGraph() {
+  const container = document.getElementById('graph-canvas');
+  container.innerHTML = '';
+
+  // Build dagre graph
+  const g = new dagre.graphlib.Graph();
+  g.setGraph({ rankdir: 'TB', ranksep: 60, nodesep: 40, marginx: 40, marginy: 40 });
+  g.setDefaultEdgeLabel(() => ({}));
+
+  // Add nodes
+  for (const node of allNodes) {
+    const label = `${node.id}: ${node.title}`;
+    const truncated = label.length > 36 ? label.slice(0, 33) + '...' : label;
+    g.setNode(node.id, { label: truncated, width: 220, height: 44, _node: node });
+  }
+
+  // Add edges
+  for (const node of allNodes) {
+    if (node.parentId && getNode(node.parentId)) {
+      g.setEdge(node.parentId, node.id, { _type: 'parent' });
+    }
+    if (node.relatedIds) {
+      for (const rid of node.relatedIds) {
+        if (getNode(rid) && !g.hasEdge(node.id, rid) && !g.hasEdge(rid, node.id)) {
+          g.setEdge(node.id, rid, { _type: 'related' });
+        }
+      }
+    }
+  }
+
+  dagre.layout(g);
+
+  // Render with D3
+  const graphInfo = g.graph();
+  const svg = d3.select(container).append('svg')
+    .attr('width', '100%')
+    .attr('height', '100%');
+
+  const defs = svg.append('defs');
+  defs.append('marker')
+    .attr('id', 'arrow')
+    .attr('viewBox', '0 0 10 10')
+    .attr('refX', 9)
+    .attr('refY', 5)
+    .attr('markerWidth', 6)
+    .attr('markerHeight', 6)
+    .attr('orient', 'auto-start-reverse')
+    .append('path')
+    .attr('d', 'M 0 0 L 10 5 L 0 10 z')
+    .attr('fill', '#2a2a35');
+
+  const gRoot = svg.append('g');
+  graphSvgGroup = gRoot;
+
+  // Zoom
+  graphZoomBehavior = d3.zoom()
+    .scaleExtent([0.2, 3])
+    .on('zoom', (event) => gRoot.attr('transform', event.transform));
+  svg.call(graphZoomBehavior);
+
+  // Edges
+  g.edges().forEach(e => {
+    const edge = g.edge(e);
+    const isRelated = edge._type === 'related';
+    const points = edge.points;
+    const line = d3.line().x(d => d.x).y(d => d.y).curve(d3.curveBasis);
+    gRoot.append('g')
+      .attr('class', `graph-edge ${isRelated ? 'related' : 'parent'}`)
+      .append('path')
+      .attr('d', line(points))
+      .attr('marker-end', isRelated ? '' : 'url(#arrow)');
+  });
+
+  // Nodes
+  const tooltip = document.getElementById('graphTooltip');
+
+  g.nodes().forEach(nId => {
+    const info = g.node(nId);
+    const node = info._node;
+    const color = TYPE_COLORS[node._type] || '#52525b';
+    const isRejected = node.status === 'rejected';
+
+    const group = gRoot.append('g')
+      .attr('class', 'graph-node')
+      .attr('transform', `translate(${info.x - info.width / 2}, ${info.y - info.height / 2})`)
+      .on('mouseenter', (event) => {
+        let ttHtml = `<div class="tt-title">${node.title}</div>`;
+        ttHtml += `<div class="tt-status"><span class="type-badge type-${node._type}">${node._type}</span> <span class="status-badge status-${node.status}">${node.status}</span></div>`;
+        if (node.reasoning) ttHtml += `<div>${node.reasoning.slice(0, 200)}${node.reasoning.length > 200 ? '...' : ''}</div>`;
+        tooltip.innerHTML = ttHtml;
+        tooltip.classList.add('visible');
+        const rect = container.getBoundingClientRect();
+        tooltip.style.left = (event.clientX - rect.left + 12) + 'px';
+        tooltip.style.top = (event.clientY - rect.top + 12) + 'px';
+      })
+      .on('mousemove', (event) => {
+        const rect = container.getBoundingClientRect();
+        tooltip.style.left = (event.clientX - rect.left + 12) + 'px';
+        tooltip.style.top = (event.clientY - rect.top + 12) + 'px';
+      })
+      .on('mouseleave', () => tooltip.classList.remove('visible'))
+      .on('click', () => {
+        switchView('tree');
+        selectNode(node.id);
+      });
+
+    group.append('rect')
+      .attr('width', info.width)
+      .attr('height', info.height)
+      .attr('fill', isRejected ? '#111116' : color + '0d')
+      .attr('stroke', isRejected ? '#1e1e26' : color + '44')
+      .attr('opacity', isRejected ? 0.5 : 1);
+
+    // Type dot
+    group.append('circle')
+      .attr('cx', 14)
+      .attr('cy', info.height / 2)
+      .attr('r', 4)
+      .attr('fill', color)
+      .attr('opacity', isRejected ? 0.4 : 1);
+
+    // Label
+    group.append('text')
+      .attr('x', 26)
+      .attr('y', info.height / 2 + 1)
+      .attr('dominant-baseline', 'middle')
+      .attr('font-size', 11)
+      .attr('fill', isRejected ? '#52525b' : '#e4e4e7')
+      .text(info.label);
+  });
+
+  // Initial fit
+  requestAnimationFrame(graphFit);
+}
+
+function graphZoom(factor) {
+  const svg = d3.select('#graph-canvas svg');
+  svg.transition().duration(200).call(graphZoomBehavior.scaleBy, factor);
+}
+
+function graphFit() {
+  const svg = d3.select('#graph-canvas svg');
+  const svgEl = svg.node();
+  if (!svgEl || !graphSvgGroup) return;
+  const bounds = graphSvgGroup.node().getBBox();
+  const parent = svgEl.parentElement;
+  const fullWidth = parent.clientWidth;
+  const fullHeight = parent.clientHeight;
+  const width = bounds.width;
+  const height = bounds.height;
+  const midX = bounds.x + width / 2;
+  const midY = bounds.y + height / 2;
+  const scale = 0.85 / Math.max(width / fullWidth, height / fullHeight);
+  const translate = [fullWidth / 2 - scale * midX, fullHeight / 2 - scale * midY];
+  svg.transition().duration(400).call(
+    graphZoomBehavior.transform,
+    d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
+  );
+}
+
+// ══════════════════════════════════════════
+// VIEW C: TIMELINE
+// ══════════════════════════════════════════
+function renderTimeline() {
+  const container = document.getElementById('timelineContainer');
+  // Keep the line element
+  container.innerHTML = '<div class="timeline-line"></div>';
+
+  // Sort all nodes by date
+  const dated = allNodes.filter(n => n.date).sort((a, b) => a.date.localeCompare(b.date));
+
+  // Group by date
+  const groups = {};
+  for (const node of dated) {
+    if (!groups[node.date]) groups[node.date] = [];
+    groups[node.date].push(node);
+  }
+
+  for (const [date, nodes] of Object.entries(groups)) {
+    let html = `<div class="timeline-group">`;
+    html += `<div class="timeline-date">${date}</div>`;
+
+    for (const node of nodes) {
+      const color = TYPE_COLORS[node._type] || '#52525b';
+      html += `<div class="timeline-entry" style="border-left: 2px solid ${color}33">`;
+      html += `<div class="timeline-entry-header">`;
+      html += `<span class="type-badge type-${node._type}">${node._type}</span>`;
+      html += `<span class="status-badge status-${node.status}">${node.status}</span>`;
+      html += `<span class="timeline-entry-title">${node.title}</span>`;
+      html += `</div>`;
+      if (node.reasoning) {
+        html += `<div class="timeline-entry-reasoning">${node.reasoning}</div>`;
+      }
+      if (node.context) {
+        html += `<div class="timeline-entry-reasoning">${node.context}</div>`;
+      }
+      if (node.evidence && node.evidence.length) {
+        for (const ev of node.evidence) {
+          html += `<div class="timeline-entry-evidence">`;
+          html += `<div class="quote">"${ev.quote}"</div>`;
+          html += `<div class="attribution">${ev.type} — ${ev.source}</div>`;
+          html += `</div>`;
+        }
+      }
+      html += `</div>`;
+    }
+    html += `</div>`;
+    container.innerHTML += html;
+  }
+}
+
+// ══════════════════════════════════════════
+// VIEW D: READER
+// ══════════════════════════════════════════
+function renderReader() {
+  const container = document.getElementById('readerContainer');
+  let html = '';
+
+  const sections = [
+    { key: 'outcomes', label: 'Outcomes', type: 'outcome' },
+    { key: 'opportunities', label: 'Opportunities', type: 'opportunity' },
+    { key: 'solutions', label: 'Solutions', type: 'solution' },
+    { key: 'experiments', label: 'Experiments', type: 'experiment' },
+    { key: 'decisions', label: 'Decisions', type: 'decision' },
+    { key: 'openQuestions', label: 'Open Questions', type: 'question' },
+  ];
+
+  for (const sec of sections) {
+    const items = DATA[sec.key];
+    if (!items || !items.length) continue;
+    const color = TYPE_COLORS[sec.type];
+
+    html += `<div class="reader-section">`;
+    html += `<div class="reader-section-header">`;
+    html += `<div class="reader-section-title" style="color:${color}">${sec.label}</div>`;
+    html += `<span class="reader-section-count">${items.length}</span>`;
+    html += `</div>`;
+
+    for (const item of items) {
+      const isRejected = item.status === 'rejected';
+      html += `<div class="reader-card${isRejected ? ' rejected' : ''}">`;
+      html += `<div class="reader-card-header">`;
+      html += `<span class="type-badge type-${sec.type}" style="font-size:8px">${item.id}</span>`;
+      html += `<span class="status-badge status-${item.status}">${item.status}</span>`;
+      html += `<span class="reader-card-title">${item.title}</span>`;
+      if (item.date) html += `<span class="reader-card-date">${item.date}</span>`;
+      html += `</div>`;
+
+      if (item.reasoning) {
+        html += `<div class="reader-card-reasoning">${item.reasoning}</div>`;
+      }
+      if (item.context) {
+        html += `<div class="reader-card-reasoning">${item.context}</div>`;
+      }
+
+      if (item.evidence && item.evidence.length) {
+        for (const ev of item.evidence) {
+          html += `<div class="reader-card-evidence">`;
+          html += `<div class="quote">"${ev.quote}"</div>`;
+          html += `<div class="attribution">${ev.type} — ${ev.source}</div>`;
+          html += `</div>`;
+        }
+      }
+
+      if (item.artifact) {
+        html += `<div class="reader-card-meta"><a class="detail-artifact" href="${item.artifact}" target="_blank">&#9654; ${item.artifact}</a></div>`;
+      }
+
+      if (item.openItems && item.openItems.length) {
+        html += `<ul class="detail-open-items" style="margin-top:8px">`;
+        for (const oi of item.openItems) html += `<li>${oi}</li>`;
+        html += `</ul>`;
+      }
+
+      // Related links
+      if (item.relatedIds && item.relatedIds.length) {
+        html += `<div class="reader-card-meta">`;
+        for (const rid of item.relatedIds) {
+          const rn = getNode(rid);
+          if (rn) html += `<span class="detail-related-link" style="cursor:default;font-size:10px">&#8596; ${rn.id}: ${rn.title}</span>`;
+        }
+        html += `</div>`;
+      }
+
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ══════════════════════════════════════════
+// RENDER ALL
+// ══════════════════════════════════════════
+function renderAll() {
+  document.getElementById('title').textContent = DATA.title;
+  document.getElementById('project').textContent = DATA.project;
+  document.getElementById('updated').textContent = `Updated ${DATA.lastUpdated}`;
+  renderStats();
+  renderTree();
+  renderTimeline();
+  renderReader();
+  // Graph renders on-demand when tab is switched
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+loadData();
+</script>
+
+</body>
+</html>

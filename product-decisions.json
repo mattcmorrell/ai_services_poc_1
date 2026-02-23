@@ -1,0 +1,208 @@
+{
+  "title": "Product Decision Journal",
+  "project": "AI Services POC — BambooHR Consultant App",
+  "lastUpdated": "2026-02-23",
+  "schema": {
+    "version": 1,
+    "nodeTypes": ["outcome", "opportunity", "solution", "experiment", "decision"],
+    "statuses": ["active", "exploring", "chosen", "rejected", "deferred", "open"]
+  },
+  "outcomes": [
+    {
+      "id": "O1",
+      "title": "Make design work in Claude Code legible and transferable",
+      "status": "active",
+      "date": "2026-02-23",
+      "reasoning": "Designer transitioned from Figma to Claude Code. Two things were lost: (1) the visual canvas showing all artboards/branches/iterations at a glance, and (2) the ability to hand off a project file where a new designer can see everything that's been designed and understand why. Without these, a Claude Code project is opaque to anyone who wasn't in the original sessions.",
+      "evidence": [
+        { "type": "firsthand", "source": "Designer (project lead)", "quote": "If I take over a project that another designer has worked on, I just want to talk to Claude and get answers on any questions I have: why things were done a certain way, what the decisions were at critical junctures." },
+        { "type": "firsthand", "source": "Designer (project lead)", "quote": "A coworker was using a spreadsheet to keep track of ideas, experiments done, results found. My reaction was: I want to be able to ask Claude about this instead of looking through a spreadsheet." }
+      ]
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "OP1",
+      "title": "Designers can't see the landscape of what's been explored",
+      "status": "active",
+      "date": "2026-02-23",
+      "parentId": "O1",
+      "reasoning": "In Figma, you copy an artboard and start changing it — the canvas shows the whole train of thought, the branches, dead ends. In Claude Code, there's no equivalent. You can't see what screens exist, what was tried, what was abandoned. The mental model lives only in the designer's head and the conversation history.",
+      "evidence": []
+    },
+    {
+      "id": "OP2",
+      "title": "No institutional memory — new designer can't understand why things are the way they are",
+      "status": "active",
+      "date": "2026-02-23",
+      "parentId": "O1",
+      "reasoning": "When a designer takes over a project, step one is knowing what exists (inventory). Step two is understanding why decisions were made (narrative). The previous designer might not be around to explain. Today there's no artifact that captures this — you'd have to read through every conversation transcript."
+    }
+  ],
+  "solutions": [
+    {
+      "id": "S1",
+      "title": "Design Iteration Tracker (Tool 1)",
+      "status": "active",
+      "date": "2026-02-20",
+      "parentId": "OP1",
+      "reasoning": "A visual tool for tracking the branching tree of ideas during active design work. Shows what's active, parked, rejected, and how ideas spawned from each other. This is the 'Figma canvas replacement' — externalizing the mental model of exploration. Addresses OP1 directly.",
+      "artifact": "decision-tree.html",
+      "artifactData": "decision-tree-data.json",
+      "relatedIds": ["S2"],
+      "evidence": [
+        { "type": "observation", "source": "Designer", "quote": "It's just hard to keep the whole tree in your head of good ideas vs ideas to come back to later vs rejected ideas." }
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Product Decision Journal (Tool 2)",
+      "status": "exploring",
+      "date": "2026-02-23",
+      "parentId": "OP2",
+      "reasoning": "A living record of the entire product discovery process — outcomes, opportunities, solutions, experiments, decisions. Claude maintains it automatically. Primary interface is conversational (ask Claude 'why did we choose X?'). Secondary interface is visual (OST graph). This is the handoff artifact — makes a project legible to newcomers. Addresses OP2 directly.",
+      "artifact": "product-decisions.json",
+      "relatedIds": ["S1"],
+      "evidence": [
+        { "type": "analogy", "source": "Designer", "quote": "The mental model I have here is automated AI meeting notes, where AI has listened to the meeting and captured todos, action items, etc." }
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Key decision: Two separate tools, not one",
+      "status": "chosen",
+      "date": "2026-02-23",
+      "parentId": "O1",
+      "reasoning": "Tool 1 (iteration tracker) is the workbench — used during active design. Tool 2 (decision journal) is the archive — used for handoff and institutional memory. Tool 1 feeds into Tool 2: exploration captured in the iteration tracker gets distilled into the decision journal as entries. They must stay separate because they serve different audiences and timescales. The iteration tracker can be referenced from a decision journal node but they have independent schemas and lifecycles.",
+      "relatedIds": ["S1", "S2"]
+    }
+  ],
+  "experiments": [
+    {
+      "id": "E1",
+      "title": "Spreadsheet for tracking decisions",
+      "status": "rejected",
+      "date": "2026-02-23",
+      "parentId": "S2",
+      "reasoning": "A coworker's approach — tracking ideas, experiments, results in a spreadsheet. Rejected because: not queryable conversationally by Claude, not visual/spatial, flat structure can't represent an OST hierarchy, and the designer's reaction was 'I want to ask Claude about this, not look through a spreadsheet.'"
+    },
+    {
+      "id": "E2",
+      "title": "Obsidian vault (folder of markdown files)",
+      "status": "rejected",
+      "date": "2026-02-23",
+      "parentId": "S2",
+      "reasoning": "One file per decision/opportunity/experiment, linked with [[wikilinks]]. Good for humans browsing, good for Claude to read/write. Rejected because: Obsidian's graph view is famously useless for comprehension (hairball), requires Obsidian as a dependency, and adds friction to adoption."
+    },
+    {
+      "id": "E3",
+      "title": "Single structured JSON + standalone HTML viewer",
+      "status": "chosen",
+      "date": "2026-02-23",
+      "parentId": "S2",
+      "reasoning": "Chosen for v1. Claude reads/writes JSON natively. Zero external dependencies — render it however you want with a standalone HTML file (proven pattern from the iteration tracker). JSON isn't fun to read raw, so it lives or dies by the viewer and Claude's ability to answer questions from it. Simplest path to a working v1.",
+      "relatedIds": ["E6"]
+    },
+    {
+      "id": "E4",
+      "title": "Single markdown file with conventions (DECISIONS.md)",
+      "status": "rejected",
+      "date": "2026-02-23",
+      "parentId": "S2",
+      "reasoning": "Headings = outcomes, subheadings = opportunities, bullets = solutions. Claude can read/write trivially, humans can read in any editor. Rejected because: too unstructured for reliable querying, no graph view possible without a parser, and markdown conventions drift over time."
+    },
+    {
+      "id": "E5",
+      "title": "Notion as collaboration layer",
+      "status": "deferred",
+      "date": "2026-02-23",
+      "parentId": "S2",
+      "reasoning": "Notion databases can represent the OST relationally (Outcomes, Opportunities, Solutions, Experiments as linked databases). Multiple views of same data (kanban, table, gallery, timeline). Real-time collaboration built in. Official Notion MCP exists with full read/write (22 tools, create entries, update properties, write page content). Free plan works for solo + 10 guests. Deferred because: collaboration isn't a v1 requirement, and the local JSON approach proves the concept faster. But this is the path forward for scaling across the org.",
+      "evidence": [
+        { "type": "research", "source": "Notion MCP investigation", "quote": "Official Notion MCP server, maintained by Notion. Setup is one command + OAuth. Claude can create databases, create entries, update properties, write page content. Cannot upload files or do bulk operations." },
+        { "type": "research", "source": "Notion free plan investigation", "quote": "Unlimited pages and blocks for solo use. Databases and API fully available. Up to 10 guest collaborators. Pain points: 5MB file cap, 7-day version history, 1000 block limit for team workspaces." }
+      ]
+    },
+    {
+      "id": "E6",
+      "title": "Hybrid: local JSON + Notion sync",
+      "status": "deferred",
+      "date": "2026-02-23",
+      "parentId": "S2",
+      "reasoning": "Claude maintains a local JSON copy for querying and reasoning. Periodically syncs to/from Notion for collaboration. Trio maintains their FigJam OST, Claude reads it via MCP, reconciles with local copy. Described as 'janky but interesting' — doesn't require the trio to change behavior. Deferred to post-v1.",
+      "relatedIds": ["E5"]
+    },
+    {
+      "id": "E7",
+      "title": "SQLite database",
+      "status": "rejected",
+      "date": "2026-02-23",
+      "parentId": "S2",
+      "reasoning": "Structured and queryable, Claude can read/write via bash. Powerful for complex queries. Rejected because: invisible without a viewer, overkill for most projects, adds complexity without proportional benefit over JSON for this use case."
+    },
+    {
+      "id": "E8",
+      "title": "Git-native approach (commit history + PR descriptions)",
+      "status": "rejected",
+      "date": "2026-02-23",
+      "parentId": "S2",
+      "reasoning": "No new artifact — decisions live in commit messages, PR descriptions, branch names. Claude synthesizes on demand. Rejected because: most commit messages are garbage, only works retroactively, and doesn't capture the reasoning/context that lives in conversation."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "title": "Claude auto-maintains the journal via implicit capture",
+      "status": "chosen",
+      "date": "2026-02-23",
+      "reasoning": "The 'AI meeting notes' model: Claude watches for decision moments in conversation and logs them automatically. The designer doesn't change their behavior. Explicit capture ('/decision' command) also available as a supplement. Hook-based capture (post-session review) is interesting for later. The key insight: the tool fails if it requires manual curation — it needs to be passive like meeting notes AI.",
+      "relatedIds": ["S2"],
+      "openItems": ["Exact trigger heuristics for implicit capture not yet defined", "Post-session hook design not yet specified"]
+    },
+    {
+      "id": "D2",
+      "title": "Notion is the collaboration path, but not v1",
+      "status": "chosen",
+      "date": "2026-02-23",
+      "reasoning": "The scaling story: (1) Now: local JSON, solo + conversation with Claude. (2) Soon: show the workflow works, org buys Notion, sync local journal to Notion. (3) Later: standardized template, every project gets an OST workspace. Collaboration is not a v1 requirement, but the architecture should point toward it. The designer is pioneering a process to scale across the org.",
+      "relatedIds": ["E5", "E6"],
+      "evidence": [
+        { "type": "firsthand", "source": "Designer", "quote": "Collaboration is not a hard requirement for v1, but I'm pioneering a process here that I would really like to be able to scale across the org." }
+      ]
+    },
+    {
+      "id": "D3",
+      "title": "The ideal end-state is FigJam OST with Claude read/write",
+      "status": "open",
+      "date": "2026-02-23",
+      "reasoning": "If Claude could write to FigJam, the solution would be obvious: trio maintains OST in FigJam (as they should already be doing), Claude reads and writes via MCP, humans see it natively, no duplicate work. Currently blocked by FigJam MCP being read-only. This is the north star — every intermediate solution is a stepping stone to this.",
+      "relatedIds": ["E5", "E6"]
+    }
+  ],
+  "openQuestions": [
+    {
+      "id": "Q1",
+      "title": "What are the exact heuristics for implicit decision capture?",
+      "date": "2026-02-23",
+      "context": "Claude needs to recognize decision moments in conversation: 'let's go with X', 'that doesn't work because...', 'oh interesting, what if...'. What patterns trigger a journal entry vs. are just normal conversation?"
+    },
+    {
+      "id": "Q2",
+      "title": "What should the OST graph viewer look like?",
+      "date": "2026-02-23",
+      "context": "User wants a node-and-edge graph (not just a card list). Should show dead ends grayed out, active paths highlighted. Needs to be zoomable/pannable. Should also collapse to a flat rich-content list. Standalone HTML, zero dependencies."
+    },
+    {
+      "id": "Q3",
+      "title": "When and how to introduce Notion sync?",
+      "date": "2026-02-23",
+      "context": "After v1 proves the concept. Needs: Notion MCP write working reliably, a database schema that maps to this JSON schema, a sync strategy (one-way push? bidirectional merge? conflict resolution?)."
+    },
+    {
+      "id": "Q4",
+      "title": "How does the trio's existing OST practice (if any) integrate?",
+      "date": "2026-02-23",
+      "context": "Trios should be building OSTs. If they already are (in FigJam, Miro, etc.), the journal shouldn't duplicate that work. Ideal: Claude reads the trio's OST and enriches it with design-session details."
+    }
+  ]
+}

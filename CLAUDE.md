@@ -86,3 +86,27 @@ Requires `OPENAI_API_KEY` in `.env.local`
 ### Path Alias
 
 `@/*` maps to `./src/*` (configured in tsconfig.json)
+
+## Product Decision Journal
+
+The file `product-decisions.json` is a living record of product discovery decisions for this project, structured as an Opportunity Solution Tree (outcomes, opportunities, solutions, experiments, decisions).
+
+### When resuming work or answering questions about project history
+- Read `product-decisions.json` first to understand what's been explored and why.
+
+### When to update it
+- A new solution or approach is explored → add a `solutions` entry
+- An experiment is run (prototype, test, research) → add an `experiments` entry
+- A fork-in-the-road decision is made → add a `decisions` entry with reasoning
+- An approach is rejected, deferred, or chosen → update the relevant entry's `status` and `reasoning`
+- A new question emerges → add to `openQuestions`
+- A question is resolved → remove it from `openQuestions` and capture the answer as a decision
+
+### Rules
+- Never delete entries. Change `status` instead (active, exploring, chosen, rejected, deferred, open).
+- Always capture `reasoning` — the *why*, not just the *what*.
+- Include `evidence` when available (user quotes, research findings, persona feedback).
+- Use `relatedIds` to link connected entries across the tree.
+- Use `parentId` to maintain the OST hierarchy (outcome → opportunity → solution → experiment).
+- Update `lastUpdated` when making changes.
+- This file is SEPARATE from the Design Iteration Tracker (`decision-tree-data.json`). They serve different purposes. Reference the iteration tracker via `artifact` fields when relevant, but don't merge them.
