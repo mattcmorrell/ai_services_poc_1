@@ -43,8 +43,8 @@
     color: #8b8b95;
   }
   .top-bar .updated {
-    font-size: 11px;
-    color: #b4b4bc;
+    font-size: 10px;
+    color: #52525b;
   }
 
   /* ── Tab bar ── */
@@ -1559,7 +1559,9 @@ function renderReader() {
 function renderAll() {
   document.getElementById('title').textContent = DATA.title;
   document.getElementById('project').textContent = DATA.project;
-  document.getElementById('updated').textContent = `Updated ${DATA.lastUpdated}`;
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  document.getElementById('updated').textContent = `${DATA.lastUpdated} · ${time}`;
   renderStats();
   renderTree();
   applyFilters();
