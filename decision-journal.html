@@ -39,11 +39,11 @@
   }
   .top-bar .project {
     font-size: 11px;
-    color: #52525b;
+    color: #8b8b95;
   }
   .top-bar .updated {
     font-size: 11px;
-    color: #3f3f46;
+    color: #b4b4bc;
   }
 
   /* ── Tab bar ── */
@@ -60,7 +60,7 @@
     border-radius: 6px;
     font-size: 12px;
     font-weight: 500;
-    color: #71717a;
+    color: #b4b4bc;
     cursor: pointer;
     transition: all 0.15s;
     border: 1px solid transparent;
@@ -68,7 +68,7 @@
     user-select: none;
   }
   .tab:hover {
-    color: #a1a1aa;
+    color: #b4b4bc;
     background: #141419;
   }
   .tab.active {
@@ -78,7 +78,7 @@
   }
   .tab-desc {
     font-size: 10px;
-    color: #3f3f46;
+    color: #b4b4bc;
     font-weight: 400;
     margin-left: 6px;
   }
@@ -168,9 +168,26 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    color: #52525b;
+    color: #8b8b95;
     padding: 4px 24px;
     margin-bottom: 4px;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.15s;
+  }
+  .tree-section-label:hover {
+    color: #b4b4bc;
+  }
+  .tree-section-label .chevron {
+    font-size: 8px;
+    transition: transform 0.15s;
+    display: inline-block;
+  }
+  .tree-section-label.collapsed .chevron {
+    transform: rotate(-90deg);
   }
   .tree-node {
     display: flex;
@@ -197,14 +214,14 @@
   .tree-node .node-id {
     font-size: 10px;
     font-weight: 700;
-    color: #52525b;
+    color: #8b8b95;
     font-family: 'SF Mono', 'Fira Code', monospace;
     flex-shrink: 0;
     min-width: 24px;
   }
   .tree-node .node-title {
     font-size: 12px;
-    color: #a1a1aa;
+    color: #b4b4bc;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -225,7 +242,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #3f3f46;
+    color: #b4b4bc;
     font-size: 13px;
   }
   .detail-header {
@@ -242,7 +259,7 @@
   }
   .detail-date {
     font-size: 11px;
-    color: #52525b;
+    color: #8b8b95;
     margin-bottom: 24px;
   }
   .detail-section {
@@ -253,12 +270,12 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #52525b;
+    color: #8b8b95;
     margin-bottom: 8px;
   }
   .detail-reasoning {
     font-size: 13px;
-    color: #a1a1aa;
+    color: #b4b4bc;
     line-height: 1.7;
   }
   .detail-evidence {
@@ -270,13 +287,13 @@
   }
   .detail-evidence .quote {
     font-size: 12px;
-    color: #a1a1aa;
+    color: #b4b4bc;
     font-style: italic;
     line-height: 1.6;
   }
   .detail-evidence .attribution {
     font-size: 10px;
-    color: #52525b;
+    color: #8b8b95;
     margin-top: 4px;
   }
   .detail-related {
@@ -290,7 +307,7 @@
     border-radius: 4px;
     border: 1px solid #2a2a35;
     background: #141419;
-    color: #a1a1aa;
+    color: #b4b4bc;
     cursor: pointer;
     transition: all 0.15s;
   }
@@ -320,7 +337,7 @@
   }
   .detail-open-items li {
     font-size: 12px;
-    color: #a1a1aa;
+    color: #b4b4bc;
     padding: 4px 0;
     padding-left: 16px;
     position: relative;
@@ -339,12 +356,14 @@
      ════════════════════════════════════════ */
   #view-graph {
     position: relative;
+    flex: 1;
   }
   #graph-canvas {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    inset: 0;
   }
   #graph-canvas svg {
+    display: block;
     width: 100%;
     height: 100%;
   }
@@ -386,7 +405,7 @@
     border: 1px solid #2a2a35;
     background: #141419;
     font-size: 12px;
-    color: #a1a1aa;
+    color: #b4b4bc;
     line-height: 1.5;
     pointer-events: none;
     opacity: 0;
@@ -415,7 +434,7 @@
     border-radius: 6px;
     border: 1px solid #2a2a35;
     background: #141419;
-    color: #71717a;
+    color: #b4b4bc;
     font-size: 16px;
     cursor: pointer;
     display: flex;
@@ -459,7 +478,7 @@
   .timeline-date {
     font-size: 11px;
     font-weight: 700;
-    color: #52525b;
+    color: #8b8b95;
     font-family: 'SF Mono', 'Fira Code', monospace;
     margin-bottom: 12px;
     position: relative;
@@ -510,7 +529,7 @@
   }
   .timeline-entry-reasoning {
     font-size: 12px;
-    color: #a1a1aa;
+    color: #b4b4bc;
     line-height: 1.6;
     margin-bottom: 8px;
   }
@@ -523,13 +542,13 @@
   }
   .timeline-entry-evidence .quote {
     font-size: 11px;
-    color: #a1a1aa;
+    color: #b4b4bc;
     font-style: italic;
     line-height: 1.5;
   }
   .timeline-entry-evidence .attribution {
     font-size: 10px;
-    color: #52525b;
+    color: #8b8b95;
     margin-top: 2px;
   }
 
@@ -567,7 +586,7 @@
   }
   .reader-section-count {
     font-size: 11px;
-    color: #52525b;
+    color: #8b8b95;
     font-family: 'SF Mono', 'Fira Code', monospace;
   }
   .reader-card {
@@ -598,13 +617,13 @@
   }
   .reader-card-date {
     font-size: 10px;
-    color: #3f3f46;
+    color: #b4b4bc;
     margin-left: auto;
     font-family: 'SF Mono', 'Fira Code', monospace;
   }
   .reader-card-reasoning {
     font-size: 12px;
-    color: #a1a1aa;
+    color: #b4b4bc;
     line-height: 1.7;
     margin-bottom: 10px;
   }
@@ -617,13 +636,13 @@
   }
   .reader-card-evidence .quote {
     font-size: 11px;
-    color: #a1a1aa;
+    color: #b4b4bc;
     font-style: italic;
     line-height: 1.5;
   }
   .reader-card-evidence .attribution {
     font-size: 10px;
-    color: #52525b;
+    color: #8b8b95;
     margin-top: 3px;
   }
   .reader-card-meta {
@@ -648,7 +667,7 @@
     align-items: center;
     gap: 5px;
     font-size: 11px;
-    color: #71717a;
+    color: #b4b4bc;
     padding: 3px 8px;
     border-radius: 4px;
     background: #111116;
@@ -661,7 +680,7 @@
   }
   .stat-chip .count {
     font-weight: 700;
-    color: #a1a1aa;
+    color: #b4b4bc;
     font-family: 'SF Mono', 'Fira Code', monospace;
   }
   .stat-chip.clickable {
@@ -714,7 +733,7 @@
   .toggle.on::after { transform: translateX(16px); }
   .toggle-label {
     font-size: 11px;
-    color: #52525b;
+    color: #8b8b95;
     cursor: pointer;
     user-select: none;
     transition: color 0.15s;
@@ -722,7 +741,7 @@
   .toggle-label.on { color: #a1a1aa; }
   .filter-hint {
     font-size: 10px;
-    color: #3f3f46;
+    color: #b4b4bc;
     margin-left: auto;
     transition: color 0.15s;
   }
@@ -892,17 +911,11 @@ function switchView(view) {
 // ══════════════════════════════════════════
 function renderStats() {
   const row = document.getElementById('statsRow');
-  const typeCounts = {};
   const statusCounts = {};
   for (const n of allNodes) {
-    typeCounts[n._type] = (typeCounts[n._type] || 0) + 1;
     if (n.status) statusCounts[n.status] = (statusCounts[n.status] || 0) + 1;
   }
   let html = '';
-  for (const [type, count] of Object.entries(typeCounts)) {
-    html += `<div class="stat-chip"><div class="dot" style="background:${TYPE_COLORS[type]}"></div><span class="count">${count}</span>${type}s</div>`;
-  }
-  html += '<div style="width:1px;background:#1e1e26;margin:0 4px"></div>';
   const statusOrder = ['active', 'exploring', 'chosen', 'deferred', 'rejected', 'open'];
   for (const status of statusOrder) {
     const count = statusCounts[status] || 0;
@@ -911,6 +924,7 @@ function renderStats() {
     const isActive = activeFilter === status;
     html += `<div class="stat-chip clickable${isActive ? ' active' : ''}" data-status="${status}" style="--chip-color:${color}44;--chip-bg:${color}15" onclick="toggleFilter('${status}')"><div class="dot" style="background:${color}"></div><span class="count">${count}</span>${status}</div>`;
   }
+  html += `<div class="stat-chip" style="margin-left:auto;cursor:default"><span class="count">${allNodes.length}</span>total</div>`;
   row.innerHTML = html;
 }
 
@@ -1047,7 +1061,30 @@ function renderTree() {
 function sectionLabel(text, type, indent) {
   const color = TYPE_COLORS[type] || '#52525b';
   const indentPx = indent ? (indent * 16 + 24) : 24;
-  return `<div class="tree-section-label" style="padding-left:${indentPx}px;color:${color};margin-top:12px">${text}</div>`;
+  const sectionId = `section-${type}-${indent || 0}`;
+  return `<div class="tree-section-label" style="padding-left:${indentPx}px;color:${color};margin-top:12px" data-section="${sectionId}" onclick="toggleSection(this)"><span class="chevron">&#9660;</span>${text}</div>`;
+}
+
+function toggleSection(labelEl) {
+  const sectionId = labelEl.dataset.section;
+  const isCollapsed = labelEl.classList.toggle('collapsed');
+  // Hide/show all siblings until the next section label at the same or lower indent level
+  let el = labelEl.nextElementSibling;
+  const labelIndent = parseInt(labelEl.style.paddingLeft) || 24;
+  while (el) {
+    if (el.classList.contains('tree-section-label')) {
+      const elIndent = parseInt(el.style.paddingLeft) || 24;
+      if (elIndent <= labelIndent) break; // sibling or parent section, stop
+      // child section label — hide/show it too
+      el.style.display = isCollapsed ? 'none' : '';
+      if (isCollapsed) el.classList.add('collapsed');
+    } else if (el.classList.contains('tree-node')) {
+      el.style.display = isCollapsed ? 'none' : '';
+    } else {
+      break;
+    }
+    el = el.nextElementSibling;
+  }
 }
 
 function renderDescendants(parentId, depth) {
