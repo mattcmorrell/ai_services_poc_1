@@ -86,3 +86,73 @@ All in `src/components/clients/approaches/`:
 2. **Merge winning approach** — strip the prototype switcher + unused approaches, ship clean.
 3. **Build out chat view** — currently stub ("Chat view coming soon"). Wire up real chat UI.
 4. **Consider hybrid** — if user wants, combine C (sidebar) with D (table view) for a triage mode.
+
+---
+
+# SIDEQUEST — Product Decision Journal & Design Tooling
+
+This section is separate from the Client Tabs feature above. It tracks a meta-project: building tools that make Claude Code design work legible, transferable, and traceable.
+
+## Goal
+
+Two problems to solve for designers working in Claude Code:
+1. **No visual canvas** — In Figma you can see all artboards, branches, and iterations at a glance. In CC there's no equivalent. You can't see what screens exist, what was tried, what was abandoned.
+2. **No institutional memory** — When a designer takes over a project, there's no artifact that captures why things are the way they are. The previous designer might not be around to explain.
+
+The vision: any designer should be able to pick up a CC project and (a) see the full landscape of what's been explored via a visual artifact, and (b) ask Claude questions about any decision and get answers.
+
+## Current Direction
+
+**Two separate tools, not one:**
+- **Tool 1: Design Iteration Tracker** — tracks branching tree of ideas during active design (the "workbench"). Already exists as `decision-tree.html` + `decision-tree-data.json`. Captures what's active, parked, rejected, spawned-from.
+- **Tool 2: Product Decision Journal** — living record of the full product discovery process structured as an OST (the "archive/handoff artifact"). New file: `product-decisions.json` + `decision-journal.html` viewer.
+
+Tool 1 feeds into Tool 2. The iteration tracker captures real-time exploration; that exploration gets distilled into the decision journal.
+
+## What's Done
+
+### Product Decision Journal (Tool 2) — v1
+- **`product-decisions.json`** — Structured as an Opportunity Solution Tree: outcomes, opportunities, solutions, experiments, decisions, open questions. Each node has id, title, status, reasoning, date, parentId, relatedIds, evidence[]. Seeded with the full brainstorm about how to build this tool (meta!).
+- **`decision-journal.html`** — 4-view standalone HTML viewer served from `localhost:3333`:
+  - **Tree view** (primary): OST hierarchy grouped by opportunity. Opportunities are collapsible sections with solutions nested underneath. Active/exploring items get colored left borders + emphasis. Experiments auto-collapsed. Status filter chips + "Active only" toggle.
+  - **Graph view**: Node-and-edge diagram via dagre + d3. Zoomable/pannable. Hover tooltips. Click to jump to tree detail.
+  - **Timeline view**: Chronological vertical timeline grouped by date.
+  - **Reader view**: Full content, section by section.
+- **CLAUDE.md updated** with instructions for Claude to read/maintain the journal across sessions.
+
+### Key Decisions Made
+1. **Two separate tools** — workbench (iteration tracker) vs archive (decision journal). Different audiences, different timescales. Must stay separate files/schemas.
+2. **Claude auto-maintains the journal via implicit capture** — "AI meeting notes" model. Claude watches for decision moments and logs them. Explicit `/decision` command also available as supplement.
+3. **Notion is the collaboration path, but not v1** — Notion MCP has full read/write (22 tools). Free plan works for solo + 10 guests. Deferred because collab isn't a v1 requirement. Architecture should point toward it.
+4. **The ideal end-state is FigJam OST with Claude read/write** — currently blocked by FigJam MCP being read-only. Every intermediate solution is a stepping stone.
+5. **Local JSON + standalone HTML viewer for v1** — proven pattern from the iteration tracker. Zero dependencies. Claude reads/writes JSON natively.
+
+### Rejected Approaches for Tool 2
+- **Spreadsheet** — not queryable conversationally, not visual, flat
+- **Obsidian vault** — hairball graph, extra dependency
+- **Single markdown file** — too unstructured for reliable querying
+- **SQLite** — overkill, invisible without a viewer
+- **Git-native** — commit messages are garbage, only works retroactively
+
+### Deferred for Later
+- **Notion sync** — local JSON ↔ Notion database. Enables real-time collaboration for the trio.
+- **Hybrid FigJam sync** — Claude reads trio's FigJam OST, merges with local journal. "Janky but interesting."
+- **Auto-capture hooks** — post-session hook where Claude reviews what happened and proposes journal entries.
+- **Graph viewer as full spatial canvas** — node-and-edge with pan/zoom, dead ends grayed out, like a Figma canvas.
+
+## Files Owned by This Sidequest
+- `decision-tree.html`, `decision-tree-data.json`, `decision-tree-server.js` — Design Iteration Tracker (Tool 1)
+- `product-decisions.json`, `decision-journal.html` — Product Decision Journal (Tool 2)
+- `SIDEQUEST.md` — Original sidequest brief
+
+## Open Questions
+- What are the exact heuristics for implicit decision capture?
+- When/how to introduce Notion sync?
+- How does the trio's existing OST practice (if any) integrate?
+- Scaling story: how to make this adoptable across the org?
+
+## Next Steps
+1. Continue refining the tree view UX (primary working view)
+2. Add inline editing to the decision journal (proven pattern from iteration tracker)
+3. Test the "ask Claude about decisions" workflow — can Claude answer handoff questions from the JSON?
+4. Consider building a `/decision` slash command for explicit capture

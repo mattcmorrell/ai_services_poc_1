@@ -12,9 +12,10 @@
     background: #0a0a0f;
     color: #e4e4e7;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   /* ── Top bar ── */
@@ -23,7 +24,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px 32px;
-    border-bottom: 1px solid #1e1e26;
+    border-bottom: 1px solid #2d2d3a;
     background: #0d0d14;
     flex-shrink: 0;
   }
@@ -51,7 +52,7 @@
     display: flex;
     gap: 2px;
     padding: 8px 32px;
-    border-bottom: 1px solid #1e1e26;
+    border-bottom: 1px solid #2d2d3a;
     background: #0d0d14;
     flex-shrink: 0;
   }
@@ -144,7 +145,7 @@
   .tree-panel {
     width: 420px;
     min-width: 320px;
-    border-right: 1px solid #1e1e26;
+    border-right: 1px solid #2d2d3a;
     overflow-y: auto;
     padding: 20px 0;
   }
@@ -169,8 +170,9 @@
     text-transform: uppercase;
     letter-spacing: 1.5px;
     color: #8b8b95;
-    padding: 4px 24px;
-    margin-bottom: 4px;
+    padding: 6px 24px;
+    margin-bottom: 2px;
+    margin-top: 4px;
     cursor: pointer;
     user-select: none;
     display: flex;
@@ -179,7 +181,7 @@
     transition: color 0.15s;
   }
   .tree-section-label:hover {
-    color: #b4b4bc;
+    color: #d4d4dc;
   }
   .tree-section-label .chevron {
     font-size: 8px;
@@ -189,14 +191,21 @@
   .tree-section-label.collapsed .chevron {
     transform: rotate(-90deg);
   }
+  .tree-section-label .section-count {
+    font-size: 9px;
+    color: #8b8b95;
+    font-weight: 400;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    opacity: 0.6;
+  }
   .tree-node {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 7px 24px;
     cursor: pointer;
-    transition: background 0.1s;
-    border-left: 2px solid transparent;
+    transition: background 0.1s, opacity 0.15s;
+    border-left: 3px solid transparent;
   }
   .tree-node:hover {
     background: #141419;
@@ -211,20 +220,10 @@
     border-radius: 50%;
     flex-shrink: 0;
   }
-  .tree-node .node-id {
-    font-size: 10px;
-    font-weight: 700;
-    color: #8b8b95;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    flex-shrink: 0;
-    min-width: 24px;
-  }
   .tree-node .node-title {
     font-size: 12px;
-    color: #b4b4bc;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: #8b8b95;
+    line-height: 1.4;
   }
   .tree-node.selected .node-title {
     color: #e4e4e7;
@@ -232,9 +231,89 @@
   .tree-node .node-status {
     margin-left: auto;
   }
+  /* Indentation */
   .tree-indent-1 { padding-left: 40px; }
   .tree-indent-2 { padding-left: 56px; }
   .tree-indent-3 { padding-left: 72px; }
+
+  /* ── Active/exploring items get emphasis ── */
+  .tree-node.emphasis {
+    border-left-color: var(--emphasis-color);
+    background: var(--emphasis-bg);
+  }
+  .tree-node.emphasis .node-title {
+    color: #e4e4e7;
+    font-weight: 500;
+  }
+  .tree-node.emphasis:hover {
+    background: var(--emphasis-hover);
+  }
+
+  /* ── Opportunity group label ── */
+  .tree-opp-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    margin-top: 8px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    border-top: 1px solid #2d2d3a;
+    transition: background 0.1s;
+  }
+  .tree-opp-label:first-of-type {
+    border-top: none;
+  }
+  .tree-opp-label:hover {
+    background: #141419;
+  }
+  .tree-opp-label.opp-active {
+    border-left-color: rgba(96,165,250,0.4);
+    background: rgba(96,165,250,0.04);
+  }
+  .tree-opp-label .opp-expand {
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+  .tree-opp-label .opp-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #d4d4dc;
+    line-height: 1.4;
+  }
+  .tree-opp-label.opp-active .opp-title {
+    color: #f4f4f5;
+  }
+  .tree-opp-label .section-count {
+    font-size: 9px;
+    color: #8b8b95;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    opacity: 0.6;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .tree-opp-label.collapsed .chevron {
+    transform: rotate(-90deg);
+  }
+  .tree-opp-label .chevron {
+    font-size: 8px;
+    color: #8b8b95;
+    transition: transform 0.15s;
+    display: inline-block;
+  }
+  .tree-opp-label.selected {
+    background: rgba(96,165,250,0.06);
+    border-left-color: #60a5fa;
+  }
+
+  /* ── Sub-section labels (Experiments under a solution) ── */
+  .tree-sub-label {
+    font-size: 8px;
+    margin-top: 4px;
+    opacity: 0.7;
+  }
 
   /* Detail panel content */
   .detail-empty {
@@ -576,7 +655,7 @@
     gap: 10px;
     margin-bottom: 16px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #1e1e26;
+    border-bottom: 1px solid #2d2d3a;
   }
   .reader-section-title {
     font-size: 14px;
@@ -657,7 +736,7 @@
     display: flex;
     gap: 8px;
     padding: 8px 32px;
-    border-bottom: 1px solid #1e1e26;
+    border-bottom: 1px solid #2d2d3a;
     background: #0d0d14;
     flex-shrink: 0;
     flex-wrap: wrap;
@@ -671,7 +750,7 @@
     padding: 3px 8px;
     border-radius: 4px;
     background: #111116;
-    border: 1px solid #1e1e26;
+    border: 1px solid #2d2d3a;
   }
   .stat-chip .dot {
     width: 6px;
@@ -697,15 +776,6 @@
   }
 
   /* ── Active-only toggle ── */
-  .filter-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 6px 32px;
-    border-bottom: 1px solid #1e1e26;
-    background: #0d0d14;
-    flex-shrink: 0;
-  }
   .toggle {
     position: relative;
     width: 32px;
@@ -785,12 +855,6 @@
 </div>
 
 <div class="stats-row" id="statsRow"></div>
-
-<div class="filter-bar">
-  <button class="toggle" id="activeToggle" onclick="toggleActiveOnly()"></button>
-  <span class="toggle-label" onclick="toggleActiveOnly()">Active only</span>
-  <span class="filter-hint" id="filterHint">Click a status to filter</span>
-</div>
 
 <!-- View A: Tree + Detail -->
 <div class="view active" id="view-tree">
@@ -924,7 +988,12 @@ function renderStats() {
     const isActive = activeFilter === status;
     html += `<div class="stat-chip clickable${isActive ? ' active' : ''}" data-status="${status}" style="--chip-color:${color}44;--chip-bg:${color}15" onclick="toggleFilter('${status}')"><div class="dot" style="background:${color}"></div><span class="count">${count}</span>${status}</div>`;
   }
-  html += `<div class="stat-chip" style="margin-left:auto;cursor:default"><span class="count">${allNodes.length}</span>total</div>`;
+  // Toggle + hint on the right
+  html += `<div style="display:flex;align-items:center;gap:8px;margin-left:auto">`;
+  html += `<button class="toggle${activeOnly ? ' on' : ''}" id="activeToggle" onclick="toggleActiveOnly()"></button>`;
+  html += `<span class="toggle-label${activeOnly ? ' on' : ''}" onclick="toggleActiveOnly()">Active only</span>`;
+  html += `<span class="filter-hint${activeFilter || activeOnly ? ' visible' : ''}" id="filterHint">${activeFilter ? `Showing: ${activeFilter} · Esc to clear` : activeOnly ? 'Showing active items only' : ''}</span>`;
+  html += `</div>`;
   row.innerHTML = html;
 }
 
@@ -944,17 +1013,8 @@ function toggleActiveOnly() {
 }
 
 function updateFilterHint() {
-  const hint = document.getElementById('filterHint');
-  if (activeFilter) {
-    hint.textContent = `Showing: ${activeFilter} · Click again or Esc to clear`;
-    hint.classList.add('visible');
-  } else if (activeOnly) {
-    hint.textContent = 'Showing active items only';
-    hint.classList.add('visible');
-  } else {
-    hint.textContent = 'Click a status to filter';
-    hint.classList.remove('visible');
-  }
+  // Hint is now rendered inline in renderStats(), so just re-render
+  renderStats();
 }
 
 function applyFilters() {
@@ -986,58 +1046,44 @@ function renderTree() {
   const decisions = allNodes.filter(n => n._type === 'decision');
   const questions = allNodes.filter(n => n._type === 'question');
 
-  // Outcomes
-  html += sectionLabel('Outcomes', 'outcome');
-  for (const o of outcomes) {
-    html += treeNodeHTML(o, 0);
+  // For each outcome, render its opportunities with solutions nested under each
+  for (const outcome of outcomes) {
+    html += sectionLabel('Outcome', 'outcome');
+    html += treeNodeHTML(outcome, 0);
 
-    // Opportunities under this outcome
-    const opps = getChildren(o.id).filter(n => n._type === 'opportunity');
-    if (opps.length) {
-      html += sectionLabel('Opportunities', 'opportunity', 1);
-      for (const op of opps) {
-        html += treeNodeHTML(op, 1);
+    const opportunities = getChildren(outcome.id).filter(n => n._type === 'opportunity');
+    for (const opp of opportunities) {
+      // Opportunity is a collapsible section — its solutions are nested inside
+      const solutions = getChildren(opp.id).filter(n => n._type === 'solution');
 
-        // Solutions under this opportunity
-        const sols = getChildren(op.id).filter(n => n._type === 'solution');
-        if (sols.length) {
-          html += sectionLabel('Solutions', 'solution', 2);
-          for (const s of sols) {
-            html += treeNodeHTML(s, 2);
+      html += oppSectionLabel(opp);
+      for (const sol of solutions) {
+        html += treeNodeHTML(sol, 1);
 
-            // Experiments under this solution
-            const exps = getChildren(s.id).filter(n => n._type === 'experiment');
-            if (exps.length) {
-              html += sectionLabel('Experiments', 'experiment', 3);
-              for (const ex of exps) {
-                html += treeNodeHTML(ex, 3);
-              }
-            }
+        // Experiments under this solution
+        const exps = getChildren(sol.id).filter(n => n._type === 'experiment');
+        if (exps.length) {
+          html += subSectionLabel('Experiments', 'experiment', true, 2);
+          for (const ex of exps) {
+            html += treeNodeHTML(ex, 2, true);
           }
         }
-        // Also check for solutions without a parent opportunity
       }
     }
 
-    // Solutions directly under outcome (like S3 "two separate tools")
-    const directSols = getChildren(o.id).filter(n => n._type === 'solution');
-    if (directSols.length) {
-      html += sectionLabel('Solutions', 'solution', 1);
-      for (const s of directSols) {
-        html += treeNodeHTML(s, 1);
-        const exps = getChildren(s.id).filter(n => n._type === 'experiment');
-        if (exps.length) {
-          html += sectionLabel('Experiments', 'experiment', 2);
-          for (const ex of exps) {
-            html += treeNodeHTML(ex, 2);
-          }
-        }
+    // Solutions directly under outcome (not under an opportunity)
+    const directSolutions = getChildren(outcome.id).filter(n => n._type === 'solution');
+    if (directSolutions.length) {
+      html += sectionLabel('Cross-cutting Solutions', 'solution');
+      for (const sol of directSolutions) {
+        html += treeNodeHTML(sol, 0);
       }
     }
   }
 
   // Decisions
   if (decisions.length) {
+    const activeD = decisions.filter(n => ACTIVE_STATUSES.includes(n.status)).length;
     html += sectionLabel('Decisions', 'decision');
     for (const d of decisions) {
       html += treeNodeHTML(d, 0);
@@ -1053,67 +1099,94 @@ function renderTree() {
   }
 
   panel.innerHTML = html;
+
+  // Auto-collapse sections marked startCollapsed
+  panel.querySelectorAll('[data-start-collapsed="true"]').forEach(el => {
+    el.classList.add('collapsed');
+    toggleSectionVisibility(el, true);
+  });
+
   panel.querySelectorAll('.tree-node').forEach(el => {
     el.addEventListener('click', () => selectNode(el.dataset.id));
   });
 }
 
-function sectionLabel(text, type, indent) {
+// Top-level section label (Outcome, Decisions, Open Questions, etc.)
+function sectionLabel(text, type) {
+  const color = TYPE_COLORS[type] || '#52525b';
+  return `<div class="tree-section-label" style="color:${color}" data-section="${type}" onclick="toggleSection(this)"><span class="chevron">&#9660;</span>${text}</div>`;
+}
+
+// Opportunity as a collapsible group — styled more prominently since it's the primary grouping
+function oppSectionLabel(opp) {
+  const color = TYPE_COLORS['opportunity'];
+  const isActive = ACTIVE_STATUSES.includes(opp.status);
+  return `<div class="tree-opp-label${isActive ? ' opp-active' : ''}" data-id="${opp.id}" data-section="opp-${opp.id}" onclick="if(event.target.closest('.opp-expand')){toggleSection(this)}else{selectNode('${opp.id}')}">
+    <div class="opp-expand"><span class="chevron">&#9660;</span></div>
+    <div class="node-dot" style="background:${color};${isActive ? 'box-shadow:0 0 6px ' + color + '66' : ''}"></div>
+    <span class="opp-title">${opp.title}</span>
+    ${opp.status ? `<span class="status-badge status-${opp.status}">${opp.status}</span>` : ''}
+  </div>`;
+}
+
+// Sub-section label (Experiments under a solution)
+function subSectionLabel(text, type, startCollapsed, indent) {
   const color = TYPE_COLORS[type] || '#52525b';
   const indentPx = indent ? (indent * 16 + 24) : 24;
-  const sectionId = `section-${type}-${indent || 0}`;
-  return `<div class="tree-section-label" style="padding-left:${indentPx}px;color:${color};margin-top:12px" data-section="${sectionId}" onclick="toggleSection(this)"><span class="chevron">&#9660;</span>${text}</div>`;
+  return `<div class="tree-section-label tree-sub-label" style="color:${color};padding-left:${indentPx}px" data-section="${type}-sub" data-start-collapsed="${!!startCollapsed}" onclick="toggleSection(this)"><span class="chevron">&#9660;</span>${text}</div>`;
 }
 
 function toggleSection(labelEl) {
-  const sectionId = labelEl.dataset.section;
   const isCollapsed = labelEl.classList.toggle('collapsed');
-  // Hide/show all siblings until the next section label at the same or lower indent level
+  toggleSectionVisibility(labelEl, isCollapsed);
+}
+
+function toggleSectionVisibility(labelEl, isCollapsed) {
   let el = labelEl.nextElementSibling;
-  const labelIndent = parseInt(labelEl.style.paddingLeft) || 24;
+  const isOpp = labelEl.classList.contains('tree-opp-label');
+  const isSubLabel = labelEl.classList.contains('tree-sub-label');
   while (el) {
-    if (el.classList.contains('tree-section-label')) {
-      const elIndent = parseInt(el.style.paddingLeft) || 24;
-      if (elIndent <= labelIndent) break; // sibling or parent section, stop
-      // child section label — hide/show it too
+    // Stop at next section of same or higher level
+    if (el.classList.contains('tree-section-label') && !el.classList.contains('tree-sub-label')) break;
+    if (el.classList.contains('tree-opp-label')) break;
+    // For opp labels, stop at sub-labels too if they're not inside us
+    if (isSubLabel && el.classList.contains('tree-section-label')) break;
+
+    if (el.classList.contains('tree-node') || el.classList.contains('tree-sub-label')) {
       el.style.display = isCollapsed ? 'none' : '';
-      if (isCollapsed) el.classList.add('collapsed');
-    } else if (el.classList.contains('tree-node')) {
-      el.style.display = isCollapsed ? 'none' : '';
-    } else {
-      break;
     }
     el = el.nextElementSibling;
   }
 }
 
-function renderDescendants(parentId, depth) {
-  const children = getChildren(parentId);
-  let html = '';
-  for (const child of children) {
-    html += treeNodeHTML(child, depth);
-    html += renderDescendants(child.id, depth + 1);
-  }
-  return html;
-}
-
-function treeNodeHTML(node, depth) {
-  const indent = depth > 0 ? ` tree-indent-${Math.min(depth, 3)}` : '';
+function treeNodeHTML(node, indent, startHidden) {
   const color = TYPE_COLORS[node._type] || '#52525b';
-  const statusColor = STATUS_COLORS[node.status] || '#52525b';
-  const statusLabel = node.status || '';
-  const inactive = !activeFilter && !activeOnly && (node.status === 'rejected' || node.status === 'deferred');
-  return `<div class="tree-node${indent}${inactive ? ' inactive' : ''}" data-id="${node.id}" data-status="${node.status}">
-    <div class="node-dot" style="background:${color};${node.status === 'active' || node.status === 'exploring' ? 'box-shadow:0 0 5px ' + color + '66' : ''}"></div>
-    <span class="node-id">${node.id}</span>
+  const isEmphasis = node.status === 'active' || node.status === 'exploring';
+  const isSettled = node.status === 'rejected' || node.status === 'deferred';
+  const showStatus = node.status && !isSettled;
+
+  let classes = 'tree-node';
+  if (indent) classes += ` tree-indent-${Math.min(indent, 3)}`;
+  if (isEmphasis) classes += ' emphasis';
+  if (isSettled && !activeFilter && !activeOnly) classes += ' inactive';
+
+  let style = '';
+  if (isEmphasis) {
+    style = `--emphasis-color:${color}88;--emphasis-bg:${color}08;--emphasis-hover:${color}0f;`;
+  }
+  if (startHidden) style += 'display:none;';
+
+  return `<div class="${classes}" data-id="${node.id}" data-status="${node.status}" style="${style}">
+    <div class="node-dot" style="background:${color};${isEmphasis ? 'box-shadow:0 0 6px ' + color + '66' : ''}"></div>
     <span class="node-title">${node.title}</span>
-    <span class="status-badge status-${node.status}">${statusLabel}</span>
+    ${showStatus ? `<span class="status-badge status-${node.status}">${node.status}</span>` : ''}
   </div>`;
 }
 
 function selectNode(id) {
   selectedNodeId = id;
   document.querySelectorAll('.tree-node').forEach(el => el.classList.toggle('selected', el.dataset.id === id));
+  document.querySelectorAll('.tree-opp-label').forEach(el => el.classList.toggle('selected', el.dataset.id === id));
   renderDetail(id);
 }
 
