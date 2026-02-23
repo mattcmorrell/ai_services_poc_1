@@ -664,6 +664,80 @@
     color: #a1a1aa;
     font-family: 'SF Mono', 'Fira Code', monospace;
   }
+  .stat-chip.clickable {
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .stat-chip.clickable:hover {
+    border-color: #3a3a48;
+    background: #1a1a22;
+  }
+  .stat-chip.clickable.active {
+    border-color: var(--chip-color);
+    background: var(--chip-bg);
+  }
+
+  /* ── Active-only toggle ── */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 32px;
+    border-bottom: 1px solid #1e1e26;
+    background: #0d0d14;
+    flex-shrink: 0;
+  }
+  .toggle {
+    position: relative;
+    width: 32px;
+    height: 16px;
+    border-radius: 8px;
+    background: #2a2a35;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: none;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .toggle.on { background: #3b82f6; }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #e4e4e7;
+    transition: transform 0.2s;
+  }
+  .toggle.on::after { transform: translateX(16px); }
+  .toggle-label {
+    font-size: 11px;
+    color: #52525b;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s;
+  }
+  .toggle-label.on { color: #a1a1aa; }
+  .filter-hint {
+    font-size: 10px;
+    color: #3f3f46;
+    margin-left: auto;
+    transition: color 0.15s;
+  }
+  .filter-hint.visible { color: #a1a1aa; }
+
+  /* ── Tree node states ── */
+  .tree-node.dimmed {
+    opacity: 0.2;
+  }
+  .tree-node.hidden {
+    display: none;
+  }
+  .tree-node.inactive {
+    opacity: 0.45;
+  }
 </style>
 </head>
 <body>
@@ -692,6 +766,12 @@
 </div>
 
 <div class="stats-row" id="statsRow"></div>
+
+<div class="filter-bar">
+  <button class="toggle" id="activeToggle" onclick="toggleActiveOnly()"></button>
+  <span class="toggle-label" onclick="toggleActiveOnly()">Active only</span>
+  <span class="filter-hint" id="filterHint">Click a status to filter</span>
+</div>
 
 <!-- View A: Tree + Detail -->
 <div class="view active" id="view-tree">
@@ -734,6 +814,9 @@ let selectedNodeId = null;
 let currentView = 'tree';
 let graphZoomBehavior = null;
 let graphSvgGroup = null;
+let activeFilter = null;   // status filter from clicking stat chips
+let activeOnly = false;     // toggle to hide rejected/deferred
+const ACTIVE_STATUSES = ['active', 'exploring', 'chosen', 'open'];
 
 const TYPE_COLORS = {
   outcome: '#34d399',
@@ -820,10 +903,62 @@ function renderStats() {
     html += `<div class="stat-chip"><div class="dot" style="background:${TYPE_COLORS[type]}"></div><span class="count">${count}</span>${type}s</div>`;
   }
   html += '<div style="width:1px;background:#1e1e26;margin:0 4px"></div>';
-  for (const [status, count] of Object.entries(statusCounts)) {
-    html += `<div class="stat-chip"><div class="dot" style="background:${STATUS_COLORS[status] || '#52525b'}"></div><span class="count">${count}</span>${status}</div>`;
+  const statusOrder = ['active', 'exploring', 'chosen', 'deferred', 'rejected', 'open'];
+  for (const status of statusOrder) {
+    const count = statusCounts[status] || 0;
+    if (!count) continue;
+    const color = STATUS_COLORS[status] || '#52525b';
+    const isActive = activeFilter === status;
+    html += `<div class="stat-chip clickable${isActive ? ' active' : ''}" data-status="${status}" style="--chip-color:${color}44;--chip-bg:${color}15" onclick="toggleFilter('${status}')"><div class="dot" style="background:${color}"></div><span class="count">${count}</span>${status}</div>`;
   }
   row.innerHTML = html;
+}
+
+function toggleFilter(status) {
+  activeFilter = activeFilter === status ? null : status;
+  renderStats();
+  applyFilters();
+  updateFilterHint();
+}
+
+function toggleActiveOnly() {
+  activeOnly = !activeOnly;
+  document.getElementById('activeToggle').classList.toggle('on', activeOnly);
+  document.querySelector('.toggle-label').classList.toggle('on', activeOnly);
+  applyFilters();
+  updateFilterHint();
+}
+
+function updateFilterHint() {
+  const hint = document.getElementById('filterHint');
+  if (activeFilter) {
+    hint.textContent = `Showing: ${activeFilter} · Click again or Esc to clear`;
+    hint.classList.add('visible');
+  } else if (activeOnly) {
+    hint.textContent = 'Showing active items only';
+    hint.classList.add('visible');
+  } else {
+    hint.textContent = 'Click a status to filter';
+    hint.classList.remove('visible');
+  }
+}
+
+function applyFilters() {
+  document.querySelectorAll('.tree-node[data-status]').forEach(el => {
+    const status = el.dataset.status;
+    const isActive = ACTIVE_STATUSES.includes(status);
+
+    // Hidden: activeOnly is on and this isn't active
+    const hidden = activeOnly && !isActive;
+    // Dimmed: a specific filter is set and this doesn't match
+    const dimmed = activeFilter && status !== activeFilter;
+    // Inactive: no filter set, but this is rejected/deferred (subtle dim)
+    const inactive = !activeFilter && !activeOnly && (status === 'rejected' || status === 'deferred');
+
+    el.classList.toggle('hidden', hidden);
+    el.classList.toggle('dimmed', dimmed);
+    el.classList.toggle('inactive', inactive);
+  });
 }
 
 // ══════════════════════════════════════════
@@ -833,39 +968,86 @@ function renderTree() {
   const panel = document.getElementById('treePanel');
   let html = '';
 
-  // Build the tree: outcomes → opportunities → solutions → experiments
   const outcomes = allNodes.filter(n => n._type === 'outcome');
   const decisions = allNodes.filter(n => n._type === 'decision');
   const questions = allNodes.filter(n => n._type === 'question');
 
-  // Render outcomes and their descendants
+  // Outcomes
+  html += sectionLabel('Outcomes', 'outcome');
   for (const o of outcomes) {
     html += treeNodeHTML(o, 0);
-    html += renderDescendants(o.id, 1);
+
+    // Opportunities under this outcome
+    const opps = getChildren(o.id).filter(n => n._type === 'opportunity');
+    if (opps.length) {
+      html += sectionLabel('Opportunities', 'opportunity', 1);
+      for (const op of opps) {
+        html += treeNodeHTML(op, 1);
+
+        // Solutions under this opportunity
+        const sols = getChildren(op.id).filter(n => n._type === 'solution');
+        if (sols.length) {
+          html += sectionLabel('Solutions', 'solution', 2);
+          for (const s of sols) {
+            html += treeNodeHTML(s, 2);
+
+            // Experiments under this solution
+            const exps = getChildren(s.id).filter(n => n._type === 'experiment');
+            if (exps.length) {
+              html += sectionLabel('Experiments', 'experiment', 3);
+              for (const ex of exps) {
+                html += treeNodeHTML(ex, 3);
+              }
+            }
+          }
+        }
+        // Also check for solutions without a parent opportunity
+      }
+    }
+
+    // Solutions directly under outcome (like S3 "two separate tools")
+    const directSols = getChildren(o.id).filter(n => n._type === 'solution');
+    if (directSols.length) {
+      html += sectionLabel('Solutions', 'solution', 1);
+      for (const s of directSols) {
+        html += treeNodeHTML(s, 1);
+        const exps = getChildren(s.id).filter(n => n._type === 'experiment');
+        if (exps.length) {
+          html += sectionLabel('Experiments', 'experiment', 2);
+          for (const ex of exps) {
+            html += treeNodeHTML(ex, 2);
+          }
+        }
+      }
+    }
   }
 
-  // Decisions section
+  // Decisions
   if (decisions.length) {
-    html += `<div class="tree-section"><div class="tree-section-label">Decisions</div>`;
+    html += sectionLabel('Decisions', 'decision');
     for (const d of decisions) {
       html += treeNodeHTML(d, 0);
     }
-    html += `</div>`;
   }
 
-  // Open questions
+  // Open Questions
   if (questions.length) {
-    html += `<div class="tree-section"><div class="tree-section-label">Open Questions</div>`;
+    html += sectionLabel('Open Questions', 'question');
     for (const q of questions) {
       html += treeNodeHTML(q, 0);
     }
-    html += `</div>`;
   }
 
   panel.innerHTML = html;
   panel.querySelectorAll('.tree-node').forEach(el => {
     el.addEventListener('click', () => selectNode(el.dataset.id));
   });
+}
+
+function sectionLabel(text, type, indent) {
+  const color = TYPE_COLORS[type] || '#52525b';
+  const indentPx = indent ? (indent * 16 + 24) : 24;
+  return `<div class="tree-section-label" style="padding-left:${indentPx}px;color:${color};margin-top:12px">${text}</div>`;
 }
 
 function renderDescendants(parentId, depth) {
@@ -883,7 +1065,8 @@ function treeNodeHTML(node, depth) {
   const color = TYPE_COLORS[node._type] || '#52525b';
   const statusColor = STATUS_COLORS[node.status] || '#52525b';
   const statusLabel = node.status || '';
-  return `<div class="tree-node${indent}" data-id="${node.id}">
+  const inactive = !activeFilter && !activeOnly && (node.status === 'rejected' || node.status === 'deferred');
+  return `<div class="tree-node${indent}${inactive ? ' inactive' : ''}" data-id="${node.id}" data-status="${node.status}">
     <div class="node-dot" style="background:${color};${node.status === 'active' || node.status === 'exploring' ? 'box-shadow:0 0 5px ' + color + '66' : ''}"></div>
     <span class="node-id">${node.id}</span>
     <span class="node-title">${node.title}</span>
@@ -1293,10 +1476,25 @@ function renderAll() {
   document.getElementById('updated').textContent = `Updated ${DATA.lastUpdated}`;
   renderStats();
   renderTree();
+  applyFilters();
   renderTimeline();
   renderReader();
   // Graph renders on-demand when tab is switched
 }
+
+// ══════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ══════════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (activeFilter) {
+      activeFilter = null;
+      renderStats();
+      applyFilters();
+      updateFilterHint();
+    }
+  }
+});
 
 // ══════════════════════════════════════════
 // INIT
