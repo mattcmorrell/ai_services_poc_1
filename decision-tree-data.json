@@ -1,7 +1,7 @@
 {
   "title": "Client Selection UX — Decision Tree",
   "subtitle": "Tracing every idea from brainstorm → prototype → iteration → verdict",
-  "lastUpdated": "2026-02-20",
+  "lastUpdated": "2026-02-23",
   "statuses": {
     "exploring": {
       "label": "Exploring",
@@ -44,14 +44,17 @@
               "name": "Card Grid",
               "status": "parked",
               "note": "Mode-switch friction — must leave workspace to switch clients",
-              "versions": [
-                "v1",
-                "v2",
-                "v3"
-              ],
+              "versions": ["v1", "v2", "v3"],
               "currentVersion": "v3",
               "mockup": "mockup-01-card-grid.html",
               "prototype": "localhost:3001",
+              "thumbnail": "approach-a-v2-grid.png",
+              "screenshots": [
+                { "src": "approach-a-v1-grid.png", "label": "v1 Grid" },
+                { "src": "approach-a-v1-workspace.png", "label": "v1 Workspace" },
+                { "src": "approach-a-v2-grid.png", "label": "v2 Grid" },
+                { "src": "approach-a-v2-workspace.png", "label": "v2 Workspace" }
+              ],
               "children": []
             },
             {
@@ -59,29 +62,37 @@
               "name": "Dropdown Switcher",
               "status": "parked",
               "note": "Compact and functional, but user moved on to other concepts",
-              "versions": [
-                "v1",
-                "v2",
-                "v3"
-              ],
+              "versions": ["v1", "v2", "v3"],
               "currentVersion": "v3",
               "mockup": "mockup-02-dropdown.html",
               "prototype": "localhost:3001",
+              "thumbnail": "approach-b-v3-dropdown-open.png",
+              "screenshots": [
+                { "src": "approach-b-v1.png", "label": "v1" },
+                { "src": "approach-b-v2.png", "label": "v2" },
+                { "src": "approach-b-v2-dropdown.png", "label": "v2 Dropdown open" },
+                { "src": "approach-b-v3.png", "label": "v3" },
+                { "src": "approach-b-v3-dropdown-open.png", "label": "v3 Dropdown open" }
+              ],
               "children": []
             },
             {
               "id": "C",
-              "name": "Sidebar Client List test",
+              "name": "Sidebar Client List",
               "status": "exploring",
               "note": "Favorite so far — width concern → try collapsed-by-default",
-              "versions": [
-                "v1",
-                "v2",
-                "v3"
-              ],
+              "versions": ["v1", "v2", "v3"],
               "currentVersion": "v3",
               "mockup": "mockup-03-sidebar.html",
               "prototype": "localhost:3001",
+              "thumbnail": "approach-c-v2.png",
+              "screenshots": [
+                { "src": "approach-c-v1.png", "label": "v1" },
+                { "src": "approach-c-v2.png", "label": "v2 Expanded" },
+                { "src": "approach-c-v2-collapsed.png", "label": "v2 Collapsed" },
+                { "src": "approach-c-v3-collapsed.png", "label": "v3 Collapsed" },
+                { "src": "approach-c-v3-tab-persistence.png", "label": "v3 Tab persistence" }
+              ],
               "children": [
                 {
                   "id": "F",
@@ -89,9 +100,7 @@
                   "status": "new",
                   "note": "Horizontal version of C's collapsed mode — vertical space instead of horizontal",
                   "spawn": "inspired by C collapsed + idea #9",
-                  "versions": [
-                    "v1"
-                  ],
+                  "versions": ["v1"],
                   "currentVersion": "v1",
                   "prototype": "localhost:3001",
                   "children": []
@@ -103,14 +112,17 @@
               "name": "Breadcrumb Navigation",
               "status": "parked",
               "note": "Best triage/data tool, but too many clicks for daily switching",
-              "versions": [
-                "v1",
-                "v2",
-                "v3"
-              ],
+              "versions": ["v1", "v2", "v3"],
               "currentVersion": "v3",
               "mockup": "mockup-04-breadcrumb.html",
               "prototype": "localhost:3001",
+              "thumbnail": "approach-d-v2.png",
+              "screenshots": [
+                { "src": "approach-d-v1.png", "label": "v1" },
+                { "src": "approach-d-v1-list.png", "label": "v1 List view" },
+                { "src": "approach-d-v2.png", "label": "v2" },
+                { "src": "approach-d-v2-table.png", "label": "v2 Table view" }
+              ],
               "children": []
             }
           ]
@@ -131,9 +143,7 @@
               "name": "Tab Groups",
               "status": "new",
               "note": "No client selection step — tabs grouped by client. Just prototyped.",
-              "versions": [
-                "v1"
-              ],
+              "versions": ["v1"],
               "currentVersion": "v1",
               "mockup": "mockup-07-tab-groups.html",
               "prototype": "localhost:3001",
