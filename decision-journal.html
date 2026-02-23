@@ -194,7 +194,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 7px 24px;
+    padding: 8px 24px;
     cursor: pointer;
     transition: background 0.1s, opacity 0.15s;
     border-left: 3px solid transparent;
@@ -212,6 +212,20 @@
     border-radius: 50%;
     flex-shrink: 0;
   }
+  .tree-node .node-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+  .tree-node .node-type {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #52525b;
+  }
+  .tree-node.emphasis .node-type { color: #71717a; }
   .tree-node .node-title {
     font-size: 12px;
     color: #8b8b95;
@@ -269,6 +283,20 @@
     padding: 2px;
     flex-shrink: 0;
   }
+  .tree-opp-label .opp-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+  .tree-opp-label .opp-type {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #52525b;
+  }
+  .tree-opp-label.opp-active .opp-type { color: #71717a; }
   .tree-opp-label .opp-title {
     font-size: 12px;
     font-weight: 600;
@@ -1100,7 +1128,10 @@ function oppSectionLabel(opp) {
   return `<div class="tree-opp-label${isActive ? ' opp-active' : ''}" data-id="${opp.id}" data-section="opp-${opp.id}" onclick="if(event.target.closest('.opp-expand')){toggleSection(this)}else{selectNode('${opp.id}')}">
     <div class="opp-expand"><span class="chevron">&#9660;</span></div>
     <div class="node-dot" style="background:${color};${isActive ? 'box-shadow:0 0 6px ' + color + '66' : ''}"></div>
-    <span class="opp-title">${opp.title}</span>
+    <div class="opp-content">
+      <span class="opp-type">Opportunity</span>
+      <span class="opp-title">${opp.title}</span>
+    </div>
     ${opp.status ? `<span class="status-badge status-${opp.status}">${opp.status}</span>` : ''}
   </div>`;
 }
@@ -1152,9 +1183,13 @@ function treeNodeHTML(node, indent, startHidden) {
   }
   if (startHidden) style += 'display:none;';
 
+  const typeLabel = node._type || '';
   return `<div class="${classes}" data-id="${node.id}" data-status="${node.status}" style="${style}">
     <div class="node-dot" style="background:${color};${isEmphasis ? 'box-shadow:0 0 6px ' + color + '66' : ''}"></div>
-    <span class="node-title">${node.title}</span>
+    <div class="node-content">
+      <span class="node-type">${typeLabel}</span>
+      <span class="node-title">${node.title}</span>
+    </div>
     ${showStatus ? `<span class="status-badge status-${node.status}">${node.status}</span>` : ''}
   </div>`;
 }
