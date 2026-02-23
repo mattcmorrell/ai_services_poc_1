@@ -211,7 +211,7 @@
     background: #141419;
   }
   .tree-node.selected {
-    background: rgba(96,165,250,0.06);
+    background: rgba(96,165,250,0.18);
     border-left-color: #60a5fa;
   }
   .tree-node .node-dot {
@@ -304,7 +304,7 @@
     display: inline-block;
   }
   .tree-opp-label.selected {
-    background: rgba(96,165,250,0.06);
+    background: rgba(96,165,250,0.18);
     border-left-color: #60a5fa;
   }
 
@@ -734,46 +734,44 @@
   /* ── Stats summary ── */
   .stats-row {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 12px;
     padding: 8px 32px;
     border-bottom: 1px solid #2d2d3a;
     background: #0d0d14;
     flex-shrink: 0;
-    flex-wrap: wrap;
   }
-  .stat-chip {
+  .stats-left {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    color: #b4b4bc;
-    padding: 3px 8px;
-    border-radius: 4px;
+    gap: 8px;
+  }
+  .stats-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+  /* ── Filter select ── */
+  .filter-select {
+    appearance: none;
+    -webkit-appearance: none;
     background: #111116;
     border: 1px solid #2d2d3a;
-  }
-  .stat-chip .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-  }
-  .stat-chip .count {
-    font-weight: 700;
+    border-radius: 4px;
     color: #b4b4bc;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-  }
-  .stat-chip.clickable {
+    font-size: 11px;
+    padding: 4px 24px 4px 8px;
     cursor: pointer;
-    transition: all 0.15s;
+    font-family: inherit;
+    transition: border-color 0.15s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b8b95'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
   }
-  .stat-chip.clickable:hover {
-    border-color: #3a3a48;
-    background: #1a1a22;
-  }
-  .stat-chip.clickable.active {
-    border-color: var(--chip-color);
-    background: var(--chip-bg);
-  }
+  .filter-select:hover { border-color: #3a3a48; }
+  .filter-select:focus { outline: none; border-color: #3b82f6; }
+  .filter-select.has-filter { border-color: #3b82f666; color: #e4e4e7; }
 
   /* ── Active-only toggle ── */
   .toggle {
@@ -809,13 +807,6 @@
     transition: color 0.15s;
   }
   .toggle-label.on { color: #a1a1aa; }
-  .filter-hint {
-    font-size: 10px;
-    color: #b4b4bc;
-    margin-left: auto;
-    transition: color 0.15s;
-  }
-  .filter-hint.visible { color: #a1a1aa; }
 
   /* ── Tree node states ── */
   .tree-node.dimmed {
@@ -980,41 +971,42 @@ function renderStats() {
     if (n.status) statusCounts[n.status] = (statusCounts[n.status] || 0) + 1;
   }
   let html = '';
+  // Left: Active only toggle
+  html += `<div class="stats-left">`;
+  html += `<button class="toggle${activeOnly ? ' on' : ''}" id="activeToggle" onclick="toggleActiveOnly()"></button>`;
+  html += `<span class="toggle-label${activeOnly ? ' on' : ''}" onclick="toggleActiveOnly()">Active only</span>`;
+  html += `</div>`;
+  // Right: Filter dropdown
+  html += `<div class="stats-right">`;
   const statusOrder = ['active', 'exploring', 'chosen', 'deferred', 'rejected', 'open'];
+  html += `<select class="filter-select${activeFilter ? ' has-filter' : ''}" id="filterSelect" onchange="setFilter(this.value)">`;
+  html += `<option value="">All statuses</option>`;
   for (const status of statusOrder) {
     const count = statusCounts[status] || 0;
     if (!count) continue;
-    const color = STATUS_COLORS[status] || '#52525b';
-    const isActive = activeFilter === status;
-    html += `<div class="stat-chip clickable${isActive ? ' active' : ''}" data-status="${status}" style="--chip-color:${color}44;--chip-bg:${color}15" onclick="toggleFilter('${status}')"><div class="dot" style="background:${color}"></div><span class="count">${count}</span>${status}</div>`;
+    html += `<option value="${status}"${activeFilter === status ? ' selected' : ''}>${status} (${count})</option>`;
   }
-  // Toggle + hint on the right
-  html += `<div style="display:flex;align-items:center;gap:8px;margin-left:auto">`;
-  html += `<button class="toggle${activeOnly ? ' on' : ''}" id="activeToggle" onclick="toggleActiveOnly()"></button>`;
-  html += `<span class="toggle-label${activeOnly ? ' on' : ''}" onclick="toggleActiveOnly()">Active only</span>`;
-  html += `<span class="filter-hint${activeFilter || activeOnly ? ' visible' : ''}" id="filterHint">${activeFilter ? `Showing: ${activeFilter} · Esc to clear` : activeOnly ? 'Showing active items only' : ''}</span>`;
+  html += `</select>`;
   html += `</div>`;
   row.innerHTML = html;
+}
+
+function setFilter(status) {
+  activeFilter = status || null;
+  renderStats();
+  applyFilters();
 }
 
 function toggleFilter(status) {
   activeFilter = activeFilter === status ? null : status;
   renderStats();
   applyFilters();
-  updateFilterHint();
 }
 
 function toggleActiveOnly() {
   activeOnly = !activeOnly;
-  document.getElementById('activeToggle').classList.toggle('on', activeOnly);
-  document.querySelector('.toggle-label').classList.toggle('on', activeOnly);
-  applyFilters();
-  updateFilterHint();
-}
-
-function updateFilterHint() {
-  // Hint is now rendered inline in renderStats(), so just re-render
   renderStats();
+  applyFilters();
 }
 
 function applyFilters() {
@@ -1601,7 +1593,6 @@ document.addEventListener('keydown', (e) => {
       activeFilter = null;
       renderStats();
       applyFilters();
-      updateFilterHint();
     }
   }
 });
