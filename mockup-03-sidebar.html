@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 03 — Sidebar Client List (Split Pane)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0a0f;
+    color: #e4e4e7;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 224px;
+    min-width: 224px;
+    background: #101015;
+    border-right: 1px solid #2a2a35;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 14px 12px;
+    border-bottom: 1px solid #2a2a35;
+  }
+  .sidebar-header h2 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #71717a;
+  }
+  .sidebar-header button {
+    background: none;
+    border: none;
+    color: #71717a;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s, background 0.15s;
+  }
+  .sidebar-header button:hover {
+    color: #e4e4e7;
+    background: #1e1e26;
+  }
+
+  .client-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0;
+  }
+  .client-list::-webkit-scrollbar { width: 4px; }
+  .client-list::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 4px; }
+
+  .client-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.12s, border-color 0.12s;
+    position: relative;
+  }
+  .client-item:hover {
+    background: #1a1a22;
+  }
+  .client-item.active {
+    background: #161620;
+    border-left-color: #3b82f6;
+  }
+  .client-item.active .client-name {
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  .avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .client-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .client-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #d4d4d8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .client-meta {
+    font-size: 11px;
+    color: #52525b;
+    margin-top: 1px;
+  }
+
+  .badge {
+    background: #3b82f6;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    flex-shrink: 0;
+  }
+  .badge.empty { display: none; }
+
+  /* ── Main area ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  /* Tab bar */
+  .tab-bar {
+    display: flex;
+    align-items: stretch;
+    background: #101015;
+    border-bottom: 1px solid #2a2a35;
+    height: 40px;
+    padding: 0 4px;
+    gap: 2px;
+  }
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 14px;
+    font-size: 12.5px;
+    color: #71717a;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.12s, border-color 0.12s, background 0.12s;
+    white-space: nowrap;
+    position: relative;
+  }
+  .tab:hover { color: #a1a1aa; background: #1a1a22; }
+  .tab.active {
+    color: #e4e4e7;
+    border-bottom-color: #3b82f6;
+    background: #141419;
+  }
+  .tab .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .tab .tab-badge {
+    background: #ef4444;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    min-width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+  }
+  .tab-close {
+    opacity: 0;
+    margin-left: 4px;
+    font-size: 14px;
+    color: #52525b;
+    transition: opacity 0.12s, color 0.12s;
+    line-height: 1;
+  }
+  .tab:hover .tab-close { opacity: 1; }
+  .tab-close:hover { color: #e4e4e7; }
+
+  .tab-new {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    color: #52525b;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.12s;
+  }
+  .tab-new:hover { color: #a1a1aa; }
+
+  /* Active client header */
+  .client-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-bottom: 1px solid #1e1e26;
+  }
+  .client-header .avatar { width: 36px; height: 36px; font-size: 15px; border-radius: 8px; }
+  .client-header-info h1 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  .client-header-info span {
+    font-size: 12px;
+    color: #52525b;
+  }
+  .header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+  }
+  .header-actions button {
+    background: #1e1e26;
+    border: 1px solid #2a2a35;
+    color: #a1a1aa;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+  }
+  .header-actions button:hover { background: #2a2a35; color: #e4e4e7; }
+
+  /* Workspace */
+  .workspace {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .message {
+    max-width: 72%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .message.assistant {
+    background: #1a1a24;
+    border: 1px solid #2a2a35;
+    align-self: flex-start;
+    color: #d4d4d8;
+  }
+  .message.user {
+    background: #1d3a5c;
+    border: 1px solid #264a73;
+    align-self: flex-end;
+    color: #e4e4e7;
+  }
+  .message-time {
+    font-size: 10px;
+    color: #52525b;
+    margin-top: 4px;
+  }
+
+  .chat-input-bar {
+    display: flex;
+    gap: 8px;
+    padding: 16px 24px;
+    border-top: 1px solid #2a2a35;
+    background: #101015;
+  }
+  .chat-input-bar input {
+    flex: 1;
+    background: #141419;
+    border: 1px solid #2a2a35;
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #e4e4e7;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .chat-input-bar input:focus { border-color: #3b82f6; }
+  .chat-input-bar input::placeholder { color: #52525b; }
+  .chat-input-bar button {
+    background: #3b82f6;
+    border: none;
+    color: #fff;
+    padding: 0 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .chat-input-bar button:hover { background: #2563eb; }
+
+  /* SVG icons inline */
+  svg { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h2>Clients</h2>
+    <button title="Search clients">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+  </div>
+  <div class="client-list">
+    <!-- Active -->
+    <div class="client-item active">
+      <div class="avatar" style="background:#2563eb;">A</div>
+      <div class="client-info">
+        <div class="client-name">Aperture Science</div>
+        <div class="client-meta">3 chats</div>
+      </div>
+      <div class="badge">6</div>
+    </div>
+    <div class="client-item">
+      <div class="avatar" style="background:#dc2626;">U</div>
+      <div class="client-info">
+        <div class="client-name">Umbrella Corporation</div>
+        <div class="client-meta">2 chats</div>
+      </div>
+    </div>
+    <div class="client-item">
+      <div class="avatar" style="background:#7c3aed;">W</div>
+      <div class="client-info">
+        <div class="client-name">Weyland-Yutani</div>
+        <div class="client-meta">1 chat</div>
+      </div>
+      <div class="badge">1</div>
+    </div>
+    <div class="client-item">
+      <div class="avatar" style="background:#ea580c;">B</div>
+      <div class="client-info">
+        <div class="client-name">Black Mesa</div>
+        <div class="client-meta">4 chats</div>
+      </div>
+      <div class="badge">4</div>
+    </div>
+    <div class="client-item">
+      <div class="avatar" style="background:#0891b2;">C</div>
+      <div class="client-info">
+        <div class="client-name">Cyberdyne Systems</div>
+        <div class="client-meta">1 chat</div>
+      </div>
+    </div>
+    <div class="client-item">
+      <div class="avatar" style="background:#ca8a04;">T</div>
+      <div class="client-info">
+        <div class="client-name">Tyrell Corporation</div>
+        <div class="client-meta">2 chats</div>
+      </div>
+      <div class="badge">2</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── Main ── -->
+<div class="main">
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <div class="tab active">
+      <span class="dot" style="background:#3b82f6;"></span>
+      Home
+    </div>
+    <div class="tab">
+      <span class="dot" style="background:#22c55e;"></span>
+      Payroll Review
+      <span class="tab-badge">3</span>
+      <span class="tab-close">&times;</span>
+    </div>
+    <div class="tab">
+      <span class="dot" style="background:#a855f7;"></span>
+      Benefits Enrollment
+      <span class="tab-badge">3</span>
+      <span class="tab-close">&times;</span>
+    </div>
+    <div class="tab-new" title="New chat">+</div>
+  </div>
+
+  <!-- Client context header -->
+  <div class="client-header">
+    <div class="avatar" style="background:#2563eb;">A</div>
+    <div class="client-header-info">
+      <h1>Aperture Science</h1>
+      <span>12 employees &middot; Last active 2 min ago</span>
+    </div>
+    <div class="header-actions">
+      <button>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px;margin-right:4px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Edit
+      </button>
+      <button>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px;margin-right:4px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </button>
+    </div>
+  </div>
+
+  <!-- Workspace content (Home tab shown) -->
+  <div class="workspace">
+    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px;">
+      <div style="background:#141419; border:1px solid #2a2a35; border-radius:10px; padding:16px;">
+        <div style="font-size:11px; color:#71717a; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">Open Chats</div>
+        <div style="font-size:28px; font-weight:700; color:#fff;">3</div>
+      </div>
+      <div style="background:#141419; border:1px solid #2a2a35; border-radius:10px; padding:16px;">
+        <div style="font-size:11px; color:#71717a; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">Unread Messages</div>
+        <div style="font-size:28px; font-weight:700; color:#3b82f6;">6</div>
+      </div>
+      <div style="background:#141419; border:1px solid #2a2a35; border-radius:10px; padding:16px;">
+        <div style="font-size:11px; color:#71717a; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">Pending Actions</div>
+        <div style="font-size:28px; font-weight:700; color:#f59e0b;">2</div>
+      </div>
+    </div>
+
+    <div style="background:#141419; border:1px solid #2a2a35; border-radius:10px; padding:16px;">
+      <div style="font-size:13px; font-weight:600; color:#e4e4e7; margin-bottom:12px;">Recent Activity</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; align-items:center; gap:10px; font-size:13px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#3b82f6;flex-shrink:0;"></div>
+          <span style="color:#a1a1aa;">Payroll Review</span>
+          <span style="color:#52525b;">&mdash;</span>
+          <span style="color:#71717a;">Agent flagged 3 discrepancies in February payroll</span>
+          <span style="margin-left:auto;color:#52525b;font-size:11px;">2m ago</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; font-size:13px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0;"></div>
+          <span style="color:#a1a1aa;">Benefits Enrollment</span>
+          <span style="color:#52525b;">&mdash;</span>
+          <span style="color:#71717a;">Open enrollment window closes in 5 days</span>
+          <span style="margin-left:auto;color:#52525b;font-size:11px;">18m ago</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; font-size:13px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#a855f7;flex-shrink:0;"></div>
+          <span style="color:#a1a1aa;">Onboarding</span>
+          <span style="color:#52525b;">&mdash;</span>
+          <span style="color:#71717a;">New hire documents pending for C. Johnson</span>
+          <span style="margin-left:auto;color:#52525b;font-size:11px;">1h ago</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat input -->
+  <div class="chat-input-bar">
+    <input type="text" placeholder="Message Aperture Science workspace..." />
+    <button>Send</button>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 05 — Command Palette (Keyboard First)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e8;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Dimmed background workspace ── */
+  .workspace {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    filter: blur(2px);
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .workspace-topbar {
+    height: 48px;
+    background: #141419;
+    border-bottom: 1px solid #2a2a35;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 16px;
+  }
+  .workspace-topbar .logo {
+    font-weight: 700;
+    font-size: 14px;
+    color: #7c6bf5;
+    letter-spacing: -0.3px;
+  }
+  .workspace-topbar .nav-item {
+    font-size: 13px;
+    color: #6b6b78;
+    padding: 6px 12px;
+    border-radius: 6px;
+  }
+  .workspace-topbar .nav-item.active {
+    color: #e0e0e8;
+    background: #1e1e26;
+  }
+  .workspace-body {
+    flex: 1;
+    display: flex;
+  }
+  .workspace-sidebar {
+    width: 240px;
+    background: #0e0e14;
+    border-right: 1px solid #2a2a35;
+    padding: 16px 12px;
+  }
+  .workspace-sidebar .sidebar-item {
+    height: 32px;
+    border-radius: 6px;
+    background: #1a1a22;
+    margin-bottom: 6px;
+  }
+  .workspace-main {
+    flex: 1;
+    padding: 32px;
+  }
+  .workspace-main .placeholder-line {
+    height: 14px;
+    background: #1a1a22;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+  .workspace-main .placeholder-line:nth-child(1) { width: 60%; }
+  .workspace-main .placeholder-line:nth-child(2) { width: 85%; }
+  .workspace-main .placeholder-line:nth-child(3) { width: 45%; }
+  .workspace-main .placeholder-line:nth-child(4) { width: 72%; }
+
+  /* ── Overlay ── */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 18vh;
+    z-index: 100;
+  }
+
+  /* ── Command Palette ── */
+  .palette {
+    width: 480px;
+    background: #141419;
+    border: 1px solid #2a2a35;
+    border-radius: 14px;
+    box-shadow:
+      0 0 0 1px rgba(124, 107, 245, 0.08),
+      0 24px 80px rgba(0, 0, 0, 0.6),
+      0 8px 24px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    animation: paletteIn 0.18s ease-out;
+  }
+  @keyframes paletteIn {
+    from { opacity: 0; transform: scale(0.96) translateY(-8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Search area */
+  .palette-search {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #2a2a35;
+    gap: 10px;
+  }
+  .search-icon {
+    width: 18px;
+    height: 18px;
+    color: #6b6b78;
+    flex-shrink: 0;
+  }
+  .palette-search input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: #e0e0e8;
+    font-size: 15px;
+    font-family: inherit;
+    letter-spacing: -0.1px;
+  }
+  .palette-search input::placeholder {
+    color: #4a4a56;
+  }
+  .kbd-hint {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+  .kbd {
+    font-size: 11px;
+    color: #4a4a56;
+    background: #1e1e26;
+    border: 1px solid #2a2a35;
+    border-radius: 5px;
+    padding: 2px 6px;
+    font-family: inherit;
+    line-height: 1.4;
+  }
+
+  /* Section label */
+  .palette-section {
+    padding: 10px 16px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #4a4a56;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+
+  /* Client list */
+  .palette-list {
+    padding: 4px 6px 8px;
+    max-height: 360px;
+    overflow-y: auto;
+  }
+  .palette-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .palette-item:hover {
+    background: #1e1e26;
+  }
+  .palette-item.selected {
+    background: #1c1a2e;
+    outline: 1px solid rgba(124, 107, 245, 0.3);
+  }
+
+  /* Avatar */
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    letter-spacing: -0.5px;
+  }
+  .avatar.as { background: linear-gradient(135deg, #f59e42, #e06820); }
+  .avatar.uc { background: linear-gradient(135deg, #e04040, #b02020); }
+  .avatar.wy { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+  .avatar.bm { background: linear-gradient(135deg, #22c55e, #15803d); }
+  .avatar.cs { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+  .avatar.tc { background: linear-gradient(135deg, #ec4899, #be185d); }
+
+  /* Info */
+  .item-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .item-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #e0e0e8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .item-meta {
+    font-size: 12px;
+    color: #4a4a56;
+    margin-top: 1px;
+  }
+
+  /* Badge */
+  .badge {
+    background: #7c6bf5;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    flex-shrink: 0;
+  }
+  .badge.zero {
+    background: none;
+    visibility: hidden;
+  }
+
+  /* Arrow hint on selected */
+  .select-hint {
+    font-size: 11px;
+    color: #4a4a56;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.1s;
+  }
+  .palette-item.selected .select-hint {
+    opacity: 1;
+  }
+
+  /* Footer */
+  .palette-footer {
+    border-top: 1px solid #2a2a35;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 11px;
+    color: #4a4a56;
+  }
+  .palette-footer .footer-action {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .palette-footer .footer-action .kbd {
+    font-size: 10px;
+    padding: 1px 5px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Dimmed background workspace -->
+<div class="workspace">
+  <div class="workspace-topbar">
+    <div class="logo">BambooHR Console</div>
+    <div class="nav-item active">Chats</div>
+    <div class="nav-item">Agents</div>
+    <div class="nav-item">Dashboard</div>
+  </div>
+  <div class="workspace-body">
+    <div class="workspace-sidebar">
+      <div class="sidebar-item"></div>
+      <div class="sidebar-item"></div>
+      <div class="sidebar-item"></div>
+      <div class="sidebar-item"></div>
+      <div class="sidebar-item"></div>
+    </div>
+    <div class="workspace-main">
+      <div class="placeholder-line"></div>
+      <div class="placeholder-line"></div>
+      <div class="placeholder-line"></div>
+      <div class="placeholder-line"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay + Command Palette -->
+<div class="overlay">
+  <div class="palette">
+    <!-- Search -->
+    <div class="palette-search">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" placeholder="Search clients..." autofocus />
+      <div class="kbd-hint">
+        <span class="kbd">&#8984;K</span>
+      </div>
+    </div>
+
+    <!-- Section label -->
+    <div class="palette-section">Clients</div>
+
+    <!-- Client list -->
+    <div class="palette-list">
+      <div class="palette-item">
+        <div class="avatar as">AS</div>
+        <div class="item-info">
+          <div class="item-name">Aperture Science</div>
+          <div class="item-meta">12 employees &middot; Last active 2h ago</div>
+        </div>
+        <div class="badge">6</div>
+        <div class="select-hint">&#8629;</div>
+      </div>
+
+      <div class="palette-item selected">
+        <div class="avatar uc">UC</div>
+        <div class="item-info">
+          <div class="item-name">Umbrella Corporation</div>
+          <div class="item-meta">340 employees &middot; Last active 1d ago</div>
+        </div>
+        <div class="badge zero">0</div>
+        <div class="select-hint">&#8629;</div>
+      </div>
+
+      <div class="palette-item">
+        <div class="avatar wy">WY</div>
+        <div class="item-info">
+          <div class="item-name">Weyland-Yutani</div>
+          <div class="item-meta">89 employees &middot; Last active 4h ago</div>
+        </div>
+        <div class="badge">1</div>
+        <div class="select-hint">&#8629;</div>
+      </div>
+
+      <div class="palette-item">
+        <div class="avatar bm">BM</div>
+        <div class="item-info">
+          <div class="item-name">Black Mesa</div>
+          <div class="item-meta">156 employees &middot; Last active 30m ago</div>
+        </div>
+        <div class="badge">4</div>
+        <div class="select-hint">&#8629;</div>
+      </div>
+
+      <div class="palette-item">
+        <div class="avatar cs">CS</div>
+        <div class="item-info">
+          <div class="item-name">Cyberdyne Systems</div>
+          <div class="item-meta">45 employees &middot; Last active 3d ago</div>
+        </div>
+        <div class="badge zero">0</div>
+        <div class="select-hint">&#8629;</div>
+      </div>
+
+      <div class="palette-item">
+        <div class="avatar tc">TC</div>
+        <div class="item-info">
+          <div class="item-name">Tyrell Corporation</div>
+          <div class="item-meta">210 employees &middot; Last active 6h ago</div>
+        </div>
+        <div class="badge">2</div>
+        <div class="select-hint">&#8629;</div>
+      </div>
+    </div>
+
+    <!-- Footer hints -->
+    <div class="palette-footer">
+      <div class="footer-action">
+        <span class="kbd">&uarr;</span>
+        <span class="kbd">&darr;</span>
+        <span>Navigate</span>
+      </div>
+      <div class="footer-action">
+        <span class="kbd">&#8629;</span>
+        <span>Select</span>
+      </div>
+      <div class="footer-action">
+        <span class="kbd">esc</span>
+        <span>Close</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

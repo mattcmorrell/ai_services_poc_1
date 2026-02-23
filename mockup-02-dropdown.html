@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tab Bar Dropdown — HRIS Consultant</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #e4e4e7;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ─── Top bar ─── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 52px;
+    background: #101016;
+    border-bottom: 1px solid #1e1e28;
+    position: relative;
+    z-index: 100;
+  }
+  .top-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .divider-v {
+    width: 1px;
+    height: 24px;
+    background: #2a2a35;
+  }
+
+  /* Client selector trigger */
+  .client-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 8px;
+    background: #1a1a22;
+    border: 1px solid #2a2a35;
+    border-radius: 9px;
+    cursor: pointer;
+    position: relative;
+  }
+  .client-trigger:hover {
+    border-color: #3f3f50;
+    background: #1e1e28;
+  }
+  .client-trigger .ct-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+  }
+  .client-trigger .ct-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.2px;
+  }
+  .client-trigger .ct-arrow {
+    font-size: 10px;
+    color: #52525b;
+    margin-left: 2px;
+  }
+  .client-trigger .ct-badge {
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: #ef4444;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .top-bar-right .avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #334155, #475569);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #cbd5e1;
+    cursor: pointer;
+  }
+
+  /* ─── Dropdown popover ─── */
+  .dropdown-anchor {
+    position: relative;
+    display: inline-flex;
+  }
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 380px;
+    background: #141419;
+    border: 1px solid #2a2a35;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03);
+    z-index: 200;
+    overflow: hidden;
+  }
+
+  .dd-header {
+    padding: 14px 16px 0;
+  }
+  .dd-header .dd-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #52525b;
+    margin-bottom: 10px;
+  }
+  .dd-search {
+    width: 100%;
+    padding: 9px 12px;
+    background: #1a1a22;
+    border: 1px solid #2a2a35;
+    border-radius: 9px;
+    font-size: 13px;
+    color: #e4e4e7;
+    outline: none;
+    margin-bottom: 6px;
+  }
+  .dd-search::placeholder { color: #3f3f50; }
+  .dd-search:focus { border-color: #6366f1; }
+
+  .dd-list {
+    padding: 6px 8px 10px;
+    max-height: 340px;
+    overflow-y: auto;
+  }
+
+  .dd-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .dd-item:hover { background: #1e1e28; }
+  .dd-item.selected { background: rgba(99,102,241,0.1); }
+
+  .dd-item .dd-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .dd-item .dd-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .dd-item .dd-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.2px;
+    margin-bottom: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dd-item .dd-detail {
+    font-size: 12px;
+    color: #52525b;
+  }
+  .dd-item .dd-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .dd-item .dd-time {
+    font-size: 11px;
+    color: #3f3f50;
+  }
+  .dd-item .dd-unread {
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: #ef4444;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dd-item .dd-unread.amber { background: #d97706; }
+  .dd-item .dd-unread.none { display: none; }
+
+  .dd-footer {
+    padding: 10px 16px;
+    border-top: 1px solid #1e1e28;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #52525b;
+    cursor: pointer;
+  }
+  .dd-footer:hover { color: #818cf8; }
+
+  /* ─── Tab bar ─── */
+  .tab-bar {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    height: 42px;
+    background: #0e0e14;
+    border-bottom: 1px solid #1e1e28;
+    gap: 2px;
+  }
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    height: 34px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #71717a;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    position: relative;
+  }
+  .tab:hover {
+    background: #1a1a22;
+    color: #a1a1aa;
+  }
+  .tab.active {
+    background: #1a1a22;
+    color: #fff;
+    border-color: #2a2a35;
+  }
+  .tab .tab-icon {
+    font-size: 14px;
+  }
+  .tab .tab-badge {
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: #ef4444;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tab .tab-close {
+    font-size: 14px;
+    color: #3f3f50;
+    margin-left: 2px;
+    line-height: 1;
+  }
+  .tab .tab-close:hover { color: #a1a1aa; }
+  .tab-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    font-size: 18px;
+    color: #3f3f50;
+    cursor: pointer;
+    margin-left: 4px;
+    transition: all 0.15s;
+  }
+  .tab-add:hover {
+    background: #1a1a22;
+    color: #71717a;
+  }
+
+  /* ─── Workspace placeholder ─── */
+  .workspace {
+    display: flex;
+    height: calc(100vh - 52px - 42px);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 260px;
+    background: #101016;
+    border-right: 1px solid #1e1e28;
+    padding: 16px 12px;
+    flex-shrink: 0;
+  }
+  .sb-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #3f3f50;
+    padding: 0 10px;
+    margin-bottom: 8px;
+    margin-top: 16px;
+  }
+  .sb-section-label:first-child { margin-top: 0; }
+  .sb-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #71717a;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .sb-item:hover { background: #1a1a22; color: #a1a1aa; }
+  .sb-item.active { background: #1a1a22; color: #fff; }
+  .sb-item .sb-icon { font-size: 15px; opacity: 0.6; width: 20px; text-align: center; }
+  .sb-item .sb-badge {
+    margin-left: auto;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Content */
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #27272a;
+  }
+  .content-empty {
+    text-align: center;
+  }
+  .content-empty .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.3;
+  }
+  .content-empty h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #3f3f50;
+    margin-bottom: 6px;
+  }
+  .content-empty p {
+    font-size: 13px;
+    color: #27272a;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar with client selector -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <div class="logo-icon">B</div>
+    <div class="divider-v"></div>
+
+    <div class="dropdown-anchor">
+      <!-- Trigger -->
+      <div class="client-trigger">
+        <div class="ct-avatar">A</div>
+        <span class="ct-name">Aperture Science</span>
+        <span class="ct-badge">5</span>
+        <span class="ct-arrow">&#9660;</span>
+      </div>
+
+      <!-- Dropdown (shown open for mockup) -->
+      <div class="dropdown">
+        <div class="dd-header">
+          <div class="dd-label">Switch Client</div>
+          <input class="dd-search" type="text" placeholder="Search clients..." />
+        </div>
+        <div class="dd-list">
+
+          <!-- Aperture Science (selected) -->
+          <div class="dd-item selected">
+            <div class="dd-avatar" style="background: linear-gradient(135deg, #f97316, #ea580c);">A</div>
+            <div class="dd-info">
+              <div class="dd-name">Aperture Science</div>
+              <div class="dd-detail">4 chats &middot; 342 employees</div>
+            </div>
+            <div class="dd-right">
+              <div class="dd-time">12m</div>
+              <div class="dd-unread">5</div>
+            </div>
+          </div>
+
+          <!-- Umbrella -->
+          <div class="dd-item">
+            <div class="dd-avatar" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">U</div>
+            <div class="dd-info">
+              <div class="dd-name">Umbrella Corporation</div>
+              <div class="dd-detail">3 chats &middot; 1,204 employees</div>
+            </div>
+            <div class="dd-right">
+              <div class="dd-time">28m</div>
+              <div class="dd-unread">3</div>
+            </div>
+          </div>
+
+          <!-- Weyland-Yutani -->
+          <div class="dd-item">
+            <div class="dd-avatar" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">W</div>
+            <div class="dd-info">
+              <div class="dd-name">Weyland-Yutani</div>
+              <div class="dd-detail">3 chats &middot; 8,910 employees</div>
+            </div>
+            <div class="dd-right">
+              <div class="dd-time">2h</div>
+              <div class="dd-unread amber">1</div>
+            </div>
+          </div>
+
+          <!-- Black Mesa -->
+          <div class="dd-item">
+            <div class="dd-avatar" style="background: linear-gradient(135deg, #22c55e, #16a34a);">B</div>
+            <div class="dd-info">
+              <div class="dd-name">Black Mesa</div>
+              <div class="dd-detail">2 chats &middot; 567 employees</div>
+            </div>
+            <div class="dd-right">
+              <div class="dd-time">1d</div>
+              <div class="dd-unread none">0</div>
+            </div>
+          </div>
+
+          <!-- Cyberdyne -->
+          <div class="dd-item">
+            <div class="dd-avatar" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">C</div>
+            <div class="dd-info">
+              <div class="dd-name">Cyberdyne Systems</div>
+              <div class="dd-detail">1 chat &middot; 189 employees</div>
+            </div>
+            <div class="dd-right">
+              <div class="dd-time">3d</div>
+              <div class="dd-unread none">0</div>
+            </div>
+          </div>
+
+          <!-- Tyrell -->
+          <div class="dd-item">
+            <div class="dd-avatar" style="background: linear-gradient(135deg, #a855f7, #7c3aed);">T</div>
+            <div class="dd-info">
+              <div class="dd-name">Tyrell Corporation</div>
+              <div class="dd-detail">1 chat &middot; 2,450 employees</div>
+            </div>
+            <div class="dd-right">
+              <div class="dd-time">5d</div>
+              <div class="dd-unread none">0</div>
+            </div>
+          </div>
+
+        </div>
+        <div class="dd-footer">
+          &#x2795; Manage clients
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="top-bar-right">
+    <div class="avatar">MM</div>
+  </div>
+</div>
+
+<!-- Tab bar -->
+<div class="tab-bar">
+  <div class="tab active">
+    <span class="tab-icon">&#x1F3E0;</span>
+    Home
+  </div>
+  <div class="tab">
+    <span class="tab-icon">&#x1F4AC;</span>
+    Payroll Q1 Review
+    <span class="tab-badge">2</span>
+    <span class="tab-close">&times;</span>
+  </div>
+  <div class="tab">
+    <span class="tab-icon">&#x1F4AC;</span>
+    Onboarding &mdash; Batch 12
+    <span class="tab-close">&times;</span>
+  </div>
+  <div class="tab-add">+</div>
+</div>
+
+<!-- Workspace -->
+<div class="workspace">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sb-section-label">Navigation</div>
+    <div class="sb-item active">
+      <span class="sb-icon">&#x1F3E0;</span>
+      Dashboard
+    </div>
+    <div class="sb-item">
+      <span class="sb-icon">&#x1F4AC;</span>
+      Conversations
+      <span class="sb-badge">5</span>
+    </div>
+    <div class="sb-item">
+      <span class="sb-icon">&#x1F916;</span>
+      Agents
+    </div>
+
+    <div class="sb-section-label">Recent Chats</div>
+    <div class="sb-item">
+      <span class="sb-icon">&#x1F7E0;</span>
+      Payroll Q1 Review
+      <span class="sb-badge">2</span>
+    </div>
+    <div class="sb-item">
+      <span class="sb-icon">&#x1F7E2;</span>
+      Onboarding Batch 12
+    </div>
+    <div class="sb-item">
+      <span class="sb-icon">&#x1F535;</span>
+      Benefits Enrollment
+      <span class="sb-badge">3</span>
+    </div>
+    <div class="sb-item">
+      <span class="sb-icon">&#x1F7E3;</span>
+      Compliance Audit
+    </div>
+  </div>
+
+  <!-- Content area -->
+  <div class="content">
+    <div class="content-empty">
+      <div class="empty-icon">&#x1F4CB;</div>
+      <h3>Aperture Science &mdash; Dashboard</h3>
+      <p>4 active conversations &middot; 5 unread messages</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -136,6 +136,10 @@
               "status": "filed",
               "note": "Power user quick-switch — will revisit as supplement",
               "mockup": "mockup-05-command-palette.html",
+              "thumbnail": "mockup-05-command-palette.png",
+              "screenshots": [
+                { "src": "mockup-05-command-palette.png", "label": "Mockup" }
+              ],
               "children": []
             },
             {
@@ -147,6 +151,10 @@
               "currentVersion": "v1",
               "mockup": "mockup-07-tab-groups.html",
               "prototype": "localhost:3001",
+              "thumbnail": "mockup-07-tab-groups.png",
+              "screenshots": [
+                { "src": "mockup-07-tab-groups.png", "label": "Mockup" }
+              ],
               "children": []
             },
             {
@@ -155,6 +163,10 @@
               "status": "parked",
               "note": "Interesting but not the most interesting",
               "mockup": "mockup-08-sliding-drawer.html",
+              "thumbnail": "mockup-08-sliding-drawer.png",
+              "screenshots": [
+                { "src": "mockup-08-sliding-drawer.png", "label": "Mockup" }
+              ],
               "children": []
             },
             {
@@ -163,6 +175,10 @@
               "status": "parked",
               "note": "Interesting concept → evolved into Approach F (Client Tabs Row)",
               "mockup": "mockup-09-recent-favorites.html",
+              "thumbnail": "mockup-09-recent-favorites.png",
+              "screenshots": [
+                { "src": "mockup-09-recent-favorites.png", "label": "Mockup" }
+              ],
               "children": []
             },
             {
@@ -171,6 +187,10 @@
               "status": "abandoned",
               "note": "Too hidden for primary navigation",
               "mockup": "mockup-06-floating-pill.html",
+              "thumbnail": "mockup-06-floating-pill.png",
+              "screenshots": [
+                { "src": "mockup-06-floating-pill.png", "label": "Mockup" }
+              ],
               "children": []
             },
             {
@@ -179,6 +199,10 @@
               "status": "abandoned",
               "note": "Scales poorly, lacks context",
               "mockup": "mockup-10-avatar-row.html",
+              "thumbnail": "mockup-10-avatar-row.png",
+              "screenshots": [
+                { "src": "mockup-10-avatar-row.png", "label": "Mockup" }
+              ],
               "children": []
             }
           ]

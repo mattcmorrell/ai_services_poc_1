@@ -156,3 +156,77 @@ Tool 1 feeds into Tool 2. The iteration tracker captures real-time exploration; 
 2. Add inline editing to the decision journal (proven pattern from iteration tracker)
 3. Test the "ask Claude about decisions" workflow — can Claude answer handoff questions from the JSON?
 4. Consider building a `/decision` slash command for explicit capture
+
+---
+
+# WORKSTREAM 3 — Decision Tree Gallery View & Visual Polish
+
+## Goal
+
+Make the design iteration tracker (`decision-tree.html`) visually compelling and useful for someone stepping into the project cold. The original list-only view shows names and statuses but doesn't convey what any approach actually looks like.
+
+## Current Direction
+
+Gallery view is live. All approaches now have screenshot thumbnails. User wants this to evolve into a proper "design decision history" tool (see SIDEQUEST.md for full brief handed to a sidequest session).
+
+## What's Done
+
+### Gallery View (v5) — COMPLETE
+- **Gallery layout**: Responsive card grid with screenshot thumbnails as hero images. Each card shows the approach's latest screenshot at `aspect-ratio: 16/10`, `object-fit: cover`. Status dot, ID badge, name, version, status pill, note, and links below.
+- **List/Gallery toggle**: Segmented control `[List] [Gallery]` in controls bar. Defaults to Gallery. List view preserves the original compact row layout exactly.
+- **Lightbox**: Clicking a thumbnail opens a fullscreen overlay with the image, caption ("Card Grid — v2 Grid"), left/right arrow navigation, and dot indicators. Arrow keys + Esc work. Multiple screenshots per approach are navigable.
+- **Screenshot data in JSON**: Each node now has optional `thumbnail` (string, filename for gallery card) and `screenshots` (array of `{src, label}` for lightbox navigation). Schema is backward-compatible — nodes without these fields show a placeholder.
+- **Placeholders**: Nodes without screenshots show the approach ID in large monospace text + "No screenshot yet" hint. Only F (Client Tabs Row) still has no screenshot (needs dev server running).
+- **Bug fix**: `lbNav()` was using implicit `event` global — fixed to accept `(dir, e)` parameter.
+
+### Screenshots Captured
+- **Approaches A-D**: Already had prototype screenshots from earlier sessions (approach-a-v1-grid.png, etc.)
+- **Mockups 5-10**: Newly screenshotted from the HTML mockup files served via port 3333:
+  - `mockup-05-command-palette.png` — Command Palette
+  - `mockup-06-floating-pill.png` — Floating Pill
+  - `mockup-07-tab-groups.png` — Tab Groups
+  - `mockup-08-sliding-drawer.png` — Sliding Drawer
+  - `mockup-09-recent-favorites.png` — Recent + Favorites Bar
+  - `mockup-10-avatar-row.png` — Avatar Row
+- **Missing**: F (Client Tabs Row) — needs `npm run dev` on port 3001 to capture
+
+### Font Size Bump — COMPLETE
+All font sizes increased across the entire decision tree UI. Nothing is below 12px anymore:
+- Title: 20→28px, subtitle: 13→16px
+- Stats bar: 12→14px, counts: 13→15px, dots: 7→9px
+- Filter hint: 11→14px
+- View toggle buttons: 12→14px, toggle label: 12→14px
+- Section labels: 10→13px
+- Card names: 13→16px (list), 14→17px (gallery)
+- Card IDs: 10→13px, versions: 10→13px, status badges: 10→12px
+- Card notes: 11→14px (list), 12→14px (gallery)
+- Card links: 10→13px
+- Spawn tags: 10→13px
+- Lightbox caption: 13→16px
+- Keyboard hints: 11→13px, kbd codes: 10→12px
+- Save indicator: 12→14px
+- Gallery shot count: 10→13px, placeholder ID: 32→40px, placeholder hint: 10→13px
+
+### Commits
+- `48f721d` — Add gallery view with screenshot thumbnails to decision tree
+- Font size bump not yet committed
+
+## Running Services
+- **Decision tree server**: `node decision-tree-server.js` on **port 3333** — serves `decision-tree.html`, `decision-tree-data.json`, all PNG screenshots, mockup HTML files. Has POST `/save` endpoint for auto-save.
+- **Next.js dev server**: NOT running (was on port 3001). Needed for live prototype screenshots.
+
+## Files Owned by This Workstream
+- `decision-tree.html` — The interactive UI
+- `decision-tree-data.json` — The data store
+- `decision-tree-server.js` — The Node server
+- `mockup-*.png` — Newly captured mockup screenshots
+- `decision-tree-v5-*.png` — Screenshot artifacts of the tree itself
+
+## Sidequest Running
+A separate Claude Code session was launched (via `/sidequest`) to evolve the decision tree into a **design decision history tool**. That session has its own brief in `SIDEQUEST.md`. Its scope: add reasoning capture, timeline/narrative, evidence links, decision moments, onboarding flow. It owns the same decision-tree files but is focused on the "why" layer, not the visual gallery.
+
+## Next Steps
+1. **Commit font size bump** — ready to go
+2. **Capture F screenshot** — start dev server, screenshot Client Tabs Row approach
+3. **Sidequest progress** — check what the design decision history session produced
+4. **Consider merging gallery + decision history features** — the sidequest may have evolved the HTML/JSON in parallel

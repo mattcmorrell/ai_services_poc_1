@@ -174,7 +174,7 @@ export function DropdownSwitcher({
   return (
     <div className="flex h-full flex-col">
       {/* Top bar */}
-      <div className="relative flex h-10 flex-shrink-0 items-center border-b border-border bg-background/80 px-3 backdrop-blur-sm">
+      <div className="relative z-50 flex h-10 flex-shrink-0 items-center border-b border-border bg-background/80 px-3 backdrop-blur-sm">
         <button
           ref={triggerRef}
           onClick={() => setOpen((prev) => !prev)}

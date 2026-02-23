@@ -8,6 +8,8 @@ import { CardGrid } from "./approaches/card-grid";
 import { DropdownSwitcher } from "./approaches/dropdown-switcher";
 import { SidebarList } from "./approaches/sidebar-list";
 import { BreadcrumbNav } from "./approaches/breadcrumb-nav";
+import { ClientTabsRow } from "./approaches/client-tabs-row";
+import { TabGroups } from "./approaches/tab-groups";
 import { Chat } from "@/types/chat";
 import { mockChats, mockClients } from "@/data/mock-data";
 import { MessageSquare } from "lucide-react";
@@ -17,6 +19,8 @@ const APPROACHES: ApproachConfig[] = [
   { id: "B", label: "Dropdown", description: "Compact switcher in tab bar", maxVersion: 3 },
   { id: "C", label: "Sidebar", description: "Persistent client list", maxVersion: 3 },
   { id: "D", label: "Breadcrumb", description: "Hierarchical navigation", maxVersion: 3 },
+  { id: "E", label: "Tab Groups", description: "Multi-client grouped tabs", maxVersion: 1 },
+  { id: "F", label: "Client Tabs", description: "Horizontal client avatar row", maxVersion: 1 },
 ];
 
 export function ClientsView() {
@@ -176,6 +180,10 @@ export function ClientsView() {
         return <SidebarList {...props}>{tabWorkspace}</SidebarList>;
       case "D":
         return <BreadcrumbNav {...props}>{tabWorkspace}</BreadcrumbNav>;
+      case "E":
+        return <TabGroups {...props}>{tabWorkspace}</TabGroups>;
+      case "F":
+        return <ClientTabsRow {...props}>{tabWorkspace}</ClientTabsRow>;
       default:
         return null;
     }

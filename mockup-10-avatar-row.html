@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 10 — Avatar Row (Visual Switcher)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0a0f;
+    color: #e4e4e7;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Unified Tab Bar with Avatars ── */
+  .tab-bar {
+    display: flex;
+    align-items: center;
+    height: 42px;
+    background: #111117;
+    border-bottom: 1px solid #2a2a35;
+    padding: 0 10px;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  /* Avatar section */
+  .avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 4px 0 2px;
+    flex-shrink: 0;
+  }
+  .av-slot {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3px 2px 5px;
+    flex-shrink: 0;
+  }
+  .av-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+  }
+  .av-slot:hover .av-circle {
+    transform: scale(1.08);
+  }
+  .av-slot.active .av-circle {
+    box-shadow: 0 0 0 2px #111117, 0 0 0 3.5px #6366f1;
+  }
+  /* Unread dot below avatar */
+  .av-slot .unread-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ef4444;
+    margin-top: 2px;
+  }
+  .av-slot .unread-dot.hidden {
+    visibility: hidden;
+  }
+  /* Tooltip */
+  .av-slot .av-tip {
+    position: absolute;
+    top: 42px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2a2a35;
+    color: #e4e4e7;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 200;
+  }
+  .av-slot .av-tip::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid #2a2a35;
+  }
+  .av-slot:hover .av-tip {
+    opacity: 1;
+  }
+  .av-unread-count {
+    font-size: 8px;
+    font-weight: 700;
+    color: #ef4444;
+    margin-top: 0px;
+    line-height: 1;
+  }
+
+  /* Divider between avatars and tabs */
+  .bar-divider {
+    width: 1px;
+    height: 24px;
+    background: #2a2a35;
+    margin: 0 8px;
+    flex-shrink: 0;
+  }
+
+  /* Tab section */
+  .tab-section {
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+    gap: 2px;
+    flex: 1;
+    overflow-x: auto;
+    min-width: 0;
+  }
+  .tab-section::-webkit-scrollbar { display: none; }
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 14px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #71717a;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    flex-shrink: 0;
+  }
+  .tab:hover {
+    color: #a1a1aa;
+    background: rgba(255,255,255,0.02);
+  }
+  .tab.active {
+    color: #e4e4e7;
+    border-bottom-color: #6366f1;
+  }
+  .tab .t-icon { font-size: 14px; opacity: 0.6; }
+  .tab .t-close {
+    font-size: 14px;
+    color: #52525b;
+    margin-left: 2px;
+    opacity: 0;
+    transition: opacity 0.1s ease, color 0.1s ease;
+  }
+  .tab:hover .t-close { opacity: 1; }
+  .tab .t-close:hover { color: #ef4444; }
+  .tab-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    font-size: 18px;
+    color: #52525b;
+    cursor: pointer;
+    transition: color 0.15s ease;
+    flex-shrink: 0;
+  }
+  .tab-add:hover { color: #a1a1aa; }
+
+  /* ── Client Context Strip ── */
+  .client-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    background: #0e0e14;
+    border-bottom: 1px solid #1e1e28;
+    flex-shrink: 0;
+  }
+  .cs-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .cs-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e4e4e7;
+  }
+  .cs-meta {
+    font-size: 11px;
+    color: #52525b;
+  }
+  .cs-status {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(34,197,94,0.1);
+    color: #22c55e;
+  }
+
+  /* ── Workspace ── */
+  .workspace {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+  .sidebar {
+    width: 240px;
+    background: #111117;
+    border-right: 1px solid #1e1e28;
+    flex-shrink: 0;
+  }
+  .sb-head {
+    padding: 14px 16px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #52525b;
+  }
+  .sb-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #a1a1aa;
+    cursor: pointer;
+    transition: background 0.1s ease, color 0.1s ease;
+  }
+  .sb-item:hover {
+    background: rgba(255,255,255,0.03);
+    color: #e4e4e7;
+  }
+  .sb-item.active {
+    background: rgba(99,102,241,0.08);
+    color: #818cf8;
+  }
+  .sb-item .sb-ic { font-size: 15px; opacity: 0.6; }
+  .sb-item .sb-badge {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 600;
+    background: rgba(99,102,241,0.15);
+    color: #818cf8;
+    padding: 1px 6px;
+    border-radius: 8px;
+  }
+
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0a0a0f;
+  }
+  .chat {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .msg {
+    max-width: 520px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .msg.bot {
+    background: #1a1a24;
+    border: 1px solid #2a2a35;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .msg.user {
+    background: #3730a3;
+    color: #e0e7ff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .input-row {
+    padding: 12px 20px;
+    border-top: 1px solid #1e1e28;
+    display: flex;
+    gap: 8px;
+  }
+  .input-row input {
+    flex: 1;
+    background: #141419;
+    border: 1px solid #2a2a35;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    color: #e4e4e7;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  .input-row input:focus { border-color: #6366f1; }
+  .input-row input::placeholder { color: #52525b; }
+  .input-row button {
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .input-row button:hover { background: #4f46e5; }
+
+  /* Label */
+  .mockup-label {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: rgba(99,102,241,0.12);
+    border: 1px solid rgba(99,102,241,0.25);
+    color: #818cf8;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    z-index: 1000;
+  }
+
+  /* Avatar colors */
+  .c-orange { background: #c2410c; }
+  .c-purple { background: #7c3aed; }
+  .c-teal   { background: #0d9488; }
+  .c-red    { background: #dc2626; }
+  .c-blue   { background: #2563eb; }
+  .c-amber  { background: #d97706; }
+</style>
+</head>
+<body>
+
+<!-- Unified Tab Bar -->
+<div class="tab-bar">
+
+  <!-- Avatar Row (inline in tab bar) -->
+  <div class="avatar-section">
+    <div class="av-slot active">
+      <div class="av-circle c-orange">AS</div>
+      <div class="unread-dot"></div>
+      <div class="av-tip">Aperture Science (6)</div>
+    </div>
+    <div class="av-slot">
+      <div class="av-circle c-purple">UC</div>
+      <div class="unread-dot hidden"></div>
+      <div class="av-tip">Umbrella Corporation</div>
+    </div>
+    <div class="av-slot">
+      <div class="av-circle c-teal">WY</div>
+      <div class="unread-dot"></div>
+      <div class="av-tip">Weyland-Yutani (1)</div>
+    </div>
+    <div class="av-slot">
+      <div class="av-circle c-red">BM</div>
+      <div class="unread-dot"></div>
+      <div class="av-tip">Black Mesa (4)</div>
+    </div>
+    <div class="av-slot">
+      <div class="av-circle c-blue">CS</div>
+      <div class="unread-dot hidden"></div>
+      <div class="av-tip">Cyberdyne Systems</div>
+    </div>
+    <div class="av-slot">
+      <div class="av-circle c-amber">TC</div>
+      <div class="unread-dot"></div>
+      <div class="av-tip">Tyrell Corporation (2)</div>
+    </div>
+  </div>
+
+  <div class="bar-divider"></div>
+
+  <!-- Tabs -->
+  <div class="tab-section">
+    <div class="tab active">
+      <span class="t-icon">&#9679;</span>
+      Home
+    </div>
+    <div class="tab">
+      <span class="t-icon">&#128172;</span>
+      Payroll Review
+      <span class="t-close">&times;</span>
+    </div>
+    <div class="tab">
+      <span class="t-icon">&#128172;</span>
+      Benefits Audit
+      <span class="t-close">&times;</span>
+    </div>
+    <div class="tab">
+      <span class="t-icon">&#128172;</span>
+      Onboarding Setup
+      <span class="t-close">&times;</span>
+    </div>
+    <div class="tab-add">+</div>
+  </div>
+</div>
+
+<!-- Client Context -->
+<div class="client-strip">
+  <div class="cs-avatar c-orange">AS</div>
+  <div>
+    <span class="cs-name">Aperture Science</span>
+    <span class="cs-meta">&nbsp;&middot; 142 employees &middot; Payroll &amp; Benefits</span>
+  </div>
+  <div class="cs-status">Active</div>
+</div>
+
+<!-- Workspace -->
+<div class="workspace">
+  <div class="sidebar">
+    <div class="sb-head">Aperture Science</div>
+    <div class="sb-item active">
+      <span class="sb-ic">&#128200;</span> Dashboard
+    </div>
+    <div class="sb-item">
+      <span class="sb-ic">&#128172;</span> Conversations
+      <span class="sb-badge">6</span>
+    </div>
+    <div class="sb-item">
+      <span class="sb-ic">&#128101;</span> Employees
+    </div>
+    <div class="sb-item">
+      <span class="sb-ic">&#128176;</span> Payroll
+    </div>
+    <div class="sb-item">
+      <span class="sb-ic">&#128203;</span> Benefits
+    </div>
+    <div class="sb-item">
+      <span class="sb-ic">&#9881;</span> Settings
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="chat">
+      <div class="msg bot">
+        Welcome back. Aperture Science has <strong>6 items</strong> requiring attention. The Q1 payroll reconciliation deadline is in 3 days, and 2 benefits enrollment changes are pending approval.
+      </div>
+      <div class="msg user">
+        Show me the payroll discrepancies first.
+      </div>
+      <div class="msg bot">
+        Found <strong>3 discrepancies</strong> in Q1 payroll for Aperture Science:<br><br>
+        1. <strong>Gordon Freeman</strong> &mdash; Overtime mismatch (reported: 12h, system: 8h)<br>
+        2. <strong>Chell Johnson</strong> &mdash; Missing bonus allocation ($2,400)<br>
+        3. <strong>GLaDOS Admin</strong> &mdash; Duplicate tax withholding entry<br><br>
+        Want me to draft a correction report?
+      </div>
+    </div>
+    <div class="input-row">
+      <input type="text" placeholder="Message Aperture Science workspace..." />
+      <button>Send</button>
+    </div>
+  </div>
+</div>
+
+<div class="mockup-label">Concept 10 &mdash; Avatar Row (Visual Switcher)</div>
+
+</body>
+</html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 07 — Tab Groups (Multi-Client Tabs)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e8;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Top bar ── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    background: #101016;
+    border-bottom: 1px solid #2a2a35;
+    padding: 0 16px;
+    flex-shrink: 0;
+  }
+  .top-bar .logo {
+    font-weight: 700;
+    font-size: 14px;
+    color: #a0a0b0;
+    letter-spacing: 0.5px;
+    margin-right: 24px;
+    white-space: nowrap;
+  }
+  .top-bar .logo span { color: #6ee7b7; }
+  .top-bar .window-controls {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+  }
+  .top-bar .window-controls span {
+    width: 12px; height: 12px; border-radius: 50%;
+    display: inline-block;
+  }
+  .top-bar .window-controls .c-close { background: #ff5f57; }
+  .top-bar .window-controls .c-min   { background: #febc2e; }
+  .top-bar .window-controls .c-max   { background: #28c840; }
+
+  /* ── Tab strip ── */
+  .tab-strip {
+    display: flex;
+    align-items: flex-end;
+    background: #0e0e14;
+    padding: 0 8px;
+    border-bottom: 1px solid #2a2a35;
+    flex-shrink: 0;
+    overflow-x: auto;
+    gap: 2px;
+  }
+  .tab-strip::-webkit-scrollbar { height: 0; }
+
+  /* Group wrapper */
+  .tab-group {
+    display: flex;
+    align-items: flex-end;
+    margin-right: 4px;
+    position: relative;
+  }
+  .tab-group::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 8px;
+    bottom: 4px;
+    width: 1px;
+    background: #2a2a35;
+  }
+  .tab-group:last-child::after { display: none; }
+
+  /* Group header chip */
+  .group-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    border-radius: 8px 8px 0 0;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+    position: relative;
+  }
+  .group-header .dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .group-header .badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 8px;
+    color: #fff;
+    margin-left: 2px;
+  }
+
+  /* Color variants */
+  .group-blue .group-header   { background: rgba(59,130,246,0.12); color: #93bbfc; }
+  .group-blue .group-header .dot { background: #3b82f6; }
+  .group-blue .group-header .badge { background: #3b82f6; }
+  .group-blue .tab.active { border-bottom-color: #3b82f6; }
+
+  .group-red .group-header    { background: rgba(239,68,68,0.12); color: #fca5a5; }
+  .group-red .group-header .dot { background: #ef4444; }
+  .group-red .group-header .badge { background: #ef4444; }
+  .group-red .tab.active { border-bottom-color: #ef4444; }
+
+  .group-amber .group-header  { background: rgba(245,158,11,0.12); color: #fcd34d; }
+  .group-amber .group-header .dot { background: #f59e0b; }
+  .group-amber .group-header .badge { background: #f59e0b; }
+  .group-amber .tab.active { border-bottom-color: #f59e0b; }
+
+  .group-purple .group-header { background: rgba(139,92,246,0.12); color: #c4b5fd; }
+  .group-purple .group-header .dot { background: #8b5cf6; }
+  .group-purple .group-header .badge { background: #8b5cf6; }
+  .group-purple .tab.active { border-bottom-color: #8b5cf6; }
+
+  .group-cyan .group-header   { background: rgba(6,182,212,0.12); color: #67e8f9; }
+  .group-cyan .group-header .dot { background: #06b6d4; }
+  .group-cyan .group-header .badge { background: #06b6d4; }
+  .group-cyan .tab.active { border-bottom-color: #06b6d4; }
+
+  .group-rose .group-header   { background: rgba(244,63,94,0.12); color: #fda4af; }
+  .group-rose .group-header .dot { background: #f43f5e; }
+  .group-rose .group-header .badge { background: #f43f5e; }
+  .group-rose .tab.active { border-bottom-color: #f43f5e; }
+
+  /* Tabs */
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+    color: #888898;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+    position: relative;
+  }
+  .tab:hover { color: #c0c0d0; background: rgba(255,255,255,0.03); }
+  .tab.active {
+    color: #f0f0f8;
+    background: #141419;
+    border-radius: 6px 6px 0 0;
+  }
+  .tab .tab-icon {
+    font-size: 13px;
+    opacity: 0.7;
+  }
+  .tab .close-btn {
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    margin-left: 4px;
+    color: #666;
+  }
+  .tab:hover .close-btn { opacity: 0.6; }
+  .tab .close-btn:hover { opacity: 1; color: #fff; }
+  .tab .unread-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #6ee7b7; flex-shrink: 0;
+  }
+
+  /* New tab button */
+  .new-tab-btn {
+    padding: 8px 12px;
+    font-size: 16px;
+    color: #555;
+    cursor: pointer;
+    transition: color 0.15s;
+    flex-shrink: 0;
+  }
+  .new-tab-btn:hover { color: #aaa; }
+
+  /* ── Main content area ── */
+  .main-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* Sidebar (chat list for active group) */
+  .sidebar {
+    width: 260px;
+    background: #111118;
+    border-right: 1px solid #2a2a35;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sidebar-header {
+    padding: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #a0a0b0;
+    border-bottom: 1px solid #1e1e28;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sidebar-header .client-dot {
+    width: 10px; height: 10px; border-radius: 50%; background: #3b82f6;
+  }
+  .chat-list { flex: 1; overflow-y: auto; padding: 8px; }
+  .chat-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 2px;
+    transition: background 0.15s;
+  }
+  .chat-item:hover { background: rgba(255,255,255,0.04); }
+  .chat-item.active { background: rgba(59,130,246,0.1); }
+  .chat-item .chat-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #d0d0d8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chat-item .chat-name .unread-indicator {
+    width: 6px; height: 6px; border-radius: 50%; background: #6ee7b7;
+  }
+  .chat-item .chat-preview {
+    font-size: 11px;
+    color: #666678;
+    margin-top: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .chat-item .chat-time {
+    font-size: 10px;
+    color: #555;
+    margin-top: 2px;
+  }
+
+  /* Chat area */
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0a0a0f;
+  }
+  .chat-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #2a2a35;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .chat-header h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #e0e0e8;
+  }
+  .chat-header .agent-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: rgba(59,130,246,0.15);
+    color: #93bbfc;
+    font-weight: 500;
+  }
+  .chat-messages {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .message {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .message.assistant {
+    background: #1a1a24;
+    color: #c8c8d4;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .message.user {
+    background: #2563eb;
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .chat-input-area {
+    padding: 16px 24px;
+    border-top: 1px solid #2a2a35;
+  }
+  .chat-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: #141419;
+    border: 1px solid #2a2a35;
+    border-radius: 10px;
+    color: #e0e0e8;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .chat-input:focus { border-color: #3b82f6; }
+  .chat-input::placeholder { color: #555568; }
+
+  /* ── Description overlay ── */
+  .description {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20,20,25,0.95);
+    border: 1px solid #2a2a35;
+    border-radius: 12px;
+    padding: 16px 24px;
+    max-width: 600px;
+    text-align: center;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .description h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #a0a0b0;
+    margin-bottom: 6px;
+  }
+  .description p {
+    font-size: 12px;
+    color: #666678;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="top-bar">
+  <div class="window-controls">
+    <span class="c-close"></span>
+    <span class="c-min"></span>
+    <span class="c-max"></span>
+  </div>
+  <div class="logo" style="margin-left:16px">Bamboo<span>HR</span> Consultant</div>
+</div>
+
+<!-- Tab strip with grouped tabs -->
+<div class="tab-strip">
+
+  <!-- Aperture Science (blue) -->
+  <div class="tab-group group-blue">
+    <div class="group-header">
+      <span class="dot"></span>
+      Aperture Science
+      <span class="badge">6</span>
+    </div>
+    <div class="tab active">
+      <span class="tab-icon">&#128172;</span>
+      Portal Gun Safety
+      <span class="unread-dot"></span>
+      <span class="close-btn">&times;</span>
+    </div>
+    <div class="tab">
+      <span class="tab-icon">&#128172;</span>
+      GLaDOS Maintenance
+      <span class="unread-dot"></span>
+      <span class="close-btn">&times;</span>
+    </div>
+    <div class="tab">
+      <span class="tab-icon">&#128203;</span>
+      Q1 Benefits Review
+      <span class="close-btn">&times;</span>
+    </div>
+  </div>
+
+  <!-- Black Mesa (purple) -->
+  <div class="tab-group group-purple">
+    <div class="group-header">
+      <span class="dot"></span>
+      Black Mesa
+      <span class="badge">4</span>
+    </div>
+    <div class="tab">
+      <span class="tab-icon">&#128172;</span>
+      January Payroll
+      <span class="unread-dot"></span>
+      <span class="close-btn">&times;</span>
+    </div>
+    <div class="tab">
+      <span class="tab-icon">&#128172;</span>
+      Hazard Pay Policy
+      <span class="close-btn">&times;</span>
+    </div>
+  </div>
+
+  <!-- Weyland-Yutani (amber) -->
+  <div class="tab-group group-amber">
+    <div class="group-header">
+      <span class="dot"></span>
+      Weyland-Yutani
+      <span class="badge">1</span>
+    </div>
+    <div class="tab">
+      <span class="tab-icon">&#128172;</span>
+      Colony Onboarding
+      <span class="unread-dot"></span>
+      <span class="close-btn">&times;</span>
+    </div>
+  </div>
+
+  <!-- Tyrell Corporation (rose) -->
+  <div class="tab-group group-rose">
+    <div class="group-header">
+      <span class="dot"></span>
+      Tyrell Corp
+      <span class="badge">2</span>
+    </div>
+    <div class="tab">
+      <span class="tab-icon">&#128172;</span>
+      Replicant Classification
+      <span class="close-btn">&times;</span>
+    </div>
+  </div>
+
+  <!-- Umbrella Corp (red) — no unread -->
+  <div class="tab-group group-red">
+    <div class="group-header">
+      <span class="dot"></span>
+      Umbrella Corp
+    </div>
+    <div class="tab">
+      <span class="tab-icon">&#128172;</span>
+      Lab Compliance
+      <span class="close-btn">&times;</span>
+    </div>
+  </div>
+
+  <!-- Cyberdyne (cyan) — no unread -->
+  <div class="tab-group group-cyan">
+    <div class="group-header">
+      <span class="dot"></span>
+      Cyberdyne
+    </div>
+    <div class="tab">
+      <span class="tab-icon">&#128172;</span>
+      Terminator Program HR
+      <span class="close-btn">&times;</span>
+    </div>
+  </div>
+
+  <div class="new-tab-btn">+</div>
+</div>
+
+<!-- Main area -->
+<div class="main-content">
+  <!-- Sidebar: chats for the active group (Aperture) -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <span class="client-dot"></span>
+      Aperture Science — Chats
+    </div>
+    <div class="chat-list">
+      <div class="chat-item active">
+        <div class="chat-name">
+          <span class="unread-indicator"></span>
+          Portal Gun Safety
+        </div>
+        <div class="chat-preview">The safety protocols need to cover...</div>
+        <div class="chat-time">2 min ago</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-name">
+          <span class="unread-indicator"></span>
+          GLaDOS Maintenance
+        </div>
+        <div class="chat-preview">Annual review of AI system contracts...</div>
+        <div class="chat-time">18 min ago</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-name">Q1 Benefits Review</div>
+        <div class="chat-preview">Benefits enrollment deadline approaching...</div>
+        <div class="chat-time">1 hr ago</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-name">
+          <span class="unread-indicator"></span>
+          Turret Assembly Onboarding
+        </div>
+        <div class="chat-preview">New hire docs for manufacturing...</div>
+        <div class="chat-time">3 hrs ago</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-name">February Payroll</div>
+        <div class="chat-preview">Processing 847 employees...</div>
+        <div class="chat-time">Yesterday</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat area -->
+  <div class="chat-area">
+    <div class="chat-header">
+      <h2>Portal Gun Safety</h2>
+      <span class="agent-badge">Compliance Agent</span>
+    </div>
+    <div class="chat-messages">
+      <div class="message assistant">
+        I've reviewed the current portal gun safety protocols for Aperture Science. There are 3 areas that need immediate attention for OSHA compliance.
+      </div>
+      <div class="message user">
+        Can you summarize what needs to change and draft an updated policy document?
+      </div>
+      <div class="message assistant">
+        Of course. Here's a summary of the required changes:<br><br>
+        <strong>1. Dimensional Rift Exposure Limits</strong> — Current policy allows 8 hours of portal proximity. OSHA requires max 4 hours with mandatory 30-min breaks.<br><br>
+        <strong>2. Protective Equipment</strong> — Long-fall boots are mandatory but the policy doesn't specify quantum shielding for portal operators.<br><br>
+        <strong>3. Emergency Shutdown</strong> — No documented procedure for portal collapse events. I'll draft a complete policy update now.
+      </div>
+      <div class="message user">
+        Perfect, also flag any liability issues for the board.
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <input class="chat-input" placeholder="Message Compliance Agent about Aperture Science..." />
+    </div>
+  </div>
+</div>
+
+<!-- Description -->
+<div class="description">
+  <h3>Concept 07 — Tab Groups (Multi-Client Tabs)</h3>
+  <p>Tabs are grouped by client with colored headers. All clients' tabs are visible simultaneously in one strip. No explicit client switcher needed — context is always clear from the group color and label. Like Chrome Tab Groups or Arc Spaces.</p>
+</div>
+
+</body>
+</html>

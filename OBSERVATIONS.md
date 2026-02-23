@@ -307,3 +307,31 @@ No visual changes in v3 — the v2 improvements addressed their main issues, and
 **Approach C (Sidebar)** is the clear winner for daily use. Consider combining C with elements of B (the attention indicator "4 need attention" is a great passive signal that C doesn't have) or D (the sortable table could be a "Manage Clients" view accessible from the sidebar header).
 
 The production solution could be: **C as the primary interface**, with an optional "All Clients" link in the sidebar header that opens a D-style table view for triage/management tasks.
+
+---
+
+## HTML Mockup Review (All 10 Approaches)
+
+User reviewed all 10 static HTML mockups. Feedback:
+
+### Keep exploring
+| # | Approach | User Feedback |
+|---|----------|--------------|
+| **03** | Sidebar | "Good representation of the kind of thing I want on the client home tab." Sidebar picker has known issues (horizontal space) but not a bad approach. |
+| **05** | Command Palette | "Power user quick switch window — I want to keep looking at. File that away." Will revisit later as a supplementary feature. |
+| **07** | Tab Groups | "Very interesting and worth a look." Multi-client tabs grouped by client — no explicit selection, just grouped tabs. |
+| **09** | Recent + Favorites | "Interesting idea to put the clients at the top, like their own tabs." Clients as a horizontal row of avatars above the workspace. |
+
+### Interesting but lower priority
+| # | Approach | User Feedback |
+|---|----------|--------------|
+| **08** | Sliding Drawer | "Interesting, but not the most interesting." |
+
+### Set aside for now
+01 (Card Grid), 02 (Dropdown), 04 (Breadcrumb), 06 (Floating Pill), 10 (Avatar Row) — not pursuing further.
+
+### Key Takeaways
+- The **home tab content** in mockup 03 resonated — richer than what we have, worth referencing.
+- **Command palette (#5)** is being filed as a future power-user supplement, not a primary selection method.
+- **Tab groups (#7)** is a new direction worth prototyping — fundamentally different from the other approaches because there's no explicit "client selection" step. You just open tabs and they're grouped.
+- **Client avatars as top-level tabs (#9)** is conceptually similar to Approach C's collapsed mode but positioned horizontally above the workspace instead of vertically in a sidebar.

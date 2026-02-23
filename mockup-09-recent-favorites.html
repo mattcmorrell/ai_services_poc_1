@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 09 — Recent + Favorites Bar (Quick Access)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0a0f;
+    color: #e4e4e7;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Quick Access Bar ── */
+  .quick-access-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 16px;
+    height: 42px;
+    background: #0e0e14;
+    border-bottom: 1px solid #1e1e28;
+    flex-shrink: 0;
+  }
+  .quick-access-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5a5a6e;
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  .avatar-slot {
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #fff;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+  }
+  .avatar-slot:hover .avatar {
+    transform: scale(1.1);
+  }
+  .avatar-slot.active .avatar {
+    box-shadow: 0 0 0 2.5px #0a0a0f, 0 0 0 4.5px #6366f1;
+  }
+  .avatar-slot .badge {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid #0e0e14;
+    line-height: 1;
+  }
+  .avatar-slot .tooltip {
+    position: absolute;
+    bottom: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2a2a35;
+    color: #e4e4e7;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 5px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 100;
+  }
+  .avatar-slot:hover .tooltip {
+    opacity: 1;
+  }
+  .overflow-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #1e1e28;
+    border: 1px solid #2a2a35;
+    color: #71717a;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 1px;
+    transition: background 0.15s ease, color 0.15s ease;
+    flex-shrink: 0;
+  }
+  .overflow-btn:hover {
+    background: #2a2a35;
+    color: #a1a1aa;
+  }
+  .quick-access-divider {
+    width: 1px;
+    height: 20px;
+    background: #2a2a35;
+    margin: 0 4px;
+    flex-shrink: 0;
+  }
+  .star-icon {
+    color: #eab308;
+    font-size: 10px;
+    position: absolute;
+    bottom: -2px;
+    right: -1px;
+  }
+
+  /* ── Tab Bar ── */
+  .tab-bar {
+    display: flex;
+    align-items: stretch;
+    height: 38px;
+    background: #111117;
+    border-bottom: 1px solid #2a2a35;
+    padding: 0 8px;
+    gap: 2px;
+    flex-shrink: 0;
+    overflow-x: auto;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 14px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #71717a;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .tab:hover {
+    color: #a1a1aa;
+    background: rgba(255,255,255,0.02);
+  }
+  .tab.active {
+    color: #e4e4e7;
+    border-bottom-color: #6366f1;
+  }
+  .tab .tab-icon {
+    font-size: 14px;
+    opacity: 0.7;
+  }
+  .tab .close-btn {
+    font-size: 14px;
+    color: #52525b;
+    margin-left: 4px;
+    opacity: 0;
+    transition: opacity 0.1s ease, color 0.1s ease;
+  }
+  .tab:hover .close-btn { opacity: 1; }
+  .tab .close-btn:hover { color: #ef4444; }
+  .tab-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    font-size: 18px;
+    color: #52525b;
+    cursor: pointer;
+    transition: color 0.15s ease;
+    flex-shrink: 0;
+  }
+  .tab-add:hover { color: #a1a1aa; }
+
+  /* ── Client Context ── */
+  .client-context {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: #111117;
+    border-bottom: 1px solid #1e1e28;
+    flex-shrink: 0;
+  }
+  .client-context .ctx-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .client-context .ctx-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e4e4e7;
+  }
+  .client-context .ctx-detail {
+    font-size: 11px;
+    color: #52525b;
+  }
+  .client-context .ctx-status {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: rgba(34,197,94,0.12);
+    color: #22c55e;
+  }
+
+  /* ── Workspace ── */
+  .workspace {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+  .sidebar {
+    width: 240px;
+    background: #111117;
+    border-right: 1px solid #1e1e28;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sidebar-header {
+    padding: 14px 16px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #52525b;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #a1a1aa;
+    cursor: pointer;
+    transition: background 0.1s ease, color 0.1s ease;
+  }
+  .sidebar-item:hover {
+    background: rgba(255,255,255,0.03);
+    color: #e4e4e7;
+  }
+  .sidebar-item.active {
+    background: rgba(99,102,241,0.08);
+    color: #818cf8;
+  }
+  .sidebar-item .si-icon { font-size: 15px; opacity: 0.6; }
+  .sidebar-item .si-badge {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 600;
+    background: rgba(99,102,241,0.15);
+    color: #818cf8;
+    padding: 1px 6px;
+    border-radius: 8px;
+  }
+
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0a0a0f;
+  }
+  .chat-area {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .msg {
+    max-width: 520px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .msg.assistant {
+    background: #1a1a24;
+    border: 1px solid #2a2a35;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .msg.user {
+    background: #3730a3;
+    color: #e0e7ff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .input-bar {
+    padding: 12px 20px;
+    border-top: 1px solid #1e1e28;
+    display: flex;
+    gap: 8px;
+  }
+  .input-bar input {
+    flex: 1;
+    background: #141419;
+    border: 1px solid #2a2a35;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    color: #e4e4e7;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  .input-bar input:focus { border-color: #6366f1; }
+  .input-bar input::placeholder { color: #52525b; }
+  .input-bar button {
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .input-bar button:hover { background: #4f46e5; }
+
+  /* ── Label ── */
+  .mockup-label {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: rgba(99,102,241,0.12);
+    border: 1px solid rgba(99,102,241,0.25);
+    color: #818cf8;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    z-index: 1000;
+  }
+
+  /* Color palette for avatars */
+  .av-orange { background: #c2410c; }
+  .av-purple { background: #7c3aed; }
+  .av-teal { background: #0d9488; }
+  .av-red { background: #dc2626; }
+  .av-blue { background: #2563eb; }
+  .av-amber { background: #d97706; }
+</style>
+</head>
+<body>
+
+<!-- Quick Access Bar -->
+<div class="quick-access-bar">
+  <span class="quick-access-label">Clients</span>
+
+  <div class="avatar-slot active">
+    <div class="avatar av-orange">AS</div>
+    <span class="badge">6</span>
+    <span class="tooltip">Aperture Science</span>
+  </div>
+
+  <div class="avatar-slot">
+    <div class="avatar av-purple">UC</div>
+    <span class="tooltip">Umbrella Corporation</span>
+  </div>
+
+  <div class="avatar-slot">
+    <div class="avatar av-teal">WY</div>
+    <span class="badge">1</span>
+    <span class="tooltip">Weyland-Yutani</span>
+  </div>
+
+  <div class="avatar-slot">
+    <div class="avatar av-red">BM</div>
+    <span class="badge">4</span>
+    <span class="tooltip">Black Mesa</span>
+  </div>
+
+  <button class="overflow-btn" title="All clients">+2</button>
+
+  <div class="quick-access-divider"></div>
+
+  <span style="font-size:10px; color:#3f3f50; white-space:nowrap;">6 clients</span>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <div class="tab active">
+    <span class="tab-icon">&#9679;</span>
+    Home
+  </div>
+  <div class="tab">
+    <span class="tab-icon">&#128172;</span>
+    Payroll Review
+    <span class="close-btn">&times;</span>
+  </div>
+  <div class="tab">
+    <span class="tab-icon">&#128172;</span>
+    Benefits Audit
+    <span class="close-btn">&times;</span>
+  </div>
+  <div class="tab">
+    <span class="tab-icon">&#128172;</span>
+    Onboarding Setup
+    <span class="close-btn">&times;</span>
+  </div>
+  <div class="tab-add">+</div>
+</div>
+
+<!-- Client Context Strip -->
+<div class="client-context">
+  <div class="ctx-avatar av-orange">AS</div>
+  <div>
+    <div class="ctx-name">Aperture Science</div>
+    <div class="ctx-detail">142 employees &middot; Payroll &amp; Benefits</div>
+  </div>
+  <div class="ctx-status">Active</div>
+</div>
+
+<!-- Workspace -->
+<div class="workspace">
+  <div class="sidebar">
+    <div class="sidebar-header">Aperture Science</div>
+    <div class="sidebar-item active">
+      <span class="si-icon">&#128200;</span> Dashboard
+    </div>
+    <div class="sidebar-item">
+      <span class="si-icon">&#128172;</span> Conversations
+      <span class="si-badge">6</span>
+    </div>
+    <div class="sidebar-item">
+      <span class="si-icon">&#128101;</span> Employees
+    </div>
+    <div class="sidebar-item">
+      <span class="si-icon">&#128176;</span> Payroll
+    </div>
+    <div class="sidebar-item">
+      <span class="si-icon">&#128203;</span> Benefits
+    </div>
+    <div class="sidebar-item">
+      <span class="si-icon">&#9881;</span> Settings
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="chat-area">
+      <div class="msg assistant">
+        Welcome back. Aperture Science has <strong>6 items</strong> that need your attention. The Q1 payroll reconciliation is due in 3 days, and there are 2 pending benefits enrollment changes.
+      </div>
+      <div class="msg user">
+        Let's start with the payroll reconciliation. Show me the discrepancies.
+      </div>
+      <div class="msg assistant">
+        I found <strong>3 discrepancies</strong> in the Q1 payroll data for Aperture Science:<br><br>
+        1. <strong>Gordon Freeman</strong> &mdash; Overtime hours mismatch (reported: 12h, system: 8h)<br>
+        2. <strong>Chell Johnson</strong> &mdash; Missing bonus allocation ($2,400)<br>
+        3. <strong>GLaDOS Admin</strong> &mdash; Duplicate tax withholding entry<br><br>
+        Would you like me to generate a correction report?
+      </div>
+    </div>
+    <div class="input-bar">
+      <input type="text" placeholder="Message Aperture Science workspace..." />
+      <button>Send</button>
+    </div>
+  </div>
+</div>
+
+<div class="mockup-label">Concept 09 &mdash; Recent + Favorites Bar</div>
+
+</body>
+</html>

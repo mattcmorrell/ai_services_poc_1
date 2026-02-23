@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Cards Grid — HRIS Consultant</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #e4e4e7;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* Top nav bar */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 32px;
+    background: #101016;
+    border-bottom: 1px solid #1e1e28;
+  }
+  .top-bar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  .top-bar-logo .logo-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+  }
+  .top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .top-bar-right .notif-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: #1a1a22;
+    border: 1px solid #2a2a35;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    color: #888;
+    font-size: 16px;
+  }
+  .notif-btn .notif-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 1.5px solid #101016;
+  }
+  .top-bar-right .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #334155, #475569);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #cbd5e1;
+    cursor: pointer;
+  }
+
+  /* Main content area */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px 64px;
+  }
+
+  .header {
+    margin-bottom: 36px;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 14px;
+    color: #71717a;
+    font-weight: 400;
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #141419;
+    border: 1px solid #2a2a35;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #a1a1aa;
+  }
+  .stat-pill .stat-num {
+    font-weight: 700;
+    color: #fff;
+    font-size: 15px;
+  }
+  .stat-pill.urgent .stat-num { color: #ef4444; }
+  .stat-pill.active .stat-num { color: #6366f1; }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  /* Card */
+  .card {
+    background: #141419;
+    border: 1px solid #2a2a35;
+    border-radius: 14px;
+    padding: 22px 24px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+  .card.urgency-high::before { background: #ef4444; }
+  .card.urgency-med::before { background: #f59e0b; }
+  .card.urgency-low::before { background: transparent; }
+
+  .card:hover {
+    border-color: #3f3f50;
+    background: #18181f;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .card-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .card-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 17px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .card-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2px;
+    letter-spacing: -0.2px;
+  }
+  .card-industry {
+    font-size: 12px;
+    color: #52525b;
+    font-weight: 400;
+  }
+
+  .unread-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 11px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    background: #ef4444;
+    flex-shrink: 0;
+  }
+  .unread-badge.amber { background: #d97706; }
+  .unread-badge.none {
+    background: #27272a;
+    color: #52525b;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 12.5px;
+    color: #52525b;
+  }
+  .card-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .card-meta-item .icon {
+    font-size: 13px;
+    opacity: 0.7;
+  }
+
+  .card-divider {
+    height: 1px;
+    background: #1e1e28;
+    margin: 14px 0;
+  }
+
+  .card-agents {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .agent-tag {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: #1e1e28;
+    color: #71717a;
+    font-weight: 500;
+  }
+  .agent-tag.active {
+    background: rgba(99, 102, 241, 0.15);
+    color: #818cf8;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top navigation -->
+<div class="top-bar">
+  <div class="top-bar-logo">
+    <div class="logo-icon">B</div>
+    BambooHR Services
+  </div>
+  <div class="top-bar-right">
+    <div class="notif-btn">
+      &#x1F514;
+      <div class="notif-dot"></div>
+    </div>
+    <div class="avatar">MM</div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Header -->
+  <div class="header">
+    <h1>Your Clients</h1>
+    <p>6 active clients &middot; 14 open conversations &middot; 9 unread messages</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-pill urgent">
+      <span class="stat-num">3</span> need attention
+    </div>
+    <div class="stat-pill active">
+      <span class="stat-num">14</span> active chats
+    </div>
+    <div class="stat-pill">
+      <span class="stat-num">6</span> clients
+    </div>
+  </div>
+
+  <!-- Card Grid -->
+  <div class="grid">
+
+    <!-- Aperture Science -->
+    <div class="card urgency-high">
+      <div class="card-top">
+        <div class="card-left">
+          <div class="card-avatar" style="background: linear-gradient(135deg, #f97316, #ea580c);">A</div>
+          <div>
+            <div class="card-name">Aperture Science</div>
+            <div class="card-industry">Research &amp; Development</div>
+          </div>
+        </div>
+        <div class="unread-badge">5</div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <div class="card-meta-item">
+          <span class="icon">&#x1F4AC;</span> 4 chats
+        </div>
+        <div class="card-meta-item">
+          <span class="icon">&#x1F552;</span> 12 min ago
+        </div>
+        <div class="card-meta-item">
+          <span class="icon">&#x1F465;</span> 342 employees
+        </div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-agents">
+        <span class="agent-tag active">Payroll</span>
+        <span class="agent-tag active">Onboarding</span>
+        <span class="agent-tag">Benefits</span>
+      </div>
+    </div>
+
+    <!-- Umbrella Corporation -->
+    <div class="card urgency-high">
+      <div class="card-top">
+        <div class="card-left">
+          <div class="card-avatar" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">U</div>
+          <div>
+            <div class="card-name">Umbrella Corporation</div>
+            <div class="card-industry">Pharmaceuticals</div>
+          </div>
+        </div>
+        <div class="unread-badge">3</div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <div class="card-meta-item">
+          <span class="icon">&#x1F4AC;</span> 3 chats
+        </div>
+        <div class="card-meta-item">
+          <span class="icon">&#x1F552;</span> 28 min ago
+        </div>
+        <div class="card-meta-item">
+          <span class="icon">&#x1F465;</span> 1,204 employees
+        </div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-agents">
+        <span class="agent-tag active">Compliance</span>
+        <span class="agent-tag active">Payroll</span>
+        <span class="agent-tag">Offboarding</span>
+      </div>
+    </div>
+
+    <!-- Weyland-Yutani -->
+    <div class="card urgency-med">
+      <div class="card-top">
+        <div class="card-left">
+          <div class="card-avatar" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">W</div>
+          <div>
+            <div class="card-name">Weyland-Yutani</div>
+            <div class="card-industry">Aerospace &amp; Defense</div>
+          </div>
+        </div>
+        <div class="unread-badge amber">1</div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <div class="card-meta-item">
+          <span class="icon">&#x1F4AC;</span> 3 chats
+        </div>
+        <div class="card-meta-item">
+          <span class="icon">&#x1F552;</span> 2 hours ago
+        </div>
+        <div class="card-meta-item">
+          <span class="icon">&#x1F465;</span> 8,910 employees
+        </div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-agents">
+        <span class="agent-tag active">Benefits</span>
+        <span class="agent-tag">Payroll</span>
+      </div>
+    </div>
+
+    <!-- Black Mesa -->
+    <div class="card urgency-low">
+      <div class="card-top">
+        <div class="card-left">
+          <div class="card-avatar" style="background: linear-gradient(135deg, #22c55e, #16a34a);">B</div>
+          <div>
+            <div class="card-name">Black Mesa</div>
+            <div class="card-industry">Government Research</div>
+          </div>
+        </div>
+        <div class="unread-badge none">0</div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <div class="card-meta-item">
+          <span class="icon">&#x1F4AC;</span> 2 chats
+        </div>
+        <div class="card-meta-item">
+          <span class="icon">&#x1F552;</span> 1 day ago
+        </div>
+        <div class="card-meta-item">
+          <span class="icon">&#x1F465;</span> 567 employees
+        </div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-agents">
+        <span class="agent-tag">Onboarding</span>
+        <span class="agent-tag">Payroll</span>
+      </div>
+    </div>
+
+    <!-- Cyberdyne Systems -->
+    <div class="card urgency-low">
+      <div class="card-top">
+        <div class="card-left">
+          <div class="card-avatar" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">C</div>
+          <div>
+            <div class="card-name">Cyberdyne Systems</div>
+            <div class="card-industry">Artificial Intelligence</div>
+          </div>
+        </div>
+        <div class="unread-badge none">0</div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <div class="card-meta-item">
+          <span class="icon">&#x1F4AC;</span> 1 chat
+        </div>
+        <div class="card-meta-item">
+          <span class="icon">&#x1F552;</span> 3 days ago
+        </div>
+        <div class="card-meta-item">
+          <span class="icon">&#x1F465;</span> 189 employees
+        </div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-agents">
+        <span class="agent-tag">Benefits</span>
+      </div>
+    </div>
+
+    <!-- Tyrell Corporation -->
+    <div class="card urgency-low">
+      <div class="card-top">
+        <div class="card-left">
+          <div class="card-avatar" style="background: linear-gradient(135deg, #a855f7, #7c3aed);">T</div>
+          <div>
+            <div class="card-name">Tyrell Corporation</div>
+            <div class="card-industry">Bioengineering</div>
+          </div>
+        </div>
+        <div class="unread-badge none">0</div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <div class="card-meta-item">
+          <span class="icon">&#x1F4AC;</span> 1 chat
+        </div>
+        <div class="card-meta-item">
+          <span class="icon">&#x1F552;</span> 5 days ago
+        </div>
+        <div class="card-meta-item">
+          <span class="icon">&#x1F465;</span> 2,450 employees
+        </div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-agents">
+        <span class="agent-tag">Compliance</span>
+        <span class="agent-tag">Payroll</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

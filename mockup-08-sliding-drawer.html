@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 08 — Sliding Drawer (Progressive Disclosure)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e8;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Top bar ── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    height: 52px;
+    background: #111118;
+    border-bottom: 1px solid #2a2a35;
+    padding: 0 20px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .hamburger {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .hamburger:hover { background: rgba(255,255,255,0.06); }
+  .hamburger span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: #888898;
+    border-radius: 1px;
+    transition: all 0.3s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  .top-bar .logo {
+    font-weight: 700;
+    font-size: 14px;
+    color: #a0a0b0;
+    letter-spacing: 0.5px;
+    margin-left: 16px;
+  }
+  .top-bar .logo em { font-style: normal; color: #6ee7b7; }
+
+  .top-bar .current-client {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 32px;
+    padding: 6px 14px;
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .top-bar .current-client:hover { background: rgba(59,130,246,0.15); }
+  .top-bar .current-client .avatar {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: #3b82f6;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+  .top-bar .current-client .name {
+    font-size: 13px; font-weight: 600; color: #c0c8e0;
+  }
+  .top-bar .current-client .chevron {
+    font-size: 10px; color: #666; margin-left: 4px;
+  }
+
+  .top-bar .spacer { flex: 1; }
+
+  .top-bar .nav-tabs {
+    display: flex;
+    gap: 4px;
+  }
+  .top-bar .nav-tab {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #666678;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .top-bar .nav-tab:hover { color: #a0a0b0; background: rgba(255,255,255,0.04); }
+  .top-bar .nav-tab.active { color: #e0e0e8; background: rgba(255,255,255,0.08); }
+
+  /* ── Drawer backdrop ── */
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 50;
+    opacity: 1;
+    transition: opacity 0.3s;
+  }
+  .drawer-backdrop.hidden { opacity: 0; pointer-events: none; }
+
+  /* ── Drawer ── */
+  .drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 340px;
+    height: 100vh;
+    background: #111118;
+    border-right: 1px solid #2a2a35;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(0);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 20px 0 60px rgba(0,0,0,0.5);
+  }
+  .drawer.hidden { transform: translateX(-100%); }
+
+  .drawer-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid #1e1e28;
+  }
+  .drawer-header h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e0e0e8;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .drawer-header h2 .close-drawer {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    color: #666;
+    transition: all 0.15s;
+  }
+  .drawer-header h2 .close-drawer:hover { background: rgba(255,255,255,0.06); color: #aaa; }
+
+  .drawer-search {
+    width: 100%;
+    padding: 10px 14px;
+    background: #0a0a0f;
+    border: 1px solid #2a2a35;
+    border-radius: 8px;
+    color: #e0e0e8;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .drawer-search:focus { border-color: #3b82f6; }
+  .drawer-search::placeholder { color: #444458; }
+
+  .drawer-section-label {
+    padding: 14px 20px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #555568;
+  }
+
+  .client-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 10px;
+  }
+
+  .client-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .client-item:hover { background: rgba(255,255,255,0.04); }
+  .client-item.active { background: rgba(59,130,246,0.1); }
+  .client-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: #3b82f6;
+  }
+
+  .client-avatar {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .client-avatar .status-dot {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 2px solid #111118;
+  }
+  .status-dot.online { background: #22c55e; }
+  .status-dot.away { background: #f59e0b; }
+  .status-dot.offline { background: #555; }
+
+  .client-info { flex: 1; min-width: 0; }
+  .client-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #d0d0d8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .client-meta {
+    font-size: 11px;
+    color: #555568;
+    margin-top: 2px;
+    display: flex;
+    gap: 10px;
+  }
+  .client-meta span { display: flex; align-items: center; gap: 3px; }
+
+  .client-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .client-time {
+    font-size: 10px;
+    color: #555568;
+  }
+  .unread-badge {
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    background: #3b82f6;
+    padding: 2px 7px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .drawer-footer {
+    padding: 16px 20px;
+    border-top: 1px solid #1e1e28;
+  }
+  .drawer-footer button {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid #2a2a35;
+    border-radius: 8px;
+    color: #888898;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .drawer-footer button:hover { background: rgba(255,255,255,0.08); color: #c0c0d0; }
+
+  /* ── Main workspace ── */
+  .workspace {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* Chat sidebar */
+  .chat-sidebar {
+    width: 260px;
+    background: #0e0e14;
+    border-right: 1px solid #2a2a35;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .chat-sidebar-header {
+    padding: 14px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888898;
+    border-bottom: 1px solid #1e1e28;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .chat-sidebar-header .new-chat {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: #666;
+    transition: all 0.15s;
+  }
+  .chat-sidebar-header .new-chat:hover { background: rgba(255,255,255,0.06); color: #aaa; }
+
+  .chat-list { flex: 1; overflow-y: auto; padding: 6px 8px; }
+  .chat-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 2px;
+    transition: background 0.15s;
+  }
+  .chat-item:hover { background: rgba(255,255,255,0.03); }
+  .chat-item.active { background: rgba(59,130,246,0.1); }
+  .chat-item .chat-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #c0c0d0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chat-item .chat-name .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #6ee7b7; flex-shrink: 0;
+  }
+  .chat-item .chat-preview {
+    font-size: 11px;
+    color: #555568;
+    margin-top: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Chat main */
+  .chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0a0a0f;
+  }
+  .chat-main-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #2a2a35;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .chat-main-header h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #e0e0e8;
+  }
+  .chat-main-header .badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: rgba(139,92,246,0.15);
+    color: #c4b5fd;
+    font-weight: 500;
+  }
+
+  .messages { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+  .msg {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .msg.ai {
+    background: #1a1a24;
+    color: #c8c8d4;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .msg.user {
+    background: #2563eb;
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+
+  .input-bar {
+    padding: 16px 24px;
+    border-top: 1px solid #2a2a35;
+  }
+  .input-bar input {
+    width: 100%;
+    padding: 12px 16px;
+    background: #141419;
+    border: 1px solid #2a2a35;
+    border-radius: 10px;
+    color: #e0e0e8;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .input-bar input:focus { border-color: #3b82f6; }
+  .input-bar input::placeholder { color: #444458; }
+
+  /* ── Description overlay ── */
+  .description {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: rgba(20,20,25,0.95);
+    border: 1px solid #2a2a35;
+    border-radius: 12px;
+    padding: 16px 24px;
+    max-width: 400px;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .description h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #a0a0b0;
+    margin-bottom: 6px;
+  }
+  .description p {
+    font-size: 12px;
+    color: #666678;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="top-bar">
+  <div class="hamburger open" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="logo">Bamboo<em>HR</em> Consultant</div>
+
+  <div class="current-client" onclick="toggleDrawer()">
+    <div class="avatar">AS</div>
+    <div class="name">Aperture Science</div>
+    <div class="chevron">&#9662;</div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="nav-tabs">
+    <div class="nav-tab">Dashboard</div>
+    <div class="nav-tab active">Chats</div>
+    <div class="nav-tab">Agents</div>
+  </div>
+</div>
+
+<!-- Drawer backdrop -->
+<div class="drawer-backdrop" id="backdrop" onclick="toggleDrawer()"></div>
+
+<!-- Sliding drawer -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h2>
+      Select Client
+      <span class="close-drawer" onclick="toggleDrawer()">&times;</span>
+    </h2>
+    <input class="drawer-search" placeholder="Search clients..." />
+  </div>
+
+  <div class="drawer-section-label">Active Clients &middot; 6</div>
+
+  <div class="client-list">
+    <!-- Aperture Science -->
+    <div class="client-item active">
+      <div class="client-avatar" style="background: #3b82f6;">
+        AS
+        <span class="status-dot online"></span>
+      </div>
+      <div class="client-info">
+        <div class="client-name">Aperture Science</div>
+        <div class="client-meta">
+          <span>&#128172; 5 chats</span>
+          <span>&#128101; 847 employees</span>
+        </div>
+      </div>
+      <div class="client-right">
+        <span class="client-time">2m ago</span>
+        <span class="unread-badge">6</span>
+      </div>
+    </div>
+
+    <!-- Black Mesa -->
+    <div class="client-item">
+      <div class="client-avatar" style="background: #8b5cf6;">
+        BM
+        <span class="status-dot online"></span>
+      </div>
+      <div class="client-info">
+        <div class="client-name">Black Mesa</div>
+        <div class="client-meta">
+          <span>&#128172; 3 chats</span>
+          <span>&#128101; 612 employees</span>
+        </div>
+      </div>
+      <div class="client-right">
+        <span class="client-time">15m ago</span>
+        <span class="unread-badge">4</span>
+      </div>
+    </div>
+
+    <!-- Tyrell Corporation -->
+    <div class="client-item">
+      <div class="client-avatar" style="background: #f43f5e;">
+        TC
+        <span class="status-dot away"></span>
+      </div>
+      <div class="client-info">
+        <div class="client-name">Tyrell Corporation</div>
+        <div class="client-meta">
+          <span>&#128172; 4 chats</span>
+          <span>&#128101; 289 employees</span>
+        </div>
+      </div>
+      <div class="client-right">
+        <span class="client-time">1h ago</span>
+        <span class="unread-badge">2</span>
+      </div>
+    </div>
+
+    <!-- Weyland-Yutani -->
+    <div class="client-item">
+      <div class="client-avatar" style="background: #f59e0b;">
+        WY
+        <span class="status-dot online"></span>
+      </div>
+      <div class="client-info">
+        <div class="client-name">Weyland-Yutani</div>
+        <div class="client-meta">
+          <span>&#128172; 2 chats</span>
+          <span>&#128101; 1,204 employees</span>
+        </div>
+      </div>
+      <div class="client-right">
+        <span class="client-time">3h ago</span>
+        <span class="unread-badge">1</span>
+      </div>
+    </div>
+
+    <!-- Umbrella Corporation -->
+    <div class="client-item">
+      <div class="client-avatar" style="background: #ef4444;">
+        UC
+        <span class="status-dot offline"></span>
+      </div>
+      <div class="client-info">
+        <div class="client-name">Umbrella Corporation</div>
+        <div class="client-meta">
+          <span>&#128172; 2 chats</span>
+          <span>&#128101; 1,530 employees</span>
+        </div>
+      </div>
+      <div class="client-right">
+        <span class="client-time">2d ago</span>
+      </div>
+    </div>
+
+    <!-- Cyberdyne Systems -->
+    <div class="client-item">
+      <div class="client-avatar" style="background: #06b6d4;">
+        CS
+        <span class="status-dot offline"></span>
+      </div>
+      <div class="client-info">
+        <div class="client-name">Cyberdyne Systems</div>
+        <div class="client-meta">
+          <span>&#128172; 1 chat</span>
+          <span>&#128101; 156 employees</span>
+        </div>
+      </div>
+      <div class="client-right">
+        <span class="client-time">5d ago</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-footer">
+    <button>+ Add New Client</button>
+  </div>
+</div>
+
+<!-- Main workspace -->
+<div class="workspace">
+  <div class="chat-sidebar">
+    <div class="chat-sidebar-header">
+      Aperture Science Chats
+      <span class="new-chat">+</span>
+    </div>
+    <div class="chat-list">
+      <div class="chat-item active">
+        <div class="chat-name"><span class="dot"></span> Portal Gun Safety</div>
+        <div class="chat-preview">The safety protocols need to cover...</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-name"><span class="dot"></span> GLaDOS Maintenance</div>
+        <div class="chat-preview">Annual review of AI system contracts...</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-name">Q1 Benefits Review</div>
+        <div class="chat-preview">Benefits enrollment deadline approaching...</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-name"><span class="dot"></span> Turret Assembly Onboarding</div>
+        <div class="chat-preview">New hire docs for manufacturing...</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-name">February Payroll</div>
+        <div class="chat-preview">Processing 847 employees...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-main">
+    <div class="chat-main-header">
+      <h2>Portal Gun Safety</h2>
+      <span class="badge">Compliance Agent</span>
+    </div>
+    <div class="messages">
+      <div class="msg ai">
+        I've reviewed the current portal gun safety protocols for Aperture Science. There are 3 areas that need immediate attention for OSHA compliance.
+      </div>
+      <div class="msg user">
+        Can you summarize what needs to change and draft an updated policy document?
+      </div>
+      <div class="msg ai">
+        Of course. Here's what needs updating:<br><br>
+        <strong>1. Dimensional Rift Exposure Limits</strong> — OSHA requires max 4-hour portal proximity with mandatory breaks.<br><br>
+        <strong>2. Protective Equipment</strong> — Quantum shielding must be specified for portal operators in addition to long-fall boots.<br><br>
+        <strong>3. Emergency Shutdown</strong> — No documented procedure exists for portal collapse events. I'll draft the full update.
+      </div>
+    </div>
+    <div class="input-bar">
+      <input placeholder="Message Compliance Agent..." />
+    </div>
+  </div>
+</div>
+
+<!-- Description -->
+<div class="description">
+  <h3>Concept 08 — Sliding Drawer</h3>
+  <p>A left-side drawer slides over the workspace with a dimmed backdrop. Shows all clients with avatars, unread badges, chat counts, employee counts, and last activity. Triggered by the hamburger icon or client name in the top bar.</p>
+</div>
+
+<script>
+  function toggleDrawer() {
+    document.getElementById('drawer').classList.toggle('hidden');
+    document.getElementById('backdrop').classList.toggle('hidden');
+    document.querySelector('.hamburger').classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>

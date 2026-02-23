@@ -21,12 +21,12 @@
     justify-content: space-between;
     margin-bottom: 4px;
   }
-  h1 { font-size: 20px; font-weight: 600; }
+  h1 { font-size: 28px; font-weight: 600; }
   .last-updated {
-    font-size: 11px;
+    font-size: 13px;
     color: #52525b;
   }
-  .subtitle { font-size: 13px; color: #71717a; margin-bottom: 28px; }
+  .subtitle { font-size: 16px; color: #71717a; margin-bottom: 28px; }
 
   /* Stats bar */
   .stats-bar {
@@ -39,9 +39,9 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: 14px;
     color: #a1a1aa;
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 6px;
     border: 1px solid #1e1e26;
     background: #111116;
@@ -59,20 +59,20 @@
   }
   .stat .count {
     font-weight: 700;
-    font-size: 13px;
+    font-size: 15px;
     color: #e4e4e7;
     font-family: 'SF Mono', 'Fira Code', monospace;
   }
   .stat .dot {
-    width: 7px;
-    height: 7px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     flex-shrink: 0;
   }
 
   /* Filter hint */
   .filter-hint {
-    font-size: 11px;
+    font-size: 14px;
     color: #3f3f46;
     margin-bottom: 32px;
     height: 16px;
@@ -100,8 +100,8 @@
     overflow: hidden;
   }
   .view-btn {
-    padding: 5px 12px;
-    font-size: 12px;
+    padding: 6px 14px;
+    font-size: 14px;
     background: transparent;
     border: none;
     color: #52525b;
@@ -120,8 +120,8 @@
     color: #e4e4e7;
   }
   .view-btn svg {
-    width: 13px;
-    height: 13px;
+    width: 15px;
+    height: 15px;
   }
 
   /* Active-only toggle */
@@ -159,7 +159,7 @@
     transform: translateX(16px);
   }
   .toggle-label {
-    font-size: 12px;
+    font-size: 14px;
     color: #71717a;
     cursor: pointer;
     user-select: none;
@@ -170,7 +170,7 @@
     margin-bottom: 32px;
   }
   .section-label {
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1.5px;
@@ -222,7 +222,7 @@
   }
 
   .spawn-tag {
-    font-size: 10px;
+    font-size: 13px;
     color: #8b5cf6;
     padding-left: 34px;
     margin-top: -2px;
@@ -269,7 +269,7 @@
 
   /* Status dot */
   .status-dot {
-    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
   }
   .status-dot.exploring { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.5); }
   .status-dot.new       { background: #8b5cf6; box-shadow: 0 0 6px rgba(139,92,246,0.5); }
@@ -279,19 +279,19 @@
 
   /* Card content */
   .card-id {
-    font-size: 10px; font-weight: 700; color: #71717a;
-    background: #1a1a22; padding: 1px 5px; border-radius: 3px;
+    font-size: 13px; font-weight: 700; color: #71717a;
+    background: #1a1a22; padding: 2px 7px; border-radius: 3px;
     flex-shrink: 0; font-family: 'SF Mono', 'Fira Code', monospace;
   }
   .card-name {
-    font-size: 13px; font-weight: 600; color: #f4f4f5; white-space: nowrap;
+    font-size: 16px; font-weight: 600; color: #f4f4f5; white-space: nowrap;
   }
   .card-version {
-    font-size: 10px; color: #71717a; flex-shrink: 0;
+    font-size: 13px; color: #71717a; flex-shrink: 0;
     font-family: 'SF Mono', 'Fira Code', monospace;
   }
   .card-status {
-    font-size: 10px; font-weight: 500; padding: 2px 7px;
+    font-size: 12px; font-weight: 500; padding: 3px 9px;
     border-radius: 10px; flex-shrink: 0;
     text-transform: uppercase; letter-spacing: 0.5px;
   }
@@ -302,7 +302,7 @@
   .card-status.abandoned { background: rgba(63,63,70,0.2); color: #52525b; }
 
   .card-note {
-    font-size: 11px; color: #a1a1aa; margin-left: auto;
+    font-size: 14px; color: #a1a1aa; margin-left: auto;
     text-align: right; white-space: nowrap;
     overflow: hidden; text-overflow: ellipsis;
     max-width: 400px;
@@ -316,10 +316,10 @@
     margin-left: 8px;
   }
   .card-link {
-    font-size: 10px;
+    font-size: 13px;
     color: #a1a1aa;
     text-decoration: none;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 4px;
     border: 1px solid #2a2a35;
     background: #1a1a22;
@@ -334,7 +334,7 @@
     background: #22222a;
   }
   .card-link .link-icon {
-    font-size: 10px;
+    font-size: 13px;
   }
 
   /* Editable fields */
@@ -427,7 +427,7 @@
     position: absolute;
     bottom: 8px;
     right: 8px;
-    font-size: 10px;
+    font-size: 13px;
     color: #e4e4e7;
     background: rgba(0,0,0,0.7);
     backdrop-filter: blur(4px);
@@ -441,7 +441,7 @@
     position: absolute;
     top: 8px;
     left: 8px;
-    font-size: 10px;
+    font-size: 13px;
     color: #c4b5fd;
     background: rgba(139, 92, 246, 0.2);
     backdrop-filter: blur(4px);
@@ -463,14 +463,14 @@
     cursor: default;
   }
   .gallery-thumb-placeholder .placeholder-id {
-    font-size: 32px;
+    font-size: 40px;
     font-weight: 800;
     color: #2a2a35;
     font-family: 'SF Mono', 'Fira Code', monospace;
     line-height: 1;
   }
   .gallery-thumb-placeholder .placeholder-hint {
-    font-size: 10px;
+    font-size: 13px;
     color: #3f3f46;
   }
 
@@ -485,14 +485,14 @@
     margin-bottom: 6px;
   }
   .gallery-name {
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 600;
     color: #f4f4f5;
     flex: 1;
     min-width: 0;
   }
   .gallery-note {
-    font-size: 12px;
+    font-size: 14px;
     color: #a1a1aa;
     line-height: 1.5;
     display: -webkit-box;
@@ -556,7 +556,7 @@
   }
   .lightbox-caption {
     margin-top: 16px;
-    font-size: 13px;
+    font-size: 16px;
     color: #a1a1aa;
     text-align: center;
   }
@@ -642,7 +642,7 @@
     border-radius: 8px;
     border: 1px solid #2a2a35;
     background: #141419;
-    font-size: 12px;
+    font-size: 14px;
     color: #a1a1aa;
     transition: transform 0.25s ease, opacity 0.25s ease;
     opacity: 0;
@@ -669,7 +669,7 @@
     right: 20px;
     display: flex;
     gap: 12px;
-    font-size: 11px;
+    font-size: 13px;
     color: #3f3f46;
   }
   .kbd {
@@ -680,10 +680,10 @@
   .kbd code {
     background: #1e1e26;
     border: 1px solid #1e1e26;
-    padding: 1px 6px;
+    padding: 2px 7px;
     border-radius: 3px;
     font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 10px;
+    font-size: 12px;
     color: #52525b;
   }
 
