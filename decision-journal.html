@@ -100,12 +100,12 @@
     letter-spacing: 0.5px;
     flex-shrink: 0;
   }
-  .status-active     { background: rgba(59,130,246,0.15); color: #93c5fd; }
-  .status-exploring  { background: rgba(139,92,246,0.15); color: #c4b5fd; }
-  .status-chosen     { background: rgba(34,197,94,0.15); color: #86efac; }
-  .status-rejected   { background: rgba(82,82,91,0.25); color: #71717a; }
-  .status-deferred   { background: rgba(245,158,11,0.15); color: #fcd34d; }
-  .status-open       { background: rgba(244,114,182,0.15); color: #f9a8d4; }
+  .status-active     { background: rgba(59,130,246,0.3); color: #bfdbfe; }
+  .status-exploring  { background: rgba(139,92,246,0.3); color: #ddd6fe; }
+  .status-chosen     { background: rgba(34,197,94,0.3); color: #bbf7d0; }
+  .status-rejected   { background: rgba(82,82,91,0.35); color: #a1a1aa; }
+  .status-deferred   { background: rgba(245,158,11,0.3); color: #fde68a; }
+  .status-open       { background: rgba(244,114,182,0.3); color: #fbcfe8; }
 
   /* ── Type badge ── */
   .type-badge {
@@ -143,6 +143,25 @@
   }
   .tree-panel::-webkit-scrollbar { width: 4px; }
   .tree-panel::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 2px; }
+
+  .resize-handle {
+    width: 4px;
+    cursor: col-resize;
+    background: transparent;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
+    transition: background 0.15s;
+  }
+  .resize-handle:hover,
+  .resize-handle.dragging {
+    background: #3b82f6;
+  }
+  .resize-handle::before {
+    content: '';
+    position: absolute;
+    inset: 0 -4px;
+  }
 
   .detail-panel {
     flex: 1;
@@ -224,9 +243,10 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    color: #e4e4e7 !important;
     opacity: 0.5;
   }
-  .tree-node.emphasis .node-type { opacity: 0.7; }
+  .tree-node.emphasis .node-type { opacity: 0.8; }
   .tree-node .node-title {
     font-size: 13px;
     color: #8b8b95;
@@ -250,6 +270,8 @@
   }
   .tree-node.emphasis .node-title {
     color: #e4e4e7;
+  }
+  .tree-node.selected .node-title {
     font-weight: 500;
   }
   .tree-node.emphasis:hover {
@@ -306,12 +328,14 @@
   .tree-opp-label.opp-active .opp-type { opacity: 0.7; }
   .tree-opp-label .opp-title {
     font-size: 13px;
-    font-weight: 600;
     color: #d4d4dc;
     line-height: 1.4;
   }
   .tree-opp-label.opp-active .opp-title {
     color: #f4f4f5;
+  }
+  .tree-opp-label.selected .opp-title {
+    font-weight: 600;
   }
   .tree-opp-label .section-count {
     font-size: 11px;
@@ -353,15 +377,23 @@
   }
   .detail-header {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 10px;
     margin-bottom: 8px;
-    flex-wrap: wrap;
   }
   .detail-title {
     font-size: 18px;
     font-weight: 600;
     color: #f4f4f5;
+    flex: 1;
+    min-width: 0;
+  }
+  .detail-status-text {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
   }
   .detail-date {
     font-size: 12px;
@@ -381,7 +413,7 @@
   }
   .detail-reasoning {
     font-size: 14px;
-    color: #b4b4bc;
+    color: #e4e4e7;
     line-height: 1.7;
   }
   .detail-evidence {
@@ -393,13 +425,13 @@
   }
   .detail-evidence .quote {
     font-size: 13px;
-    color: #b4b4bc;
+    color: #e4e4e7;
     font-style: italic;
     line-height: 1.6;
   }
   .detail-evidence .attribution {
     font-size: 12px;
-    color: #8b8b95;
+    color: #b4b4bc;
     margin-top: 4px;
   }
   .detail-related {
@@ -869,6 +901,7 @@
 <!-- View A: Tree + Detail -->
 <div class="view active" id="view-tree">
   <div class="tree-panel" id="treePanel"></div>
+  <div class="resize-handle" id="resizeHandle"></div>
   <div class="detail-panel" id="detailPanel">
     <div class="detail-empty">Select a node to view details</div>
   </div>
@@ -1220,11 +1253,12 @@ function renderDetail(id) {
   let html = '';
 
   // Header
+  const statusColor = STATUS_COLORS[node.status] || '#8b8b95';
   html += `<div class="detail-header">`;
   html += `<span class="type-badge type-${node._type}">${node._type}</span>`;
-  html += `<span class="status-badge status-${node.status}">${node.status}</span>`;
-  html += `</div>`;
   html += `<div class="detail-title" style="color:${typeColor}">${node.title}</div>`;
+  html += `<span class="detail-status-text" style="color:${statusColor}">${node.status}</span>`;
+  html += `</div>`;
   html += `<div class="detail-date">${node.id}${node.date ? ' · ' + node.date : ''}</div>`;
 
   // Reasoning
@@ -1624,6 +1658,39 @@ document.addEventListener('keydown', (e) => {
     }
   }
 });
+
+// ══════════════════════════════════════════
+// RESIZE HANDLE
+// ══════════════════════════════════════════
+{
+  const handle = document.getElementById('resizeHandle');
+  const treePanel = document.getElementById('treePanel');
+  let dragging = false;
+
+  handle.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    dragging = true;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const container = document.getElementById('view-tree');
+    const rect = container.getBoundingClientRect();
+    const newWidth = Math.max(240, Math.min(e.clientX - rect.left, rect.width - 200));
+    treePanel.style.width = newWidth + 'px';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+}
 
 // ══════════════════════════════════════════
 // INIT

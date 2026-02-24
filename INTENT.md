@@ -111,14 +111,27 @@ Tool 1 feeds into Tool 2. The iteration tracker captures real-time exploration; 
 
 ## What's Done
 
-### Product Decision Journal (Tool 2) — v1
+### Product Decision Journal (Tool 2) — v1 + UX Polish
 - **`product-decisions.json`** — Structured as an Opportunity Solution Tree: outcomes, opportunities, solutions, experiments, decisions, open questions. Each node has id, title, status, reasoning, date, parentId, relatedIds, evidence[]. Seeded with the full brainstorm about how to build this tool (meta!).
 - **`decision-journal.html`** — 4-view standalone HTML viewer served from `localhost:3333`:
-  - **Tree view** (primary): OST hierarchy grouped by opportunity. Opportunities are collapsible sections with solutions nested underneath. Active/exploring items get colored left borders + emphasis. Experiments auto-collapsed. Status filter chips + "Active only" toggle.
+  - **Tree view** (primary): OST hierarchy grouped by opportunity. Opportunities are collapsible sections with solutions nested underneath. Active/exploring items get colored left borders + emphasis. Experiments auto-collapsed. Status dropdown filter + "Active only" toggle.
   - **Graph view**: Node-and-edge diagram via dagre + d3. Zoomable/pannable. Hover tooltips. Click to jump to tree detail.
   - **Timeline view**: Chronological vertical timeline grouped by date.
   - **Reader view**: Full content, section by section.
 - **CLAUDE.md updated** with instructions for Claude to read/maintain the journal across sessions.
+
+### Tree View UX Polish (v2 iteration)
+- **Removed visual noise**: Node IDs (OP1, S2, etc.) removed, section counts removed, titles wrap instead of truncating
+- **Type labels on every node**: Each item shows a colored uppercase label (OUTCOME, OPPORTUNITY, SOLUTION, DECISION, QUESTION) above its title — essential for scannability now that color coding is subtle
+- **Type-specific selection colors**: Selected outcome = green tint, opportunity = blue, solution = purple, decision = cyan, question = pink — matches each node's type color
+- **Filter chips → dropdown**: Replaced 6 individual colored status filter chips with a single compact "All statuses" dropdown on the right. Active only toggle moved to the left. Much less visual noise.
+- **Underline tabs**: Replaced pill-style view tabs with clean underline tabs (Tree, Graph, Timeline, Reader). No secondary description text.
+- **Timestamp with local time**: Header shows "2026-02-23 · 4:16 PM" in subdued grey
+- **Font size bump**: Minimum font is now 11px (was 8px). Full scale: 11→12→13→14→15→18px. Readable at 100% zoom.
+- **Right-aligned status pills**: All status badges (ACTIVE, CHOSEN, etc.) pushed to right edge of tree panel
+- **Smart default collapse**: Cross-cutting Solutions, Decisions, and Open Questions start collapsed. Primary content (Outcome → Opportunities → Solutions) is immediately visible.
+- **Brighter selected state**: Selected items clearly distinguishable from emphasis (active) items
+- **Improved contrast**: All grey text bumped lighter, dividers more visible (#2d2d3a)
 
 ### Key Decisions Made
 1. **Two separate tools** — workbench (iteration tracker) vs archive (decision journal). Different audiences, different timescales. Must stay separate files/schemas.

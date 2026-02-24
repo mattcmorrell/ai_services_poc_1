@@ -7,7 +7,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background: #0a0a0f;
+    background: #121218;
     color: #e4e4e7;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     padding: 40px 48px;
@@ -26,69 +26,132 @@
     font-size: 13px;
     color: #52525b;
   }
-  .subtitle { font-size: 16px; color: #71717a; margin-bottom: 28px; }
+  .subtitle { font-size: 16px; color: #71717a; margin-bottom: 28px; display: none; }
 
-  /* Stats bar */
-  .stats-bar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 8px;
-    flex-wrap: wrap;
-  }
-  .stat {
+  /* Filter dropdown */
+  .filter-dropdown-wrap {
+    position: relative;
+    margin-left: auto;
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 14px;
+    gap: 12px;
+  }
+  .filter-total {
+    font-size: 13px;
+    color: #71717a;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .filter-total strong {
+    color: #e4e4e7;
+    font-weight: 700;
+  }
+  .filter-trigger {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
     color: #a1a1aa;
     padding: 6px 12px;
-    border-radius: 6px;
-    border: 1px solid #1e1e26;
+    border-radius: 7px;
+    border: 1px solid #2a2a35;
     background: #111116;
     cursor: pointer;
     user-select: none;
     transition: all 0.15s;
+    font-family: inherit;
   }
-  .stat:hover {
+  .filter-trigger:hover {
     border-color: #3a3a48;
     background: #1a1a22;
-  }
-  .stat.active {
-    border-color: var(--stat-color);
-    background: var(--stat-bg);
-  }
-  .stat .count {
-    font-weight: 700;
-    font-size: 15px;
     color: #e4e4e7;
-    font-family: 'SF Mono', 'Fira Code', monospace;
   }
-  .stat .dot {
-    width: 9px;
-    height: 9px;
+  .filter-trigger.has-filter {
+    border-color: var(--filter-color);
+    background: var(--filter-bg);
+  }
+  .filter-trigger .dot {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
   }
-
-  /* Filter hint */
-  .filter-hint {
-    font-size: 14px;
-    color: #3f3f46;
-    margin-bottom: 32px;
-    height: 16px;
-    transition: color 0.15s;
+  .filter-trigger .arrow {
+    font-size: 10px;
+    margin-left: 2px;
+    transition: transform 0.15s;
   }
-  .filter-hint.visible {
+  .filter-trigger.open .arrow {
+    transform: rotate(180deg);
+  }
+  .filter-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 6px;
+    min-width: 200px;
+    background: #1a1a22;
+    border: 1px solid #2a2a35;
+    border-radius: 8px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    z-index: 50;
+    padding: 4px;
+    display: none;
+  }
+  .filter-menu.open {
+    display: block;
+  }
+  .filter-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #a1a1aa;
+    cursor: pointer;
+    transition: all 0.1s;
+    border: none;
+    background: none;
+    width: 100%;
+    font-family: inherit;
+    text-align: left;
+  }
+  .filter-option:hover {
+    background: #22222e;
+    color: #e4e4e7;
+  }
+  .filter-option.active {
+    background: #22222e;
+    color: #e4e4e7;
+  }
+  .filter-option .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .filter-option .opt-count {
+    margin-left: auto;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    color: #52525b;
+  }
+  .filter-option.active .opt-count {
     color: #a1a1aa;
   }
+  .filter-sep {
+    height: 1px;
+    background: #2a2a35;
+    margin: 4px 8px;
+  }
 
-  /* Controls bar — view toggle + active-only toggle */
+  /* Controls bar — view toggle + active-only toggle + stats */
   .controls-bar {
     display: flex;
     align-items: center;
     gap: 20px;
-    margin-top: -20px;
     margin-bottom: 28px;
+    flex-wrap: wrap;
   }
 
   /* View mode toggle */
@@ -233,7 +296,7 @@
   /* Card (list mode) */
   .card {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 10px;
     padding: 12px 16px;
     border-radius: 8px;
@@ -249,16 +312,16 @@
 
   /* Status-specific card styling */
   .card.status-exploring, .gallery-card.status-exploring {
-    border-color: #3b82f633;
-    background: rgba(59, 130, 246, 0.06);
+    border-color: #3b82f655;
+    background: rgba(59, 130, 246, 0.12);
   }
   .card.status-new, .gallery-card.status-new {
-    border-color: #8b5cf633;
-    background: rgba(139, 92, 246, 0.06);
+    border-color: #8b5cf655;
+    background: rgba(139, 92, 246, 0.12);
   }
   .card.status-filed, .gallery-card.status-filed {
-    border-color: #f59e0b22;
-    background: rgba(245, 158, 11, 0.03);
+    border-color: #f59e0b44;
+    background: rgba(245, 158, 11, 0.08);
   }
   .card.status-parked, .gallery-card.status-parked {
     opacity: 0.75;
@@ -284,7 +347,7 @@
     flex-shrink: 0; font-family: 'SF Mono', 'Fira Code', monospace;
   }
   .card-name {
-    font-size: 16px; font-weight: 600; color: #f4f4f5; white-space: nowrap;
+    font-size: 16px; font-weight: 600; color: #f4f4f5; flex-shrink: 0;
   }
   .card-version {
     font-size: 13px; color: #71717a; flex-shrink: 0;
@@ -302,10 +365,9 @@
   .card-status.abandoned { background: rgba(63,63,70,0.2); color: #52525b; }
 
   .card-note {
-    font-size: 14px; color: #a1a1aa; margin-left: auto;
-    text-align: right; white-space: nowrap;
-    overflow: hidden; text-overflow: ellipsis;
-    max-width: 400px;
+    font-size: 14px; color: #d4d4d8;
+    flex: 1; min-width: 0;
+    line-height: 1.4;
   }
 
   /* Links */
@@ -313,7 +375,7 @@
     display: flex;
     gap: 4px;
     flex-shrink: 0;
-    margin-left: 8px;
+    margin-left: auto;
   }
   .card-link {
     font-size: 13px;
@@ -706,23 +768,29 @@
 </div>
 <p class="subtitle" id="subtitle"></p>
 
-<div class="stats-bar" id="statsBar"></div>
-<div class="filter-hint" id="filterHint">Click a status to filter</div>
-
 <div class="controls-bar">
   <div class="view-toggle">
-    <button class="view-btn" data-view="list" onclick="setViewMode('list')">
+    <button class="view-btn active" data-view="list" onclick="setViewMode('list')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="14" y2="12"/></svg>
       List
     </button>
-    <button class="view-btn active" data-view="gallery" onclick="setViewMode('gallery')">
+    <button class="view-btn" data-view="gallery" onclick="setViewMode('gallery')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
       Gallery
     </button>
   </div>
   <div class="toggle-group">
-    <button class="toggle" id="activeToggle" onclick="toggleActiveOnly()"></button>
+    <button class="toggle on" id="activeToggle" onclick="toggleActiveOnly()"></button>
     <span class="toggle-label" onclick="toggleActiveOnly()">Show active only</span>
+  </div>
+  <div class="filter-dropdown-wrap" id="filterWrap">
+    <span class="filter-total" id="filterTotal"></span>
+    <button class="filter-trigger" id="filterTrigger" onclick="toggleFilterMenu()">
+      <span class="dot" id="filterDot" style="display:none"></span>
+      <span id="filterLabel">All statuses</span>
+      <span class="arrow">&#9662;</span>
+    </button>
+    <div class="filter-menu" id="filterMenu"></div>
   </div>
 </div>
 
@@ -752,8 +820,8 @@ let DATA = null;
 let ORIGINAL_DATA = null;
 let activeFilter = null;
 let saveTimeout = null;
-let activeOnly = false;
-let viewMode = 'gallery'; // 'list' or 'gallery'
+let activeOnly = true;
+let viewMode = 'list'; // 'list' or 'gallery'
 const ACTIVE_STATUSES = ['exploring', 'new', 'filed'];
 
 // Lightbox state
@@ -810,7 +878,7 @@ function scheduleSave() {
 }
 
 async function saveToFile() {
-  DATA.lastUpdated = new Date().toISOString().slice(0, 10);
+  DATA.lastUpdated = new Date().toISOString();
   try {
     const resp = await fetch('/save', {
       method: 'POST',
@@ -856,49 +924,74 @@ function collectStatuses(nodes, counts) {
   return counts;
 }
 
-function renderStats() {
+function renderFilterDropdown() {
   const counts = collectStatuses(DATA.tree, {});
-  const bar = document.getElementById('statsBar');
-  bar.innerHTML = '';
   const order = ['exploring', 'new', 'filed', 'parked', 'abandoned'];
   let total = 0;
-  for (const key of order) {
-    const count = counts[key] || 0;
-    total += count;
-    const cfg = DATA.statuses[key];
-    const isActive = activeFilter === key;
-    const stat = document.createElement('div');
-    stat.className = 'stat' + (isActive ? ' active' : '');
-    stat.style.setProperty('--stat-color', cfg.color);
-    stat.style.setProperty('--stat-bg', cfg.color + '15');
-    stat.innerHTML = `<div class="dot" style="background:${cfg.color};${cfg.glow ? 'box-shadow:0 0 6px ' + cfg.color + '66' : ''}"></div><span class="count">${count}</span><span>${cfg.label}</span>`;
-    stat.addEventListener('click', () => toggleFilter(key));
-    bar.appendChild(stat);
-  }
-  const totalStat = document.createElement('div');
-  totalStat.className = 'stat';
-  totalStat.style.cursor = 'default';
-  totalStat.innerHTML = `<span class="count">${total}</span><span>Total</span>`;
-  bar.appendChild(totalStat);
-}
+  for (const key of order) total += counts[key] || 0;
 
-function toggleFilter(status) {
-  activeFilter = activeFilter === status ? null : status;
-  renderStats();
-  applyFilter();
-  updateFilterHint();
-}
+  // Total count
+  document.getElementById('filterTotal').innerHTML = `<strong>${total}</strong> ideas`;
 
-function updateFilterHint() {
-  const hint = document.getElementById('filterHint');
+  // Trigger label
+  const trigger = document.getElementById('filterTrigger');
+  const dot = document.getElementById('filterDot');
+  const label = document.getElementById('filterLabel');
   if (activeFilter) {
-    hint.textContent = `Showing: ${DATA.statuses[activeFilter].label} \u00b7 Click again or Esc to clear`;
-    hint.className = 'filter-hint visible';
+    const cfg = DATA.statuses[activeFilter];
+    label.textContent = cfg.label;
+    dot.style.display = '';
+    dot.style.background = cfg.color;
+    if (cfg.glow) dot.style.boxShadow = `0 0 6px ${cfg.color}66`;
+    else dot.style.boxShadow = 'none';
+    trigger.classList.add('has-filter');
+    trigger.style.setProperty('--filter-color', cfg.color + '55');
+    trigger.style.setProperty('--filter-bg', cfg.color + '15');
   } else {
-    hint.textContent = 'Click a status to filter';
-    hint.className = 'filter-hint';
+    label.textContent = 'All statuses';
+    dot.style.display = 'none';
+    trigger.classList.remove('has-filter');
   }
+
+  // Menu options
+  const menu = document.getElementById('filterMenu');
+  let html = `<button class="filter-option${!activeFilter ? ' active' : ''}" onclick="setFilter(null)">All statuses<span class="opt-count">${total}</span></button>`;
+  html += `<div class="filter-sep"></div>`;
+  for (const key of order) {
+    const cfg = DATA.statuses[key];
+    const count = counts[key] || 0;
+    const isActive = activeFilter === key;
+    html += `<button class="filter-option${isActive ? ' active' : ''}" onclick="setFilter('${key}')">`;
+    html += `<span class="dot" style="background:${cfg.color};${cfg.glow ? 'box-shadow:0 0 6px ' + cfg.color + '66' : ''}"></span>`;
+    html += `${cfg.label}<span class="opt-count">${count}</span></button>`;
+  }
+  menu.innerHTML = html;
 }
+
+function toggleFilterMenu() {
+  const menu = document.getElementById('filterMenu');
+  const trigger = document.getElementById('filterTrigger');
+  const isOpen = menu.classList.contains('open');
+  menu.classList.toggle('open', !isOpen);
+  trigger.classList.toggle('open', !isOpen);
+}
+
+function setFilter(status) {
+  activeFilter = status;
+  document.getElementById('filterMenu').classList.remove('open');
+  document.getElementById('filterTrigger').classList.remove('open');
+  renderFilterDropdown();
+  applyFilter();
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('filterWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('filterMenu').classList.remove('open');
+    document.getElementById('filterTrigger').classList.remove('open');
+  }
+});
 
 function toggleActiveOnly() {
   activeOnly = !activeOnly;
@@ -952,11 +1045,10 @@ function renderCardHTML(node, isChild) {
 
   html += `<div class="card-item${isChild ? ' child' : ''}" data-status="${s}" data-id="${node.id}">`;
   html += `<div class="card status-${s}">`;
-  html += `<div class="status-dot ${s}"></div>`;
+  html += `<span class="card-status ${s}" data-editable data-node-id="${node.id}" title="Click to cycle">${statusLabel}</span>`;
   html += `<span class="card-id">${node.id}</span>`;
   html += `<span class="card-name" data-editable data-node-id="${node.id}" data-field="name" contenteditable="false">${node.name}</span>`;
   if (ver) html += `<span class="card-version">${ver}</span>`;
-  html += `<span class="card-status ${s}" data-editable data-node-id="${node.id}" title="Click to cycle">${statusLabel}</span>`;
   html += `<span class="card-note" data-editable data-node-id="${node.id}" data-field="note" contenteditable="false">${node.note || ''}</span>`;
   const links = renderLinksHTML(node);
   if (links) html += `<div class="card-links">${links}</div>`;
@@ -1005,13 +1097,10 @@ function renderGalleryCardHTML(node, isChild) {
   // Metadata
   html += `<div class="gallery-meta">`;
   html += `<div class="gallery-meta-row">`;
-  html += `<div class="status-dot ${s}"></div>`;
+  html += `<span class="card-status ${s}" data-editable data-node-id="${node.id}" title="Click to cycle">${statusLabel}</span>`;
   html += `<span class="card-id">${node.id}</span>`;
   html += `<span class="gallery-name" data-editable data-node-id="${node.id}" data-field="name" contenteditable="false">${node.name}</span>`;
   if (ver) html += `<span class="card-version">${ver}</span>`;
-  html += `</div>`;
-  html += `<div class="gallery-meta-row" style="margin-bottom:8px;">`;
-  html += `<span class="card-status ${s}" data-editable data-node-id="${node.id}" title="Click to cycle">${statusLabel}</span>`;
   html += `</div>`;
   html += `<div class="gallery-note" data-editable data-node-id="${node.id}" data-field="note" contenteditable="false">${node.note || ''}</div>`;
   const links = renderLinksHTML(node);
@@ -1065,10 +1154,14 @@ function renderTree() {
 function render() {
   document.getElementById('title').textContent = DATA.title;
   document.getElementById('subtitle').textContent = DATA.subtitle;
-  document.getElementById('lastUpdated').textContent = `Updated ${DATA.lastUpdated}`;
-  renderStats();
+  const raw = DATA.lastUpdated;
+  const d = raw.includes('T') ? new Date(raw) : new Date(raw + 'T12:00:00');
+  const datePart = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  const timePart = raw.includes('T') ? ` · ${d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}` : '';
+  document.getElementById('lastUpdated').textContent = `Updated ${datePart}${timePart}`;
+  renderFilterDropdown();
   renderTree();
-  updateFilterHint();
+  applyFilter();
   bindEditables();
 }
 
@@ -1174,9 +1267,8 @@ document.addEventListener('keydown', (e) => {
   if (e.target.contentEditable === 'true') return;
   if (e.key === 'Escape') {
     activeFilter = null;
-    renderStats();
+    renderFilterDropdown();
     applyFilter();
-    updateFilterHint();
   }
 });
 
