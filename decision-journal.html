@@ -218,6 +218,21 @@
     transition: background 0.1s, opacity 0.15s;
     border-left: 3px solid transparent;
   }
+  .tree-node .node-expand {
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+  .tree-node .node-expand .chevron {
+    font-size: 11px;
+    color: #8b8b95;
+    transition: transform 0.15s;
+    display: inline-block;
+  }
+  .tree-node.collapsed .node-expand .chevron {
+    transform: rotate(-90deg);
+  }
   .tree-node:hover {
     background: #141419;
   }
@@ -259,9 +274,10 @@
     margin-left: auto;
   }
   /* Indentation */
-  .tree-indent-1 { padding-left: 40px; }
-  .tree-indent-2 { padding-left: 56px; }
-  .tree-indent-3 { padding-left: 72px; }
+  .tree-indent-1.tree-indent-1 { padding-left: 40px; }
+  .tree-indent-2.tree-indent-2 { padding-left: 56px; }
+  .tree-indent-3.tree-indent-3 { padding-left: 72px; }
+  .tree-indent-4.tree-indent-4 { padding-left: 88px; }
 
   /* ── Active/exploring items get emphasis ── */
   .tree-node.emphasis {
@@ -1090,26 +1106,26 @@ function renderTree() {
   const decisions = allNodes.filter(n => n._type === 'decision');
   const questions = allNodes.filter(n => n._type === 'question');
 
-  // For each outcome, render its opportunities with solutions nested under each
+  // For each outcome, render with a static label + collapsible node
   for (const outcome of outcomes) {
-    html += sectionLabel('Outcome', 'outcome');
-    html += treeNodeHTML(outcome, 0);
+    html += staticSectionLabel('Outcome', 'outcome');
+    html += treeNodeHTML(outcome, 0, false, true);
 
     const opportunities = getChildren(outcome.id).filter(n => n._type === 'opportunity');
     for (const opp of opportunities) {
       // Opportunity is a collapsible section — its solutions are nested inside
       const solutions = getChildren(opp.id).filter(n => n._type === 'solution');
 
-      html += oppSectionLabel(opp);
+      html += oppSectionLabel(opp, 1);
       for (const sol of solutions) {
-        html += treeNodeHTML(sol, 1);
+        html += treeNodeHTML(sol, 2);
 
         // Experiments under this solution
         const exps = getChildren(sol.id).filter(n => n._type === 'experiment');
         if (exps.length) {
-          html += subSectionLabel('Experiments', 'experiment', true, 2);
+          html += subSectionLabel('Experiments', 'experiment', true, 3);
           for (const ex of exps) {
-            html += treeNodeHTML(ex, 2, true);
+            html += treeNodeHTML(ex, 3, true);
           }
         }
       }
@@ -1120,7 +1136,7 @@ function renderTree() {
     if (directSolutions.length) {
       html += sectionLabel('Cross-cutting Solutions', 'solution', true);
       for (const sol of directSolutions) {
-        html += treeNodeHTML(sol, 0);
+        html += treeNodeHTML(sol, 1);
       }
     }
   }
@@ -1151,8 +1167,20 @@ function renderTree() {
   });
 
   panel.querySelectorAll('.tree-node').forEach(el => {
-    el.addEventListener('click', () => selectNode(el.dataset.id));
+    el.addEventListener('click', (e) => {
+      if (el.classList.contains('collapsible') && e.target.closest('.node-expand')) {
+        toggleCollapsibleNode(el);
+      } else {
+        selectNode(el.dataset.id);
+      }
+    });
   });
+}
+
+// Static section label (no collapse affordance)
+function staticSectionLabel(text, type) {
+  const color = TYPE_COLORS[type] || '#52525b';
+  return `<div class="tree-section-label" style="color:${color};cursor:default">${text}</div>`;
 }
 
 // Top-level section label (Outcome, Decisions, Open Questions, etc.)
@@ -1162,10 +1190,11 @@ function sectionLabel(text, type, startCollapsed) {
 }
 
 // Opportunity as a collapsible group — styled more prominently since it's the primary grouping
-function oppSectionLabel(opp) {
+function oppSectionLabel(opp, indent) {
   const color = TYPE_COLORS['opportunity'];
   const isActive = ACTIVE_STATUSES.includes(opp.status);
-  return `<div class="tree-opp-label${isActive ? ' opp-active' : ''}" data-id="${opp.id}" data-section="opp-${opp.id}" style="--node-color:${color};--select-bg:${color}2e" onclick="if(event.target.closest('.opp-expand')){toggleSection(this)}else{selectNode('${opp.id}')}">
+  const indentClass = indent ? ` tree-indent-${Math.min(indent, 4)}` : '';
+  return `<div class="tree-opp-label${isActive ? ' opp-active' : ''}${indentClass}" data-id="${opp.id}" data-section="opp-${opp.id}" style="--node-color:${color};--select-bg:${color}2e" onclick="if(event.target.closest('.opp-expand')){toggleSection(this)}else{selectNode('${opp.id}')}">
     <div class="opp-expand"><span class="chevron">&#9660;</span></div>
     <div class="node-dot" style="background:${color};${isActive ? 'box-shadow:0 0 6px ' + color + '66' : ''}"></div>
     <div class="opp-content">
@@ -1183,6 +1212,19 @@ function subSectionLabel(text, type, startCollapsed, indent) {
   return `<div class="tree-section-label tree-sub-label" style="color:${color};padding-left:${indentPx}px" data-section="${type}-sub" data-start-collapsed="${!!startCollapsed}" onclick="toggleSection(this)"><span class="chevron">&#9660;</span>${text}</div>`;
 }
 
+function toggleCollapsibleNode(nodeEl) {
+  const isCollapsed = nodeEl.classList.toggle('collapsed');
+  let el = nodeEl.nextElementSibling;
+  while (el) {
+    // Stop at next collapsible node or top-level section label
+    if (el.classList.contains('collapsible')) break;
+    if (el.classList.contains('tree-section-label') && !el.classList.contains('tree-sub-label')) break;
+
+    el.style.display = isCollapsed ? 'none' : '';
+    el = el.nextElementSibling;
+  }
+}
+
 function toggleSection(labelEl) {
   const isCollapsed = labelEl.classList.toggle('collapsed');
   toggleSectionVisibility(labelEl, isCollapsed);
@@ -1190,32 +1232,34 @@ function toggleSection(labelEl) {
 
 function toggleSectionVisibility(labelEl, isCollapsed) {
   let el = labelEl.nextElementSibling;
-  const isOpp = labelEl.classList.contains('tree-opp-label');
+  const isTopLevel = labelEl.classList.contains('tree-section-label') && !labelEl.classList.contains('tree-sub-label');
   const isSubLabel = labelEl.classList.contains('tree-sub-label');
   while (el) {
-    // Stop at next section of same or higher level
+    // Stop at next top-level section label
     if (el.classList.contains('tree-section-label') && !el.classList.contains('tree-sub-label')) break;
-    if (el.classList.contains('tree-opp-label')) break;
-    // For opp labels, stop at sub-labels too if they're not inside us
+    // If we're an opp label, stop at the next opp label
+    if (!isTopLevel && el.classList.contains('tree-opp-label')) break;
+    // For sub-labels, stop at next section label
     if (isSubLabel && el.classList.contains('tree-section-label')) break;
 
-    if (el.classList.contains('tree-node') || el.classList.contains('tree-sub-label')) {
+    if (el.classList.contains('tree-node') || el.classList.contains('tree-sub-label') || el.classList.contains('tree-opp-label')) {
       el.style.display = isCollapsed ? 'none' : '';
     }
     el = el.nextElementSibling;
   }
 }
 
-function treeNodeHTML(node, indent, startHidden) {
+function treeNodeHTML(node, indent, startHidden, collapsible) {
   const color = TYPE_COLORS[node._type] || '#52525b';
   const isEmphasis = node.status === 'active' || node.status === 'exploring';
   const isSettled = node.status === 'rejected' || node.status === 'deferred';
   const showStatus = node.status && !isSettled;
 
   let classes = 'tree-node';
-  if (indent) classes += ` tree-indent-${Math.min(indent, 3)}`;
+  if (indent) classes += ` tree-indent-${Math.min(indent, 4)}`;
   if (isEmphasis) classes += ' emphasis';
   if (isSettled && !activeFilter && !activeOnly) classes += ' inactive';
+  if (collapsible) classes += ' collapsible';
 
   let style = `--node-color:${color};--select-bg:${color}2e;`;
   if (isEmphasis) {
@@ -1224,7 +1268,9 @@ function treeNodeHTML(node, indent, startHidden) {
   if (startHidden) style += 'display:none;';
 
   const typeLabel = node._type || '';
+  const chevronHTML = collapsible ? `<div class="node-expand"><span class="chevron">&#9660;</span></div>` : '';
   return `<div class="${classes}" data-id="${node.id}" data-status="${node.status}" style="${style}">
+    ${chevronHTML}
     <div class="node-dot" style="background:${color};${isEmphasis ? 'box-shadow:0 0 6px ' + color + '66' : ''}"></div>
     <div class="node-content">
       <span class="node-type" style="color:${color}">${typeLabel}</span>
