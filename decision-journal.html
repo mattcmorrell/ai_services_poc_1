@@ -278,10 +278,10 @@
     margin-left: auto;
   }
   /* Indentation */
-  .tree-indent-1.tree-indent-1 { padding-left: 40px; }
-  .tree-indent-2.tree-indent-2 { padding-left: 56px; }
-  .tree-indent-3.tree-indent-3 { padding-left: 72px; }
-  .tree-indent-4.tree-indent-4 { padding-left: 88px; }
+  .tree-indent-1.tree-indent-1 { padding-left: 38px; }
+  .tree-indent-2.tree-indent-2 { padding-left: 66px; }
+  .tree-indent-3.tree-indent-3 { padding-left: 94px; }
+  .tree-indent-4.tree-indent-4 { padding-left: 122px; }
 
   /* ── Active/exploring items get emphasis ── */
   .tree-node.emphasis {
@@ -502,6 +502,43 @@
     color: var(--question);
     font-weight: 700;
     font-size: 12px;
+  }
+
+  /* ── Detail child cards ── */
+  .detail-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .detail-card {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #2a2a35;
+    background: #141419;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .detail-card:hover {
+    border-color: #3a3a48;
+    background: #1a1a22;
+  }
+  .detail-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .detail-card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #f4f4f5;
+  }
+  .detail-card-reasoning {
+    font-size: 12px;
+    color: #e4e4e7;
+    line-height: 1.5;
   }
 
   /* ════════════════════════════════════════
@@ -956,7 +993,7 @@ let currentView = 'tree';
 let graphZoomBehavior = null;
 let graphSvgGroup = null;
 let activeFilter = null;   // status filter from clicking stat chips
-let activeOnly = false;     // toggle to hide rejected/deferred
+let activeOnly = true;      // toggle to hide rejected/deferred
 const ACTIVE_STATUSES = ['active', 'exploring', 'chosen', 'open'];
 
 const TYPE_COLORS = {
@@ -1268,9 +1305,10 @@ function treeNodeHTML(node, indent, startHidden, collapsible) {
 
   const typeLabel = node._type || '';
   const chevronHTML = collapsible ? `<div class="node-expand"><span class="chevron">&#9660;</span></div>` : '';
+  const dotHTML = node._type === 'outcome' ? '' : `<div class="node-dot" style="background:${color};${isEmphasis ? 'box-shadow:0 0 6px ' + color + '66' : ''}"></div>`;
   return `<div class="${classes}" data-id="${node.id}" data-status="${node.status}" style="${style}">
     ${chevronHTML}
-    <div class="node-dot" style="background:${color};${isEmphasis ? 'box-shadow:0 0 6px ' + color + '66' : ''}"></div>
+    ${dotHTML}
     <div class="node-content">
       <span class="node-type" style="color:${color}">${typeLabel}</span>
       <span class="node-title">${node.title}</span>
@@ -1371,26 +1409,29 @@ function renderDetail(id) {
     html += `</div>`;
   }
 
-  // Related
-  const relatedIds = node.relatedIds || [];
-  const children = getChildren(node.id);
-  const parent = node.parentId ? getNode(node.parentId) : null;
-
-  if (parent || relatedIds.length || children.length) {
-    html += `<div class="detail-section">`;
-    html += `<div class="detail-section-label">Connections</div>`;
-    html += `<div class="detail-related">`;
-    if (parent) {
-      html += `<div class="detail-related-link" onclick="selectNode('${parent.id}')" style="border-color:${TYPE_COLORS[parent._type]}33">&#8593; ${parent.id}: ${parent.title}</div>`;
+  // Child cards: opportunities show active solutions, solutions show active experiments
+  const childTypes = { opportunity: 'solution', solution: 'experiment' };
+  const childType = childTypes[node._type];
+  if (childType) {
+    const children = getChildren(node.id)
+      .filter(n => n._type === childType && ACTIVE_STATUSES.includes(n.status));
+    if (children.length) {
+      const childColor = TYPE_COLORS[childType] || '#52525b';
+      const label = childType.charAt(0).toUpperCase() + childType.slice(1) + 's';
+      html += `<div class="detail-section">`;
+      html += `<div class="detail-section-label">${label}</div>`;
+      html += `<div class="detail-cards">`;
+      for (const child of children) {
+        html += `<div class="detail-card" onclick="selectNode('${child.id}')" style="border-color:${childColor}22">`;
+        html += `<div class="detail-card-header">`;
+        html += `<span class="status-badge status-${child.status}">${child.status}</span>`;
+        html += `</div>`;
+        html += `<div class="detail-card-title">${child.title}</div>`;
+        if (child.reasoning) html += `<div class="detail-card-reasoning">${child.reasoning}</div>`;
+        html += `</div>`;
+      }
+      html += `</div></div>`;
     }
-    for (const rid of relatedIds) {
-      const rn = getNode(rid);
-      if (rn) html += `<div class="detail-related-link" onclick="selectNode('${rid}')" style="border-color:${TYPE_COLORS[rn._type]}33">&#8596; ${rn.id}: ${rn.title}</div>`;
-    }
-    for (const child of children) {
-      html += `<div class="detail-related-link" onclick="selectNode('${child.id}')" style="border-color:${TYPE_COLORS[child._type]}33">&#8595; ${child.id}: ${child.title}</div>`;
-    }
-    html += `</div></div>`;
   }
 
   panel.innerHTML = html;
