@@ -203,8 +203,8 @@
     background: #141419;
   }
   .tree-node.selected {
-    background: rgba(96,165,250,0.18);
-    border-left-color: #60a5fa;
+    background: var(--select-bg);
+    border-left-color: var(--node-color);
   }
   .tree-node .node-dot {
     width: 6px;
@@ -255,8 +255,8 @@
     background: var(--emphasis-hover);
   }
   .tree-node.emphasis.selected {
-    background: rgba(96,165,250,0.18);
-    border-left-color: #60a5fa;
+    background: var(--select-bg);
+    border-left-color: var(--node-color);
   }
 
   /* ── Opportunity group label ── */
@@ -329,8 +329,8 @@
     display: inline-block;
   }
   .tree-opp-label.selected {
-    background: rgba(96,165,250,0.18);
-    border-left-color: #60a5fa;
+    background: var(--select-bg);
+    border-left-color: var(--node-color);
   }
 
   /* ── Sub-section labels (Experiments under a solution) ── */
@@ -1130,7 +1130,7 @@ function sectionLabel(text, type) {
 function oppSectionLabel(opp) {
   const color = TYPE_COLORS['opportunity'];
   const isActive = ACTIVE_STATUSES.includes(opp.status);
-  return `<div class="tree-opp-label${isActive ? ' opp-active' : ''}" data-id="${opp.id}" data-section="opp-${opp.id}" onclick="if(event.target.closest('.opp-expand')){toggleSection(this)}else{selectNode('${opp.id}')}">
+  return `<div class="tree-opp-label${isActive ? ' opp-active' : ''}" data-id="${opp.id}" data-section="opp-${opp.id}" style="--node-color:${color};--select-bg:${color}2e" onclick="if(event.target.closest('.opp-expand')){toggleSection(this)}else{selectNode('${opp.id}')}">
     <div class="opp-expand"><span class="chevron">&#9660;</span></div>
     <div class="node-dot" style="background:${color};${isActive ? 'box-shadow:0 0 6px ' + color + '66' : ''}"></div>
     <div class="opp-content">
@@ -1182,9 +1182,9 @@ function treeNodeHTML(node, indent, startHidden) {
   if (isEmphasis) classes += ' emphasis';
   if (isSettled && !activeFilter && !activeOnly) classes += ' inactive';
 
-  let style = '';
+  let style = `--node-color:${color};--select-bg:${color}2e;`;
   if (isEmphasis) {
-    style = `--emphasis-color:${color}88;--emphasis-bg:${color}08;--emphasis-hover:${color}0f;`;
+    style += `--emphasis-color:${color}88;--emphasis-bg:${color}08;--emphasis-hover:${color}0f;`;
   }
   if (startHidden) style += 'display:none;';
 
