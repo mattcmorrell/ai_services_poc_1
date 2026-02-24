@@ -1085,7 +1085,7 @@ function renderTree() {
     // Solutions directly under outcome (not under an opportunity)
     const directSolutions = getChildren(outcome.id).filter(n => n._type === 'solution');
     if (directSolutions.length) {
-      html += sectionLabel('Cross-cutting Solutions', 'solution');
+      html += sectionLabel('Cross-cutting Solutions', 'solution', true);
       for (const sol of directSolutions) {
         html += treeNodeHTML(sol, 0);
       }
@@ -1095,7 +1095,7 @@ function renderTree() {
   // Decisions
   if (decisions.length) {
     const activeD = decisions.filter(n => ACTIVE_STATUSES.includes(n.status)).length;
-    html += sectionLabel('Decisions', 'decision');
+    html += sectionLabel('Decisions', 'decision', true);
     for (const d of decisions) {
       html += treeNodeHTML(d, 0);
     }
@@ -1103,7 +1103,7 @@ function renderTree() {
 
   // Open Questions
   if (questions.length) {
-    html += sectionLabel('Open Questions', 'question');
+    html += sectionLabel('Open Questions', 'question', true);
     for (const q of questions) {
       html += treeNodeHTML(q, 0);
     }
@@ -1123,9 +1123,9 @@ function renderTree() {
 }
 
 // Top-level section label (Outcome, Decisions, Open Questions, etc.)
-function sectionLabel(text, type) {
+function sectionLabel(text, type, startCollapsed) {
   const color = TYPE_COLORS[type] || '#52525b';
-  return `<div class="tree-section-label" style="color:${color}" data-section="${type}" onclick="toggleSection(this)"><span class="chevron">&#9660;</span>${text}</div>`;
+  return `<div class="tree-section-label" style="color:${color}" data-section="${type}" data-start-collapsed="${!!startCollapsed}" onclick="toggleSection(this)"><span class="chevron">&#9660;</span>${text}</div>`;
 }
 
 // Opportunity as a collapsible group — styled more prominently since it's the primary grouping
