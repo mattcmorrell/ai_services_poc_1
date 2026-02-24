@@ -1,7 +1,7 @@
 {
   "title": "Client Selection UX — Decision Tree",
   "subtitle": "Tracing every idea from brainstorm → prototype → iteration → verdict",
-  "lastUpdated": "2026-02-23",
+  "lastUpdated": "2026-02-24",
   "statuses": {
     "exploring": {
       "label": "Exploring",
@@ -43,7 +43,7 @@
               "id": "A",
               "name": "Card Grid",
               "status": "parked",
-              "note": "Mode-switch friction — must leave workspace to switch clients",
+              "note": "Parked — cards metaphor interesting but may belong on the dashboard, not as the primary client selector",
               "versions": ["v1", "v2", "v3"],
               "currentVersion": "v3",
               "mockup": "mockup-01-card-grid.html",
@@ -60,8 +60,8 @@
             {
               "id": "B",
               "name": "Dropdown Switcher",
-              "status": "parked",
-              "note": "Compact and functional, but user moved on to other concepts",
+              "status": "exploring",
+              "note": "Active candidate — compact, fast switching, attention indicator",
               "versions": ["v1", "v2", "v3"],
               "currentVersion": "v3",
               "mockup": "mockup-02-dropdown.html",
@@ -80,7 +80,7 @@
               "id": "C",
               "name": "Sidebar Client List",
               "status": "exploring",
-              "note": "Favorite so far — width concern → try collapsed-by-default",
+              "note": "Active candidate — persistent, collapsible, fastest switching",
               "versions": ["v1", "v2", "v3"],
               "currentVersion": "v3",
               "mockup": "mockup-03-sidebar.html",
@@ -97,8 +97,8 @@
                 {
                   "id": "F",
                   "name": "Client Tabs Row",
-                  "status": "new",
-                  "note": "Horizontal version of C's collapsed mode — vertical space instead of horizontal",
+                  "status": "abandoned",
+                  "note": "Killed — essentially a two-layer tab, HRCs unlikely to embrace circles for clients",
                   "spawn": "inspired by C collapsed + idea #9",
                   "versions": ["v1"],
                   "currentVersion": "v1",
@@ -110,8 +110,8 @@
             {
               "id": "D",
               "name": "Breadcrumb Navigation",
-              "status": "parked",
-              "note": "Best triage/data tool, but too many clicks for daily switching",
+              "status": "abandoned",
+              "note": "Killed — only one layer of breadcrumbs, pattern doesn't justify itself",
               "versions": ["v1", "v2", "v3"],
               "currentVersion": "v3",
               "mockup": "mockup-04-breadcrumb.html",
@@ -145,8 +145,8 @@
             {
               "id": "7→E",
               "name": "Tab Groups",
-              "status": "new",
-              "note": "No client selection step — tabs grouped by client. Just prototyped.",
+              "status": "exploring",
+              "note": "Active candidate — multi-client grouped tabs, intriguing but not a front-runner",
               "versions": ["v1"],
               "currentVersion": "v1",
               "mockup": "mockup-07-tab-groups.html",

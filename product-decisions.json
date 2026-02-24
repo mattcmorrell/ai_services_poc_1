@@ -1,7 +1,7 @@
 {
   "title": "Product Decision Journal",
   "project": "AI Services POC — BambooHR Consultant App",
-  "lastUpdated": "2026-02-23",
+  "lastUpdated": "2026-02-24",
   "schema": {
     "version": 1,
     "nodeTypes": ["outcome", "opportunity", "solution", "experiment", "decision"],
@@ -21,6 +21,14 @@
     }
   ],
   "opportunities": [
+    {
+      "id": "OP3",
+      "title": "Consultants need a fast, intuitive way to switch between client workspaces",
+      "status": "active",
+      "date": "2026-02-20",
+      "parentId": "O1",
+      "reasoning": "HR consultants manage 5-50 clients and switch between them frequently throughout the day. The core UX question: how does a consultant select which client they're working with? Must feel fast, professional, and not lose context when switching. Prototyped 6 approaches (A-F), narrowed to 3 active candidates (B, C, E)."
+    },
     {
       "id": "OP1",
       "title": "Designers can't see the landscape of what's been explored",
@@ -65,6 +73,72 @@
       "relatedIds": ["S1"],
       "evidence": [
         { "type": "analogy", "source": "Designer", "quote": "The mental model I have here is automated AI meeting notes, where AI has listened to the meeting and captured todos, action items, etc." }
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Approach A: Card Grid — full-page client cards with click-to-enter",
+      "status": "deferred",
+      "date": "2026-02-20",
+      "parentId": "OP3",
+      "reasoning": "Full-page grid of client cards. Click a card to enter that client's workspace. Good first impression and onboarding feel, but mode-switch friction persists — you leave the workspace to see the grid. Parked because the cards metaphor has potential on the main dashboard page or combined with another approach, but not as the primary client selector.",
+      "relatedIds": ["D4"],
+      "evidence": [
+        { "type": "firsthand", "source": "Designer", "quote": "The clients as cards view is interesting, but I don't know if this is the right place for it. I could see it coming back on the main dashboard page, or maybe we like this + another idea." }
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Approach B: Dropdown Switcher — compact dropdown in tab bar",
+      "status": "exploring",
+      "date": "2026-02-20",
+      "parentId": "OP3",
+      "reasoning": "Compact dropdown trigger in the tab bar area. Open to search/switch clients. Attention indicator on trigger shows pending items. Minimal space usage, fast switching, ⌘K hint for power users. One of two front-runner approaches.",
+      "relatedIds": ["D4"]
+    },
+    {
+      "id": "S6",
+      "title": "Approach C: Sidebar List — persistent collapsible client panel",
+      "status": "exploring",
+      "date": "2026-02-20",
+      "parentId": "OP3",
+      "reasoning": "Persistent sidebar (w-56, collapsible to w-12) with client avatars, names, unread badges, urgency indicators, and search. Fastest switching — client is always one click away. Collapsible to reclaim space. The other front-runner approach.",
+      "relatedIds": ["D4"]
+    },
+    {
+      "id": "S7",
+      "title": "Approach D: Breadcrumb Navigation — hierarchical nav with admin table",
+      "status": "rejected",
+      "date": "2026-02-20",
+      "parentId": "OP3",
+      "reasoning": "Breadcrumb trail (All Clients > Client Name) with a filterable/sortable admin table for client selection. Good triage tool but killed because there's only one layer of breadcrumbs, so the pattern doesn't justify itself.",
+      "relatedIds": ["D4"],
+      "evidence": [
+        { "type": "firsthand", "source": "Designer", "quote": "Kill. It's only one layer of breadcrumbs." }
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Approach E: Tab Groups — multi-client grouped tabs in a single bar",
+      "status": "exploring",
+      "date": "2026-02-22",
+      "parentId": "OP3",
+      "reasoning": "All clients' chat tabs visible in one bar, grouped by client with colored headers. Each group has a client avatar chip followed by that client's chat tabs. Interesting Chrome-like model. Not a front-runner but kept open out of curiosity to see if it can be made to work at scale.",
+      "relatedIds": ["D4"],
+      "evidence": [
+        { "type": "firsthand", "source": "Designer", "quote": "This one has promise, maybe just because of a perverse curiosity I have to see if it could be made to work. It's not a front runner but we could come back to it." }
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "Approach F: Client Tabs Row — horizontal avatar row above tab bar",
+      "status": "rejected",
+      "date": "2026-02-22",
+      "parentId": "OP3",
+      "reasoning": "Row of client avatar circles above the chat tab bar. Click avatar to switch client context. Killed because it's essentially a two-layer tab (avatar row + chat tab bar) and the designer doubts HRCs will embrace circles as client identity.",
+      "relatedIds": ["D4"],
+      "evidence": [
+        { "type": "firsthand", "source": "Designer", "quote": "Kill. It's basically like a two-layer tab. I don't think HRCs are going to be keen on the circles to represent clients." }
       ]
     },
     {
@@ -150,6 +224,20 @@
     }
   ],
   "decisions": [
+    {
+      "id": "D4",
+      "title": "Prune client navigation prototypes: keep B, C, E — park A, kill D and F",
+      "status": "chosen",
+      "date": "2026-02-24",
+      "reasoning": "After building and reviewing all 6 client-selection approaches at v3 with full-width tab bars, the designer pruned the set. B (Dropdown) and C (Sidebar) are the strongest candidates — both switch-first approaches that feel fast for daily workflow. E (Tab Groups) stays open as an intriguing experiment. A (Card Grid) is parked — the cards-as-clients metaphor has potential but may belong on the dashboard, not here. D (Breadcrumb) is killed — only one layer of breadcrumbs, so the pattern doesn't add value. F (Client Tabs Row) is killed — essentially a two-layer tab with avatar circles; HRCs unlikely to embrace circles for client identity.",
+      "relatedIds": ["S4", "S5", "S6", "S7", "S8", "S9"],
+      "evidence": [
+        { "type": "firsthand", "source": "Designer", "quote": "A: park. The clients as cards view is interesting, but I don't know if this is the right place for it. I could see it coming back on the main dashboard page." },
+        { "type": "firsthand", "source": "Designer", "quote": "D: kill. It's only one layer of breadcrumbs." },
+        { "type": "firsthand", "source": "Designer", "quote": "E: this one has promise, maybe just because of a perverse curiosity I have to see if it could be made to work." },
+        { "type": "firsthand", "source": "Designer", "quote": "F: kill. It's basically like a two-layer tab. I don't think HRCs are going to be keen on the circles to represent clients." }
+      ]
+    },
     {
       "id": "D1",
       "title": "Claude auto-maintains the journal via implicit capture",

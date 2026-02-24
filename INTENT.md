@@ -8,7 +8,7 @@ We're prototyping 4 different approaches to client selection, iterating each to 
 
 ## Current Direction
 
-**V3 of all 4 approaches is complete.** All built, screenshotted, UX-reviewed, and ranked. Ready for the user to pick a winner.
+**Pruned to 3 active candidates (B, C, E).** A is parked (cards may suit the dashboard better). D and F are killed. Prototype switcher shows active approaches by default with an expandable "Archived" section for parked/killed. Default view is now B (Dropdown).
 
 **V2 Rankings:**
 1. **Approach C (Sidebar)** — Best overall. Fastest switching, collapsible for space, urgency indicators, search.
@@ -24,7 +24,7 @@ We're prototyping 4 different approaches to client selection, iterating each to 
 - **Worktree**: `worktree-client-tabs` branch, based off `main`. Working dir: `/Users/mmorrell/CascadeProjects/ai_services_poc_1/.claude/worktrees/client-tabs/`
 - **Dev server**: was running on `localhost:3001` (may need restart: `npm run dev`)
 - **Sidebar nav**: "Clients" item added with Building2 icon (`src/components/sidebar.tsx`)
-- **Tab bar**: Home tab (always present, not closeable), chat tabs (closeable, scrollable), "+" button with "New Chat" + unopened chats dropdown (`src/components/clients/client-tab-bar.tsx`)
+- **Tab bar**: Home tab (always present, not closeable), chat tabs (closeable, scrollable), Chrome-style "+" button adjacent to last tab — direct click creates new chat, no dropdown (`src/components/clients/client-tab-bar.tsx`)
 - **Home tab**: Enriched with per-client metadata — industry, location, primary contact, employee count, urgency labels next to unread stat (`src/components/clients/client-home-tab.tsx`)
 - **Floating prototype switcher**: Bottom-right pill, expands to show approach (A/B/C/D) + version (v1/v2) selector (`src/components/clients/prototype-switcher.tsx`)
 
@@ -38,8 +38,19 @@ All in `src/components/clients/approaches/`:
 | `sidebar-list.tsx` | C: Sidebar | Persistent w-56 sidebar with avatars + badges | Collapsible (w-56 → w-12), urgency dots/rings, search, tooltips, collapsed avatar mode |
 | `breadcrumb-nav.tsx` | D: Breadcrumb | Breadcrumb + admin table with filter | Sortable columns, recently-viewed avatars, quick-switch dropdown on breadcrumb, hover actions |
 
+### New Approaches (E, F)
+- **Approach E (Tab Groups)** — `tab-groups.tsx`: Multi-client grouped tabs in a single bar. Each client has a colored header chip + their chat tabs inline. Color-coded backgrounds per group. Auto-selects first client/tab.
+- **Approach F (Client Tabs Row)** — `client-tabs-row.tsx`: Horizontal avatar row above the tab bar. Click avatar to switch client. Urgency rings on avatars. Compact, always-visible.
+
+### Tab Bar Architecture (Full-Width Refactor)
+- **Split architecture**: `clients-view.tsx` creates `tabBar` (ClientTabBar) and `tabContent` (tab panels) as separate React nodes, passed as props to each approach
+- **Full-width fix**: Wrapper div uses `min-w-0 flex-1 overflow-hidden` (no `flex`) to fill parent container. PrototypeSwitcher is `position: fixed` so it doesn't affect layout flow.
+- **Sidebar hierarchy**: Approach C renders tabBar INSIDE the main content area (right of sidebar), not above the sidebar+content split. Other approaches render tabBar above their content.
+- **Chrome-style + button**: Removed `flex-1` from scrollable tab area in both `client-tab-bar.tsx` and `tab-groups.tsx` — tabs and + button cluster together on the left.
+- **Direct new chat**: Clicking + creates a stub tab immediately. No dropdown menu. `newChat` callback in `clients-view.tsx` generates `new-${Date.now()}` tabs.
+
 ### Orchestration
-- `src/components/clients/clients-view.tsx` — Main orchestrator. APPROACHES array has `maxVersion: 2` for all.
+- `src/components/clients/clients-view.tsx` — Main orchestrator. 6 approaches (A-F). Manages tab state, tab persistence per client, creates tabBar + tabContent props.
 - `src/app/page.tsx` — Renders `<ClientsView />` when `activeView === "clients"`
 
 ### Reviews Complete (V1 + V2)
@@ -51,8 +62,15 @@ All in `src/components/clients/approaches/`:
 ### Cross-Cutting Fixes Applied (V2)
 - Home tab enriched with mock metadata per client (industry, employees, location, contact)
 - Urgency labels ("Urgent"/"Needs attention") next to unread stat
-- "New Chat" option added to tab bar "+" dropdown
 - `suppressHydrationWarning` on time elements to fix SSR mismatch
+
+### Tab Bar Full-Width Refactor (Post-V3)
+- Split `tabWorkspace` into separate `tabBar` + `tabContent` props passed to all 6 approaches
+- Fixed tab bar not spanning full content width (was stopping at ~60% in B, D)
+- Fixed sidebar hierarchy in Approach C — tab bar now inside main content area, not above sidebar
+- Chrome-style + button positioning — removed `flex-1` from scrollable tab area so + sits adjacent to last tab
+- Replaced dropdown "New Chat" menu with direct-click + button
+- Committed as `9652576`, pushed to `worktree-client-tabs`
 
 ## V3 Changes (COMPLETE)
 
@@ -72,20 +90,23 @@ All in `src/components/clients/approaches/`:
 - No visual v3 changes — v2 addressed main issues, remaining problems are structural
 - Tab persistence benefits both
 
-## Rejected Approaches
-- None rejected by user — all 4 approaches are active candidates.
-- The brainstorm had 10 options; 6 were not prototyped (see OBSERVATIONS.md for reasoning).
+## Rejected / Parked Approaches
+- **A (Card Grid)** — Parked. Cards metaphor is interesting but may belong on the dashboard, not as the primary client selector. Could come back combined with another idea.
+- **D (Breadcrumb)** — Killed. Only one layer of breadcrumbs, so the pattern doesn't justify itself.
+- **F (Client Tabs Row)** — Killed. Essentially a two-layer tab. HRCs unlikely to embrace circles for client identity.
+- **Dropdown on + button** — user rejected this UX immediately ("that's just dumb"). Direct click to create tab is the correct pattern.
+- The brainstorm had 10 options; 4 were never prototyped (see OBSERVATIONS.md for reasoning).
 
 ## Open Questions
 - How does client selection interact with the rest of the app? (e.g., if you're in Dashboard and click a client mention, should it navigate to Clients view for that client?)
-- Should tab state persist across client switches? (Persona feedback says yes — planned for v3)
 - The user hasn't yet decided which approach to go with — that's the whole point of this exercise.
+- Chat view is still a stub ("Chat view coming soon") — what does the real chat UI look like?
 
 ## Next Steps
-1. **User picks a winner** — all 4 approaches at v3, production-ready. See OBSERVATIONS.md for final rankings + recommendation.
+1. **Narrow to a winner** — 3 active candidates: B (Dropdown), C (Sidebar), E (Tab Groups). Iterate further or pick.
 2. **Merge winning approach** — strip the prototype switcher + unused approaches, ship clean.
 3. **Build out chat view** — currently stub ("Chat view coming soon"). Wire up real chat UI.
-4. **Consider hybrid** — if user wants, combine C (sidebar) with D (table view) for a triage mode.
+4. **Consider hybrid** — e.g., A's card grid on dashboard + C's sidebar for client workspace.
 
 ---
 
