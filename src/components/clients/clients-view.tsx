@@ -122,42 +122,50 @@ export function ClientsView() {
     [activeTabId]
   );
 
-  const unopenedChats = clientChats.filter((c) => !tabs.find((t) => t.id === c.id));
+  const newChat = useCallback(() => {
+    const id = `new-${Date.now()}`;
+    setTabs((prev) => [
+      ...prev,
+      { id, type: "chat" as const, chatId: id, title: "New Chat", hasUnread: false },
+    ]);
+    setActiveTabId(id);
+  }, []);
 
-  // The tab workspace content that gets passed to each approach
-  const tabWorkspace = selectedClientId && client ? (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      <ClientTabBar
-        tabs={tabs}
-        activeTabId={activeTabId}
-        onSelectTab={setActiveTabId}
-        onCloseTab={closeTab}
-        unopenedChats={unopenedChats}
-        onOpenChat={openChat}
-      />
-      <div className="flex flex-1 overflow-hidden">
-        {/* Home tab */}
-        <div className={activeTabId === "home" ? "flex flex-1 overflow-hidden" : "hidden"}>
-          <ClientHomeTab client={client} chats={clientChats} onOpenChat={openChat} />
-        </div>
-        {/* Chat tabs — stub content */}
-        {tabs
-          .filter((t): t is Extract<ClientTab, { type: "chat" }> => t.type === "chat")
-          .map((tab) => (
-            <div
-              key={tab.id}
-              className={
-                activeTabId === tab.id
-                  ? "flex flex-1 flex-col items-center justify-center gap-3 overflow-hidden"
-                  : "hidden"
-              }
-            >
-              <MessageSquare className="h-10 w-10 text-muted-foreground/40" />
-              <p className="text-sm font-medium">{tab.title}</p>
-              <p className="text-xs text-muted-foreground">Chat view coming soon</p>
-            </div>
-          ))}
+  // Tab bar (rendered separately so approaches can place it full-width)
+  const tabBar = selectedClientId && client ? (
+    <ClientTabBar
+      tabs={tabs}
+      activeTabId={activeTabId}
+      onSelectTab={setActiveTabId}
+      onCloseTab={closeTab}
+      onNewChat={newChat}
+    />
+  ) : null;
+
+  // Tab content (rendered as children inside each approach's content area)
+  const tabContent = selectedClientId && client ? (
+    <div className="flex flex-1 overflow-hidden">
+      {/* Home tab */}
+      <div className={activeTabId === "home" ? "flex flex-1 overflow-hidden" : "hidden"}>
+        <ClientHomeTab client={client} chats={clientChats} onOpenChat={openChat} />
       </div>
+      {/* Chat tabs — stub content */}
+      {tabs
+        .filter((t): t is Extract<ClientTab, { type: "chat" }> => t.type === "chat")
+        .map((tab) => (
+          <div
+            key={tab.id}
+            className={
+              activeTabId === tab.id
+                ? "flex flex-1 flex-col items-center justify-center gap-3 overflow-hidden"
+                : "hidden"
+            }
+          >
+            <MessageSquare className="h-10 w-10 text-muted-foreground/40" />
+            <p className="text-sm font-medium">{tab.title}</p>
+            <p className="text-xs text-muted-foreground">Chat view coming soon</p>
+          </div>
+        ))}
     </div>
   ) : null;
 
@@ -173,17 +181,17 @@ export function ClientsView() {
 
     switch (currentApproach) {
       case "A":
-        return <CardGrid {...props}>{tabWorkspace}</CardGrid>;
+        return <CardGrid {...props} tabBar={tabBar}>{tabContent}</CardGrid>;
       case "B":
-        return <DropdownSwitcher {...props}>{tabWorkspace}</DropdownSwitcher>;
+        return <DropdownSwitcher {...props} tabBar={tabBar}>{tabContent}</DropdownSwitcher>;
       case "C":
-        return <SidebarList {...props}>{tabWorkspace}</SidebarList>;
+        return <SidebarList {...props} tabBar={tabBar}>{tabContent}</SidebarList>;
       case "D":
-        return <BreadcrumbNav {...props}>{tabWorkspace}</BreadcrumbNav>;
+        return <BreadcrumbNav {...props} tabBar={tabBar}>{tabContent}</BreadcrumbNav>;
       case "E":
-        return <TabGroups {...props}>{tabWorkspace}</TabGroups>;
+        return <TabGroups {...props} tabBar={tabBar}>{tabContent}</TabGroups>;
       case "F":
-        return <ClientTabsRow {...props}>{tabWorkspace}</ClientTabsRow>;
+        return <ClientTabsRow {...props} tabBar={tabBar}>{tabContent}</ClientTabsRow>;
       default:
         return null;
     }
@@ -191,7 +199,9 @@ export function ClientsView() {
 
   return (
     <div className="flex flex-1 overflow-hidden">
-      {renderApproach()}
+      <div className="min-w-0 flex-1 overflow-hidden">
+        {renderApproach()}
+      </div>
       <PrototypeSwitcher
         approaches={APPROACHES}
         currentApproach={currentApproach}

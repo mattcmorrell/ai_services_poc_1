@@ -18,6 +18,7 @@ interface ApproachProps {
   selectedClientId: string | null;
   onSelectClient: (clientId: string | null) => void;
   children: React.ReactNode;
+  tabBar?: React.ReactNode;
   version: number;
 }
 
@@ -88,6 +89,7 @@ export function BreadcrumbNav({
   selectedClientId,
   onSelectClient,
   children,
+  tabBar,
   version,
 }: ApproachProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -342,6 +344,8 @@ export function BreadcrumbNav({
         )}
       </div>
 
+      {/* Tab bar (full width) */}
+      {selectedClient && tabBar}
       {/* Content area */}
       {selectedClient ? (
         // Mode 2: Render workspace children

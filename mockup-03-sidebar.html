@@ -12,7 +12,13 @@
     color: #e4e4e7;
     height: 100vh;
     display: flex;
+    flex-direction: column;
     overflow: hidden;
+  }
+  .content-row {
+    display: flex;
+    flex: 1;
+    min-height: 0;
   }
 
   /* ── Sidebar ── */
@@ -23,7 +29,6 @@
     border-right: 1px solid #2a2a35;
     display: flex;
     flex-direction: column;
-    height: 100vh;
   }
   .sidebar-header {
     display: flex;
@@ -149,6 +154,7 @@
     height: 40px;
     padding: 0 4px;
     gap: 2px;
+    flex-shrink: 0;
   }
   .tab {
     display: flex;
@@ -325,6 +331,30 @@
 </head>
 <body>
 
+<!-- Tab bar (full width) -->
+<div class="tab-bar">
+    <div class="tab active">
+      <span class="dot" style="background:#3b82f6;"></span>
+      Home
+    </div>
+    <div class="tab">
+      <span class="dot" style="background:#22c55e;"></span>
+      Payroll Review
+      <span class="tab-badge">3</span>
+      <span class="tab-close">&times;</span>
+    </div>
+    <div class="tab">
+      <span class="dot" style="background:#a855f7;"></span>
+      Benefits Enrollment
+      <span class="tab-badge">3</span>
+      <span class="tab-close">&times;</span>
+    </div>
+    <div class="tab-new" title="New chat">+</div>
+  </div>
+
+<!-- Content row: sidebar + main -->
+<div class="content-row">
+
 <!-- ── Sidebar ── -->
 <aside class="sidebar">
   <div class="sidebar-header">
@@ -334,7 +364,6 @@
     </button>
   </div>
   <div class="client-list">
-    <!-- Active -->
     <div class="client-item active">
       <div class="avatar" style="background:#2563eb;">A</div>
       <div class="client-info">
@@ -386,27 +415,6 @@
 
 <!-- ── Main ── -->
 <div class="main">
-  <!-- Tab bar -->
-  <div class="tab-bar">
-    <div class="tab active">
-      <span class="dot" style="background:#3b82f6;"></span>
-      Home
-    </div>
-    <div class="tab">
-      <span class="dot" style="background:#22c55e;"></span>
-      Payroll Review
-      <span class="tab-badge">3</span>
-      <span class="tab-close">&times;</span>
-    </div>
-    <div class="tab">
-      <span class="dot" style="background:#a855f7;"></span>
-      Benefits Enrollment
-      <span class="tab-badge">3</span>
-      <span class="tab-close">&times;</span>
-    </div>
-    <div class="tab-new" title="New chat">+</div>
-  </div>
-
   <!-- Client context header -->
   <div class="client-header">
     <div class="avatar" style="background:#2563eb;">A</div>
@@ -477,6 +485,7 @@
     <button>Send</button>
   </div>
 </div>
+</div><!-- /content-row -->
 
 </body>
 </html>

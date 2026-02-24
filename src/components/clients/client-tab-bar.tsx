@@ -3,13 +3,6 @@
 import { useRef } from "react";
 import { Home, X, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Chat } from "@/types/chat";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export type ClientTab =
   | { id: "home"; type: "home" }
@@ -20,8 +13,7 @@ interface ClientTabBarProps {
   activeTabId: string;
   onSelectTab: (id: string) => void;
   onCloseTab: (id: string) => void;
-  unopenedChats: Chat[];
-  onOpenChat: (chat: Chat) => void;
+  onNewChat: () => void;
 }
 
 export function ClientTabBar({
@@ -29,8 +21,7 @@ export function ClientTabBar({
   activeTabId,
   onSelectTab,
   onCloseTab,
-  unopenedChats,
-  onOpenChat,
+  onNewChat,
 }: ClientTabBarProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -39,7 +30,7 @@ export function ClientTabBar({
       {/* Scrollable tab list */}
       <div
         ref={scrollRef}
-        className="flex min-w-0 flex-1 items-stretch overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex min-w-0 items-stretch overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {tabs.map((tab) => {
           const isActive = tab.id === activeTabId;
@@ -95,34 +86,13 @@ export function ClientTabBar({
 
       {/* New tab button */}
       <div className="flex shrink-0 items-center px-1">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              <Plus className="h-3.5 w-3.5" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={() => {}} className="text-primary">
-              <Plus className="mr-2 h-3.5 w-3.5" />
-              New Chat
-            </DropdownMenuItem>
-            {unopenedChats.length > 0 && (
-              <>
-                <div className="mx-2 my-1 border-t border-border" />
-                {unopenedChats.map((chat) => (
-                  <DropdownMenuItem key={chat.id} onClick={() => onOpenChat(chat)}>
-                    <span className="truncate">{chat.title}</span>
-                    {chat.hasUnread && (
-                      <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    )}
-                  </DropdownMenuItem>
-                ))}
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <button
+          onClick={onNewChat}
+          className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          title="New chat"
+        >
+          <Plus className="h-3.5 w-3.5" />
+        </button>
       </div>
     </div>
   );

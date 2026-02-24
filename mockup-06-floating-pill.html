@@ -71,7 +71,20 @@
     border-bottom: 2px solid transparent;
     cursor: pointer;
     position: relative;
+    white-space: nowrap;
   }
+  .tab-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    font-size: 18px;
+    color: #4a4a56;
+    cursor: pointer;
+    transition: color 0.15s ease;
+    flex-shrink: 0;
+  }
+  .tab-add:hover { color: #a1a1aa; }
   .tab.active {
     color: #e0e0e8;
     border-bottom-color: #7c6bf5;
@@ -385,6 +398,7 @@
   </div>
   <div class="tab">Benefits Enrollment</div>
   <div class="tab">Onboarding</div>
+  <div class="tab-add" title="New chat">+</div>
 </div>
 
 <!-- Main content -->

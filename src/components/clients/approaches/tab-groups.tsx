@@ -11,6 +11,7 @@ interface ApproachProps {
   selectedClientId: string | null;
   onSelectClient: (clientId: string | null) => void;
   children: React.ReactNode;
+  tabBar?: React.ReactNode;
   version: number;
 }
 
@@ -122,6 +123,7 @@ export function TabGroups({
   selectedClientId,
   onSelectClient,
   children,
+  tabBar,
   version,
 }: ApproachProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -174,7 +176,7 @@ export function TabGroups({
       <div className="flex h-10 shrink-0 items-stretch border-b border-border bg-card">
         <div
           ref={scrollRef}
-          className="flex min-w-0 flex-1 items-stretch overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex min-w-0 items-stretch overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {clientGroups.map((group, groupIdx) => {
             const isGroupActive = selectedClientId === group.client.id;
@@ -279,6 +281,8 @@ export function TabGroups({
         </div>
       </div>
 
+      {/* Per-client tab bar (full width) */}
+      {tabBar}
       {/* Workspace content */}
       <main className="flex flex-1 overflow-hidden">
         {children ? (

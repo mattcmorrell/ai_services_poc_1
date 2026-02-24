@@ -11,6 +11,7 @@ interface ApproachProps {
   selectedClientId: string | null;
   onSelectClient: (clientId: string | null) => void;
   children: React.ReactNode;
+  tabBar?: React.ReactNode;
   version: number;
 }
 
@@ -77,6 +78,7 @@ export function CardGrid({
   selectedClientId,
   onSelectClient,
   children,
+  tabBar,
   version,
 }: ApproachProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -150,6 +152,7 @@ export function CardGrid({
               : "All Clients"}
           </button>
         </div>
+        {tabBar}
         <div className="flex-1 overflow-hidden">{children}</div>
       </div>
     );

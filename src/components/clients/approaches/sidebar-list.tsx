@@ -11,6 +11,7 @@ interface ApproachProps {
   selectedClientId: string | null;
   onSelectClient: (clientId: string | null) => void;
   children: React.ReactNode;
+  tabBar?: React.ReactNode;
   version: number;
 }
 
@@ -69,6 +70,7 @@ export function SidebarList({
   selectedClientId,
   onSelectClient,
   children,
+  tabBar,
   version,
 }: ApproachProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -132,96 +134,97 @@ export function SidebarList({
   if (!isV2) {
     return (
       <div className="flex h-full">
-        <aside className="flex w-56 flex-shrink-0 flex-col border-r border-border bg-card">
-          <div className="flex flex-shrink-0 items-center justify-between border-b border-border px-4 py-3">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Clients
-            </h2>
-            <button
-              className={cn(
-                "inline-flex h-7 w-7 items-center justify-center rounded-md",
-                "text-muted-foreground transition-colors",
-                "hover:bg-muted hover:text-foreground",
-                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              )}
-              aria-label="Search clients"
-            >
-              <Search className="h-3.5 w-3.5" />
-            </button>
-          </div>
+          <aside className="flex w-56 flex-shrink-0 flex-col border-r border-border bg-card">
+            <div className="flex flex-shrink-0 items-center justify-between border-b border-border px-4 py-3">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Clients
+              </h2>
+              <button
+                className={cn(
+                  "inline-flex h-7 w-7 items-center justify-center rounded-md",
+                  "text-muted-foreground transition-colors",
+                  "hover:bg-muted hover:text-foreground",
+                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                )}
+                aria-label="Search clients"
+              >
+                <Search className="h-3.5 w-3.5" />
+              </button>
+            </div>
 
-          <nav className="flex-1 overflow-y-auto py-1" role="listbox" aria-label="Client list">
-            {clientItems.map(({ client, chatCount }) => {
-              const isActive = selectedClientId === client.id;
+            <nav className="flex-1 overflow-y-auto py-1" role="listbox" aria-label="Client list">
+              {clientItems.map(({ client, chatCount }) => {
+                const isActive = selectedClientId === client.id;
 
-              return (
-                <button
-                  key={client.id}
-                  role="option"
-                  aria-selected={isActive}
-                  onClick={() => onSelectClient(client.id)}
-                  className={cn(
-                    "group relative flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors",
-                    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring",
-                    isActive
-                      ? "border-l-2 border-primary bg-accent"
-                      : "border-l-2 border-transparent hover:bg-muted/50"
-                  )}
-                >
-                  <div
+                return (
+                  <button
+                    key={client.id}
+                    role="option"
+                    aria-selected={isActive}
+                    onClick={() => onSelectClient(client.id)}
                     className={cn(
-                      "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white",
-                      getAvatarColor(client.id)
+                      "group relative flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors",
+                      "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring",
+                      isActive
+                        ? "border-l-2 border-primary bg-accent"
+                        : "border-l-2 border-transparent hover:bg-muted/50"
                     )}
                   >
-                    {getInitials(client.name)}
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <span
-                        className={cn(
-                          "truncate text-sm font-medium transition-colors",
-                          isActive
-                            ? "text-foreground"
-                            : "text-foreground/80 group-hover:text-foreground"
-                        )}
-                      >
-                        {client.name}
-                      </span>
-
-                      {client.unreadCount > 0 && (
-                        <span
-                          className={cn(
-                            "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
-                            "rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground"
-                          )}
-                        >
-                          {client.unreadCount}
-                        </span>
+                    <div
+                      className={cn(
+                        "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white",
+                        getAvatarColor(client.id)
                       )}
+                    >
+                      {getInitials(client.name)}
                     </div>
 
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <MessageSquare className="h-3 w-3" />
-                      {chatCount} {chatCount === 1 ? "chat" : "chats"}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span
+                          className={cn(
+                            "truncate text-sm font-medium transition-colors",
+                            isActive
+                              ? "text-foreground"
+                              : "text-foreground/80 group-hover:text-foreground"
+                          )}
+                        >
+                          {client.name}
+                        </span>
 
-            {clients.length === 0 && (
-              <div className="px-4 py-8 text-center">
-                <p className="text-xs text-muted-foreground">No clients found</p>
-              </div>
-            )}
-          </nav>
-        </aside>
+                        {client.unreadCount > 0 && (
+                          <span
+                            className={cn(
+                              "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
+                              "rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground"
+                            )}
+                          >
+                            {client.unreadCount}
+                          </span>
+                        )}
+                      </div>
 
-        <main className="flex-1 overflow-hidden">
-          {children}
-        </main>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <MessageSquare className="h-3 w-3" />
+                        {chatCount} {chatCount === 1 ? "chat" : "chats"}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+
+              {clients.length === 0 && (
+                <div className="px-4 py-8 text-center">
+                  <p className="text-xs text-muted-foreground">No clients found</p>
+                </div>
+              )}
+            </nav>
+          </aside>
+
+          <main className="flex flex-1 flex-col overflow-hidden">
+            {tabBar}
+            <div className="flex-1 overflow-hidden">{children}</div>
+          </main>
       </div>
     );
   }
@@ -461,8 +464,9 @@ export function SidebarList({
       </aside>
 
       {/* Main workspace content */}
-      <main className="flex-1 overflow-hidden">
-        {children}
+      <main className="flex flex-1 flex-col overflow-hidden">
+        {tabBar}
+        <div className="flex-1 overflow-hidden">{children}</div>
       </main>
     </div>
   );

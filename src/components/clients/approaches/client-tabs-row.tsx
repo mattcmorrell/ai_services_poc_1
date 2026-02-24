@@ -10,6 +10,7 @@ interface ApproachProps {
   selectedClientId: string | null;
   onSelectClient: (clientId: string | null) => void;
   children: React.ReactNode;
+  tabBar?: React.ReactNode;
   version: number;
 }
 
@@ -56,6 +57,7 @@ export function ClientTabsRow({
   selectedClientId,
   onSelectClient,
   children,
+  tabBar,
 }: ApproachProps) {
   // Auto-select first client if none selected
   useEffect(() => {
@@ -119,7 +121,9 @@ export function ClientTabsRow({
         ))}
       </div>
 
-      {/* Tab bar + workspace content rendered as children */}
+      {/* Tab bar (full width) */}
+      {tabBar}
+      {/* Workspace content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {children}
       </div>

@@ -11,6 +11,7 @@ interface ApproachProps {
   selectedClientId: string | null;
   onSelectClient: (clientId: string | null) => void;
   children: React.ReactNode;
+  tabBar?: React.ReactNode;
   version: number;
 }
 
@@ -64,6 +65,7 @@ export function DropdownSwitcher({
   selectedClientId,
   onSelectClient,
   children,
+  tabBar,
   version,
 }: ApproachProps) {
   const [open, setOpen] = useState(false);
@@ -349,6 +351,8 @@ export function DropdownSwitcher({
         )}
       </div>
 
+      {/* Tab bar (full width) */}
+      {tabBar}
       {/* Workspace content */}
       <div className="flex-1 overflow-hidden">{children}</div>
     </div>
