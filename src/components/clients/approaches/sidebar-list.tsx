@@ -206,7 +206,7 @@ export function SidebarList({
       {/* Main workspace content */}
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {tabBar}
-        <div className="flex-1 overflow-hidden">{children}</div>
+        <div className="flex flex-1 overflow-hidden">{children}</div>
       </main>
     </div>
   );
