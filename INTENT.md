@@ -168,35 +168,33 @@ Tool 1 feeds into Tool 2. The iteration tracker captures real-time exploration; 
 - **Removed connections section**: The parent/child/related links in the detail panel were removed — redundant with the tree navigation.
 - **Horizontal card grid for children**: When you select an opportunity, active solution cards appear in a horizontal grid in the detail panel. When you select a solution, active experiment cards appear. Cards show title, status badge, and full reasoning. Click a card to select that node.
 
-### Decision Journal Architecture Redesign (NEXT — approved, not yet implemented)
+### Decision Journal Architecture Redesign — IMPLEMENTED (v4)
 
 **The Problem:** The left panel was trying to be two things — a full hierarchical map AND a navigation tool. A 4-level deep tree (outcome → opportunity → solution → experiment) is hard to scan and requires too much expand/collapse management. Solutions appeared in two places (tree AND cards), creating routing confusion.
 
 **The Solution: "Shallow tree + detail does the drill-down" (Option A)**
 
 Left panel only shows outcomes and opportunities — nothing deeper. The detail panel handles drill-down:
-- Select an **outcome** → detail shows reasoning + opportunity cards
+- Select an **outcome** → detail shows reasoning + opportunity cards + cross-cutting solution cards
 - Select an **opportunity** → detail shows reasoning + solution cards
-- Click a **solution card** → detail shows reasoning + experiment cards
-- Click an **experiment card** → detail shows reasoning (leaf node)
+- Click a **solution card** → detail shows reasoning + experiment cards (via `drillToNode`)
+- Click an **experiment card** → detail shows reasoning (leaf node, via `drillToNode`)
 
-**Why this approach wins:**
-1. **Left panel becomes trivially simple** — 1-2 outcomes, 2-3 opportunities each = 3-6 items. No deep nesting, no collapse headaches.
-2. **Eliminates duplicate display** — solutions only exist in one place (right panel cards). No ambiguity about which is canonical.
-3. **Matches mental model** — people think "pick a problem space, then browse what was tried." The drill-down mirrors how you'd naturally explore an OST.
-4. **Detail panel gets a consistent role** — "tell me about what I selected, and show me what's inside it." Always the same pattern at every level.
-5. **"Active only" filtering becomes the natural default** — you browse active solutions; rejected/deferred are visible but dimmed or in a collapsed section.
+**Implementation details:**
+- `renderTree()` simplified to only render outcomes (collapsible) and opportunities (regular nodes)
+- Removed: `sectionLabel`, `oppSectionLabel`, `subSectionLabel`, `toggleSection`, `toggleSectionVisibility` — all dead code after simplification
+- New state: `detailNodeId` (separate from `selectedNodeId`) tracks what the detail panel shows during drill-down
+- `selectNode(id)` — sets both `selectedNodeId` and `detailNodeId`, used for tree-level clicks
+- `drillToNode(id)` — only sets `detailNodeId`, walks up to find nearest tree ancestor (outcome/opportunity) to highlight in tree
+- `highlightTree(id)` — extracted helper for tree selection + ancestor highlighting
+- Breadcrumb: ancestor chain at top of detail panel, each segment clickable and color-coded by type. Tree-level ancestors use `selectNode`, deeper ancestors use `drillToNode`.
+- Decisions and open questions removed from tree — they live in Reader, Timeline, and Graph views
+- Cross-cutting solutions (solutions with parentId pointing to outcome, not opportunity) appear in a separate card section on outcome detail
 
-**Navigation back up:** Need a breadcrumb trail in the detail panel (e.g., `Outcome > Opportunity > Solution`) so you can navigate back up after drilling in. Clicking any breadcrumb segment re-selects that node.
-
-**Rejected alternatives:**
-- **B: Keep tree, kill cards** — simpler mental model but doesn't solve the "too much clicking" problem. Accordion-style collapse is a band-aid.
-- **C: Flat list with filters** — loses the hierarchy entirely. Fast to scan but you can't see the OST structure.
-
-**Open questions for implementation:**
-- Should the left panel highlight which opportunity you're drilled into (when viewing a solution)?
-- Should there be a "show all" toggle to see rejected/deferred children alongside active ones?
-- Future: assumptions as a node type under experiments?
+**Resolved questions:**
+- Yes, the left panel highlights which opportunity you're drilled into (via `drillToNode` walking up to tree-level ancestor)
+- Active Only toggle controls card visibility — rejected/deferred children hidden when on
+- Pluralization fix: "Opportunities" not "Opportunitys"
 
 ### Key Decisions Made
 1. **Two separate tools** — workbench (iteration tracker) vs archive (decision journal). Different audiences, different timescales. Must stay separate files/schemas.
