@@ -390,6 +390,14 @@
     color: #b4b4bc;
     font-size: 14px;
   }
+  .detail-type-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #71717a;
+    margin-bottom: 4px;
+  }
   .detail-header {
     display: flex;
     align-items: baseline;
@@ -536,9 +544,9 @@
     color: #f4f4f5;
   }
   .detail-card-reasoning {
-    font-size: 12px;
+    font-size: 14px;
     color: #e4e4e7;
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
   /* ── Detail breadcrumb ── */
@@ -1184,14 +1192,14 @@ function renderTree() {
   if (decisions.length) {
     html += sectionLabel('Decisions', 'decision', true);
     for (const d of decisions) {
-      html += treeNodeHTML(d, 0);
+      html += treeNodeHTML(d, 0, false, false, true);
     }
   }
 
   if (questions.length) {
     html += sectionLabel('Open Questions', 'question', true);
     for (const q of questions) {
-      html += treeNodeHTML(q, 0);
+      html += treeNodeHTML(q, 0, false, false, true);
     }
   }
 
@@ -1261,7 +1269,7 @@ function toggleCollapsibleNode(nodeEl) {
 }
 
 
-function treeNodeHTML(node, indent, startHidden, collapsible) {
+function treeNodeHTML(node, indent, startHidden, collapsible, hideTypeLabel) {
   const color = TYPE_COLORS[node._type] || '#52525b';
   const isEmphasis = node.status === 'active' || node.status === 'exploring';
   const isSettled = node.status === 'rejected' || node.status === 'deferred';
@@ -1279,14 +1287,15 @@ function treeNodeHTML(node, indent, startHidden, collapsible) {
   }
   if (startHidden) style += 'display:none;';
 
-  const typeLabel = node._type || '';
+  const typeLabel = hideTypeLabel ? '' : (node._type || '');
   const chevronHTML = collapsible ? `<div class="node-expand"><span class="chevron">&#9660;</span></div>` : '';
   const dotHTML = node._type === 'outcome' ? '' : `<div class="node-dot" style="background:${color};${isEmphasis ? 'box-shadow:0 0 6px ' + color + '66' : ''}"></div>`;
-  return `<div class="${classes}" data-id="${node.id}" data-status="${node.status}" style="${style}">
+  const statusAttr = node.status ? ` data-status="${node.status}"` : '';
+  return `<div class="${classes}" data-id="${node.id}"${statusAttr} style="${style}">
     ${chevronHTML}
     ${dotHTML}
     <div class="node-content">
-      <span class="node-type" style="color:${color}">${typeLabel}</span>
+      ${typeLabel ? `<span class="node-type" style="color:${color}">${typeLabel}</span>` : ''}
       <span class="node-title">${node.title}</span>
     </div>
     ${showStatus ? `<span class="status-badge status-${node.status}">${node.status}</span>` : ''}
@@ -1406,10 +1415,10 @@ function renderDetail(id) {
     html += '</div>';
   }
 
-  // Header
+  // Header — type label above title as plain text
   const statusColor = STATUS_COLORS[node.status] || '#8b8b95';
+  html += `<div class="detail-type-label">${node._type}</div>`;
   html += `<div class="detail-header">`;
-  html += `<span class="type-badge type-${node._type}">${node._type}</span>`;
   html += `<div class="detail-title" style="color:${typeColor}">${node.title}</div>`;
   html += `<span class="detail-status-text" style="color:${statusColor}">${node.status}</span>`;
   html += `</div>`;
