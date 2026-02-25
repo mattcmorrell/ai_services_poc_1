@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { MessageSquare, Bot, Clock } from "lucide-react";
+import { MessageSquare, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Client, Chat } from "@/types/chat";
 import { ChatClientToggle } from "@/components/chat-client-toggle";
@@ -49,12 +49,6 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-function getUrgencyColor(unreadCount: number): string | null {
-  if (unreadCount >= 4) return "bg-red-500";
-  if (unreadCount >= 1) return "bg-amber-500";
-  return null;
-}
-
 function relativeTime(date: Date): string {
   const now = Date.now();
   const diff = now - date.getTime();
@@ -72,7 +66,6 @@ interface ClientListItem {
   client: Client;
   chatCount: number;
   unreadChats: number;
-  agentUpdates: number;
   lastActivity: Date | null;
 }
 
@@ -98,11 +91,10 @@ export function SidebarList({
       const clientChats = chats.filter((c) => c.clientId === client.id);
       const chatCount = clientChats.length;
       const unreadChats = clientChats.filter((c) => c.hasUnread).length;
-      const agentUpdates = Math.max(0, client.unreadCount - unreadChats);
       const lastActivity = clientChats.length > 0
         ? new Date(Math.max(...clientChats.map((c) => c.updatedAt.getTime())))
         : null;
-      return { client, chatCount, unreadChats, agentUpdates, lastActivity };
+      return { client, chatCount, unreadChats, lastActivity };
     });
   }, [clients, chats]);
 
@@ -116,9 +108,8 @@ export function SidebarList({
 
         {/* Client list */}
         <nav className="flex-1 overflow-y-auto py-1" role="listbox" aria-label="Client list">
-          {clientItems.map(({ client, chatCount, unreadChats, agentUpdates, lastActivity }) => {
+          {clientItems.map(({ client, unreadChats, lastActivity }) => {
             const isActive = selectedClientId === client.id;
-            const urgencyDot = getUrgencyColor(client.unreadCount);
 
             return (
               <button
@@ -146,41 +137,23 @@ export function SidebarList({
 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="flex items-center gap-1.5">
-                      {urgencyDot && (
-                        <span
-                          className={cn(
-                            "inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full",
-                            urgencyDot
-                          )}
-                        />
+                    <span
+                      className={cn(
+                        "truncate text-sm font-medium transition-colors",
+                        isActive
+                          ? "text-foreground"
+                          : "text-foreground/80 group-hover:text-foreground"
                       )}
-                      <span
-                        className={cn(
-                          "truncate text-sm font-medium transition-colors",
-                          isActive
-                            ? "text-foreground"
-                            : "text-foreground/80 group-hover:text-foreground"
-                        )}
-                      >
-                        {client.name}
-                      </span>
+                    >
+                      {client.name}
                     </span>
 
-                    <div className="flex items-center gap-1">
-                      {unreadChats > 0 && (
-                        <span className="flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-primary">
-                          <MessageSquare className="h-2.5 w-2.5" />
-                          {unreadChats}
-                        </span>
-                      )}
-                      {agentUpdates > 0 && (
-                        <span className="flex items-center gap-0.5 rounded-full bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-violet-400">
-                          <Bot className="h-2.5 w-2.5" />
-                          {agentUpdates}
-                        </span>
-                      )}
-                    </div>
+                    {unreadChats > 0 && (
+                      <span className="flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-primary">
+                        <MessageSquare className="h-2.5 w-2.5" />
+                        {unreadChats}
+                      </span>
+                    )}
                   </div>
 
                   <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
