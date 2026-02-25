@@ -155,11 +155,15 @@ export function TabGroups({
     }
     if (clientId !== selectedClientId) {
       onSelectClient(clientId);
+      // For cross-group clicks, use onOpenChat to ensure tab exists after client switch
+      const chat = chats.find((c) => c.id === tab.chatId);
+      if (chat) {
+        onOpenChat(chat);
+        return;
+      }
     }
-    const chat = chats.find((c) => c.id === tab.chatId);
-    if (chat) {
-      onOpenChat(chat);
-    }
+    // Tab already exists in current client's state — just activate it
+    onSelectTab(tab.id);
   };
 
   const handleCloseTab = (e: React.MouseEvent, tabId: string) => {
