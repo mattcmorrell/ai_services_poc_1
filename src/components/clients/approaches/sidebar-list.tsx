@@ -107,7 +107,7 @@ export function SidebarList({
   }, [clients, chats]);
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full flex-1">
       <aside className="flex w-72 flex-shrink-0 flex-col border-r border-border bg-card">
         {/* Sidebar header */}
         <div className="flex flex-shrink-0 border-b border-border p-3">
