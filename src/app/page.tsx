@@ -557,10 +557,6 @@ export default function Home() {
       );
     }
 
-    if (activeView === "clients") {
-      return <ClientsView />;
-    }
-
     return (
       <div className="flex flex-1 items-center justify-center text-muted-foreground">
         {activeView.charAt(0).toUpperCase() + activeView.slice(1)} view coming soon
@@ -571,7 +567,10 @@ export default function Home() {
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar activeView={activeView} onViewChange={setActiveView} />
-      {renderMainContent()}
+      <div className={activeView === "clients" ? "flex flex-1 overflow-hidden" : "hidden"}>
+        <ClientsView />
+      </div>
+      {activeView !== "clients" && renderMainContent()}
       <ClientSelectDialog
         open={clientSelectOpen}
         onOpenChange={setClientSelectOpen}

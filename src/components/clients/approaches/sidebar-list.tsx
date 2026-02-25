@@ -53,12 +53,6 @@ function getUrgencyColor(unreadCount: number): string | null {
   return null;
 }
 
-function getUrgencyRingColor(unreadCount: number): string {
-  if (unreadCount >= 4) return "ring-red-500";
-  if (unreadCount >= 1) return "ring-amber-500";
-  return "ring-transparent";
-}
-
 function relativeTime(date: Date): string {
   const now = Date.now();
   const diff = now - date.getTime();
@@ -376,11 +370,7 @@ export function SidebarList({
                     <div
                       className={cn(
                         "flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white",
-                        "ring-2 ring-offset-1 ring-offset-card transition-all",
-                        getAvatarColor(client.id),
-                        isV3 && isActive
-                          ? "ring-primary"
-                          : urgencyDot ? getUrgencyRingColor(client.unreadCount) : "ring-transparent"
+                        getAvatarColor(client.id)
                       )}
                     >
                       {getInitials(client.name)}
