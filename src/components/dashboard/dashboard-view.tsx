@@ -58,8 +58,10 @@ export function DashboardView({
           <Image
             src="/Pandopticon-logo.png"
             alt="Pandopticon"
-            width={280}
-            height={80}
+            width={810}
+            height={180}
+            className="h-16 w-auto"
+            priority
           />
         </div>
 
