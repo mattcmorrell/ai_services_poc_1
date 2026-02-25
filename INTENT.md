@@ -154,6 +154,50 @@ Tool 1 feeds into Tool 2. The iteration tracker captures real-time exploration; 
 - **Brighter selected state**: Selected items clearly distinguishable from emphasis (active) items
 - **Improved contrast**: All grey text bumped lighter, dividers more visible (#2d2d3a)
 
+### Tree View UX Polish (v3 iteration — current session)
+- **Resizable tree panel**: Drag handle between tree and detail panels. Highlights blue on hover/drag. Min 240px tree, min 200px detail.
+- **Detail header restructured**: Type badge + title on the left, plain status text on the far right. Eliminates confusion between type badge and status badge (they looked identical as adjacent pills).
+- **Detail text brightened**: Reasoning and evidence text bumped to near-white (#e4e4e7). Attribution bumped from #8b8b95 to #b4b4bc.
+- **Bold only on selection**: Tree node titles and opportunity titles are normal weight by default, only bolded when selected.
+- **Outcome collapse moved to node**: "OUTCOME" label is now static (no chevron). The outcome node itself has a collapsible chevron — clicking it collapses all children. Clicking elsewhere selects it for detail view.
+- **Hierarchy indentation**: Opportunities indent under outcomes, solutions indent under opportunities, experiments under solutions. Indent step is 28px. Opportunity caret aligns with outcome text block left edge.
+- **Ancestor lineage highlighting**: When you select a child node, its parent chain (opportunity, outcome) gets a subtle left border in their type color. Communicates "you're looking at something inside this branch." Only appears on selection — not static.
+- **Removed static left-border indicators**: The always-on colored left borders on active/emphasis nodes were removed. They were redundant with status badges and added visual noise without clear meaning.
+- **No outcome dot**: Outcomes don't get the colored circle — they're top-level and don't need it.
+- **Active only on by default**: Toggle starts enabled so you see the working set immediately.
+- **Removed connections section**: The parent/child/related links in the detail panel were removed — redundant with the tree navigation.
+- **Horizontal card grid for children**: When you select an opportunity, active solution cards appear in a horizontal grid in the detail panel. When you select a solution, active experiment cards appear. Cards show title, status badge, and full reasoning. Click a card to select that node.
+
+### Decision Journal Architecture Redesign (NEXT — approved, not yet implemented)
+
+**The Problem:** The left panel was trying to be two things — a full hierarchical map AND a navigation tool. A 4-level deep tree (outcome → opportunity → solution → experiment) is hard to scan and requires too much expand/collapse management. Solutions appeared in two places (tree AND cards), creating routing confusion.
+
+**The Solution: "Shallow tree + detail does the drill-down" (Option A)**
+
+Left panel only shows outcomes and opportunities — nothing deeper. The detail panel handles drill-down:
+- Select an **outcome** → detail shows reasoning + opportunity cards
+- Select an **opportunity** → detail shows reasoning + solution cards
+- Click a **solution card** → detail shows reasoning + experiment cards
+- Click an **experiment card** → detail shows reasoning (leaf node)
+
+**Why this approach wins:**
+1. **Left panel becomes trivially simple** — 1-2 outcomes, 2-3 opportunities each = 3-6 items. No deep nesting, no collapse headaches.
+2. **Eliminates duplicate display** — solutions only exist in one place (right panel cards). No ambiguity about which is canonical.
+3. **Matches mental model** — people think "pick a problem space, then browse what was tried." The drill-down mirrors how you'd naturally explore an OST.
+4. **Detail panel gets a consistent role** — "tell me about what I selected, and show me what's inside it." Always the same pattern at every level.
+5. **"Active only" filtering becomes the natural default** — you browse active solutions; rejected/deferred are visible but dimmed or in a collapsed section.
+
+**Navigation back up:** Need a breadcrumb trail in the detail panel (e.g., `Outcome > Opportunity > Solution`) so you can navigate back up after drilling in. Clicking any breadcrumb segment re-selects that node.
+
+**Rejected alternatives:**
+- **B: Keep tree, kill cards** — simpler mental model but doesn't solve the "too much clicking" problem. Accordion-style collapse is a band-aid.
+- **C: Flat list with filters** — loses the hierarchy entirely. Fast to scan but you can't see the OST structure.
+
+**Open questions for implementation:**
+- Should the left panel highlight which opportunity you're drilled into (when viewing a solution)?
+- Should there be a "show all" toggle to see rejected/deferred children alongside active ones?
+- Future: assumptions as a node type under experiments?
+
 ### Key Decisions Made
 1. **Two separate tools** — workbench (iteration tracker) vs archive (decision journal). Different audiences, different timescales. Must stay separate files/schemas.
 2. **Claude auto-maintains the journal via implicit capture** — "AI meeting notes" model. Claude watches for decision moments and logs them. Explicit `/decision` command also available as supplement.
