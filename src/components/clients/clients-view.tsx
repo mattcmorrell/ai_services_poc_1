@@ -142,6 +142,39 @@ export function ClientsView() {
     />
   ) : null;
 
+  // All client tab states (for TabGroups approach E)
+  // Seeds every client that has chats so all groups appear on first load
+  const allClientTabs = useMemo(() => {
+    const map = new Map<string, { tabs: ClientTab[]; activeTabId: string }>();
+    // Seed all clients that have chats (home + first 2 chats)
+    for (const c of mockClients) {
+      const chatsForClient = mockChats.filter((ch) => ch.clientId === c.id);
+      if (chatsForClient.length === 0) continue;
+      map.set(c.id, {
+        tabs: [
+          { id: "home", type: "home" },
+          ...chatsForClient.slice(0, 2).map(
+            (chat): ClientTab => ({
+              id: chat.id,
+              type: "chat",
+              chatId: chat.id,
+              title: chat.title,
+              hasUnread: chat.hasUnread,
+            })
+          ),
+        ],
+        activeTabId: "home",
+      });
+    }
+    // Layer cached state on top (preserves user's opened/closed tabs)
+    tabStateCache.current.forEach((state, cid) => map.set(cid, state));
+    // Overwrite current client with live state
+    if (selectedClientId) {
+      map.set(selectedClientId, { tabs, activeTabId });
+    }
+    return map;
+  }, [selectedClientId, tabs, activeTabId]);
+
   // Tab content (rendered as children inside each approach's content area)
   const tabContent = selectedClientId && client ? (
     <div className="flex flex-1 overflow-hidden">
@@ -189,7 +222,19 @@ export function ClientsView() {
       case "D":
         return <BreadcrumbNav {...props} tabBar={tabBar}>{tabContent}</BreadcrumbNav>;
       case "E":
-        return <TabGroups {...props} tabBar={tabBar}>{tabContent}</TabGroups>;
+        return (
+          <TabGroups
+            {...props}
+            allClientTabs={allClientTabs}
+            activeTabId={activeTabId}
+            onSelectTab={setActiveTabId}
+            onCloseTab={closeTab}
+            onNewChat={newChat}
+            onOpenChat={openChat}
+          >
+            {tabContent}
+          </TabGroups>
+        );
       case "F":
         return <ClientTabsRow {...props} tabBar={tabBar}>{tabContent}</ClientTabsRow>;
       default:
