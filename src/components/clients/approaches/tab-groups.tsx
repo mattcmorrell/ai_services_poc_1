@@ -35,6 +35,13 @@ const TAB_BG_COLORS = [
   "bg-orange-500/8", "bg-pink-500/8",
 ];
 
+// Active tab background — slightly stronger group color so it still belongs
+const TAB_ACTIVE_BG_COLORS = [
+  "bg-blue-500/15", "bg-emerald-500/15", "bg-violet-500/15", "bg-amber-500/15",
+  "bg-rose-500/15", "bg-cyan-500/15", "bg-indigo-500/15", "bg-teal-500/15",
+  "bg-orange-500/15", "bg-pink-500/15",
+];
+
 // Bottom border accent for the active tab
 const BOTTOM_BORDER_COLORS = [
   "shadow-blue-500", "shadow-emerald-500", "shadow-violet-500", "shadow-amber-500",
@@ -227,7 +234,7 @@ export function TabGroups({
                       className={cn(
                         "flex h-full w-8 shrink-0 items-center justify-center transition-colors",
                         isActive && activeTabId === "home"
-                          ? cn("bg-background shadow-[inset_0_-2px_0_0]", BOTTOM_BORDER_COLORS[cIdx])
+                          ? cn(TAB_ACTIVE_BG_COLORS[cIdx], "text-foreground shadow-[inset_0_-2px_0_0]", BOTTOM_BORDER_COLORS[cIdx])
                           : isActive
                             ? cn("text-muted-foreground hover:text-foreground", TAB_BG_COLORS[cIdx])
                             : "text-muted-foreground hover:bg-accent hover:text-foreground",
@@ -248,7 +255,7 @@ export function TabGroups({
                           className={cn(
                             "group relative flex h-full max-w-[150px] min-w-0 shrink-0 cursor-pointer items-center pl-2.5 pr-1 transition-colors",
                             isTabActive
-                              ? cn("bg-background text-foreground shadow-[inset_0_-2px_0_0]", BOTTOM_BORDER_COLORS[cIdx])
+                              ? cn(TAB_ACTIVE_BG_COLORS[cIdx], "text-foreground shadow-[inset_0_-2px_0_0]", BOTTOM_BORDER_COLORS[cIdx])
                               : isActive
                                 ? cn("text-muted-foreground hover:text-foreground", TAB_BG_COLORS[cIdx])
                                 : "text-muted-foreground hover:bg-accent hover:text-foreground",
