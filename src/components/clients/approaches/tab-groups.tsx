@@ -97,8 +97,7 @@ export function TabGroups({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Only the active group is expanded; all others are collapsed.
-  // User can manually expand/collapse, but selecting a group auto-expands it
-  // and collapses the previously active one.
+  // Selecting a client auto-expands it and collapses the previous one.
   const [expandedGroupId, setExpandedGroupId] = useState<string | null>(selectedClientId);
 
   // When selected client changes, expand that group (collapse others)
