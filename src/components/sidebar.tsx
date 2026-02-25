@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, MessageSquare, Bot, Building2, Settings } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Bot, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
@@ -12,7 +12,6 @@ const navItems = [
   { id: "dashboard", icon: LayoutDashboard, label: "Dashboard", badge: 12 },
   { id: "chats", icon: MessageSquare, label: "Chats", badge: 5 },
   { id: "agents", icon: Bot, label: "Agents", badge: 1 },
-  { id: "clients", icon: Building2, label: "Clients", badge: null },
 ];
 
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Plus } from "lucide-react";
+import { useMemo, useState, useRef, useEffect } from "react";
+import { Plus, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Client, Chat } from "@/types/chat";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ChatClientToggle } from "@/components/chat-client-toggle";
 
 type ViewMode = "recent" | "clients";
 
@@ -14,6 +15,8 @@ interface ChatListPanelProps {
   selectedChatId: string | null;
   onSelectChat: (chatId: string) => void;
   onNewChat: (clientId: string) => void;
+  viewMode: ViewMode;
+  onViewModeChange: (mode: ViewMode) => void;
 }
 
 function formatTimeAgo(date: Date): string {
@@ -67,99 +70,24 @@ function ChatItem({ chat, clientName, isSelected, onSelect }: ChatItemProps) {
   );
 }
 
-interface ClientSectionProps {
-  client: Client;
-  chats: Chat[];
-  selectedChatId: string | null;
-  onSelectChat: (chatId: string) => void;
-  onNewChat: () => void;
-  isExpanded: boolean;
-  onToggleExpand: () => void;
-}
-
-function ClientSection({
-  client,
-  chats,
-  selectedChatId,
-  onSelectChat,
-  onNewChat,
-  isExpanded,
-  onToggleExpand,
-}: ClientSectionProps) {
-  return (
-    <div className="border-b border-border">
-      <div
-        onClick={onToggleExpand}
-        className="p-3 flex justify-between items-center cursor-pointer bg-muted/50 hover:bg-muted"
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground text-xs">
-            {isExpanded ? "▼" : "▶"}
-          </span>
-          <span className="font-medium">{client.name}</span>
-        </div>
-        {client.unreadCount > 0 && (
-          <span className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full">
-            {client.unreadCount}
-          </span>
-        )}
-      </div>
-      {isExpanded && (
-        <div className="bg-background">
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-              onNewChat();
-            }}
-            className="pt-1 pb-2 pl-7 hover:bg-accent/50 cursor-pointer"
-          >
-            <div className="flex items-center gap-1.5 text-primary hover:text-primary/80 text-sm">
-              <Plus className="w-3 h-3" />
-              <span>New chat</span>
-            </div>
-          </div>
-          {chats.map((chat) => (
-            <div
-              key={chat.id}
-              onClick={() => onSelectChat(chat.id)}
-              className={cn(
-                "p-2.5 pl-7 flex items-center gap-2 cursor-pointer border-l-2",
-                selectedChatId === chat.id
-                  ? "bg-accent border-primary"
-                  : "border-transparent hover:bg-accent/50"
-              )}
-            >
-              <span
-                className={cn(
-                  "w-2 h-2 flex-shrink-0 rounded-full",
-                  chat.hasUnread ? "bg-primary" : ""
-                )}
-              />
-              <div className="flex-1 min-w-0">
-                <div className="text-sm truncate">{chat.title}</div>
-                <div className="text-xs text-muted-foreground">
-                  {formatTimeAgo(chat.updatedAt)}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export function ChatListPanel({
   clients,
   chats,
   selectedChatId,
   onSelectChat,
   onNewChat,
+  viewMode,
+  onViewModeChange,
 }: ChatListPanelProps) {
-  const [viewMode, setViewMode] = useState<ViewMode>("recent");
-  const [expandedClients, setExpandedClients] = useState<Set<string>>(
-    new Set(["4", "1"]) // Black Mesa and Aperture expanded by default
-  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (searchOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [searchOpen]);
 
   const sortedChats = useMemo(() => {
     return [...chats].sort(
@@ -173,114 +101,108 @@ export function ChatListPanel({
     return map;
   }, [clients]);
 
-  const chatsByClient = useMemo(() => {
-    const map = new Map<string | null, Chat[]>();
-    chats.forEach((chat) => {
-      const existing = map.get(chat.clientId) || [];
-      existing.push(chat);
-      map.set(chat.clientId, existing);
-    });
-    // Sort chats within each client by updatedAt
-    map.forEach((clientChats, clientId) => {
-      map.set(
-        clientId,
-        clientChats.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+  const filteredChats = useMemo(() => {
+    if (!searchQuery.trim()) return sortedChats;
+    const query = searchQuery.toLowerCase();
+    return sortedChats.filter((chat) => {
+      const clientName = chat.clientId ? clientsMap.get(chat.clientId)?.name : "";
+      return (
+        chat.title.toLowerCase().includes(query) ||
+        (clientName && clientName.toLowerCase().includes(query))
       );
     });
-    return map;
-  }, [chats]);
+  }, [sortedChats, searchQuery, clientsMap]);
 
-  const toggleClientExpanded = (clientId: string) => {
-    setExpandedClients((prev) => {
-      const next = new Set(prev);
-      if (next.has(clientId)) {
-        next.delete(clientId);
-      } else {
-        next.add(clientId);
-      }
-      return next;
-    });
+  const handleSearchToggle = () => {
+    if (searchOpen) {
+      setSearchOpen(false);
+      setSearchQuery("");
+    } else {
+      setSearchOpen(true);
+    }
   };
 
   return (
     <div className="w-72 border-r border-border flex flex-col bg-background">
       {/* Toggle */}
       <div className="p-3 border-b border-border">
-        <div className="flex bg-muted rounded-lg p-1">
-          <button
-            onClick={() => setViewMode("recent")}
-            className={cn(
-              "flex-1 py-1.5 px-3 text-sm rounded-md transition-colors",
-              viewMode === "recent"
-                ? "bg-background font-medium shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Recent Chats
-          </button>
-          <button
-            onClick={() => setViewMode("clients")}
-            className={cn(
-              "flex-1 py-1.5 px-3 text-sm rounded-md transition-colors",
-              viewMode === "clients"
-                ? "bg-background font-medium shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Clients
-          </button>
+        <ChatClientToggle mode={viewMode} onChange={onViewModeChange} />
+      </div>
+
+      {/* New Chat + Search */}
+      <div className="flex items-center justify-between p-3 border-b border-border">
+        <button
+          onClick={() => {
+            const firstClient = clients[0];
+            if (firstClient) {
+              onNewChat(firstClient.id);
+            }
+          }}
+          className="flex items-center gap-2 text-primary hover:text-primary/80 text-sm"
+        >
+          <Plus className="w-4 h-4" />
+          New Chat
+        </button>
+        <button
+          onClick={handleSearchToggle}
+          className={cn(
+            "inline-flex h-7 w-7 items-center justify-center rounded-md",
+            "text-muted-foreground transition-colors",
+            "hover:bg-muted hover:text-foreground",
+            searchOpen && "bg-muted text-foreground"
+          )}
+          aria-label={searchOpen ? "Close search" : "Search chats"}
+        >
+          {searchOpen ? <X className="h-3.5 w-3.5" /> : <Search className="h-3.5 w-3.5" />}
+        </button>
+      </div>
+
+      {/* Search input */}
+      <div
+        className={cn(
+          "overflow-hidden transition-all duration-200",
+          searchOpen ? "max-h-12 opacity-100" : "max-h-0 opacity-0"
+        )}
+      >
+        <div className="flex items-center gap-2 border-b border-border px-3 py-2">
+          <Search className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search chats..."
+            className="h-6 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded text-muted-foreground hover:text-foreground"
+              aria-label="Clear search"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
         </div>
       </div>
 
-      {viewMode === "recent" ? (
-        <>
-          {/* New Chat button for Recent view */}
-          <div className="p-3 border-b border-border">
-            <button
-              onClick={() => {
-                // For now, default to first client - we'll add a dialog later
-                const firstClient = clients[0];
-                if (firstClient) {
-                  onNewChat(firstClient.id);
-                }
-              }}
-              className="flex items-center gap-2 text-primary hover:text-primary/80 text-sm"
-            >
-              <Plus className="w-4 h-4" />
-              New Chat
-            </button>
+      {/* Recent chats list */}
+      <ScrollArea className="flex-1">
+        {filteredChats.map((chat) => (
+          <ChatItem
+            key={chat.id}
+            chat={chat}
+            clientName={chat.clientId ? clientsMap.get(chat.clientId)?.name : undefined}
+            isSelected={selectedChatId === chat.id}
+            onSelect={() => onSelectChat(chat.id)}
+          />
+        ))}
+        {filteredChats.length === 0 && searchQuery && (
+          <div className="px-4 py-8 text-center">
+            <p className="text-xs text-muted-foreground">No matching chats</p>
           </div>
-
-          {/* Recent chats list */}
-          <ScrollArea className="flex-1">
-            {sortedChats.map((chat) => (
-              <ChatItem
-                key={chat.id}
-                chat={chat}
-                clientName={chat.clientId ? clientsMap.get(chat.clientId)?.name : undefined}
-                isSelected={selectedChatId === chat.id}
-                onSelect={() => onSelectChat(chat.id)}
-              />
-            ))}
-          </ScrollArea>
-        </>
-      ) : (
-        /* Clients view */
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
-          {clients.map((client) => (
-            <ClientSection
-              key={client.id}
-              client={client}
-              chats={chatsByClient.get(client.id) || []}
-              selectedChatId={selectedChatId}
-              onSelectChat={onSelectChat}
-              onNewChat={() => onNewChat(client.id)}
-              isExpanded={expandedClients.has(client.id)}
-              onToggleExpand={() => toggleClientExpanded(client.id)}
-            />
-          ))}
-        </div>
-      )}
+        )}
+      </ScrollArea>
     </div>
   );
 }

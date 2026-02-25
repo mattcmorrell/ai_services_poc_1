@@ -21,9 +21,10 @@ import { ClientsView } from "@/components/clients/clients-view";
 
 export default function Home() {
   const [activeView, setActiveView] = useState("dashboard");
+  const [chatPanelMode, setChatPanelMode] = useState<"recent" | "clients">("recent");
   const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
   const [chats, setChats] = useState<Chat[]>(mockChats);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loadingChatId, setLoadingChatId] = useState<string | null>(null);
   const [agents, setAgents] = useState<Agent[]>(mockAgents);
   const [clientSelectOpen, setClientSelectOpen] = useState(false);
   const [selectedAgentForClient, setSelectedAgentForClient] = useState<Agent | null>(null);
@@ -40,11 +41,24 @@ export default function Home() {
   );
   const currentMessages = selectedChat?.messages || [];
   const currentArtifacts = selectedChat?.artifacts || [];
-  const selectedArtifact = currentArtifacts.find((a) => a.id === selectedArtifactId) || null;
+  // Search all chats for the selected artifact (not just selectedChat)
+  const selectedArtifact = useMemo(() => {
+    if (!selectedArtifactId) return null;
+    for (const chat of chats) {
+      const found = chat.artifacts.find((a) => a.id === selectedArtifactId);
+      if (found) return found;
+    }
+    return null;
+  }, [chats, selectedArtifactId]);
 
-  const handleSendMessage = useCallback(
-    async (content: string) => {
-      if (!selectedChatId || !selectedChat) return;
+  // --- Chat-ID-explicit handlers ---
+
+  const handleSendMessageForChat = useCallback(
+    async (content: string, chatId: string) => {
+      const chat = chats.find((c) => c.id === chatId);
+      if (!chat) return;
+
+      const chatClient = mockClients.find((c) => c.id === chat.clientId);
 
       const userMessage: Message = {
         id: `msg-${Date.now()}`,
@@ -54,34 +68,32 @@ export default function Home() {
       };
 
       setChats((prev) =>
-        prev.map((chat) =>
-          chat.id === selectedChatId
-            ? { ...chat, messages: [...chat.messages, userMessage], updatedAt: new Date() }
-            : chat
+        prev.map((c) =>
+          c.id === chatId
+            ? { ...c, messages: [...c.messages, userMessage], updatedAt: new Date() }
+            : c
         )
       );
 
-      setIsLoading(true);
+      setLoadingChatId(chatId);
 
       try {
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: [...(selectedChat.messages || []), userMessage].map(
+            messages: [...(chat.messages || []), userMessage].map(
               (m) => ({ role: m.role, content: m.content })
             ),
-            clientName: selectedClient?.name || "Unknown Client",
-            agentId: selectedChat.agentId,
+            clientName: chatClient?.name || "Unknown Client",
+            agentId: chat.agentId,
           }),
         });
 
         const data = await response.json();
 
-        // Parse artifacts from LLM response
         const { content: artifactParsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
 
-        // Parse action plan from LLM response
         const actionPlanResult = parseActionPlan(artifactParsedContent);
         const finalContent = actionPlanResult?.cleanedContent || artifactParsedContent;
         const actionPlan = actionPlanResult?.plan;
@@ -96,13 +108,12 @@ export default function Home() {
         };
 
         setChats((prev) =>
-          prev.map((chat) => {
-            if (chat.id !== selectedChatId) return chat;
+          prev.map((c) => {
+            if (c.id !== chatId) return c;
 
-            // If new action plan, auto-decline any pending plans in previous messages
-            let updatedMessages = chat.messages;
+            let updatedMessages = c.messages;
             if (actionPlan) {
-              updatedMessages = chat.messages.map((msg) => {
+              updatedMessages = c.messages.map((msg) => {
                 if (msg.actionPlan && msg.actionPlan.status === "pending") {
                   return {
                     ...msg,
@@ -114,9 +125,9 @@ export default function Home() {
             }
 
             return {
-              ...chat,
+              ...c,
               messages: [...updatedMessages, assistantMessage],
-              artifacts: [...chat.artifacts, ...newArtifacts],
+              artifacts: [...c.artifacts, ...newArtifacts],
               updatedAt: new Date(),
             };
           })
@@ -124,27 +135,33 @@ export default function Home() {
       } catch (error) {
         console.error("Failed to send message:", error);
       } finally {
-        setIsLoading(false);
+        setLoadingChatId(null);
       }
     },
-    [selectedChatId, selectedChat, selectedClient]
+    [chats]
   );
 
-  const handleApprove = useCallback(
-    (messageId: string) => {
+  // Wrapper for "recent" mode — uses selectedChatId
+  const handleSendMessage = useCallback(
+    async (content: string) => {
       if (!selectedChatId) return;
+      await handleSendMessageForChat(content, selectedChatId);
+    },
+    [selectedChatId, handleSendMessageForChat]
+  );
 
+  const handleApproveForChat = useCallback(
+    (messageId: string, chatId: string) => {
       setChats((prev) =>
         prev.map((chat) =>
-          chat.id === selectedChatId
+          chat.id === chatId
             ? {
                 ...chat,
                 messages: chat.messages.map((msg) => {
                   if (msg.id !== messageId) return msg;
                   if (msg.actionPlan) {
-                    // Start execution simulation
                     const updatedPlan = { ...msg.actionPlan, status: "approved" as const };
-                    simulateExecution(messageId, updatedPlan);
+                    simulateExecutionForChat(messageId, updatedPlan, chatId);
                     return { ...msg, actionPlan: updatedPlan, approved: true };
                   }
                   return { ...msg, approved: true };
@@ -154,16 +171,22 @@ export default function Home() {
         )
       );
     },
-    [selectedChatId]
+    []
   );
 
-  const handleDecline = useCallback(
+  const handleApprove = useCallback(
     (messageId: string) => {
       if (!selectedChatId) return;
+      handleApproveForChat(messageId, selectedChatId);
+    },
+    [selectedChatId, handleApproveForChat]
+  );
 
+  const handleDeclineForChat = useCallback(
+    (messageId: string, chatId: string) => {
       setChats((prev) =>
         prev.map((chat) =>
-          chat.id === selectedChatId
+          chat.id === chatId
             ? {
                 ...chat,
                 messages: chat.messages.map((msg) => {
@@ -181,20 +204,27 @@ export default function Home() {
         )
       );
     },
-    [selectedChatId]
+    []
   );
 
-  const simulateExecution = useCallback(
-    (messageId: string, plan: ActionPlan) => {
+  const handleDecline = useCallback(
+    (messageId: string) => {
+      if (!selectedChatId) return;
+      handleDeclineForChat(messageId, selectedChatId);
+    },
+    [selectedChatId, handleDeclineForChat]
+  );
+
+  const simulateExecutionForChat = useCallback(
+    (messageId: string, plan: ActionPlan, chatId: string) => {
       const steps = plan.steps;
       let currentStep = 0;
 
       const executeStep = () => {
         if (currentStep >= steps.length) {
-          // All steps completed
           setChats((prev) =>
             prev.map((chat) =>
-              chat.id === selectedChatId
+              chat.id === chatId
                 ? {
                     ...chat,
                     messages: chat.messages.map((msg) => {
@@ -215,10 +245,9 @@ export default function Home() {
           return;
         }
 
-        // Update current step to in_progress
         setChats((prev) =>
           prev.map((chat) =>
-            chat.id === selectedChatId
+            chat.id === chatId
               ? {
                   ...chat,
                   messages: chat.messages.map((msg) => {
@@ -245,11 +274,10 @@ export default function Home() {
           )
         );
 
-        // After delay, mark step as completed and move to next
         setTimeout(() => {
           setChats((prev) =>
             prev.map((chat) =>
-              chat.id === selectedChatId
+              chat.id === chatId
                 ? {
                     ...chat,
                     messages: chat.messages.map((msg) => {
@@ -274,14 +302,13 @@ export default function Home() {
         }, 1000);
       };
 
-      // Start execution after a brief delay
       setTimeout(executeStep, 500);
     },
-    [selectedChatId]
+    []
   );
 
   const handleNewChat = useCallback(
-    (clientId: string) => {
+    (clientId: string): string => {
       const client = mockClients.find((c) => c.id === clientId);
       const newChat: Chat = {
         id: `chat-${Date.now()}`,
@@ -294,20 +321,19 @@ export default function Home() {
       };
       setChats((prev) => [newChat, ...prev]);
       setSelectedChatId(newChat.id);
+      return newChat.id;
     },
     []
   );
 
   const handleAgentClick = (agentId: string) => {
-    // Map agent to client and switch to chats view
     const agentClientMap: Record<string, string> = {
-      "agent-1": "1", // Payroll Runner -> Aperture Science
-      "agent-2": "2", // Powerpoint Builder -> Umbrella Corporation
-      "agent-3": "5", // Party Planner -> Cyberdyne Systems
-      "agent-4": "3", // CX Oracle -> Weyland-Yutani
+      "agent-1": "1",
+      "agent-2": "2",
+      "agent-3": "5",
+      "agent-4": "3",
     };
     const clientId = agentClientMap[agentId] || "1";
-    // Find most recent chat for this client or create new one
     const clientChats = chats.filter((c) => c.clientId === clientId);
     if (clientChats.length > 0) {
       const mostRecent = clientChats.sort(
@@ -318,11 +344,11 @@ export default function Home() {
       handleNewChat(clientId);
     }
     setActiveView("chats");
+    setChatPanelMode("recent");
   };
 
   const handleDashboardMessage = useCallback(
     async (message: string, client: Client | null, chipPosition: number) => {
-      // Create a new chat
       const newChatId = `chat-${Date.now()}`;
       const userMessage: Message = {
         id: `msg-${Date.now()}`,
@@ -344,7 +370,8 @@ export default function Home() {
       setChats((prev) => [newChat, ...prev]);
       setSelectedChatId(newChatId);
       setActiveView("chats");
-      setIsLoading(true);
+      setChatPanelMode("recent");
+      setLoadingChatId(newChatId);
 
       try {
         const response = await fetch("/api/chat", {
@@ -358,10 +385,8 @@ export default function Home() {
 
         const data = await response.json();
 
-        // Parse artifacts from LLM response
         const { content: artifactParsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
 
-        // Parse action plan from LLM response
         const actionPlanResult = parseActionPlan(artifactParsedContent);
         const finalContent = actionPlanResult?.cleanedContent || artifactParsedContent;
         const actionPlan = actionPlanResult?.plan;
@@ -390,14 +415,13 @@ export default function Home() {
       } catch (error) {
         console.error("Failed to send message:", error);
       } finally {
-        setIsLoading(false);
+        setLoadingChatId(null);
       }
     },
     []
   );
 
   const handleAgentFromAgentsView = (agentId: string) => {
-    // Open client selection dialog
     const agent = agents.find((a) => a.id === agentId);
     if (agent) {
       setSelectedAgentForClient(agent);
@@ -405,7 +429,6 @@ export default function Home() {
     }
   };
 
-  // Handler for when agent is selected from dashboard input
   const handleAgentSelectedFromDashboard = (agent: Agent) => {
     setSelectedAgentForClient(agent);
     setClientSelectOpen(true);
@@ -416,10 +439,8 @@ export default function Home() {
     const agent = selectedAgentForClient;
 
     if (agent && client) {
-      // Create new chat with agent greeting
       const newChatId = `chat-${Date.now()}`;
 
-      // Fetch the agent greeting
       let greeting = `Hi! I'm here to help with ${agent.name}.`;
       try {
         const response = await fetch(`/api/agent-greeting?agentId=${agent.id}`);
@@ -458,6 +479,7 @@ export default function Home() {
     setClientSelectOpen(false);
     setSelectedAgentForClient(null);
     setActiveView("chats");
+    setChatPanelMode("recent");
   };
 
   const handleToggleFavorite = (agentId: string) => {
@@ -491,58 +513,76 @@ export default function Home() {
     if (activeView === "chats") {
       return (
         <>
-          <ChatListPanel
-            clients={mockClients}
-            chats={chats}
-            selectedChatId={selectedChatId}
-            onSelectChat={setSelectedChatId}
-            onNewChat={handleNewChat}
-          />
-          {selectedChat ? (
-            <ChatView
-              client={selectedClient || null}
-              chatTitle={selectedChat.title}
-              messages={currentMessages}
-              artifacts={currentArtifacts}
-              selectedArtifactId={selectedArtifactId}
-              onSendMessage={handleSendMessage}
-              onApprove={handleApprove}
-              onDecline={handleDecline}
+          {/* Recent Chats mode */}
+          <div className={chatPanelMode === "recent" ? "flex flex-1 overflow-hidden" : "hidden"}>
+            <ChatListPanel
+              clients={mockClients}
+              chats={chats}
+              selectedChatId={selectedChatId}
+              onSelectChat={setSelectedChatId}
+              onNewChat={handleNewChat}
+              viewMode={chatPanelMode}
+              onViewModeChange={setChatPanelMode}
+            />
+            {selectedChat ? (
+              <ChatView
+                client={selectedClient || null}
+                chatTitle={selectedChat.title}
+                messages={currentMessages}
+                artifacts={currentArtifacts}
+                selectedArtifactId={selectedArtifactId}
+                onSendMessage={handleSendMessage}
+                onApprove={handleApprove}
+                onDecline={handleDecline}
+                onWorkflowClick={handleWorkflowClick}
+                onArtifactClick={setSelectedArtifactId}
+                isLoading={loadingChatId === selectedChatId}
+              />
+            ) : (
+              <div className="flex flex-1 items-center justify-center text-muted-foreground">
+                Select a chat to start messaging
+              </div>
+            )}
+            {selectedArtifact && chatPanelMode === "recent" && (
+              <ArtifactPanel
+                artifact={selectedArtifact}
+                onClose={() => setSelectedArtifactId(null)}
+                onUpdate={(updatedArtifact) => {
+                  setChats((prev) =>
+                    prev.map((chat) => ({
+                      ...chat,
+                      artifacts: chat.artifacts.map((a) =>
+                        a.id === updatedArtifact.id ? updatedArtifact : a
+                      ),
+                    }))
+                  );
+                }}
+              />
+            )}
+            {workflowPanelOpen && !selectedArtifact && (
+              <WorkflowPanel
+                workflow={defaultPayrollWorkflow}
+                onClose={() => setWorkflowPanelOpen(false)}
+              />
+            )}
+          </div>
+
+          {/* Clients mode */}
+          <div className={chatPanelMode === "clients" ? "flex flex-1 overflow-hidden" : "hidden"}>
+            <ClientsView
+              clients={mockClients}
+              chats={chats}
+              onSendMessage={handleSendMessageForChat}
+              onApprove={handleApproveForChat}
+              onDecline={handleDeclineForChat}
+              onNewChat={handleNewChat}
               onWorkflowClick={handleWorkflowClick}
               onArtifactClick={setSelectedArtifactId}
-              isLoading={isLoading}
+              loadingChatId={loadingChatId}
+              chatPanelMode={chatPanelMode}
+              onChatPanelModeChange={setChatPanelMode}
             />
-          ) : (
-            <div className="flex flex-1 items-center justify-center text-muted-foreground">
-              Select a chat to start messaging
-            </div>
-          )}
-          {selectedArtifact && (
-            <ArtifactPanel
-              artifact={selectedArtifact}
-              onClose={() => setSelectedArtifactId(null)}
-              onUpdate={(updatedArtifact) => {
-                setChats((prev) =>
-                  prev.map((chat) =>
-                    chat.id === selectedChatId
-                      ? {
-                          ...chat,
-                          artifacts: chat.artifacts.map((a) =>
-                            a.id === updatedArtifact.id ? updatedArtifact : a
-                          ),
-                        }
-                      : chat
-                  )
-                );
-              }}
-            />
-          )}
-          {workflowPanelOpen && !selectedArtifact && (
-            <WorkflowPanel
-              workflow={defaultPayrollWorkflow}
-              onClose={() => setWorkflowPanelOpen(false)}
-            />
-          )}
+          </div>
         </>
       );
     }
@@ -567,10 +607,7 @@ export default function Home() {
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar activeView={activeView} onViewChange={setActiveView} />
-      <div className={activeView === "clients" ? "flex flex-1 overflow-hidden" : "hidden"}>
-        <ClientsView />
-      </div>
-      {activeView !== "clients" && renderMainContent()}
+      {renderMainContent()}
       <ClientSelectDialog
         open={clientSelectOpen}
         onOpenChange={setClientSelectOpen}
