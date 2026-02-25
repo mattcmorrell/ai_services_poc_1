@@ -1180,7 +1180,7 @@ function renderTree() {
   // Shallow tree: outcomes and opportunities
   for (const outcome of outcomes) {
     html += staticSectionLabel('Outcome', 'outcome');
-    html += treeNodeHTML(outcome, 0, false, true); // collapsible
+    html += treeNodeHTML(outcome, 0, false, true, true); // collapsible, hide type label
 
     const opportunities = getChildren(outcome.id).filter(n => n._type === 'opportunity');
     for (const opp of opportunities) {

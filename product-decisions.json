@@ -18,6 +18,13 @@
         { "type": "firsthand", "source": "Designer (project lead)", "quote": "If I take over a project that another designer has worked on, I just want to talk to Claude and get answers on any questions I have: why things were done a certain way, what the decisions were at critical junctures." },
         { "type": "firsthand", "source": "Designer (project lead)", "quote": "A coworker was using a spreadsheet to keep track of ideas, experiments done, results found. My reaction was: I want to be able to ask Claude about this instead of looking through a spreadsheet." }
       ]
+    },
+    {
+      "id": "O2",
+      "title": "BHR consultants can work as fast as they think",
+      "status": "active",
+      "date": "2026-02-20",
+      "reasoning": "The AI Services POC is building tools for BambooHR HR consultants who manage multiple clients. The core product question: can we make the consultant's daily workflow — switching contexts, managing payroll, onboarding, benefits — feel effortless? The app should disappear and let the consultant focus on their clients, not the tool."
     }
   ],
   "opportunities": [
@@ -26,7 +33,7 @@
       "title": "Consultants need a fast, intuitive way to switch between client workspaces",
       "status": "active",
       "date": "2026-02-20",
-      "parentId": "O1",
+      "parentId": "O2",
       "reasoning": "HR consultants manage 5-50 clients and switch between them frequently throughout the day. The core UX question: how does a consultant select which client they're working with? Must feel fast, professional, and not lose context when switching. Prototyped 6 approaches (A-F), narrowed to 3 active candidates (B, C, E)."
     },
     {
