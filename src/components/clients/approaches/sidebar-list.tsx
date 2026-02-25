@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
-import { Search, MessageSquare, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Search, MessageSquare, ChevronLeft, ChevronRight, X, Bot, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Client, Chat } from "@/types/chat";
 
@@ -59,9 +59,25 @@ function getUrgencyRingColor(unreadCount: number): string {
   return "ring-transparent";
 }
 
+function relativeTime(date: Date): string {
+  const now = Date.now();
+  const diff = now - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "yesterday";
+  return `${days}d ago`;
+}
+
 interface ClientListItem {
   client: Client;
   chatCount: number;
+  unreadChats: number;
+  agentUpdates: number;
+  lastActivity: Date | null;
 }
 
 export function SidebarList({
@@ -96,8 +112,14 @@ export function SidebarList({
 
   const clientItems: ClientListItem[] = useMemo(() => {
     return clients.map((client) => {
-      const chatCount = chats.filter((c) => c.clientId === client.id).length;
-      return { client, chatCount };
+      const clientChats = chats.filter((c) => c.clientId === client.id);
+      const chatCount = clientChats.length;
+      const unreadChats = clientChats.filter((c) => c.hasUnread).length;
+      const agentUpdates = Math.max(0, client.unreadCount - unreadChats);
+      const lastActivity = clientChats.length > 0
+        ? new Date(Math.max(...clientChats.map((c) => c.updatedAt.getTime())))
+        : null;
+      return { client, chatCount, unreadChats, agentUpdates, lastActivity };
     });
   }, [clients, chats]);
 
@@ -231,6 +253,7 @@ export function SidebarList({
 
   // --- V2/V3 render ---
   const isV3 = version >= 3;
+  const isV4 = version >= 4;
 
   return (
     <div className="flex h-full">
@@ -324,7 +347,7 @@ export function SidebarList({
 
         {/* Client list */}
         <nav className="flex-1 overflow-y-auto py-1" role="listbox" aria-label="Client list">
-          {filteredClientItems.map(({ client, chatCount }) => {
+          {filteredClientItems.map(({ client, chatCount, unreadChats, agentUpdates, lastActivity }) => {
             const isActive = selectedClientId === client.id;
             const urgencyDot = getUrgencyColor(client.unreadCount);
 
@@ -430,23 +453,47 @@ export function SidebarList({
                       </span>
                     </span>
 
-                    {/* Unread badge */}
-                    {client.unreadCount > 0 && (
-                      <span
-                        className={cn(
-                          "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
-                          "rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground"
+                    {/* Unread badges */}
+                    {isV4 ? (
+                      <div className="flex items-center gap-1">
+                        {unreadChats > 0 && (
+                          <span className="flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-primary">
+                            <MessageSquare className="h-2.5 w-2.5" />
+                            {unreadChats}
+                          </span>
                         )}
-                      >
-                        {client.unreadCount}
-                      </span>
+                        {agentUpdates > 0 && (
+                          <span className="flex items-center gap-0.5 rounded-full bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-violet-400">
+                            <Bot className="h-2.5 w-2.5" />
+                            {agentUpdates}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      client.unreadCount > 0 && (
+                        <span
+                          className={cn(
+                            "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
+                            "rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground"
+                          )}
+                        >
+                          {client.unreadCount}
+                        </span>
+                      )
                     )}
                   </div>
 
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <MessageSquare className="h-3 w-3" />
-                    {chatCount} {chatCount === 1 ? "chat" : "chats"}
-                  </span>
+                  {isV4 ? (
+                    <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                      <Clock className="h-2.5 w-2.5" />
+                      {lastActivity ? relativeTime(lastActivity) : "No activity"}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <MessageSquare className="h-3 w-3" />
+                      {chatCount} {chatCount === 1 ? "chat" : "chats"}
+                    </span>
+                  )}
                 </div>
               </button>
             );

@@ -17,7 +17,7 @@ import { MessageSquare } from "lucide-react";
 const APPROACHES: ApproachConfig[] = [
   { id: "A", label: "Card Grid", description: "Home screen of client cards", maxVersion: 3, status: "parked" },
   { id: "B", label: "Dropdown", description: "Compact switcher in tab bar", maxVersion: 3, status: "active" },
-  { id: "C", label: "Sidebar", description: "Persistent client list", maxVersion: 3, status: "active" },
+  { id: "C", label: "Sidebar", description: "Persistent client list", maxVersion: 4, status: "active" },
   { id: "D", label: "Breadcrumb", description: "Hierarchical navigation", maxVersion: 3, status: "killed" },
   { id: "E", label: "Tab Groups", description: "Multi-client grouped tabs", maxVersion: 1, status: "active" },
   { id: "F", label: "Client Tabs", description: "Horizontal client avatar row", maxVersion: 1, status: "killed" },
