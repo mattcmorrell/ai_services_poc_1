@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Client, Chat } from "@/types/chat";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatClientToggle } from "@/components/chat-client-toggle";
+import { useResizable, ResizeHandle } from "@/components/ui/resize-handle";
 
 type ViewMode = "recent" | "clients";
 
@@ -79,6 +80,12 @@ export function ChatListPanel({
   viewMode,
   onViewModeChange,
 }: ChatListPanelProps) {
+  const { width, onDragStart } = useResizable({
+    defaultWidth: 288,
+    minWidth: 200,
+    maxWidth: 480,
+    storageKey: "sidebar-width",
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -123,7 +130,8 @@ export function ChatListPanel({
   };
 
   return (
-    <div className="w-72 border-r border-border flex flex-col bg-background">
+    <div className="flex flex-shrink-0" style={{ width }}>
+    <div className="flex min-w-0 flex-1 flex-col bg-background">
       {/* Toggle */}
       <div className="p-3 border-b border-border">
         <ChatClientToggle mode={viewMode} onChange={onViewModeChange} />
@@ -203,6 +211,8 @@ export function ChatListPanel({
           </div>
         )}
       </ScrollArea>
+    </div>
+    <ResizeHandle onMouseDown={onDragStart} />
     </div>
   );
 }

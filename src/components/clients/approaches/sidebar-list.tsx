@@ -5,6 +5,7 @@ import { MessageSquare, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Client, Chat } from "@/types/chat";
 import { ChatClientToggle } from "@/components/chat-client-toggle";
+import { useResizable, ResizeHandle } from "@/components/ui/resize-handle";
 
 interface SidebarListProps {
   clients: Client[];
@@ -79,6 +80,13 @@ export function SidebarList({
   chatPanelMode,
   onChatPanelModeChange,
 }: SidebarListProps) {
+  const { width, onDragStart } = useResizable({
+    defaultWidth: 288,
+    minWidth: 200,
+    maxWidth: 480,
+    storageKey: "sidebar-width",
+  });
+
   // Auto-select first client if none selected
   useEffect(() => {
     if (!selectedClientId && clients.length > 0) {
@@ -100,7 +108,7 @@ export function SidebarList({
 
   return (
     <div className="flex h-full flex-1">
-      <aside className="flex w-72 flex-shrink-0 flex-col border-r border-border bg-card">
+      <aside className="flex flex-shrink-0" style={{ width }}><div className="flex min-w-0 flex-1 flex-col bg-card">
         {/* Sidebar header */}
         <div className="flex flex-shrink-0 border-b border-border p-3">
           <ChatClientToggle mode={chatPanelMode} onChange={onChatPanelModeChange} />
@@ -174,6 +182,8 @@ export function SidebarList({
           )}
         </nav>
 
+      </div>
+      <ResizeHandle onMouseDown={onDragStart} />
       </aside>
 
       {/* Main workspace content */}
