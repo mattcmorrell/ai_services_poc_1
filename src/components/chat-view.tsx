@@ -143,7 +143,7 @@ export function ChatView({
                 <div
                   className={cn(
                     message.role === "user" &&
-                      "inline-block rounded-lg bg-primary px-4 py-2 text-primary-foreground"
+                      "inline-block rounded-lg bg-muted px-4 py-2 text-foreground"
                   )}
                   dangerouslySetInnerHTML={{
                     __html: message.content
