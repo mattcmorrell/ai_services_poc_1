@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Home v2-A: Triage First — Aperture Science</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0a;
+    color: #e5e5e5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* ── Company Header ── */
+  .company-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid #2a2a2a;
+    margin-bottom: 36px;
+  }
+
+  .company-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 20px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .company-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .company-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  .company-meta {
+    font-size: 13px;
+    color: #888;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .company-meta .sep {
+    color: #444;
+  }
+
+  .team-avatars {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .team-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid #0a0a0a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    margin-left: -6px;
+  }
+
+  .team-avatar:first-child { margin-left: 0; }
+  .team-avatar.you { background: #7c3aed; }
+  .team-avatar.jp { background: #0891b2; }
+  .team-avatar.mc { background: #d97706; }
+
+  /* ── Section shared ── */
+  .section { margin-bottom: 36px; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .section-count {
+    font-size: 12px;
+    color: #555;
+    font-weight: 500;
+  }
+
+  /* ── Needs Attention ── */
+  .attention-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    border-left: 4px solid transparent;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+
+  .attention-card:hover {
+    background: #1f1f1f;
+  }
+
+  .attention-card.severity-blocking {
+    border-left-color: #ef4444;
+  }
+
+  .attention-card.severity-error {
+    border-left-color: #f59e0b;
+  }
+
+  .attention-card.severity-review {
+    border-left-color: #3b82f6;
+  }
+
+  .attention-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .severity-badge {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .severity-blocking .severity-badge {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+  }
+
+  .severity-error .severity-badge {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+  }
+
+  .severity-review .severity-badge {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+  }
+
+  .attention-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .attention-desc {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .attention-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    color: #fff;
+  }
+
+  .btn-primary.red { background: #dc2626; }
+  .btn-primary.red:hover { background: #ef4444; }
+
+  .btn-primary.amber { background: #d97706; }
+  .btn-primary.amber:hover { background: #f59e0b; }
+
+  .btn-primary.blue { background: #2563eb; }
+  .btn-primary.blue:hover { background: #3b82f6; }
+
+  .btn-secondary {
+    background: #2a2a2a;
+    color: #ccc;
+    border: 1px solid #333;
+  }
+
+  .btn-secondary:hover {
+    background: #333;
+    color: #fff;
+  }
+
+  /* ── Active Plans ── */
+  .plan-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .plan-card:hover {
+    background: #1f1f1f;
+  }
+
+  .plan-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .plan-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e5e5e5;
+    margin-bottom: 4px;
+  }
+
+  .plan-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: #777;
+  }
+
+  .plan-steps {
+    color: #aaa;
+  }
+
+  .plan-status {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .plan-status.running {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+  }
+
+  .plan-status.awaiting {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+  }
+
+  .plan-status.paused {
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+  }
+
+  .progress-bar-track {
+    width: 120px;
+    height: 4px;
+    background: #2a2a2a;
+    border-radius: 2px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  .progress-bar-fill.running { background: #4ade80; }
+  .progress-bar-fill.awaiting { background: #fbbf24; }
+  .progress-bar-fill.paused { background: #64748b; }
+
+  .plan-time {
+    font-size: 12px;
+    color: #555;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* ── Recent Chats ── */
+  .chat-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .chat-item:hover {
+    background: #1a1a1a;
+  }
+
+  .chat-unread-col {
+    width: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .unread-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3b82f6;
+  }
+
+  .chat-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .chat-title-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 2px;
+  }
+
+  .chat-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e5e5e5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chat-item:first-child .chat-title {
+    color: #fff;
+  }
+
+  .chat-time {
+    font-size: 12px;
+    color: #555;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .chat-preview {
+    font-size: 13px;
+    color: #777;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .view-all-link {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    font-size: 13px;
+    color: #666;
+    text-decoration: none;
+    transition: color 0.15s;
+    margin-top: 4px;
+  }
+
+  .view-all-link:hover {
+    color: #aaa;
+  }
+
+  /* ── Recent Activity (collapsible) ── */
+  .disclosure-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px 0;
+    user-select: none;
+  }
+
+  .disclosure-header:hover .section-title {
+    color: #aaa;
+  }
+
+  .disclosure-chevron {
+    transition: transform 0.2s;
+    color: #555;
+  }
+
+  .disclosure-chevron.open {
+    transform: rotate(90deg);
+  }
+
+  .activity-list {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+  }
+
+  .activity-list.expanded {
+    max-height: 800px;
+  }
+
+  .activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 13px;
+  }
+
+  .activity-item + .activity-item {
+    border-top: 1px solid #1a1a1a;
+  }
+
+  .activity-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .activity-icon.human {
+    background: #1f1f1f;
+    color: #888;
+  }
+
+  .activity-icon.agent {
+    background: rgba(124, 58, 237, 0.15);
+    color: #a78bfa;
+  }
+
+  .activity-text {
+    flex: 1;
+    color: #999;
+    line-height: 1.5;
+  }
+
+  .activity-text .actor {
+    color: #ccc;
+    font-weight: 500;
+  }
+
+  .activity-text .actor.agent-name {
+    color: #a78bfa;
+  }
+
+  .activity-time {
+    font-size: 12px;
+    color: #555;
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding-top: 2px;
+  }
+
+  .agent-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #a78bfa;
+    background: rgba(124, 58, 237, 0.12);
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- 1. Company Header                               -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="company-header">
+    <div class="company-avatar">A</div>
+    <div class="company-info">
+      <div class="company-name">Aperture Science</div>
+      <div class="company-meta">
+        <span>Research &amp; Development</span>
+        <span class="sep">&middot;</span>
+        <span>Cleveland, OH</span>
+        <span class="sep">&middot;</span>
+        <span>Cave Johnson (CEO)</span>
+      </div>
+    </div>
+    <div class="team-avatars" title="Assigned team: You, Jessica Park, Marcus Chen">
+      <div class="team-avatar you">Y</div>
+      <div class="team-avatar jp">JP</div>
+      <div class="team-avatar mc">MC</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- 2. Needs Attention                              -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Needs Attention</span>
+      <span class="section-count">3 items</span>
+    </div>
+
+    <!-- Blocking -->
+    <div class="attention-card severity-blocking">
+      <div class="attention-top">
+        <span class="severity-badge">Blocking</span>
+        <span class="attention-title">Payroll Runner needs approval</span>
+      </div>
+      <div class="attention-desc">
+        Q1 payroll calculation for 312 employees is ready and waiting for your sign-off before processing.
+      </div>
+      <div class="attention-actions">
+        <button class="btn btn-primary red">
+          <span style="display:inline-flex;align-items:center;gap:5px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Approve
+          </span>
+        </button>
+        <button class="btn btn-secondary">View Details</button>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div class="attention-card severity-error">
+      <div class="attention-top">
+        <span class="severity-badge">Error</span>
+        <span class="attention-title">Benefits Enrollment failed</span>
+      </div>
+      <div class="attention-desc">
+        Dental plan sync encountered an error during enrollment processing. 14 employees affected.
+      </div>
+      <div class="attention-actions">
+        <button class="btn btn-primary amber">
+          <span style="display:inline-flex;align-items:center;gap:5px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            Investigate
+          </span>
+        </button>
+        <button class="btn btn-secondary">Dismiss</button>
+      </div>
+    </div>
+
+    <!-- Review -->
+    <div class="attention-card severity-review">
+      <div class="attention-top">
+        <span class="severity-badge">Review</span>
+        <span class="attention-title">Compliance Check complete</span>
+      </div>
+      <div class="attention-desc">
+        Annual compliance audit finished. 2 policy items flagged for your review before filing.
+      </div>
+      <div class="attention-actions">
+        <button class="btn btn-primary blue">
+          <span style="display:inline-flex;align-items:center;gap:5px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            Review
+          </span>
+        </button>
+        <button class="btn btn-secondary">Snooze</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- 3. Active Plans                                 -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Active Plans</span>
+      <span class="section-count">3 plans</span>
+    </div>
+
+    <!-- Plan 1 -->
+    <div class="plan-card">
+      <div class="plan-info">
+        <div class="plan-title">Q1 Payroll Processing</div>
+        <div class="plan-meta">
+          <span class="plan-steps">4 / 6 steps</span>
+          <span class="plan-status awaiting">Awaiting</span>
+        </div>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill awaiting" style="width: 66.6%"></div>
+      </div>
+      <span class="plan-time">2h ago</span>
+    </div>
+
+    <!-- Plan 2 -->
+    <div class="plan-card">
+      <div class="plan-info">
+        <div class="plan-title">New Hire Onboarding &mdash; Batch 12</div>
+        <div class="plan-meta">
+          <span class="plan-steps">2 / 5 steps</span>
+          <span class="plan-status running">Running</span>
+        </div>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill running" style="width: 40%"></div>
+      </div>
+      <span class="plan-time">yesterday</span>
+    </div>
+
+    <!-- Plan 3 -->
+    <div class="plan-card">
+      <div class="plan-info">
+        <div class="plan-title">Benefits Open Enrollment Setup</div>
+        <div class="plan-meta">
+          <span class="plan-steps">1 / 4 steps</span>
+          <span class="plan-status paused">Paused</span>
+        </div>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill paused" style="width: 25%"></div>
+      </div>
+      <span class="plan-time">2d ago</span>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- 4. Recent Chats                                 -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Recent Chats</span>
+    </div>
+
+    <div class="chat-item">
+      <div class="chat-unread-col"><div class="unread-dot"></div></div>
+      <div class="chat-content">
+        <div class="chat-title-row">
+          <span class="chat-title">Portal Gun Safety Training</span>
+          <span class="chat-time">33m ago</span>
+        </div>
+        <div class="chat-preview">The safety protocol for the portal gun needs updating before the next test cycle...</div>
+      </div>
+    </div>
+
+    <div class="chat-item">
+      <div class="chat-unread-col"></div>
+      <div class="chat-content">
+        <div class="chat-title-row">
+          <span class="chat-title">GLaDOS Maintenance Schedule</span>
+          <span class="chat-time">3h ago</span>
+        </div>
+        <div class="chat-preview">Scheduled maintenance window confirmed for next Tuesday at 2 AM EST...</div>
+      </div>
+    </div>
+
+    <div class="chat-item">
+      <div class="chat-unread-col"></div>
+      <div class="chat-content">
+        <div class="chat-title-row">
+          <span class="chat-title">Q1 Payroll Review</span>
+          <span class="chat-time">yesterday</span>
+        </div>
+        <div class="chat-preview">All calculations are ready for your review. Total gross payroll: $2.4M...</div>
+      </div>
+    </div>
+
+    <div class="chat-item">
+      <div class="chat-unread-col"></div>
+      <div class="chat-content">
+        <div class="chat-title-row">
+          <span class="chat-title">New Hire Onboarding &mdash; Batch 12</span>
+          <span class="chat-time">2d ago</span>
+        </div>
+        <div class="chat-preview">3 new hires processed, pending orientation scheduling for next week...</div>
+      </div>
+    </div>
+
+    <div class="chat-item">
+      <div class="chat-unread-col"></div>
+      <div class="chat-content">
+        <div class="chat-title-row">
+          <span class="chat-title">Benefits Open Enrollment 2026</span>
+          <span class="chat-time">3d ago</span>
+        </div>
+        <div class="chat-preview">Enrollment window opens March 15. Plan comparison docs are attached...</div>
+      </div>
+    </div>
+
+    <a href="#" class="view-all-link">View all chats &rarr;</a>
+  </div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- 5. Recent Activity (collapsed by default)       -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="disclosure-header" onclick="toggleActivity()">
+      <svg class="disclosure-chevron" id="activityChevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      <span class="section-title">Recent Activity</span>
+      <span class="section-count" style="margin-left:auto">8 events</span>
+    </div>
+
+    <div class="activity-list" id="activityList">
+
+      <!-- Human -->
+      <div class="activity-item">
+        <div class="activity-icon human">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <div class="activity-text"><span class="actor">You</span> updated benefits enrollment settings</div>
+        <span class="activity-time">2h ago</span>
+      </div>
+
+      <!-- Agent -->
+      <div class="activity-item">
+        <div class="activity-icon agent">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path><circle cx="12" cy="16" r="1"></circle></svg>
+        </div>
+        <div class="activity-text"><span class="actor agent-name">Payroll Runner</span> completed bi-weekly calculation<span class="agent-label">Agent</span></div>
+        <span class="activity-time">1h ago</span>
+      </div>
+
+      <!-- Human -->
+      <div class="activity-item">
+        <div class="activity-icon human">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <div class="activity-text"><span class="actor">Jessica Park</span> ran Q4 performance report</div>
+        <span class="activity-time">5h ago</span>
+      </div>
+
+      <!-- Agent -->
+      <div class="activity-item">
+        <div class="activity-icon agent">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path><circle cx="12" cy="16" r="1"></circle></svg>
+        </div>
+        <div class="activity-text"><span class="actor agent-name">CX Oracle</span> generated satisfaction report<span class="agent-label">Agent</span></div>
+        <span class="activity-time">3h ago</span>
+      </div>
+
+      <!-- Human -->
+      <div class="activity-item">
+        <div class="activity-icon human">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <div class="activity-text"><span class="actor">Marcus Chen</span> resolved payroll discrepancy</div>
+        <span class="activity-time">yesterday</span>
+      </div>
+
+      <!-- Agent -->
+      <div class="activity-item">
+        <div class="activity-icon agent">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path><circle cx="12" cy="16" r="1"></circle></svg>
+        </div>
+        <div class="activity-text"><span class="actor agent-name">Compliance Bot</span> flagged 2 policy updates<span class="agent-label">Agent</span></div>
+        <span class="activity-time">yesterday</span>
+      </div>
+
+      <!-- Human -->
+      <div class="activity-item">
+        <div class="activity-icon human">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <div class="activity-text"><span class="actor">You</span> started chat: Portal Gun Safety Training</div>
+        <span class="activity-time">yesterday</span>
+      </div>
+
+      <!-- Human -->
+      <div class="activity-item">
+        <div class="activity-icon human">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <div class="activity-text"><span class="actor">Jessica Park</span> uploaded Employee Handbook v3</div>
+        <span class="activity-time">2d ago</span>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggleActivity() {
+    const list = document.getElementById('activityList');
+    const chevron = document.getElementById('activityChevron');
+    list.classList.toggle('expanded');
+    chevron.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

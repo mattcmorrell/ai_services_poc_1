@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Home — Aperture Science | Approach A: Activity Feed First</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0a;
+    color: #e5e5e5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Layout */
+  .page { max-width: 1280px; margin: 0 auto; padding: 24px 32px; }
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Company Header */
+  .company-header {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .company-avatar {
+    width: 48px; height: 48px;
+    background: #3b82f6;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .company-info { flex: 1; min-width: 280px; }
+  .company-name { font-size: 20px; font-weight: 700; color: #fff; }
+  .company-meta {
+    display: flex; flex-wrap: wrap; gap: 6px 16px;
+    margin-top: 4px; font-size: 13px; color: #888;
+  }
+  .company-meta span { white-space: nowrap; }
+  .meta-sep { color: #444; }
+  .company-team { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .team-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.05em; }
+  .team-avatars { display: flex; align-items: center; }
+  .team-avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 2px solid #1a1a1a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: #fff;
+    margin-left: -8px;
+    flex-shrink: 0;
+  }
+  .team-avatar:first-child { margin-left: 0; }
+  .team-names { font-size: 12px; color: #999; }
+  .contact-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #222; border: 1px solid #333; border-radius: 6px;
+    padding: 3px 10px; font-size: 12px; color: #ccc;
+  }
+  .contact-chip .role { color: #666; }
+
+  /* Attention Banner */
+  .attention-banner {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  .attention-title {
+    font-size: 13px; font-weight: 600; color: #f59e0b;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .attention-title svg { width: 16px; height: 16px; }
+  .attention-items { display: flex; flex-direction: column; gap: 8px; }
+  .attention-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .attention-item:hover { background: #1e1e1e; border-color: #3a3a3a; }
+  .attention-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .dot-red { background: #ef4444; box-shadow: 0 0 6px #ef444466; }
+  .dot-amber { background: #f59e0b; box-shadow: 0 0 6px #f59e0b66; }
+  .dot-blue { background: #3b82f6; box-shadow: 0 0 6px #3b82f666; }
+  .attention-text { flex: 1; }
+  .attention-text strong { color: #fff; font-weight: 600; }
+  .attention-text .desc { color: #888; font-size: 13px; }
+  .attention-badge {
+    font-size: 11px; font-weight: 600; padding: 2px 8px;
+    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.03em;
+    flex-shrink: 0;
+  }
+  .badge-blocking { background: #ef444420; color: #f87171; border: 1px solid #ef444440; }
+  .badge-error { background: #f59e0b20; color: #fbbf24; border: 1px solid #f59e0b40; }
+  .badge-review { background: #3b82f620; color: #60a5fa; border: 1px solid #3b82f640; }
+  .attention-arrow { color: #555; font-size: 18px; flex-shrink: 0; }
+
+  /* Activity Feed */
+  .feed-section { }
+  .section-title {
+    font-size: 13px; font-weight: 600; color: #666;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .filter-pills { display: flex; gap: 6px; }
+  .filter-pill {
+    font-size: 12px; padding: 4px 12px; border-radius: 6px;
+    border: 1px solid #333; background: transparent; color: #888;
+    cursor: pointer; transition: all 0.15s;
+    text-transform: none; letter-spacing: 0; font-weight: 500;
+  }
+  .filter-pill:hover { border-color: #555; color: #ccc; }
+  .filter-pill.active { background: #fff; color: #0a0a0a; border-color: #fff; }
+
+  .feed { display: flex; flex-direction: column; gap: 2px; }
+
+  .feed-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: background 0.12s;
+    position: relative;
+  }
+  .feed-item:hover { background: #151515; }
+  .feed-item.clickable { cursor: pointer; }
+  .feed-item.clickable:hover { background: #181820; }
+
+  /* Timeline line */
+  .feed-item::before {
+    content: '';
+    position: absolute;
+    left: 33px;
+    top: 44px;
+    bottom: -6px;
+    width: 1px;
+    background: #222;
+  }
+  .feed-item:last-child::before { display: none; }
+
+  .feed-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: #fff;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .feed-avatar.human { background: #333; }
+  .feed-avatar.agent {
+    background: #2d1f5e;
+    border: 1px solid #7c3aed44;
+  }
+  .feed-avatar.you { background: #1e40af; }
+
+  .feed-body { flex: 1; min-width: 0; }
+  .feed-actor { color: #fff; font-weight: 600; font-size: 14px; }
+  .feed-actor.agent-name { color: #a78bfa; }
+  .feed-action { color: #999; font-size: 14px; }
+  .feed-action a {
+    color: #60a5fa; text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .feed-action a:hover { border-bottom-color: #60a5fa; }
+
+  .feed-time {
+    color: #555; font-size: 12px; white-space: nowrap;
+    flex-shrink: 0; padding-top: 2px;
+  }
+
+  .feed-detail {
+    margin-top: 6px; padding: 8px 12px;
+    background: #111; border: 1px solid #222; border-radius: 6px;
+    font-size: 13px; color: #777;
+  }
+
+  /* Date divider */
+  .feed-date {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 16px 8px;
+    font-size: 12px; color: #555; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .feed-date::after {
+    content: ''; flex: 1; height: 1px; background: #1e1e1e;
+  }
+
+  /* Sidebar */
+  .sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+  .sidebar-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .sidebar-title {
+    font-size: 13px; font-weight: 600; color: #666;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .sidebar-title a {
+    font-size: 12px; color: #3b82f6; text-decoration: none;
+    text-transform: none; letter-spacing: 0; font-weight: 500;
+  }
+  .sidebar-title a:hover { text-decoration: underline; }
+
+  .chat-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .chat-item:hover { background: #222; }
+  .chat-icon {
+    width: 32px; height: 32px;
+    background: #222; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .chat-icon svg { width: 16px; height: 16px; color: #666; }
+  .chat-info { flex: 1; min-width: 0; }
+  .chat-name {
+    font-size: 13px; font-weight: 500; color: #ddd;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .chat-preview {
+    font-size: 12px; color: #666;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .chat-unread {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #3b82f6; flex-shrink: 0;
+  }
+  .chat-time { font-size: 11px; color: #555; flex-shrink: 0; }
+
+  .doc-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: default;
+  }
+  .doc-icon {
+    width: 32px; height: 32px;
+    background: #1e293b; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .doc-icon svg { width: 16px; height: 16px; color: #60a5fa; }
+  .doc-info { flex: 1; min-width: 0; }
+  .doc-name {
+    font-size: 13px; font-weight: 500; color: #ddd;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .doc-meta { font-size: 12px; color: #666; }
+
+  /* Quick Stats row */
+  .quick-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 900px) {
+    .quick-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  .stat-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .stat-label { font-size: 12px; color: #666; margin-bottom: 4px; }
+  .stat-value { font-size: 22px; font-weight: 700; color: #fff; }
+  .stat-sub { font-size: 12px; color: #555; margin-top: 2px; }
+  .stat-up { color: #22c55e; }
+  .stat-down { color: #ef4444; }
+
+  /* Agent status sidebar */
+  .agent-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 6px;
+  }
+  .agent-avatar {
+    width: 32px; height: 32px;
+    background: #2d1f5e; border: 1px solid #7c3aed44;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .agent-avatar svg { width: 16px; height: 16px; color: #a78bfa; }
+  .agent-info { flex: 1; min-width: 0; }
+  .agent-name-sb {
+    font-size: 13px; font-weight: 500; color: #ddd;
+  }
+  .agent-status-text { font-size: 12px; }
+  .status-idle { color: #555; }
+  .status-running { color: #22c55e; }
+  .status-error { color: #f59e0b; }
+  .agent-status-dot {
+    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  }
+  .agent-status-dot.idle { background: #444; }
+  .agent-status-dot.running { background: #22c55e; box-shadow: 0 0 6px #22c55e66; }
+  .agent-status-dot.error { background: #f59e0b; box-shadow: 0 0 6px #f59e0b66; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Company Header -->
+  <div class="company-header">
+    <div class="company-avatar">A</div>
+    <div class="company-info">
+      <div class="company-name">Aperture Science</div>
+      <div class="company-meta">
+        <span>Research &amp; Development</span>
+        <span class="meta-sep">|</span>
+        <span>Cleveland, OH</span>
+        <span class="meta-sep">|</span>
+        <span>312 Employees</span>
+        <span class="meta-sep">|</span>
+        <span>19 BHR Users</span>
+        <span class="meta-sep">|</span>
+        <span class="contact-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Cave Johnson <span class="role">CEO</span>
+        </span>
+      </div>
+    </div>
+    <div class="company-team">
+      <div>
+        <div class="team-label">Assigned Team</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+          <div class="team-avatars">
+            <div class="team-avatar" style="background:#1e40af;">Y</div>
+            <div class="team-avatar" style="background:#6d28d9;">JP</div>
+            <div class="team-avatar" style="background:#0f766e;">MC</div>
+          </div>
+          <div class="team-names">You, Jessica Park, Marcus Chen</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attention Banner -->
+  <div class="attention-banner">
+    <div class="attention-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Attention Needed
+      <span style="font-size:12px;font-weight:500;color:#888;text-transform:none;letter-spacing:0;">3 items</span>
+    </div>
+    <div class="attention-items">
+
+      <div class="attention-item">
+        <div class="attention-dot dot-red"></div>
+        <div class="attention-text">
+          <strong>Payroll Runner needs approval</strong>
+          <span class="desc"> &mdash; Q1 payroll for 312 employees</span>
+        </div>
+        <div class="attention-badge badge-blocking">Blocking</div>
+        <div class="attention-arrow">&rsaquo;</div>
+      </div>
+
+      <div class="attention-item">
+        <div class="attention-dot dot-amber"></div>
+        <div class="attention-text">
+          <strong>Benefits Enrollment agent error</strong>
+          <span class="desc"> &mdash; failed to sync dental plan</span>
+        </div>
+        <div class="attention-badge badge-error">Error</div>
+        <div class="attention-arrow">&rsaquo;</div>
+      </div>
+
+      <div class="attention-item">
+        <div class="attention-dot dot-blue"></div>
+        <div class="attention-text">
+          <strong>Compliance Check complete</strong>
+          <span class="desc"> &mdash; 2 items flagged for review</span>
+        </div>
+        <div class="attention-badge badge-review">Review</div>
+        <div class="attention-arrow">&rsaquo;</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="quick-stats">
+    <div class="stat-card">
+      <div class="stat-label">Open Chats</div>
+      <div class="stat-value">7</div>
+      <div class="stat-sub"><span class="stat-up">+2</span> this week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Agent Runs (30d)</div>
+      <div class="stat-value">48</div>
+      <div class="stat-sub"><span class="stat-up">+12%</span> vs last month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending Actions</div>
+      <div class="stat-value">3</div>
+      <div class="stat-sub">1 blocking</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Next Payroll</div>
+      <div class="stat-value" style="font-size:18px;">Mar 1</div>
+      <div class="stat-sub">4 days away</div>
+    </div>
+  </div>
+
+  <!-- Main Grid: Feed + Sidebar -->
+  <div class="main-grid">
+
+    <!-- Activity Feed -->
+    <div class="feed-section">
+      <div class="section-title">
+        Activity
+        <div class="filter-pills">
+          <button class="filter-pill active">All</button>
+          <button class="filter-pill">People</button>
+          <button class="filter-pill">Agents</button>
+        </div>
+      </div>
+
+      <div class="feed">
+
+        <!-- Today -->
+        <div class="feed-date">Today</div>
+
+        <!-- Agent: Payroll Runner -->
+        <div class="feed-item">
+          <div class="feed-avatar agent">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="feed-body">
+            <span class="feed-actor agent-name">Payroll Runner</span>
+            <span class="feed-action">completed bi-weekly payroll calculation</span>
+            <div class="feed-detail">Processed 312 employees &middot; Total: $1,847,290.00 &middot; Awaiting approval</div>
+          </div>
+          <div class="feed-time">1h ago</div>
+        </div>
+
+        <!-- You -->
+        <div class="feed-item clickable">
+          <div class="feed-avatar you">Y</div>
+          <div class="feed-body">
+            <span class="feed-actor">You</span>
+            <span class="feed-action">updated benefits enrollment settings</span>
+          </div>
+          <div class="feed-time">2h ago</div>
+        </div>
+
+        <!-- Agent: CX Oracle -->
+        <div class="feed-item">
+          <div class="feed-avatar agent">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M20 12a8 8 0 0 0-8-8v8h8z" fill="#a78bfa" opacity="0.2"/></svg>
+          </div>
+          <div class="feed-body">
+            <span class="feed-actor agent-name">CX Oracle</span>
+            <span class="feed-action">generated customer satisfaction report</span>
+            <div class="feed-detail">Q4 CSAT: 87% (+3% QoQ) &middot; 14 responses analyzed</div>
+          </div>
+          <div class="feed-time">3h ago</div>
+        </div>
+
+        <!-- Jessica Park -->
+        <div class="feed-item">
+          <div class="feed-avatar human" style="background:#6d28d9;">JP</div>
+          <div class="feed-body">
+            <span class="feed-actor">Jessica Park</span>
+            <span class="feed-action">ran Q4 performance report</span>
+          </div>
+          <div class="feed-time">5h ago</div>
+        </div>
+
+        <!-- Yesterday -->
+        <div class="feed-date">Yesterday</div>
+
+        <!-- Agent: Compliance Bot -->
+        <div class="feed-item">
+          <div class="feed-avatar agent">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="feed-body">
+            <span class="feed-actor agent-name">Compliance Bot</span>
+            <span class="feed-action">flagged 2 policy updates needed</span>
+            <div class="feed-detail">FMLA notice template outdated &middot; Remote work policy needs Q1 revision</div>
+          </div>
+          <div class="feed-time">yesterday</div>
+        </div>
+
+        <!-- Marcus Chen -->
+        <div class="feed-item">
+          <div class="feed-avatar human" style="background:#0f766e;">MC</div>
+          <div class="feed-body">
+            <span class="feed-actor">Marcus Chen</span>
+            <span class="feed-action">resolved payroll discrepancy for J. Williams</span>
+            <div class="feed-detail">Overtime hours corrected: 6h &rarr; 8.5h &middot; Difference: $187.50</div>
+          </div>
+          <div class="feed-time">yesterday</div>
+        </div>
+
+        <!-- You - chat -->
+        <div class="feed-item clickable">
+          <div class="feed-avatar you">Y</div>
+          <div class="feed-body">
+            <span class="feed-actor">You</span>
+            <span class="feed-action">started new chat: <a href="#">Portal Gun Safety Training</a></span>
+          </div>
+          <div class="feed-time">yesterday</div>
+        </div>
+
+        <!-- 2 days ago -->
+        <div class="feed-date">2 Days Ago</div>
+
+        <!-- Jessica Park -->
+        <div class="feed-item">
+          <div class="feed-avatar human" style="background:#6d28d9;">JP</div>
+          <div class="feed-body">
+            <span class="feed-actor">Jessica Park</span>
+            <span class="feed-action">uploaded <a href="#">Employee Handbook v3</a></span>
+          </div>
+          <div class="feed-time">2 days ago</div>
+        </div>
+
+        <!-- Agent: Onboarding Assistant -->
+        <div class="feed-item">
+          <div class="feed-avatar agent">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          </div>
+          <div class="feed-body">
+            <span class="feed-actor agent-name">Onboarding Assistant</span>
+            <span class="feed-action">completed onboarding checklist for 3 new hires</span>
+            <div class="feed-detail">R. Torres, M. Singh, K. Nakamura &middot; All paperwork submitted</div>
+          </div>
+          <div class="feed-time">2 days ago</div>
+        </div>
+
+        <!-- You -->
+        <div class="feed-item">
+          <div class="feed-avatar you">Y</div>
+          <div class="feed-body">
+            <span class="feed-actor">You</span>
+            <span class="feed-action">approved PTO request batch (8 requests)</span>
+          </div>
+          <div class="feed-time">2 days ago</div>
+        </div>
+
+        <!-- 3 days ago -->
+        <div class="feed-date">3 Days Ago</div>
+
+        <!-- Marcus Chen -->
+        <div class="feed-item clickable">
+          <div class="feed-avatar human" style="background:#0f766e;">MC</div>
+          <div class="feed-body">
+            <span class="feed-actor">Marcus Chen</span>
+            <span class="feed-action">started new chat: <a href="#">Year-End Tax Prep</a></span>
+          </div>
+          <div class="feed-time">3 days ago</div>
+        </div>
+
+        <!-- Agent: Payroll Runner again -->
+        <div class="feed-item">
+          <div class="feed-avatar agent">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="feed-body">
+            <span class="feed-actor agent-name">Payroll Runner</span>
+            <span class="feed-action">generated W-2 preview for 2025 tax year</span>
+            <div class="feed-detail">312 W-2s prepared &middot; 4 flagged for address verification</div>
+          </div>
+          <div class="feed-time">3 days ago</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+      <!-- Recent Chats -->
+      <div class="sidebar-card">
+        <div class="sidebar-title">
+          Recent Chats
+          <a href="#">View all</a>
+        </div>
+
+        <div class="chat-item">
+          <div class="chat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="chat-info">
+            <div class="chat-name">Portal Gun Safety Training</div>
+            <div class="chat-preview">Draft compliance checklist ready for...</div>
+          </div>
+          <div class="chat-unread"></div>
+          <div class="chat-time">1h</div>
+        </div>
+
+        <div class="chat-item">
+          <div class="chat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="chat-info">
+            <div class="chat-name">Q1 Payroll Review</div>
+            <div class="chat-preview">Payroll Runner flagged 3 overtime...</div>
+          </div>
+          <div class="chat-unread"></div>
+          <div class="chat-time">5h</div>
+        </div>
+
+        <div class="chat-item">
+          <div class="chat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="chat-info">
+            <div class="chat-name">Benefits Open Enrollment 2026</div>
+            <div class="chat-preview">Dental plan sync issue identified...</div>
+          </div>
+          <div class="chat-time">1d</div>
+        </div>
+
+        <div class="chat-item">
+          <div class="chat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="chat-info">
+            <div class="chat-name">Year-End Tax Prep</div>
+            <div class="chat-preview">W-2 preview looks good, 4 need...</div>
+          </div>
+          <div class="chat-time">3d</div>
+        </div>
+
+      </div>
+
+      <!-- Agent Status -->
+      <div class="sidebar-card">
+        <div class="sidebar-title">
+          Agents
+          <a href="#">Configure</a>
+        </div>
+
+        <div class="agent-item">
+          <div class="agent-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="agent-info">
+            <div class="agent-name-sb">Payroll Runner</div>
+            <div class="agent-status-text status-running">Awaiting approval</div>
+          </div>
+          <div class="agent-status-dot running"></div>
+        </div>
+
+        <div class="agent-item">
+          <div class="agent-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="agent-info">
+            <div class="agent-name-sb">Compliance Bot</div>
+            <div class="agent-status-text status-idle">Idle &middot; Last run yesterday</div>
+          </div>
+          <div class="agent-status-dot idle"></div>
+        </div>
+
+        <div class="agent-item">
+          <div class="agent-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          </div>
+          <div class="agent-info">
+            <div class="agent-name-sb">Onboarding Assistant</div>
+            <div class="agent-status-text status-idle">Idle &middot; Last run 2d ago</div>
+          </div>
+          <div class="agent-status-dot idle"></div>
+        </div>
+
+        <div class="agent-item">
+          <div class="agent-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/></svg>
+          </div>
+          <div class="agent-info">
+            <div class="agent-name-sb">CX Oracle</div>
+            <div class="agent-status-text status-idle">Idle &middot; Last run 3h ago</div>
+          </div>
+          <div class="agent-status-dot idle"></div>
+        </div>
+
+        <div class="agent-item">
+          <div class="agent-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </div>
+          <div class="agent-info">
+            <div class="agent-name-sb">Benefits Enrollment</div>
+            <div class="agent-status-text status-error">Error &middot; Sync failed</div>
+          </div>
+          <div class="agent-status-dot error"></div>
+        </div>
+
+      </div>
+
+      <!-- Documents -->
+      <div class="sidebar-card">
+        <div class="sidebar-title">
+          Documents
+          <a href="#">View all</a>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="doc-info">
+            <div class="doc-name">Employee Handbook v3</div>
+            <div class="doc-meta">PDF &middot; Uploaded 2 days ago</div>
+          </div>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="doc-info">
+            <div class="doc-name">Q4 Performance Summary</div>
+            <div class="doc-meta">XLSX &middot; Generated 5h ago</div>
+          </div>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="doc-info">
+            <div class="doc-name">2025 W-2 Preview (Draft)</div>
+            <div class="doc-meta">PDF &middot; Generated 3 days ago</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

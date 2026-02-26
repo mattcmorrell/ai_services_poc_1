@@ -1,7 +1,7 @@
 {
-  "title": "Client Selection UX — Decision Tree",
+  "title": "Design Decision Tree",
   "subtitle": "Tracing every idea from brainstorm → prototype → iteration → verdict",
-  "lastUpdated": "2026-02-24",
+  "lastUpdated": "2026-02-25",
   "statuses": {
     "exploring": {
       "label": "Exploring",
@@ -31,6 +31,105 @@
   },
   "tree": [
     {
+      "id": "home-root",
+      "name": "Client Home Tab",
+      "status": "root",
+      "note": "What does a consultant see when they open a client's home tab? Company facts, team activity, agent status, attention items.",
+      "children": [
+        {
+          "phase": "v2 — Refined (post-feedback)",
+          "children": [
+            {
+              "id": "H-v2A",
+              "name": "Triage First",
+              "status": "exploring",
+              "note": "Vertical stack: Attention → Plans → Chats → Activity (collapsed). Action buttons on attention items. Generous whitespace, 800px max-width. Synthesizes best of v1 feedback.",
+              "versions": ["v1"],
+              "currentVersion": "v1",
+              "mockup": "mockups/client-home-mockups.html",
+              "children": []
+            },
+            {
+              "id": "H-v2B",
+              "name": "Compact Mosaic",
+              "status": "exploring",
+              "note": "Dense two-column grid: Attention + Chats side-by-side, Plans as horizontal cards, Activity collapsed in two-column expand. Everything above the fold on large monitors.",
+              "versions": ["v1"],
+              "currentVersion": "v1",
+              "mockup": "mockups/client-home-mockups.html",
+              "children": []
+            },
+            {
+              "id": "H-v2C",
+              "name": "Hybrid",
+              "status": "exploring",
+              "note": "Full-width attention with severity pills (from A), Chats + Plans side-by-side in row 2 (from B), Activity open by default with show more toggle. Brighter text throughout. Synthesizes best of A and B per Katy feedback.",
+              "spawn": "Best of v2-A attention styling + v2-B density layout",
+              "versions": ["v1"],
+              "currentVersion": "v1",
+              "mockup": "mockups/client-home-mockups.html",
+              "children": []
+            }
+          ]
+        },
+        {
+          "phase": "v1 — Initial Exploration (5 Approaches)",
+          "children": [
+            {
+              "id": "H-A",
+              "name": "Activity Feed First",
+              "status": "filed",
+              "note": "Activity log needed eventually but behind progressive disclosure, not as centerpiece. Attention needed section was good.",
+              "versions": ["v1"],
+              "currentVersion": "v1",
+              "mockup": "mockups/client-home-mockups.html",
+              "children": []
+            },
+            {
+              "id": "H-B",
+              "name": "Dashboard Grid",
+              "status": "new",
+              "note": "KPI tiles + modular card grid. Everything scannable at a glance: attention items, chats, team activity, agent activity, documents, company info as separate cards.",
+              "versions": ["v1"],
+              "currentVersion": "v1",
+              "mockup": "mockups/client-home-mockups.html",
+              "children": []
+            },
+            {
+              "id": "H-C",
+              "name": "Two-Pane Split",
+              "status": "abandoned",
+              "note": "Won't work — conflicts with the existing client selector sidebar pane. But attention + recent chats priority was correct.",
+              "versions": ["v1"],
+              "currentVersion": "v1",
+              "mockup": "mockups/client-home-mockups.html",
+              "children": []
+            },
+            {
+              "id": "H-D",
+              "name": "Tabbed Sections",
+              "status": "parked",
+              "note": "Last resort — too many tabs within tabs. Could revisit if needed but avoiding for now.",
+              "versions": ["v1"],
+              "currentVersion": "v1",
+              "mockup": "mockups/client-home-mockups.html",
+              "children": []
+            },
+            {
+              "id": "H-E",
+              "name": "Command Center",
+              "status": "parked",
+              "note": "Overwhelming generally. But the action buttons (Approve, Investigate, Review) on attention items were liked — carried into v2.",
+              "versions": ["v1"],
+              "currentVersion": "v1",
+              "mockup": "mockups/client-home-mockups.html",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "root",
       "name": "Client Selection UX Problem",
       "status": "root",
@@ -48,12 +147,12 @@
               "currentVersion": "v3",
               "mockup": "mockup-01-card-grid.html",
               "prototype": "localhost:3001",
-              "thumbnail": "approach-a-v2-grid.png",
+              "thumbnail": "mockups/approach-a-v2-grid.png",
               "screenshots": [
-                { "src": "approach-a-v1-grid.png", "label": "v1 Grid" },
-                { "src": "approach-a-v1-workspace.png", "label": "v1 Workspace" },
-                { "src": "approach-a-v2-grid.png", "label": "v2 Grid" },
-                { "src": "approach-a-v2-workspace.png", "label": "v2 Workspace" }
+                { "src": "mockups/approach-a-v1-grid.png", "label": "v1 Grid" },
+                { "src": "mockups/approach-a-v1-workspace.png", "label": "v1 Workspace" },
+                { "src": "mockups/approach-a-v2-grid.png", "label": "v2 Grid" },
+                { "src": "mockups/approach-a-v2-workspace.png", "label": "v2 Workspace" }
               ],
               "children": []
             },
@@ -66,13 +165,13 @@
               "currentVersion": "v3",
               "mockup": "mockup-02-dropdown.html",
               "prototype": "localhost:3001",
-              "thumbnail": "approach-b-v3-dropdown-open.png",
+              "thumbnail": "mockups/approach-b-v3-dropdown-open.png",
               "screenshots": [
-                { "src": "approach-b-v1.png", "label": "v1" },
-                { "src": "approach-b-v2.png", "label": "v2" },
-                { "src": "approach-b-v2-dropdown.png", "label": "v2 Dropdown open" },
-                { "src": "approach-b-v3.png", "label": "v3" },
-                { "src": "approach-b-v3-dropdown-open.png", "label": "v3 Dropdown open" }
+                { "src": "mockups/approach-b-v1.png", "label": "v1" },
+                { "src": "mockups/approach-b-v2.png", "label": "v2" },
+                { "src": "mockups/approach-b-v2-dropdown.png", "label": "v2 Dropdown open" },
+                { "src": "mockups/approach-b-v3.png", "label": "v3" },
+                { "src": "mockups/approach-b-v3-dropdown-open.png", "label": "v3 Dropdown open" }
               ],
               "children": []
             },
@@ -85,13 +184,13 @@
               "currentVersion": "v3",
               "mockup": "mockup-03-sidebar.html",
               "prototype": "localhost:3001",
-              "thumbnail": "approach-c-v2.png",
+              "thumbnail": "mockups/approach-c-v2.png",
               "screenshots": [
-                { "src": "approach-c-v1.png", "label": "v1" },
-                { "src": "approach-c-v2.png", "label": "v2 Expanded" },
-                { "src": "approach-c-v2-collapsed.png", "label": "v2 Collapsed" },
-                { "src": "approach-c-v3-collapsed.png", "label": "v3 Collapsed" },
-                { "src": "approach-c-v3-tab-persistence.png", "label": "v3 Tab persistence" }
+                { "src": "mockups/approach-c-v1.png", "label": "v1" },
+                { "src": "mockups/approach-c-v2.png", "label": "v2 Expanded" },
+                { "src": "mockups/approach-c-v2-collapsed.png", "label": "v2 Collapsed" },
+                { "src": "mockups/approach-c-v3-collapsed.png", "label": "v3 Collapsed" },
+                { "src": "mockups/approach-c-v3-tab-persistence.png", "label": "v3 Tab persistence" }
               ],
               "children": [
                 {
@@ -116,12 +215,12 @@
               "currentVersion": "v3",
               "mockup": "mockup-04-breadcrumb.html",
               "prototype": "localhost:3001",
-              "thumbnail": "approach-d-v2.png",
+              "thumbnail": "mockups/approach-d-v2.png",
               "screenshots": [
-                { "src": "approach-d-v1.png", "label": "v1" },
-                { "src": "approach-d-v1-list.png", "label": "v1 List view" },
-                { "src": "approach-d-v2.png", "label": "v2" },
-                { "src": "approach-d-v2-table.png", "label": "v2 Table view" }
+                { "src": "mockups/approach-d-v1.png", "label": "v1" },
+                { "src": "mockups/approach-d-v1-list.png", "label": "v1 List view" },
+                { "src": "mockups/approach-d-v2.png", "label": "v2" },
+                { "src": "mockups/approach-d-v2-table.png", "label": "v2 Table view" }
               ],
               "children": []
             }
@@ -136,9 +235,9 @@
               "status": "filed",
               "note": "Power user quick-switch — will revisit as supplement",
               "mockup": "mockup-05-command-palette.html",
-              "thumbnail": "mockup-05-command-palette.png",
+              "thumbnail": "mockups/mockup-05-command-palette.png",
               "screenshots": [
-                { "src": "mockup-05-command-palette.png", "label": "Mockup" }
+                { "src": "mockups/mockup-05-command-palette.png", "label": "Mockup" }
               ],
               "children": []
             },
@@ -151,9 +250,9 @@
               "currentVersion": "v1",
               "mockup": "mockup-07-tab-groups.html",
               "prototype": "localhost:3001",
-              "thumbnail": "mockup-07-tab-groups.png",
+              "thumbnail": "mockups/mockup-07-tab-groups.png",
               "screenshots": [
-                { "src": "mockup-07-tab-groups.png", "label": "Mockup" }
+                { "src": "mockups/mockup-07-tab-groups.png", "label": "Mockup" }
               ],
               "children": []
             },
@@ -163,9 +262,9 @@
               "status": "parked",
               "note": "Interesting but not the most interesting",
               "mockup": "mockup-08-sliding-drawer.html",
-              "thumbnail": "mockup-08-sliding-drawer.png",
+              "thumbnail": "mockups/mockup-08-sliding-drawer.png",
               "screenshots": [
-                { "src": "mockup-08-sliding-drawer.png", "label": "Mockup" }
+                { "src": "mockups/mockup-08-sliding-drawer.png", "label": "Mockup" }
               ],
               "children": []
             },
@@ -175,9 +274,9 @@
               "status": "parked",
               "note": "Interesting concept → evolved into Approach F (Client Tabs Row)",
               "mockup": "mockup-09-recent-favorites.html",
-              "thumbnail": "mockup-09-recent-favorites.png",
+              "thumbnail": "mockups/mockup-09-recent-favorites.png",
               "screenshots": [
-                { "src": "mockup-09-recent-favorites.png", "label": "Mockup" }
+                { "src": "mockups/mockup-09-recent-favorites.png", "label": "Mockup" }
               ],
               "children": []
             },
@@ -187,9 +286,9 @@
               "status": "abandoned",
               "note": "Too hidden for primary navigation",
               "mockup": "mockup-06-floating-pill.html",
-              "thumbnail": "mockup-06-floating-pill.png",
+              "thumbnail": "mockups/mockup-06-floating-pill.png",
               "screenshots": [
-                { "src": "mockup-06-floating-pill.png", "label": "Mockup" }
+                { "src": "mockups/mockup-06-floating-pill.png", "label": "Mockup" }
               ],
               "children": []
             },
@@ -199,9 +298,9 @@
               "status": "abandoned",
               "note": "Scales poorly, lacks context",
               "mockup": "mockup-10-avatar-row.html",
-              "thumbnail": "mockup-10-avatar-row.png",
+              "thumbnail": "mockups/mockup-10-avatar-row.png",
               "screenshots": [
-                { "src": "mockup-10-avatar-row.png", "label": "Mockup" }
+                { "src": "mockups/mockup-10-avatar-row.png", "label": "Mockup" }
               ],
               "children": []
             }

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Home — Aperture Science (Approach B: Dashboard Grid)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #e5e5e5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  /* ── Company Bar ── */
+  .company-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #111111;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+  }
+  .company-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .company-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .company-name {
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .company-chips {
+    display: flex;
+    gap: 8px;
+    margin-left: 6px;
+  }
+  .chip {
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 12px;
+    color: #a0a0a0;
+    white-space: nowrap;
+  }
+  .company-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .team-avatars {
+    display: flex;
+    gap: 0;
+  }
+  .team-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    border: 2px solid #111111;
+    margin-left: -6px;
+    flex-shrink: 0;
+  }
+  .team-avatar:first-child { margin-left: 0; }
+  .team-avatar.you     { background: #7c3aed; }
+  .team-avatar.jessica  { background: #0d9488; }
+  .team-avatar.marcus   { background: #d97706; }
+  .contact-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: #a0a0a0;
+  }
+  .contact-badge svg { flex-shrink: 0; }
+  .contact-badge strong { color: #d4d4d4; font-weight: 500; }
+
+  /* ── KPI Row ── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .kpi-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-label {
+    font-size: 12px;
+    color: #707070;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .kpi-label svg { opacity: 0.5; }
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .kpi-sub {
+    font-size: 12px;
+    font-weight: 400;
+    color: #606060;
+  }
+  .kpi-trend {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .kpi-trend.up   { color: #22c55e; }
+  .kpi-trend.down { color: #ef4444; }
+  .kpi-trend.neutral { color: #707070; }
+  .kpi-accent-red { border-top: 3px solid #ef4444; }
+  .kpi-accent-blue { border-top: 3px solid #3b82f6; }
+  .kpi-accent-green { border-top: 3px solid #22c55e; }
+  .kpi-sparkline {
+    position: absolute;
+    bottom: 8px;
+    right: 14px;
+    opacity: 0.25;
+  }
+  .kpi-countdown {
+    font-size: 13px;
+    color: #f59e0b;
+    font-weight: 500;
+  }
+
+  /* ── Main Grid ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 14px;
+  }
+
+  /* ── Card Base ── */
+  .card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid #222;
+  }
+  .card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-header-left svg { color: #707070; flex-shrink: 0; }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #c0c0c0;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .card-header-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+  .card-body {
+    padding: 6px 0;
+    flex: 1;
+  }
+
+  /* ── Needs Attention (spans 2 cols) ── */
+  .card-attention {
+    grid-column: 1 / 3;
+    border-color: #3a2020;
+    background: linear-gradient(135deg, #1a1a1a 0%, #1c1515 100%);
+  }
+  .card-attention .card-header { border-bottom-color: #2a1a1a; }
+
+  .attn-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 18px;
+    border-bottom: 1px solid #1f1f1f;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .attn-item:last-child { border-bottom: none; }
+  .attn-item:hover { background: rgba(255,255,255,0.02); }
+  .attn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .attn-icon.blocking { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .attn-icon.error    { background: rgba(249,115,22,0.15); color: #f97316; }
+  .attn-icon.review   { background: rgba(234,179,8,0.15);  color: #eab308; }
+  .attn-content { flex: 1; min-width: 0; }
+  .attn-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #e0e0e0;
+    margin-bottom: 2px;
+  }
+  .attn-desc {
+    font-size: 12px;
+    color: #707070;
+  }
+  .attn-tag {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 3px;
+  }
+  .attn-tag.blocking { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .attn-tag.error    { background: rgba(249,115,22,0.15); color: #f97316; }
+  .attn-tag.review   { background: rgba(234,179,8,0.15);  color: #eab308; }
+
+  /* ── List items (shared for chats, activity, etc.) ── */
+  .list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 18px;
+    border-bottom: 1px solid #1f1f1f;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-item:hover { background: rgba(255,255,255,0.02); }
+  .list-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    margin-top: 1px;
+  }
+  .list-content { flex: 1; min-width: 0; }
+  .list-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #d4d4d4;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .list-meta {
+    font-size: 12px;
+    color: #606060;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .list-time {
+    font-size: 11px;
+    color: #505050;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .unread-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #3b82f6;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .status-dot.success { background: #22c55e; }
+  .status-dot.warning { background: #eab308; }
+
+  /* ── Documents Card ── */
+  .doc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border-bottom: 1px solid #1f1f1f;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .doc-item:last-child { border-bottom: none; }
+  .doc-item:hover { background: rgba(255,255,255,0.02); }
+  .doc-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .doc-name {
+    font-size: 13px;
+    color: #d4d4d4;
+    font-weight: 400;
+    flex: 1;
+  }
+  .doc-badge {
+    font-size: 10px;
+    color: #505050;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+
+  /* ── Company Info Card ── */
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 18px;
+    border-bottom: 1px solid #1f1f1f;
+    font-size: 13px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { color: #606060; }
+  .info-value { color: #c0c0c0; font-weight: 450; text-align: right; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     COMPANY BAR
+     ════════════════════════════════════════════ -->
+<div class="company-bar">
+  <div class="company-bar-left">
+    <div class="company-avatar">A</div>
+    <span class="company-name">Aperture Science</span>
+    <div class="company-chips">
+      <span class="chip">R&amp;D</span>
+      <span class="chip">Cleveland, OH</span>
+      <span class="chip">312 employees</span>
+    </div>
+  </div>
+  <div class="company-bar-right">
+    <div class="team-avatars">
+      <div class="team-avatar you" title="You">You</div>
+      <div class="team-avatar jessica" title="Jessica Park">JP</div>
+      <div class="team-avatar marcus" title="Marcus Chen">MC</div>
+    </div>
+    <div class="contact-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <strong>Cave Johnson</strong> CEO
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     KPI TILES
+     ════════════════════════════════════════════ -->
+<div class="kpi-row">
+
+  <!-- Open Chats -->
+  <div class="kpi-card kpi-accent-blue">
+    <div class="kpi-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Open Chats
+    </div>
+    <div class="kpi-value">7</div>
+    <div class="kpi-trend up">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      +2 this week
+    </div>
+    <!-- sparkline -->
+    <svg class="kpi-sparkline" width="60" height="28" viewBox="0 0 60 28">
+      <polyline points="0,22 10,18 20,20 30,14 40,16 50,10 60,8" fill="none" stroke="#3b82f6" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <!-- Pending Approvals -->
+  <div class="kpi-card kpi-accent-red">
+    <div class="kpi-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Pending Approvals
+    </div>
+    <div class="kpi-value" style="color:#ef4444;">3</div>
+    <div class="kpi-trend down">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>
+      blocking
+    </div>
+  </div>
+
+  <!-- Agent Runs -->
+  <div class="kpi-card">
+    <div class="kpi-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Agent Runs (30d)
+    </div>
+    <div class="kpi-value">48</div>
+    <div class="kpi-trend up">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      +12% vs prev
+    </div>
+    <svg class="kpi-sparkline" width="60" height="28" viewBox="0 0 60 28">
+      <polyline points="0,24 10,20 20,22 30,16 40,12 50,14 60,6" fill="none" stroke="#22c55e" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <!-- Employees -->
+  <div class="kpi-card kpi-accent-green">
+    <div class="kpi-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Employees
+    </div>
+    <div class="kpi-value">312 <span class="kpi-sub">/ 19 BHR users</span></div>
+    <div class="kpi-trend neutral">net +4 this quarter</div>
+  </div>
+
+  <!-- Next Payroll -->
+  <div class="kpi-card">
+    <div class="kpi-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Next Payroll
+    </div>
+    <div class="kpi-value">Mar 1</div>
+    <div class="kpi-countdown">4 days away</div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════════
+     MAIN GRID
+     ════════════════════════════════════════════ -->
+<div class="main-grid">
+
+  <!-- ── Needs Attention (2-col span) ── -->
+  <div class="card card-attention">
+    <div class="card-header">
+      <div class="card-header-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span class="card-title">Needs Attention</span>
+      </div>
+      <span class="card-header-badge" style="background:rgba(239,68,68,0.12);color:#ef4444;">3 items</span>
+    </div>
+    <div class="card-body">
+      <div class="attn-item">
+        <div class="attn-icon blocking">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        </div>
+        <div class="attn-content">
+          <div class="attn-title">Payroll Runner needs approval</div>
+          <div class="attn-desc">Q1 payroll for 312 employees ready for final sign-off</div>
+        </div>
+        <span class="attn-tag blocking">Blocking</span>
+      </div>
+      <div class="attn-item">
+        <div class="attn-icon error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="attn-content">
+          <div class="attn-title">Benefits Enrollment agent error</div>
+          <div class="attn-desc">Failed to sync dental plan — MetLife API timeout at 14:22 EST</div>
+        </div>
+        <span class="attn-tag error">Error</span>
+      </div>
+      <div class="attn-item">
+        <div class="attn-icon review">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div class="attn-content">
+          <div class="attn-title">Compliance Check complete</div>
+          <div class="attn-desc">2 items flagged for review — overtime policy &amp; PTO accrual limits</div>
+        </div>
+        <span class="attn-tag review">Review</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Recent Chats ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#707070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="card-title">Recent Chats</span>
+      </div>
+      <span class="card-header-badge" style="background:rgba(59,130,246,0.12);color:#3b82f6;">2 unread</span>
+    </div>
+    <div class="card-body">
+      <div class="list-item">
+        <div class="list-icon" style="background:#1e3a5f;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="list-content">
+          <div class="list-title"><span class="unread-dot"></span> Portal Gun Safety Training</div>
+          <div class="list-meta">Need to update the hazard protocols for...</div>
+        </div>
+        <span class="list-time">33m</span>
+      </div>
+      <div class="list-item">
+        <div class="list-icon" style="background:#1e3a5f;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="list-content">
+          <div class="list-title"><span class="unread-dot"></span> GLaDOS Maintenance Schedule</div>
+          <div class="list-meta">Scheduled downtime for core personality...</div>
+        </div>
+        <span class="list-time">3h</span>
+      </div>
+      <div class="list-item">
+        <div class="list-icon" style="background:#1a2a1a;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="list-content">
+          <div class="list-title">Q1 Payroll Review</div>
+          <div class="list-meta">All numbers look good, just the overtime...</div>
+        </div>
+        <span class="list-time">1d</span>
+      </div>
+      <div class="list-item">
+        <div class="list-icon" style="background:#2a1e3a;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="list-content">
+          <div class="list-title">New Hire Onboarding — Batch 12</div>
+          <div class="list-meta">3 new hires starting Monday, paperwork...</div>
+        </div>
+        <span class="list-time">2d</span>
+      </div>
+      <div class="list-item">
+        <div class="list-icon" style="background:#2a2a1e;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="list-content">
+          <div class="list-title">Benefits Open Enrollment Q2</div>
+          <div class="list-meta">Dental plan options from MetLife are...</div>
+        </div>
+        <span class="list-time">3d</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Team Activity ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#707070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="card-title">Team Activity</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="list-item">
+        <div class="list-icon" style="background:#7c3aed;">You</div>
+        <div class="list-content">
+          <div class="list-title">Updated benefits enrollment settings</div>
+          <div class="list-meta">Changed dental plan tier defaults</div>
+        </div>
+        <span class="list-time">2h</span>
+      </div>
+      <div class="list-item">
+        <div class="list-icon" style="background:#0d9488;">JP</div>
+        <div class="list-content">
+          <div class="list-title">Ran Q4 performance report</div>
+          <div class="list-meta">Generated for all 312 employees</div>
+        </div>
+        <span class="list-time">5h</span>
+      </div>
+      <div class="list-item">
+        <div class="list-icon" style="background:#d97706;">MC</div>
+        <div class="list-content">
+          <div class="list-title">Resolved payroll discrepancy</div>
+          <div class="list-meta">Corrected overtime calc for Lab Dept</div>
+        </div>
+        <span class="list-time">1d</span>
+      </div>
+      <div class="list-item">
+        <div class="list-icon" style="background:#0d9488;">JP</div>
+        <div class="list-content">
+          <div class="list-title">Uploaded Employee Handbook v3</div>
+          <div class="list-meta">Updated safety &amp; compliance sections</div>
+        </div>
+        <span class="list-time">2d</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Agent Activity ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#707070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span class="card-title">Agent Activity</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="list-item">
+        <div class="list-icon" style="background:#1a2e1a;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div class="list-content">
+          <div class="list-title">Payroll Runner <span class="status-dot success"></span></div>
+          <div class="list-meta">Completed bi-weekly calculation</div>
+        </div>
+        <span class="list-time">1h</span>
+      </div>
+      <div class="list-item">
+        <div class="list-icon" style="background:#1a2e1a;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div class="list-content">
+          <div class="list-title">CX Oracle <span class="status-dot success"></span></div>
+          <div class="list-meta">Generated satisfaction report</div>
+        </div>
+        <span class="list-time">3h</span>
+      </div>
+      <div class="list-item">
+        <div class="list-icon" style="background:#2a2a1a;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="list-content">
+          <div class="list-title">Compliance Bot <span class="status-dot warning"></span></div>
+          <div class="list-meta">Flagged 2 policy updates</div>
+        </div>
+        <span class="list-time">1d</span>
+      </div>
+      <div class="list-item">
+        <div class="list-icon" style="background:#1a2e1a;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div class="list-content">
+          <div class="list-title">Onboarding Assistant <span class="status-dot success"></span></div>
+          <div class="list-meta">Processed 3 new hires</div>
+        </div>
+        <span class="list-time">2d</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Documents ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#707070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="card-title">Documents</span>
+      </div>
+      <span class="card-header-badge" style="background:rgba(113,113,122,0.12);color:#71717a;">4 files</span>
+    </div>
+    <div class="card-body">
+      <div class="doc-item">
+        <div class="doc-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <span class="doc-name">Employee Handbook v3</span>
+        <span class="doc-badge">PDF</span>
+      </div>
+      <div class="doc-item">
+        <div class="doc-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <span class="doc-name">Benefits Summary 2026</span>
+        <span class="doc-badge">XLSX</span>
+      </div>
+      <div class="doc-item">
+        <div class="doc-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <span class="doc-name">Q4 Performance Summary</span>
+        <span class="doc-badge">PDF</span>
+      </div>
+      <div class="doc-item">
+        <div class="doc-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <span class="doc-name">2025 W-2 Preview Draft</span>
+        <span class="doc-badge">DRAFT</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Company Info ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#707070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span class="card-title">Company Info</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="info-row">
+        <span class="info-label">Created</span>
+        <span class="info-value">Mar 4, 2024 (1yr 11mo)</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Industry</span>
+        <span class="info-value">Research & Development</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Location</span>
+        <span class="info-value">Cleveland, OH (EST)</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Primary Contact</span>
+        <span class="info-value">Cave Johnson, CEO</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Key Contact</span>
+        <span class="info-value">GLaDOS, Operations</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Job Openings</span>
+        <span class="info-value">3 / 50 positions</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

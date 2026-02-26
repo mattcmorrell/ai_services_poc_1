@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Home — Aperture Science (Approach D: Tabbed Sections)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0a;
+    color: #e5e5e5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Company Header (always visible) ── */
+  .company-header {
+    padding: 20px 32px 0 32px;
+    background: #0a0a0a;
+    flex-shrink: 0;
+  }
+
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .company-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .company-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+
+  .company-chips {
+    display: flex;
+    gap: 8px;
+    margin-left: 4px;
+  }
+
+  .chip {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 12px;
+    color: #a0a0a0;
+    white-space: nowrap;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .team-avatars {
+    display: flex;
+    align-items: center;
+    gap: -4px;
+  }
+
+  .team-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    border: 2px solid #0a0a0a;
+    margin-left: -6px;
+    flex-shrink: 0;
+  }
+  .team-avatar:first-child { margin-left: 0; }
+  .team-avatar.you { background: #2563eb; }
+  .team-avatar.jessica { background: #8b5cf6; }
+  .team-avatar.marcus { background: #059669; }
+
+  .primary-contact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #888;
+    font-size: 13px;
+    padding-left: 8px;
+    border-left: 1px solid #2a2a2a;
+  }
+
+  .primary-contact svg {
+    opacity: 0.5;
+  }
+
+  .primary-contact strong {
+    color: #ccc;
+    font-weight: 500;
+  }
+
+  /* ── Tab Bar ── */
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    padding: 0 32px;
+    margin-top: 18px;
+    border-bottom: 1px solid #2a2a2a;
+    background: #0a0a0a;
+    flex-shrink: 0;
+  }
+
+  .tab {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    user-select: none;
+  }
+
+  .tab:hover {
+    color: #aaa;
+  }
+
+  .tab.active {
+    color: #fff;
+    border-bottom-color: #2563eb;
+  }
+
+  .tab .tab-badge {
+    display: inline-block;
+    background: #ef4444;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0 5px;
+    border-radius: 8px;
+    margin-left: 6px;
+    line-height: 16px;
+    vertical-align: 1px;
+  }
+
+  /* ── Tab Content Area ── */
+  .tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 32px 32px 32px;
+  }
+
+  .tab-content::-webkit-scrollbar { width: 6px; }
+  .tab-content::-webkit-scrollbar-track { background: transparent; }
+  .tab-content::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+  .tab-panel {
+    display: none;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  /* ── Cards & Sections ── */
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #666;
+    margin-bottom: 12px;
+  }
+
+  .card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* ── Attention Items ── */
+  .attention-section {
+    margin-bottom: 28px;
+  }
+
+  .attention-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #ef4444;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .attention-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .attention-item {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .attention-item:hover {
+    background: #222;
+    border-color: #333;
+  }
+
+  .attention-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .attention-icon.blocking { background: rgba(239, 68, 68, 0.15); }
+  .attention-icon.error { background: rgba(245, 158, 11, 0.15); }
+  .attention-icon.review { background: rgba(59, 130, 246, 0.15); }
+
+  .attention-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .attention-body .label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #e5e5e5;
+  }
+
+  .attention-body .sublabel {
+    font-size: 12px;
+    color: #777;
+    margin-top: 2px;
+  }
+
+  .attention-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .attention-badge.blocking {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+  }
+
+  .attention-badge.error {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+  }
+
+  .attention-badge.review {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+  }
+
+  /* ── Quick Stats ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .stat-tile {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+  }
+
+  .stat-value.red { color: #f87171; }
+  .stat-value.blue { color: #60a5fa; }
+  .stat-value.green { color: #34d399; }
+
+  .stat-label {
+    font-size: 12px;
+    color: #777;
+    margin-top: 4px;
+  }
+
+  .stat-sublabel {
+    font-size: 11px;
+    color: #555;
+    margin-top: 2px;
+  }
+
+  /* ── Two-Column Layout ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  /* ── Activity Feed ── */
+  .activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #1f1f1f;
+  }
+
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+
+  .activity-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .activity-avatar.human { background: #2563eb; }
+  .activity-avatar.agent { background: #7c3aed; }
+  .activity-avatar.jessica { background: #8b5cf6; }
+  .activity-avatar.marcus { background: #059669; }
+
+  .activity-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .activity-body .who {
+    font-weight: 600;
+    color: #ccc;
+    font-size: 13px;
+  }
+
+  .activity-body .what {
+    color: #888;
+    font-size: 13px;
+  }
+
+  .activity-body .agent-tag {
+    display: inline-block;
+    background: rgba(124, 58, 237, 0.15);
+    color: #a78bfa;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+
+  .activity-time {
+    font-size: 12px;
+    color: #555;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* ── Chat List ── */
+  .chat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .chat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #1f1f1f;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+
+  .chat-item:last-child {
+    border-bottom: none;
+  }
+
+  .chat-item:hover {
+    background: rgba(255,255,255,0.02);
+  }
+
+  .chat-unread-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #2563eb;
+    flex-shrink: 0;
+  }
+
+  .chat-unread-dot.hidden {
+    visibility: hidden;
+  }
+
+  .chat-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .chat-body .chat-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #e5e5e5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chat-body .chat-name.unread {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .chat-body .chat-preview {
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+  }
+
+  .chat-time {
+    font-size: 12px;
+    color: #555;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .chat-time.unread {
+    color: #60a5fa;
+    font-weight: 600;
+  }
+
+  /* ── Placeholder panels ── */
+  .placeholder-header {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ccc;
+    margin-bottom: 8px;
+  }
+
+  .placeholder-sub {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 24px;
+  }
+
+  /* ── Full Activity Tab ── */
+  .full-activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid #1f1f1f;
+  }
+
+  .full-activity-item:last-child {
+    border-bottom: none;
+  }
+
+  .timeline-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .timeline-dot.blue { background: #2563eb; }
+  .timeline-dot.purple { background: #7c3aed; }
+  .timeline-dot.green { background: #059669; }
+  .timeline-dot.amber { background: #f59e0b; }
+
+  .full-activity-body {
+    flex: 1;
+  }
+
+  .full-activity-body .who {
+    font-weight: 600;
+    color: #ccc;
+    font-size: 14px;
+  }
+
+  .full-activity-body .what {
+    color: #999;
+    font-size: 13px;
+    margin-top: 2px;
+  }
+
+  .full-activity-time {
+    font-size: 12px;
+    color: #555;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* ── Chats Tab ── */
+  .chats-tab-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .chats-tab-item:hover {
+    background: #222;
+    border-color: #333;
+  }
+
+  .chat-icon-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #1f1f3a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .chats-tab-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .chats-tab-body .name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #e5e5e5;
+  }
+
+  .chats-tab-body .preview {
+    font-size: 12px;
+    color: #666;
+    margin-top: 1px;
+  }
+
+  .chats-tab-meta {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .chats-tab-meta .time {
+    font-size: 12px;
+    color: #555;
+  }
+
+  .chats-tab-meta .msgs {
+    font-size: 11px;
+    color: #777;
+    margin-top: 2px;
+  }
+
+  /* ── Company Info Tab ── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .info-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  .info-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ccc;
+    margin-bottom: 14px;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #1f1f1f;
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+  }
+
+  .info-row .label {
+    font-size: 13px;
+    color: #777;
+  }
+
+  .info-row .value {
+    font-size: 13px;
+    color: #e5e5e5;
+    font-weight: 500;
+  }
+
+  .quick-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #111;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    color: #aaa;
+    font-size: 13px;
+  }
+
+  .quick-link:hover {
+    background: #1a1a1a;
+    border-color: #333;
+    color: #fff;
+  }
+
+  .doc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #1f1f1f;
+    font-size: 13px;
+    color: #999;
+  }
+
+  .doc-item:last-child {
+    border-bottom: none;
+  }
+
+  .doc-item .doc-name {
+    color: #60a5fa;
+    cursor: pointer;
+  }
+
+  .doc-item .doc-name:hover {
+    text-decoration: underline;
+  }
+
+  .doc-item .doc-date {
+    margin-left: auto;
+    color: #555;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════ Company Header ════════════ -->
+<div class="company-header">
+  <div class="header-row">
+    <div class="header-left">
+      <div class="company-avatar">A</div>
+      <div>
+        <div class="company-name">Aperture Science</div>
+      </div>
+      <div class="company-chips">
+        <span class="chip">R&amp;D</span>
+        <span class="chip">Cleveland, OH</span>
+        <span class="chip">312 employees</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="team-avatars">
+        <div class="team-avatar you" title="You">You</div>
+        <div class="team-avatar jessica" title="Jessica Park">JP</div>
+        <div class="team-avatar marcus" title="Marcus Chen">MC</div>
+      </div>
+      <div class="primary-contact">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span><strong>Cave Johnson</strong> (CEO)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ Tab Bar ════════════ -->
+  <div class="tab-bar">
+    <div class="tab active" data-tab="overview">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Overview
+      <span class="tab-badge">3</span>
+    </div>
+    <div class="tab" data-tab="activity">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Activity
+    </div>
+    <div class="tab" data-tab="chats">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Chats
+      <span class="tab-badge">1</span>
+    </div>
+    <div class="tab" data-tab="company-info">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      Company Info
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ Tab Content ════════════ -->
+<div class="tab-content">
+
+  <!-- ════ OVERVIEW TAB ════ -->
+  <div class="tab-panel active" id="panel-overview">
+
+    <!-- Attention Needed -->
+    <div class="attention-section">
+      <div class="attention-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Attention Needed
+      </div>
+      <div class="attention-list">
+        <!-- Item 1: Blocking -->
+        <div class="attention-item">
+          <div class="attention-icon blocking">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </div>
+          <div class="attention-body">
+            <div class="label">Payroll Runner needs approval</div>
+            <div class="sublabel">Q1 payroll for 312 employees &mdash; awaiting your sign-off</div>
+          </div>
+          <span class="attention-badge blocking">Blocking</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+
+        <!-- Item 2: Error -->
+        <div class="attention-item">
+          <div class="attention-icon error">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="attention-body">
+            <div class="label">Benefits Enrollment agent error</div>
+            <div class="sublabel">Failed to sync dental plan &mdash; Delta Dental API timeout</div>
+          </div>
+          <span class="attention-badge error">Error</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+
+        <!-- Item 3: Review -->
+        <div class="attention-item">
+          <div class="attention-icon review">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="attention-body">
+            <div class="label">Compliance Check complete</div>
+            <div class="sublabel">2 items flagged for review &mdash; FMLA policy and I-9 verification</div>
+          </div>
+          <span class="attention-badge review">Review</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+      <div class="stat-tile">
+        <div class="stat-value blue">7</div>
+        <div class="stat-label">Open Chats</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-value red">3</div>
+        <div class="stat-label">Pending Approvals</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-value green">48</div>
+        <div class="stat-label">Agent Runs (30d)</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-value">Mar 1</div>
+        <div class="stat-label">Next Payroll</div>
+        <div class="stat-sublabel">4 days</div>
+      </div>
+    </div>
+
+    <!-- Two Columns -->
+    <div class="two-col">
+
+      <!-- Left: Recent Activity -->
+      <div>
+        <div class="section-title">Recent Activity</div>
+        <div class="card">
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-avatar human">You</div>
+              <div class="activity-body">
+                <span class="who">You</span>
+                <span class="what"> &mdash; updated benefits enrollment settings</span>
+              </div>
+              <div class="activity-time">2h ago</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar agent">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+              </div>
+              <div class="activity-body">
+                <span class="who">Payroll Runner</span><span class="agent-tag">Agent</span>
+                <span class="what"> &mdash; completed bi-weekly calculation</span>
+              </div>
+              <div class="activity-time">1h ago</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar jessica">JP</div>
+              <div class="activity-body">
+                <span class="who">Jessica Park</span>
+                <span class="what"> &mdash; ran Q4 performance report</span>
+              </div>
+              <div class="activity-time">5h ago</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar agent">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+              </div>
+              <div class="activity-body">
+                <span class="who">CX Oracle</span><span class="agent-tag">Agent</span>
+                <span class="what"> &mdash; generated satisfaction report</span>
+              </div>
+              <div class="activity-time">3h ago</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar marcus">MC</div>
+              <div class="activity-body">
+                <span class="who">Marcus Chen</span>
+                <span class="what"> &mdash; resolved payroll discrepancy</span>
+              </div>
+              <div class="activity-time">yesterday</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar agent">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+              </div>
+              <div class="activity-body">
+                <span class="who">Compliance Bot</span><span class="agent-tag">Agent</span>
+                <span class="what"> &mdash; flagged 2 policy updates</span>
+              </div>
+              <div class="activity-time">yesterday</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Recent Chats -->
+      <div>
+        <div class="section-title">Recent Chats</div>
+        <div class="card">
+          <div class="chat-list">
+            <div class="chat-item">
+              <div class="chat-unread-dot"></div>
+              <div class="chat-body">
+                <div class="chat-name unread">Portal Gun Safety Training</div>
+                <div class="chat-preview">Cave: "We need to update the certification requirements before..."</div>
+              </div>
+              <div class="chat-time unread">33m ago</div>
+            </div>
+            <div class="chat-item">
+              <div class="chat-unread-dot hidden"></div>
+              <div class="chat-body">
+                <div class="chat-name">GLaDOS Maintenance Schedule</div>
+                <div class="chat-preview">You: "I've reviewed the proposed maintenance windows and..."</div>
+              </div>
+              <div class="chat-time">3h ago</div>
+            </div>
+            <div class="chat-item">
+              <div class="chat-unread-dot hidden"></div>
+              <div class="chat-body">
+                <div class="chat-name">Q1 Payroll Review</div>
+                <div class="chat-preview">Jessica: "Numbers look good, just need final sign-off on the..."</div>
+              </div>
+              <div class="chat-time">yesterday</div>
+            </div>
+            <div class="chat-item">
+              <div class="chat-unread-dot hidden"></div>
+              <div class="chat-body">
+                <div class="chat-name">New Hire Onboarding &mdash; Batch 12</div>
+                <div class="chat-preview">Onboard Agent: "All 8 new hires have completed I-9 forms..."</div>
+              </div>
+              <div class="chat-time">2d ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════ ACTIVITY TAB ════ -->
+  <div class="tab-panel" id="panel-activity">
+    <div class="placeholder-header">Activity Timeline</div>
+    <div class="placeholder-sub">Full activity feed for Aperture Science &mdash; human actions and agent runs</div>
+
+    <div class="card">
+      <div class="full-activity-item">
+        <div class="timeline-dot blue"></div>
+        <div class="full-activity-body">
+          <div class="who">You</div>
+          <div class="what">Updated benefits enrollment settings for Q1 open enrollment window</div>
+        </div>
+        <div class="full-activity-time">2h ago</div>
+      </div>
+      <div class="full-activity-item">
+        <div class="timeline-dot purple"></div>
+        <div class="full-activity-body">
+          <div class="who">Payroll Runner <span class="agent-tag" style="margin-left:6px;">Agent</span></div>
+          <div class="what">Completed bi-weekly payroll calculation for 312 employees &mdash; $2.4M total</div>
+        </div>
+        <div class="full-activity-time">1h ago</div>
+      </div>
+      <div class="full-activity-item">
+        <div class="timeline-dot blue"></div>
+        <div class="full-activity-body">
+          <div class="who">Jessica Park</div>
+          <div class="what">Generated Q4 performance review report &mdash; 289 reviews completed, 23 pending</div>
+        </div>
+        <div class="full-activity-time">5h ago</div>
+      </div>
+      <div class="full-activity-item">
+        <div class="timeline-dot purple"></div>
+        <div class="full-activity-body">
+          <div class="who">CX Oracle <span class="agent-tag" style="margin-left:6px;">Agent</span></div>
+          <div class="what">Generated employee satisfaction report &mdash; eNPS score: 72 (+4 from last quarter)</div>
+        </div>
+        <div class="full-activity-time">3h ago</div>
+      </div>
+      <div class="full-activity-item">
+        <div class="timeline-dot green"></div>
+        <div class="full-activity-body">
+          <div class="who">Marcus Chen</div>
+          <div class="what">Resolved payroll discrepancy for Lab Technician dept &mdash; $3,200 adjustment</div>
+        </div>
+        <div class="full-activity-time">yesterday</div>
+      </div>
+      <div class="full-activity-item">
+        <div class="timeline-dot purple"></div>
+        <div class="full-activity-body">
+          <div class="who">Compliance Bot <span class="agent-tag" style="margin-left:6px;">Agent</span></div>
+          <div class="what">Flagged 2 policy updates: FMLA leave tracking and I-9 reverification schedule</div>
+        </div>
+        <div class="full-activity-time">yesterday</div>
+      </div>
+      <div class="full-activity-item">
+        <div class="timeline-dot blue"></div>
+        <div class="full-activity-body">
+          <div class="who">You</div>
+          <div class="what">Approved PTO request batch &mdash; 14 requests for March spring break window</div>
+        </div>
+        <div class="full-activity-time">2 days ago</div>
+      </div>
+      <div class="full-activity-item">
+        <div class="timeline-dot purple"></div>
+        <div class="full-activity-body">
+          <div class="who">Onboard Agent <span class="agent-tag" style="margin-left:6px;">Agent</span></div>
+          <div class="what">Completed onboarding workflow for Batch 12 &mdash; 8 new hires, all documents verified</div>
+        </div>
+        <div class="full-activity-time">2 days ago</div>
+      </div>
+      <div class="full-activity-item">
+        <div class="timeline-dot amber"></div>
+        <div class="full-activity-body">
+          <div class="who">Benefits Enrollment <span class="agent-tag" style="margin-left:6px;">Agent</span></div>
+          <div class="what">Synced vision plan updates for 2026 &mdash; 4 carrier rate changes applied</div>
+        </div>
+        <div class="full-activity-time">3 days ago</div>
+      </div>
+      <div class="full-activity-item">
+        <div class="timeline-dot green"></div>
+        <div class="full-activity-body">
+          <div class="who">Jessica Park</div>
+          <div class="what">Submitted quarterly headcount report to Cave Johnson</div>
+        </div>
+        <div class="full-activity-time">3 days ago</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ CHATS TAB ════ -->
+  <div class="tab-panel" id="panel-chats">
+    <div class="placeholder-header">All Chats</div>
+    <div class="placeholder-sub">7 open conversations for Aperture Science</div>
+
+    <div class="chats-tab-item">
+      <div class="chat-icon-circle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="chats-tab-body">
+        <div class="name" style="color:#fff;font-weight:600;">Portal Gun Safety Training</div>
+        <div class="preview">Cave: "We need to update the certification requirements before..."</div>
+      </div>
+      <div class="chats-tab-meta">
+        <div class="time" style="color:#60a5fa;font-weight:600;">33m ago</div>
+        <div class="msgs">12 messages</div>
+      </div>
+      <div class="chat-unread-dot" style="flex-shrink:0;"></div>
+    </div>
+
+    <div class="chats-tab-item">
+      <div class="chat-icon-circle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="chats-tab-body">
+        <div class="name">GLaDOS Maintenance Schedule</div>
+        <div class="preview">You: "I've reviewed the proposed maintenance windows and..."</div>
+      </div>
+      <div class="chats-tab-meta">
+        <div class="time">3h ago</div>
+        <div class="msgs">8 messages</div>
+      </div>
+    </div>
+
+    <div class="chats-tab-item">
+      <div class="chat-icon-circle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="chats-tab-body">
+        <div class="name">Q1 Payroll Review</div>
+        <div class="preview">Jessica: "Numbers look good, just need final sign-off on the..."</div>
+      </div>
+      <div class="chats-tab-meta">
+        <div class="time">yesterday</div>
+        <div class="msgs">24 messages</div>
+      </div>
+    </div>
+
+    <div class="chats-tab-item">
+      <div class="chat-icon-circle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="chats-tab-body">
+        <div class="name">New Hire Onboarding &mdash; Batch 12</div>
+        <div class="preview">Onboard Agent: "All 8 new hires have completed I-9 forms..."</div>
+      </div>
+      <div class="chats-tab-meta">
+        <div class="time">2d ago</div>
+        <div class="msgs">31 messages</div>
+      </div>
+    </div>
+
+    <div class="chats-tab-item">
+      <div class="chat-icon-circle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="chats-tab-body">
+        <div class="name">OSHA Lab Safety Audit Prep</div>
+        <div class="preview">Marcus: "I've pulled the last 3 incident reports and..."</div>
+      </div>
+      <div class="chats-tab-meta">
+        <div class="time">3d ago</div>
+        <div class="msgs">17 messages</div>
+      </div>
+    </div>
+
+    <div class="chats-tab-item">
+      <div class="chat-icon-circle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="chats-tab-body">
+        <div class="name">Employee Handbook Updates 2026</div>
+        <div class="preview">Compliance Bot: "Draft updated sections are ready for your..."</div>
+      </div>
+      <div class="chats-tab-meta">
+        <div class="time">4d ago</div>
+        <div class="msgs">9 messages</div>
+      </div>
+    </div>
+
+    <div class="chats-tab-item">
+      <div class="chat-icon-circle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="chats-tab-body">
+        <div class="name">Benefits Open Enrollment Planning</div>
+        <div class="preview">You: "Let's aim to launch the portal by March 15 so employees..."</div>
+      </div>
+      <div class="chats-tab-meta">
+        <div class="time">1w ago</div>
+        <div class="msgs">42 messages</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ COMPANY INFO TAB ════ -->
+  <div class="tab-panel" id="panel-company-info">
+    <div class="info-grid">
+
+      <!-- Company Details -->
+      <div class="info-card">
+        <h3>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Company Details
+        </h3>
+        <div class="info-row">
+          <span class="label">Created</span>
+          <span class="value">Mar 4, 2024</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Industry</span>
+          <span class="value">Research &amp; Development</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Location</span>
+          <span class="value">Cleveland, OH (EST)</span>
+        </div>
+        <div class="info-row">
+          <span class="label">EIN</span>
+          <span class="value">XX-XXXXX42</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Fiscal Year</span>
+          <span class="value">Jan &ndash; Dec</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Pay Schedule</span>
+          <span class="value">Bi-weekly</span>
+        </div>
+      </div>
+
+      <!-- Key Contacts -->
+      <div class="info-card">
+        <h3>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Key Contacts
+        </h3>
+        <div class="info-row">
+          <span class="label">Primary Contact</span>
+          <span class="value">Cave Johnson, CEO</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Key Contact</span>
+          <span class="value">GLaDOS, Operations Director</span>
+        </div>
+        <div class="info-row">
+          <span class="label">HR Lead</span>
+          <span class="value">Chell Martinez, VP People</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Billing Contact</span>
+          <span class="value">Wheatley Brown, Finance</span>
+        </div>
+      </div>
+
+      <!-- Workforce Stats -->
+      <div class="info-card">
+        <h3>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          Workforce
+        </h3>
+        <div class="info-row">
+          <span class="label">Total Employees</span>
+          <span class="value">312</span>
+        </div>
+        <div class="info-row">
+          <span class="label">BambooHR Users</span>
+          <span class="value">19</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Job Openings</span>
+          <span class="value">3 / 50</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Departments</span>
+          <span class="value">14</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Locations</span>
+          <span class="value">3</span>
+        </div>
+      </div>
+
+      <!-- Documents & Links -->
+      <div class="info-card">
+        <h3>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Documents
+        </h3>
+        <div class="doc-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span class="doc-name">Master Service Agreement.pdf</span>
+          <span class="doc-date">Jan 15, 2024</span>
+        </div>
+        <div class="doc-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span class="doc-name">Employee Handbook 2026.pdf</span>
+          <span class="doc-date">Feb 1, 2026</span>
+        </div>
+        <div class="doc-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span class="doc-name">Benefits Summary 2026.pdf</span>
+          <span class="doc-date">Feb 10, 2026</span>
+        </div>
+        <div class="doc-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span class="doc-name">Q4 Compliance Report.pdf</span>
+          <span class="doc-date">Jan 28, 2026</span>
+        </div>
+
+        <div style="margin-top:16px;">
+          <h3 style="font-size:14px;font-weight:600;color:#ccc;margin-bottom:10px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Quick Links
+          </h3>
+          <div class="quick-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View in BambooHR
+          </div>
+          <div class="quick-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Billing &amp; Subscription
+          </div>
+          <div class="quick-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Account Settings
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Tab switching logic
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.tab-panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Remove active from all tabs and panels
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+
+      // Activate clicked tab
+      tab.classList.add('active');
+
+      // Show corresponding panel
+      const targetId = 'panel-' + tab.dataset.tab;
+      const targetPanel = document.getElementById(targetId);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

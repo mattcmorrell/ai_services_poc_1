@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Home — Aperture Science (Approach C: Two-Pane Split)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0a;
+    color: #e5e5e5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Two-Pane Layout ── */
+  .split-layout {
+    display: flex;
+    height: 100vh;
+  }
+
+  /* ── Left Panel (fixed reference) ── */
+  .left-panel {
+    width: 320px;
+    min-width: 320px;
+    background: #111111;
+    border-right: 1px solid #2a2a2a;
+    overflow-y: auto;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .left-panel::-webkit-scrollbar {
+    width: 4px;
+  }
+  .left-panel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .left-panel::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 2px;
+  }
+
+  /* ── Right Panel (scrolling feed) ── */
+  .right-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 32px;
+  }
+
+  .right-panel::-webkit-scrollbar {
+    width: 6px;
+  }
+  .right-panel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .right-panel::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+  }
+
+  /* ── Left Panel: Company Profile ── */
+  .company-profile {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #2a2a2a;
+    margin-bottom: 20px;
+  }
+
+  .company-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 auto 12px;
+  }
+
+  .company-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+  }
+
+  .company-industry {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 12px;
+  }
+
+  .company-location {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 4px;
+  }
+  .company-location svg {
+    flex-shrink: 0;
+  }
+
+  .company-time {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 16px;
+  }
+
+  /* ── Fact Row ── */
+  .fact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .fact-item {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+
+  .fact-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .fact-label {
+    font-size: 11px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 2px;
+  }
+
+  .fact-item.full {
+    grid-column: 1 / -1;
+  }
+
+  /* ── Contact rows ── */
+  .contact-section {
+    padding-bottom: 16px;
+    border-bottom: 1px solid #2a2a2a;
+    margin-bottom: 16px;
+  }
+
+  .contact-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+  }
+
+  .contact-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .contact-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .contact-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #ddd;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .contact-role {
+    font-size: 11px;
+    color: #666;
+  }
+
+  .contact-badge {
+    font-size: 10px;
+    color: #888;
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    padding: 1px 6px;
+    white-space: nowrap;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #777;
+    padding: 4px 0;
+  }
+  .meta-row svg { flex-shrink: 0; opacity: 0.5; }
+  .meta-row .meta-label { color: #555; min-width: 60px; }
+
+  /* ── Section Headers ── */
+  .section-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+    margin-top: 4px;
+  }
+
+  /* ── Assigned Team ── */
+  .team-section {
+    padding-bottom: 16px;
+    border-bottom: 1px solid #2a2a2a;
+    margin-bottom: 16px;
+  }
+
+  .team-member {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+  }
+
+  .team-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .team-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .status-dot {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #111111;
+  }
+  .status-dot.online { background: #22c55e; }
+  .status-dot.offline { background: #555; }
+
+  .team-name {
+    font-size: 13px;
+    color: #ddd;
+    font-weight: 500;
+  }
+
+  .team-role {
+    font-size: 11px;
+    color: #666;
+  }
+
+  .team-badge {
+    margin-left: auto;
+    font-size: 10px;
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+
+  /* ── Documents ── */
+  .doc-section {
+    padding-bottom: 16px;
+    border-bottom: 1px solid #2a2a2a;
+    margin-bottom: 16px;
+  }
+
+  .doc-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 13px;
+    color: #bbb;
+  }
+  .doc-item:hover {
+    background: #1a1a1a;
+    color: #fff;
+  }
+  .doc-item svg { flex-shrink: 0; opacity: 0.4; }
+  .doc-item:hover svg { opacity: 0.7; }
+
+  /* ── Quick Links ── */
+  .quick-links {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .quick-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 13px;
+    color: #888;
+    text-decoration: none;
+  }
+  .quick-link:hover {
+    background: #1a1a1a;
+    color: #ccc;
+  }
+  .quick-link svg { flex-shrink: 0; opacity: 0.4; }
+  .quick-link:hover svg { opacity: 0.6; }
+
+  /* ═══════════════════════════════════════
+     Right Panel Styles
+     ═══════════════════════════════════════ */
+
+  .right-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .right-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .right-subtitle {
+    font-size: 13px;
+    color: #666;
+    margin-top: 2px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid #2a2a2a;
+    background: #1a1a1a;
+    color: #ccc;
+    transition: all 0.15s;
+  }
+  .btn:hover { background: #222; color: #fff; border-color: #3a3a3a; }
+  .btn svg { flex-shrink: 0; }
+
+  .btn-primary {
+    background: #2563eb;
+    border-color: #3b82f6;
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background: #1d4ed8;
+  }
+
+  /* ── Section Card ── */
+  .section-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .section-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .section-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-count {
+    font-size: 11px;
+    background: #2a2a2a;
+    color: #888;
+    border-radius: 10px;
+    padding: 1px 8px;
+    font-weight: 500;
+  }
+
+  .section-link {
+    font-size: 12px;
+    color: #3b82f6;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .section-link:hover { color: #60a5fa; text-decoration: underline; }
+
+  /* ── Attention Items ── */
+  .attention-section {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .attention-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #0f0f0f;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .attention-item:last-child { margin-bottom: 0; }
+  .attention-item:hover {
+    border-color: #3a3a3a;
+    background: #141414;
+  }
+
+  .attention-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .attention-icon.blocking {
+    background: rgba(239, 68, 68, 0.12);
+  }
+  .attention-icon.error {
+    background: rgba(245, 158, 11, 0.12);
+  }
+  .attention-icon.review {
+    background: rgba(59, 130, 246, 0.12);
+  }
+
+  .attention-content { flex: 1; min-width: 0; }
+
+  .attention-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+
+  .attention-desc {
+    font-size: 12px;
+    color: #888;
+  }
+
+  .attention-badge {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .attention-badge.blocking {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+  .attention-badge.error {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+  .attention-badge.review-badge {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+
+  /* ── Chat Items ── */
+  .chat-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid #222;
+  }
+  .chat-item:last-child { border-bottom: none; }
+  .chat-item:hover { background: #222; }
+
+  .chat-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3b82f6;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .chat-dot.read { background: transparent; }
+
+  .chat-content { flex: 1; min-width: 0; }
+
+  .chat-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 2px;
+  }
+
+  .chat-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chat-time {
+    font-size: 11px;
+    color: #555;
+    flex-shrink: 0;
+  }
+
+  .chat-preview {
+    font-size: 12px;
+    color: #777;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── Activity Timeline ── */
+  .activity-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #1f1f1f;
+  }
+  .activity-item:last-child { border-bottom: none; }
+
+  .activity-dot-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 4px;
+  }
+
+  .activity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3a3a3a;
+    flex-shrink: 0;
+  }
+
+  .activity-content { flex: 1; }
+
+  .activity-text {
+    font-size: 13px;
+    color: #ccc;
+  }
+  .activity-text .actor {
+    font-weight: 600;
+    color: #fff;
+  }
+  .activity-text .action {
+    color: #999;
+  }
+
+  .activity-time {
+    font-size: 11px;
+    color: #555;
+    margin-top: 2px;
+  }
+
+  /* ── Agent Activity ── */
+  .agent-activity-section .section-card {
+    border-color: rgba(139, 92, 246, 0.15);
+  }
+
+  .agent-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #1f1f1f;
+  }
+  .agent-item:last-child { border-bottom: none; }
+
+  .agent-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: rgba(139, 92, 246, 0.12);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .agent-content { flex: 1; }
+
+  .agent-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #c4b5fd;
+  }
+
+  .agent-desc {
+    font-size: 12px;
+    color: #888;
+    margin-top: 1px;
+  }
+
+  .agent-time {
+    font-size: 11px;
+    color: #555;
+    margin-top: 2px;
+  }
+
+  .agent-status {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .agent-status.success {
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.15);
+  }
+  .agent-status.warning {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+  }
+  .agent-status.agent-error {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+  }
+
+  /* ── Two-column grid for activity ── */
+  .two-col-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 1000px) {
+    .two-col-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="split-layout">
+
+  <!-- ═══════════════════════════════════
+       LEFT PANEL — Fixed Reference Card
+       ═══════════════════════════════════ -->
+  <aside class="left-panel">
+
+    <!-- Company Profile -->
+    <div class="company-profile">
+      <div class="company-avatar">A</div>
+      <div class="company-name">Aperture Science</div>
+      <div class="company-industry">Research & Development</div>
+      <div class="company-location">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Cleveland, OH
+      </div>
+      <div class="company-time">EST &middot; 3:45 PM local time</div>
+
+      <div class="fact-grid">
+        <div class="fact-item">
+          <div class="fact-value">312</div>
+          <div class="fact-label">Employees</div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-value">19</div>
+          <div class="fact-label">BHR Users</div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-value">3</div>
+          <div class="fact-label">Job Openings</div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-value" style="font-size: 14px;">Mar 4, 2024</div>
+          <div class="fact-label">Created (1yr 11mo)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Contacts -->
+    <div class="contact-section">
+      <div class="section-header">Key Contacts</div>
+      <div class="contact-row">
+        <div class="contact-avatar" style="background: #7c3aed;">CJ</div>
+        <div class="contact-info">
+          <div class="contact-name">Cave Johnson</div>
+          <div class="contact-role">CEO</div>
+        </div>
+        <div class="contact-badge">Primary</div>
+      </div>
+      <div class="contact-row">
+        <div class="contact-avatar" style="background: #0891b2;">GL</div>
+        <div class="contact-info">
+          <div class="contact-name">GLaDOS</div>
+          <div class="contact-role">Operations Director</div>
+        </div>
+        <div class="contact-badge">Key Contact</div>
+      </div>
+    </div>
+
+    <!-- Assigned Team -->
+    <div class="team-section">
+      <div class="section-header">Assigned Team</div>
+      <div class="team-member">
+        <div class="team-avatar-wrap">
+          <div class="team-avatar" style="background: #2563eb;">Y</div>
+          <div class="status-dot online"></div>
+        </div>
+        <div>
+          <div class="team-name">You</div>
+          <div class="team-role">Lead Consultant</div>
+        </div>
+        <div class="team-badge">Lead</div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar-wrap">
+          <div class="team-avatar" style="background: #0d9488;">JP</div>
+          <div class="status-dot online"></div>
+        </div>
+        <div>
+          <div class="team-name">Jessica Park</div>
+          <div class="team-role">Junior Consultant</div>
+        </div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar-wrap">
+          <div class="team-avatar" style="background: #6366f1;">MC</div>
+          <div class="status-dot offline"></div>
+        </div>
+        <div>
+          <div class="team-name">Marcus Chen</div>
+          <div class="team-role">Junior Consultant</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documents -->
+    <div class="doc-section">
+      <div class="section-header">Documents</div>
+      <div class="doc-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Employee Handbook v3
+      </div>
+      <div class="doc-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Benefits Summary 2026
+      </div>
+      <div class="doc-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Q4 Performance Summary
+      </div>
+      <div class="doc-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        2025 W-2 Preview Draft
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div>
+      <div class="section-header">Quick Links</div>
+      <div class="quick-links">
+        <a class="quick-link" href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          View in BambooHR
+        </a>
+        <a class="quick-link" href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Billing & Subscription
+        </a>
+        <a class="quick-link" href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Company Settings
+        </a>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ═══════════════════════════════════
+       RIGHT PANEL — Dynamic Feed
+       ═══════════════════════════════════ -->
+  <main class="right-panel">
+
+    <!-- Header -->
+    <div class="right-header">
+      <div>
+        <div class="right-title">Aperture Science</div>
+        <div class="right-subtitle">3 items need your attention</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Search
+        </button>
+        <button class="btn btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          New Chat
+        </button>
+      </div>
+    </div>
+
+    <!-- Attention Needed -->
+    <div class="attention-section">
+      <div class="section-card-header">
+        <div class="section-card-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Attention Needed
+          <span class="section-count">3</span>
+        </div>
+      </div>
+
+      <div class="attention-item">
+        <div class="attention-icon blocking">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div class="attention-content">
+          <div class="attention-title">Payroll Runner needs approval</div>
+          <div class="attention-desc">Q1 payroll for 312 employees ready for final sign-off</div>
+        </div>
+        <div class="attention-badge blocking">Blocking</div>
+      </div>
+
+      <div class="attention-item">
+        <div class="attention-icon error">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="attention-content">
+          <div class="attention-title">Benefits Enrollment agent error</div>
+          <div class="attention-desc">Failed to sync dental plan with provider API</div>
+        </div>
+        <div class="attention-badge error">Error</div>
+      </div>
+
+      <div class="attention-item">
+        <div class="attention-icon review">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div class="attention-content">
+          <div class="attention-title">Compliance Check complete</div>
+          <div class="attention-desc">2 items flagged for review in quarterly audit</div>
+        </div>
+        <div class="attention-badge review-badge">Review</div>
+      </div>
+    </div>
+
+    <!-- Recent Chats -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <div class="section-card-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Recent Chats
+          <span class="section-count">4</span>
+        </div>
+        <a class="section-link" href="#">View all</a>
+      </div>
+
+      <div class="chat-item">
+        <div class="chat-dot"></div>
+        <div class="chat-content">
+          <div class="chat-title-row">
+            <div class="chat-title">Portal Gun Safety Training</div>
+            <div class="chat-time">33m ago</div>
+          </div>
+          <div class="chat-preview">The training module for the portal gun safety certification has been updated with new...</div>
+        </div>
+      </div>
+
+      <div class="chat-item">
+        <div class="chat-dot read"></div>
+        <div class="chat-content">
+          <div class="chat-title-row">
+            <div class="chat-title">GLaDOS Maintenance Schedule</div>
+            <div class="chat-time">3h ago</div>
+          </div>
+          <div class="chat-preview">Scheduled maintenance window for the GLaDOS system is confirmed for Saturday 2am-6am...</div>
+        </div>
+      </div>
+
+      <div class="chat-item">
+        <div class="chat-dot read"></div>
+        <div class="chat-content">
+          <div class="chat-title-row">
+            <div class="chat-title">Q1 Payroll Review</div>
+            <div class="chat-time">yesterday</div>
+          </div>
+          <div class="chat-preview">Payroll calculations are ready for your review. Total gross: $4.2M across 312 employees...</div>
+        </div>
+      </div>
+
+      <div class="chat-item">
+        <div class="chat-dot read"></div>
+        <div class="chat-content">
+          <div class="chat-title-row">
+            <div class="chat-title">New Hire Onboarding &mdash; Batch 12</div>
+            <div class="chat-time">2d ago</div>
+          </div>
+          <div class="chat-preview">3 new hires processed successfully. All documentation complete and benefits enrolled...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-column: Team Activity + Agent Activity -->
+    <div class="two-col-grid">
+
+      <!-- Team Activity -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Team Activity
+          </div>
+        </div>
+
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-dot-wrap"><div class="activity-dot" style="background: #3b82f6;"></div></div>
+            <div class="activity-content">
+              <div class="activity-text">
+                <span class="actor">You</span>
+                <span class="action"> updated benefits enrollment settings</span>
+              </div>
+              <div class="activity-time">2 hours ago</div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-dot-wrap"><div class="activity-dot" style="background: #0d9488;"></div></div>
+            <div class="activity-content">
+              <div class="activity-text">
+                <span class="actor">Jessica Park</span>
+                <span class="action"> ran Q4 performance report</span>
+              </div>
+              <div class="activity-time">5 hours ago</div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-dot-wrap"><div class="activity-dot" style="background: #6366f1;"></div></div>
+            <div class="activity-content">
+              <div class="activity-text">
+                <span class="actor">Marcus Chen</span>
+                <span class="action"> resolved payroll discrepancy for J. Williams</span>
+              </div>
+              <div class="activity-time">yesterday</div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-dot-wrap"><div class="activity-dot" style="background: #3b82f6;"></div></div>
+            <div class="activity-content">
+              <div class="activity-text">
+                <span class="actor">You</span>
+                <span class="action"> started new chat: Portal Gun Safety Training</span>
+              </div>
+              <div class="activity-time">yesterday</div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-dot-wrap"><div class="activity-dot" style="background: #0d9488;"></div></div>
+            <div class="activity-content">
+              <div class="activity-text">
+                <span class="actor">Jessica Park</span>
+                <span class="action"> uploaded Employee Handbook v3</span>
+              </div>
+              <div class="activity-time">2 days ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Activity -->
+      <div class="section-card" style="border-color: rgba(139, 92, 246, 0.15);">
+        <div class="section-card-header">
+          <div class="section-card-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M16 14H8a4 4 0 0 0-4 4v2h16v-2a4 4 0 0 0-4-4z"/><circle cx="12" cy="6" r="1" fill="#8b5cf6"/></svg>
+            Agent Activity
+          </div>
+        </div>
+
+        <div class="agent-item">
+          <div class="agent-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <div class="agent-content">
+            <div class="agent-name">Payroll Runner</div>
+            <div class="agent-desc">Completed bi-weekly payroll calculation</div>
+            <div class="agent-time">1 hour ago</div>
+          </div>
+          <div class="agent-status success">Success</div>
+        </div>
+
+        <div class="agent-item">
+          <div class="agent-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <div class="agent-content">
+            <div class="agent-name">CX Oracle</div>
+            <div class="agent-desc">Generated customer satisfaction report</div>
+            <div class="agent-time">3 hours ago</div>
+          </div>
+          <div class="agent-status success">Success</div>
+        </div>
+
+        <div class="agent-item">
+          <div class="agent-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="agent-content">
+            <div class="agent-name">Compliance Bot</div>
+            <div class="agent-desc">Flagged 2 policy updates needed</div>
+            <div class="agent-time">yesterday</div>
+          </div>
+          <div class="agent-status warning">Warning</div>
+        </div>
+
+        <div class="agent-item">
+          <div class="agent-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          </div>
+          <div class="agent-content">
+            <div class="agent-name">Onboarding Assistant</div>
+            <div class="agent-desc">Processed 3 new hires</div>
+            <div class="agent-time">2 days ago</div>
+          </div>
+          <div class="agent-status success">Success</div>
+        </div>
+
+        <div class="agent-item">
+          <div class="agent-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <div class="agent-content">
+            <div class="agent-name">Benefits Enrollment</div>
+            <div class="agent-desc">Failed to sync dental plan</div>
+            <div class="agent-time">3 days ago</div>
+          </div>
+          <div class="agent-status agent-error">Error</div>
+        </div>
+      </div>
+
+    </div><!-- /two-col-grid -->
+
+  </main>
+
+</div>
+
+</body>
+</html>

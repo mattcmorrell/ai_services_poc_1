@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Home v2-C — Aperture Science</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0a;
+    color: #e5e5e5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.4;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Company Header ─────────────────────────────── */
+  .company-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    border-bottom: 1px solid #2a2a2a;
+    background: #111;
+    flex-wrap: wrap;
+  }
+  .company-avatar {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: #3b82f6;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; color: #fff;
+    flex-shrink: 0;
+  }
+  .company-name {
+    font-size: 16px; font-weight: 600; color: #f5f5f5;
+    white-space: nowrap;
+  }
+  .company-meta {
+    display: flex; align-items: center; gap: 6px;
+    color: #999; font-size: 12px; white-space: nowrap;
+  }
+  .company-meta .dot { color: #666; }
+  .header-spacer { flex: 1; }
+  .team-avatars {
+    display: flex; align-items: center;
+  }
+  .team-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600; color: #fff;
+    border: 2px solid #111;
+    margin-left: -6px;
+  }
+  .team-avatar:first-child { margin-left: 0; }
+  .team-avatar.you { background: #6366f1; }
+  .team-avatar.jessica { background: #ec4899; }
+  .team-avatar.marcus { background: #f59e0b; }
+  .team-label {
+    font-size: 11px; color: #999; margin-left: 6px; white-space: nowrap;
+  }
+
+  /* ── Main Content ───────────────────────────────── */
+  .content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 24px 32px;
+    overflow: hidden;
+  }
+
+  /* ── Section Card ───────────────────────────────── */
+  .card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid #222;
+  }
+  .card-header-left {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600; color: #ddd;
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 18px; height: 18px; border-radius: 9px;
+    font-size: 11px; font-weight: 700; padding: 0 5px;
+  }
+  .badge-red { background: #dc2626; color: #fff; }
+  .link-btn {
+    font-size: 12px; color: #3b82f6; text-decoration: none;
+    cursor: pointer;
+  }
+  .link-btn:hover { text-decoration: underline; }
+
+  /* ── Needs Attention (full width) ─────────────── */
+  .attention-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #1f1f1f;
+    min-height: 46px;
+  }
+  .attention-row:last-child { border-bottom: none; }
+
+  .severity-pill {
+    font-size: 10px; font-weight: 700; padding: 3px 8px;
+    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px;
+    flex-shrink: 0; white-space: nowrap;
+  }
+  .severity-blocking { background: #7f1d1d; color: #fca5a5; }
+  .severity-error { background: #78350f; color: #fcd34d; }
+  .severity-review { background: #1e3a5f; color: #93c5fd; }
+
+  .attention-text { flex: 1; min-width: 0; }
+  .attention-title {
+    font-size: 13px; font-weight: 600; color: #f0f0f0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .attention-sub {
+    font-size: 11px; color: #999;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .attention-actions {
+    display: flex; gap: 6px; flex-shrink: 0;
+  }
+  .btn-sm {
+    padding: 4px 12px;
+    border-radius: 5px;
+    font-size: 11px; font-weight: 500;
+    border: none; cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-primary { background: #3b82f6; color: #fff; }
+  .btn-primary:hover { background: #2563eb; }
+  .btn-ghost {
+    background: transparent; color: #aaa;
+    border: 1px solid #444;
+  }
+  .btn-ghost:hover { border-color: #666; color: #ddd; }
+  .btn-amber { background: #b45309; color: #fff; }
+  .btn-amber:hover { background: #92400e; }
+
+  /* ── Two-Column Grid ──────────────────────────── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .two-col > * { min-width: 0; }
+
+  /* ── Chat Rows ────────────────────────────────── */
+  .chat-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 14px;
+    border-bottom: 1px solid #1f1f1f;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .chat-row:last-child { border-bottom: none; }
+  .chat-row:hover { background: #222; }
+  .unread-indicator {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #3b82f6; flex-shrink: 0;
+  }
+  .unread-placeholder {
+    width: 7px; flex-shrink: 0;
+  }
+  .chat-name {
+    flex: 1; font-size: 13px; color: #ccc;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .chat-name.unread { font-weight: 600; color: #f5f5f5; }
+  .chat-time {
+    font-size: 11px; color: #888; flex-shrink: 0; white-space: nowrap;
+  }
+
+  /* ── Active Plans ─────────────────────────────── */
+  .plan-list { padding: 6px 0; }
+  .plan-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    border-bottom: 1px solid #1f1f1f;
+  }
+  .plan-row:last-child { border-bottom: none; }
+  .plan-info { flex: 1; min-width: 0; }
+  .plan-title {
+    font-size: 13px; font-weight: 600; color: #ddd;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .plan-steps { font-size: 11px; color: #999; margin-top: 1px; }
+  .plan-right {
+    display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  }
+  .plan-status {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  .status-awaiting { background: #78350f; color: #fbbf24; }
+  .status-running { background: #064e3b; color: #34d399; }
+  .status-paused { background: #272727; color: #aaa; }
+  .progress-mini {
+    width: 60px; height: 3px; background: #2a2a2a; border-radius: 2px; overflow: hidden;
+  }
+  .progress-mini-fill { height: 100%; border-radius: 2px; }
+  .fill-amber { background: #f59e0b; }
+  .fill-green { background: #34d399; }
+  .fill-gray { background: #666; }
+
+  /* ── Section Spacing ──────────────────────────── */
+  .section-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px; margin-top: 20px;
+  }
+  .section-icon { color: #888; flex-shrink: 0; }
+  .section-title {
+    font-size: 13px; font-weight: 600; color: #ddd;
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .show-more-btn {
+    background: none; border: none; color: #3b82f6;
+    font-size: 12px; cursor: pointer; padding: 0;
+    margin-left: 2px;
+  }
+  .show-more-btn:hover { text-decoration: underline; }
+
+  /* ── Recent Activity (open by default) ────────── */
+  .activity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 12px 14px;
+  }
+  .activity-grid > * { min-width: 0; }
+  .activity-col-title {
+    font-size: 11px; font-weight: 600; color: #999;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .activity-col-title .agent-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #8b5cf6;
+  }
+  .activity-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-avatar {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 600; color: #fff;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .activity-avatar.you-sm { background: #6366f1; }
+  .activity-avatar.jessica-sm { background: #ec4899; }
+  .activity-avatar.marcus-sm { background: #f59e0b; }
+  .activity-avatar.agent-sm { background: #8b5cf6; }
+  .activity-desc {
+    flex: 1; font-size: 12px; color: #bbb; line-height: 1.4;
+  }
+  .activity-desc strong { color: #e5e5e5; font-weight: 600; }
+  .activity-time { font-size: 10px; color: #888; flex-shrink: 0; margin-top: 2px; }
+
+  /* Hidden extra items */
+  .activity-extra { display: none; }
+  .activity-extra.visible { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ════════ Company Header ════════ -->
+<div class="company-header">
+  <div class="company-avatar">A</div>
+  <div class="company-name">Aperture Science</div>
+  <div class="company-meta">
+    <span class="dot">&middot;</span> R&amp;D
+    <span class="dot">&middot;</span> Cleveland, OH
+    <span class="dot">&middot;</span> Cave Johnson (CEO)
+  </div>
+  <div class="header-spacer"></div>
+  <div class="team-avatars">
+    <div class="team-avatar you" title="You">Y</div>
+    <div class="team-avatar jessica" title="Jessica Park">JP</div>
+    <div class="team-avatar marcus" title="Marcus Chen">MC</div>
+  </div>
+  <div class="team-label">3 team members</div>
+</div>
+
+<!-- ════════ Content ════════ -->
+<div class="content">
+
+  <!-- ── Needs Attention (full width) ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <svg class="section-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="card-title">Needs Attention</span>
+        <span class="badge badge-red">3</span>
+      </div>
+    </div>
+
+    <div class="attention-row">
+      <span class="severity-pill severity-blocking">Blocking</span>
+      <div class="attention-text">
+        <div class="attention-title">Payroll Runner needs approval</div>
+        <div class="attention-sub">Q1 payroll calculation for 312 employees is ready and waiting for your sign-off</div>
+      </div>
+      <div class="attention-actions">
+        <button class="btn-sm btn-primary">Approve</button>
+        <button class="btn-sm btn-ghost">View Details</button>
+      </div>
+    </div>
+
+    <div class="attention-row">
+      <span class="severity-pill severity-error">Error</span>
+      <div class="attention-text">
+        <div class="attention-title">Benefits Enrollment failed</div>
+        <div class="attention-sub">Dental plan sync encountered an error during enrollment processing. 14 employees affected.</div>
+      </div>
+      <div class="attention-actions">
+        <button class="btn-sm btn-amber">Investigate</button>
+        <button class="btn-sm btn-ghost">Dismiss</button>
+      </div>
+    </div>
+
+    <div class="attention-row">
+      <span class="severity-pill severity-review">Review</span>
+      <div class="attention-text">
+        <div class="attention-title">Compliance Check complete</div>
+        <div class="attention-sub">Annual compliance audit finished. 2 policy items flagged for your review before filing.</div>
+      </div>
+      <div class="attention-actions">
+        <button class="btn-sm btn-primary">Review</button>
+        <button class="btn-sm btn-ghost">Snooze</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Row 2: Recent Chats + Active Plans ── -->
+  <div class="two-col">
+
+    <!-- Left: Recent Chats -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <svg class="section-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span class="card-title">Recent Chats</span>
+        </div>
+        <a class="link-btn" href="#">All chats &rarr;</a>
+      </div>
+
+      <div class="chat-row">
+        <div class="unread-indicator"></div>
+        <div class="chat-name unread">Portal Gun Safety Training</div>
+        <div class="chat-time">33m ago</div>
+      </div>
+      <div class="chat-row">
+        <div class="unread-placeholder"></div>
+        <div class="chat-name">GLaDOS Maintenance Schedule</div>
+        <div class="chat-time">3h ago</div>
+      </div>
+      <div class="chat-row">
+        <div class="unread-placeholder"></div>
+        <div class="chat-name">Q1 Payroll Review</div>
+        <div class="chat-time">yesterday</div>
+      </div>
+      <div class="chat-row">
+        <div class="unread-placeholder"></div>
+        <div class="chat-name">New Hire Onboarding &mdash; Batch 12</div>
+        <div class="chat-time">2d ago</div>
+      </div>
+      <div class="chat-row">
+        <div class="unread-placeholder"></div>
+        <div class="chat-name">Benefits Open Enrollment 2026</div>
+        <div class="chat-time">3d ago</div>
+      </div>
+    </div>
+
+    <!-- Right: Active Plans -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <svg class="section-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+          </svg>
+          <span class="card-title">Active Plans</span>
+        </div>
+        <span style="font-size: 12px; color: #888;">3 plans</span>
+      </div>
+
+      <div class="plan-list">
+        <div class="plan-row">
+          <div class="plan-info">
+            <div class="plan-title">Q1 Payroll Processing</div>
+            <div class="plan-steps">4 / 6 steps</div>
+          </div>
+          <div class="plan-right">
+            <span class="plan-status status-awaiting">Awaiting</span>
+            <div class="progress-mini">
+              <div class="progress-mini-fill fill-amber" style="width: 66.6%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="plan-row">
+          <div class="plan-info">
+            <div class="plan-title">New Hire Onboarding — Batch 12</div>
+            <div class="plan-steps">2 / 5 steps</div>
+          </div>
+          <div class="plan-right">
+            <span class="plan-status status-running">Running</span>
+            <div class="progress-mini">
+              <div class="progress-mini-fill fill-green" style="width: 40%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="plan-row">
+          <div class="plan-info">
+            <div class="plan-title">Benefits Enrollment Setup</div>
+            <div class="plan-steps">1 / 4 steps</div>
+          </div>
+          <div class="plan-right">
+            <span class="plan-status status-paused">Paused</span>
+            <div class="progress-mini">
+              <div class="progress-mini-fill fill-gray" style="width: 25%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Recent Activity (open by default, 3 items per column, show more) ── -->
+  <div class="section-header">
+    <svg class="section-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
+    <span class="section-title">Recent Activity</span>
+    <button class="show-more-btn" id="showMoreBtn" onclick="toggleMore()">Show more</button>
+  </div>
+
+  <div class="card">
+    <div class="activity-grid">
+
+      <!-- Human Activity -->
+      <div>
+        <div class="activity-col-title">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+          Team
+        </div>
+
+        <div class="activity-item">
+          <div class="activity-avatar you-sm">Y</div>
+          <div class="activity-desc"><strong>You</strong> updated benefits enrollment settings</div>
+          <div class="activity-time">2h ago</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-avatar jessica-sm">JP</div>
+          <div class="activity-desc"><strong>Jessica Park</strong> ran Q4 compensation report</div>
+          <div class="activity-time">5h ago</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-avatar marcus-sm">MC</div>
+          <div class="activity-desc"><strong>Marcus Chen</strong> resolved payroll discrepancy</div>
+          <div class="activity-time">yesterday</div>
+        </div>
+
+        <!-- Extra items (hidden by default) -->
+        <div class="activity-extra" id="teamExtra">
+          <div class="activity-item">
+            <div class="activity-avatar jessica-sm">JP</div>
+            <div class="activity-desc"><strong>Jessica Park</strong> uploaded employee handbook v3</div>
+            <div class="activity-time">2d ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-avatar you-sm">Y</div>
+            <div class="activity-desc"><strong>You</strong> approved PTO policy update</div>
+            <div class="activity-time">3d ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Activity -->
+      <div>
+        <div class="activity-col-title">
+          <span class="agent-dot"></span>
+          Agents
+        </div>
+
+        <div class="activity-item">
+          <div class="activity-avatar agent-sm">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <div class="activity-desc"><strong>Payroll Runner</strong> completed Q1 calculations</div>
+          <div class="activity-time">1h ago</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-avatar agent-sm">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+            </svg>
+          </div>
+          <div class="activity-desc"><strong>CX Oracle</strong> generated satisfaction report</div>
+          <div class="activity-time">3h ago</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-avatar agent-sm">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <div class="activity-desc"><strong>Compliance Bot</strong> flagged 2 regulation updates</div>
+          <div class="activity-time">yesterday</div>
+        </div>
+
+        <!-- Extra items (hidden by default) -->
+        <div class="activity-extra" id="agentExtra">
+          <div class="activity-item">
+            <div class="activity-avatar agent-sm">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
+              </svg>
+            </div>
+            <div class="activity-desc"><strong>Onboarding Assistant</strong> processed 8 new hires</div>
+            <div class="activity-time">2d ago</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-avatar agent-sm">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <div class="activity-desc"><strong>Payroll Runner</strong> sent reminder to approvers</div>
+            <div class="activity-time">3d ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let expanded = false;
+function toggleMore() {
+  expanded = !expanded;
+  document.getElementById('teamExtra').classList.toggle('visible', expanded);
+  document.getElementById('agentExtra').classList.toggle('visible', expanded);
+  document.getElementById('showMoreBtn').textContent = expanded ? 'Show less' : 'Show more';
+}
+</script>
+
+</body>
+</html>

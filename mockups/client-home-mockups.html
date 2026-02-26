@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Home Tab — Mockups</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #e5e5e5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Switcher bar ─────────────────────────────────── */
+    .switcher {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: #111;
+      border-bottom: 1px solid #2a2a2a;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .switcher-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      margin-right: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .switcher-label svg {
+      width: 14px;
+      height: 14px;
+      color: #8b5cf6;
+    }
+
+    .sep {
+      width: 1px;
+      height: 20px;
+      background: #2a2a2a;
+      margin: 0 4px;
+    }
+
+    .switcher button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      background: #1a1a1a;
+      color: #999;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .switcher button:hover {
+      background: #222;
+      color: #ccc;
+      border-color: #3a3a3a;
+    }
+
+    .switcher button.active {
+      background: #1e1b4b;
+      color: #a78bfa;
+      border-color: #4c1d95;
+    }
+
+    .switcher button.v2 {
+      border-color: #1e3a2a;
+    }
+
+    .switcher button.v2.active {
+      background: #0f2918;
+      color: #4ade80;
+      border-color: #166534;
+    }
+
+    .switcher button .letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background: #2a2a2a;
+      font-size: 10px;
+      font-weight: 700;
+      color: #888;
+    }
+
+    .switcher button.active .letter {
+      background: #4c1d95;
+      color: #c4b5fd;
+    }
+
+    .switcher button.v2.active .letter {
+      background: #166534;
+      color: #86efac;
+    }
+
+    .desc {
+      margin-left: auto;
+      font-size: 11px;
+      color: #555;
+      font-style: italic;
+    }
+
+    .version-tag {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #666;
+      background: #1a1a1a;
+    }
+
+    .version-tag.v1 { color: #8b5cf6; background: #1e1b4b; }
+    .version-tag.v2 { color: #4ade80; background: #0f2918; }
+
+    /* ── Iframe container ─────────────────────────────── */
+    .frame-container {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .frame-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="switcher">
+    <span class="switcher-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/></svg>
+      Client Home
+    </span>
+
+    <span class="version-tag v2">v2</span>
+    <button class="v2 active" data-src="client-home-v2-C.html" onclick="switchTo(this)">
+      <span class="letter">C</span> Hybrid
+    </button>
+    <button class="v2" data-src="client-home-v2-A.html" onclick="switchTo(this)">
+      <span class="letter">A</span> Triage First
+    </button>
+    <button class="v2" data-src="client-home-v2-B.html" onclick="switchTo(this)">
+      <span class="letter">B</span> Compact Mosaic
+    </button>
+
+    <div class="sep"></div>
+
+    <span class="version-tag v1">v1</span>
+    <button data-src="client-home-A-activity-feed.html" onclick="switchTo(this)">
+      <span class="letter">A</span> Activity Feed
+    </button>
+    <button data-src="client-home-B-dashboard-grid.html" onclick="switchTo(this)">
+      <span class="letter">B</span> Dashboard Grid
+    </button>
+    <button data-src="client-home-C-two-pane.html" onclick="switchTo(this)">
+      <span class="letter">C</span> Two-Pane Split
+    </button>
+    <button data-src="client-home-D-tabbed.html" onclick="switchTo(this)">
+      <span class="letter">D</span> Tabbed Sections
+    </button>
+    <button data-src="client-home-E-command-center.html" onclick="switchTo(this)">
+      <span class="letter">E</span> Command Center
+    </button>
+
+    <span class="desc" id="desc">Full-width attention, chats + plans side-by-side, activity open by default</span>
+  </div>
+
+  <div class="frame-container">
+    <iframe id="mockup-frame" src="client-home-v2-C.html"></iframe>
+  </div>
+
+  <script>
+    const descriptions = {
+      'client-home-v2-C.html': 'Full-width attention, chats + plans side-by-side, activity open by default',
+      'client-home-v2-A.html': 'Attention-first vertical stack, action buttons, plans with progress bars',
+      'client-home-v2-B.html': 'Dense two-column grid, everything above the fold on large screens',
+      'client-home-A-activity-feed.html': 'v1 — Scrolling timeline as the centerpiece, compact company header',
+      'client-home-B-dashboard-grid.html': 'v1 — KPI tiles + modular card grid, everything in scannable modules',
+      'client-home-C-two-pane.html': 'v1 — Fixed company profile left, scrolling dynamic content right',
+      'client-home-D-tabbed.html': 'v1 — Overview triage tab + dedicated tabs for Activity, Chats, Company Info',
+      'client-home-E-command-center.html': 'v1 — Three-column mission control: Agents & Team | Actions & Chats | Company',
+    };
+
+    function switchTo(btn) {
+      document.querySelectorAll('.switcher button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const src = btn.getAttribute('data-src');
+      document.getElementById('mockup-frame').src = src;
+      document.getElementById('desc').textContent = descriptions[src] || '';
+    }
+  </script>
+</body>
+</html>
