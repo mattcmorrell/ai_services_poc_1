@@ -106,7 +106,7 @@
   /* ── Needs Attention (full width) ─────────────── */
   .attention-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     padding: 10px 14px;
     border-bottom: 1px solid #1f1f1f;
@@ -115,9 +115,12 @@
   .attention-row:last-child { border-bottom: none; }
 
   .severity-pill {
-    font-size: 10px; font-weight: 700; padding: 3px 8px;
+    font-size: 10px; font-weight: 700; padding: 3px 0;
     border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px;
     flex-shrink: 0; white-space: nowrap;
+    margin-top: 3px;
+    width: 72px;
+    text-align: center;
   }
   .severity-blocking { background: #7f1d1d; color: #fca5a5; }
   .severity-error { background: #78350f; color: #fcd34d; }
@@ -134,6 +137,7 @@
   }
   .attention-actions {
     display: flex; gap: 6px; flex-shrink: 0;
+    margin-top: 2px;
   }
   .btn-sm {
     padding: 4px 12px;
