@@ -34,6 +34,14 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# screenshots — review/check screenshots belong in the trash, mockups belong in /mockups
+/check-*.png
+/hrc-review-*.png
+/*.png
+
+# playwright MCP logs
+.playwright-mcp/
+
 # vercel
 .vercel
 

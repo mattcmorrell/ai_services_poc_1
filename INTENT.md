@@ -168,33 +168,90 @@ Tool 1 feeds into Tool 2. The iteration tracker captures real-time exploration; 
 - **Removed connections section**: The parent/child/related links in the detail panel were removed — redundant with the tree navigation.
 - **Horizontal card grid for children**: When you select an opportunity, active solution cards appear in a horizontal grid in the detail panel. When you select a solution, active experiment cards appear. Cards show title, status badge, and full reasoning. Click a card to select that node.
 
-### Decision Journal Architecture Redesign — IMPLEMENTED (v4)
+### Architecture Redesign — IMPLEMENTED (v4)
 
 **The Problem:** The left panel was trying to be two things — a full hierarchical map AND a navigation tool. A 4-level deep tree (outcome → opportunity → solution → experiment) is hard to scan and requires too much expand/collapse management. Solutions appeared in two places (tree AND cards), creating routing confusion.
 
 **The Solution: "Shallow tree + detail does the drill-down" (Option A)**
 
-Left panel only shows outcomes and opportunities — nothing deeper. The detail panel handles drill-down:
-- Select an **outcome** → detail shows reasoning + opportunity cards + cross-cutting solution cards
-- Select an **opportunity** → detail shows reasoning + solution cards
-- Click a **solution card** → detail shows reasoning + experiment cards (via `drillToNode`)
-- Click an **experiment card** → detail shows reasoning (leaf node, via `drillToNode`)
+Left panel only shows outcomes and opportunities — nothing deeper. Detail panel handles drill-down:
+- Select an **outcome** → reasoning + opportunity cards + cross-cutting solution cards
+- Select an **opportunity** → reasoning + solution cards
+- Click a **solution card** → reasoning + experiment cards (via `drillToNode`)
+- Click an **experiment card** → reasoning (leaf node, via `drillToNode`)
 
-**Implementation details:**
-- `renderTree()` simplified to only render outcomes (collapsible) and opportunities (regular nodes)
-- Removed: `sectionLabel`, `oppSectionLabel`, `subSectionLabel`, `toggleSection`, `toggleSectionVisibility` — all dead code after simplification
-- New state: `detailNodeId` (separate from `selectedNodeId`) tracks what the detail panel shows during drill-down
-- `selectNode(id)` — sets both `selectedNodeId` and `detailNodeId`, used for tree-level clicks
-- `drillToNode(id)` — only sets `detailNodeId`, walks up to find nearest tree ancestor (outcome/opportunity) to highlight in tree
-- `highlightTree(id)` — extracted helper for tree selection + ancestor highlighting
-- Breadcrumb: ancestor chain at top of detail panel, each segment clickable and color-coded by type. Tree-level ancestors use `selectNode`, deeper ancestors use `drillToNode`.
-- Decisions and open questions removed from tree — they live in Reader, Timeline, and Graph views
-- Cross-cutting solutions (solutions with parentId pointing to outcome, not opportunity) appear in a separate card section on outcome detail
+Key implementation:
+- `detailNodeId` (separate from `selectedNodeId`) tracks detail panel state during drill-down
+- `selectNode(id)` for tree-level clicks, `drillToNode(id)` for card clicks (walks up to nearest tree ancestor)
+- Breadcrumb: clickable ancestor chain at top of detail panel, color-coded by type
+- Decisions and open questions: collapsible sections at bottom of tree (start collapsed)
+- Cross-cutting solutions (parentId → outcome, not opportunity) get their own card section
 
-**Resolved questions:**
-- Yes, the left panel highlights which opportunity you're drilled into (via `drillToNode` walking up to tree-level ancestor)
-- Active Only toggle controls card visibility — rejected/deferred children hidden when on
-- Pluralization fix: "Opportunities" not "Opportunitys"
+### v4 Polish (current session)
+- **Detail header**: Type label ("OPPORTUNITY") moved above title as plain grey text, no pill. Cleaner hierarchy.
+- **Rich child cards**: Solution/experiment cards now show ALL available detail — reasoning, evidence quotes, artifact links, open items. Not just a title + summary.
+- **Card body copy**: Bumped from 12px to 14px for readability.
+- **Redundant type labels removed**: Decisions and questions hide per-node type labels (section header already says it). Outcomes hide type labels too. Opportunities keep theirs for scannability.
+- **Open questions exempt from Active Only**: They have no status field — they're always visible, never filtered.
+- **Second outcome added**: "BHR consultants can work as fast as they think" (O2). OP3 (client workspaces) re-parented under it. Previously everything was under O1 (design tooling), which was wrong — the consultant app UX is a different project concern.
+
+### UX Critique (honest assessment of current state)
+
+**What works:**
+- Shallow tree is a genuine win — 4-6 items in left panel, trivially scannable
+- Breadcrumb navigation is natural, never feel lost
+- Rich cards with evidence are the right call for handoff — scan a page, get the picture
+- Active Only toggle keeps the working set clean
+
+**What doesn't work yet:**
+1. **Read-only** — biggest gap. Can't add decisions, update status, or capture experiments from the UI. Claude or hand-editing JSON are the only write paths. Needs inline editing to be a living tool.
+2. **Decisions and open questions are buried** — collapsed at bottom, out of sight by default. These are arguably the most important sections (forks and unknowns). Need more prominence.
+3. **No recency signal** — everything looks the same age. No "recently updated" indicator, no way to see what changed since last visit.
+4. **Cards are navigation AND detail** — they show full reasoning + evidence + artifacts, which is great for reading, but the "click to drill deeper" affordance gets lost in the wall of text. Could benefit from compact-by-default with expand.
+5. **No search** — fine now with ~25 nodes, won't scale.
+6. **Graph and Reader views are half-baked** — Tree is 90% of usage. Consider hiding Graph and Reader for v1 sharing.
+
+### Distribution Strategy (BUILT)
+
+**GitHub repo:** https://github.com/mattcmorrell/product-decision-journal
+
+**Architecture:**
+```
+GitHub repo (mattcmorrell/product-decision-journal):
+├── decision-journal.html         ← viewer (fetched fresh each /journal run)
+├── decision-journal-server.js    ← server with SSE live-reload (fetched fresh)
+├── template.json                 ← empty schema for new projects
+├── journal.md                    ← the slash command itself
+└── README.md                     ← setup instructions
+
+Designer's machine:
+~/.claude/commands/journal.md     ← one-time install via curl
+
+Any project after running /journal:
+├── product-decisions.json        ← project-specific data (Claude maintains)
+├── decision-journal.html         ← pulled from GitHub
+├── decision-journal-server.js    ← pulled from GitHub
+└── CLAUDE.md                     ← auto-start + auto-update instructions appended
+```
+
+**How it works:**
+1. Designer installs once: `mkdir -p ~/.claude/commands && curl -sL https://raw.githubusercontent.com/mattcmorrell/product-decision-journal/main/journal.md -o ~/.claude/commands/journal.md`
+2. In any project, type `/journal`
+3. First run: pulls HTML + server from GitHub, creates `product-decisions.json`, scans git history for past decisions (presents top 10 for curation), appends auto-start instructions to project CLAUDE.md, starts server
+4. Subsequent runs: pulls latest HTML + server, starts server
+5. Future sessions: Claude auto-starts server (reads project CLAUDE.md instruction) — no `/journal` needed
+
+**Key features:**
+- **SSE live-reload**: Server watches `product-decisions.json` via `fs.watchFile`, pushes reload events to browser. Changes appear instantly.
+- **Git history scanner**: On first run, scans last 50 commits + merged PRs + INTENT.md/README for past decisions. Presents numbered list, user picks which to import.
+- **Auto-start via project CLAUDE.md**: `/journal` appends instructions to the project's CLAUDE.md. Any future Claude session auto-starts the server and maintains the journal. Zero per-user config after first designer runs `/journal`.
+- **Always latest viewer**: HTML + server fetched from GitHub on every `/journal` run. Push an update to the repo, everyone gets it.
+- **Port 3334**: Separate from iteration tracker (port 3333). Graceful exit if port already in use.
+
+**Remaining polish (not blocking sharing):**
+1. Clean up `product-decisions.json` reasoning — write for an audience that wasn't in the room
+2. Consider hiding Graph and Reader tabs for v1
+3. Optional: small "What is this?" blurb for designers landing cold
 
 ### Key Decisions Made
 1. **Two separate tools** — workbench (iteration tracker) vs archive (decision journal). Different audiences, different timescales. Must stay separate files/schemas.
