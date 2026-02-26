@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Client Home v2-C — Aperture Science</title>
+<title>Client Home v2-C v3 — Aperture Science</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -193,35 +193,53 @@
   .plan-list { padding: 6px 0; }
   .plan-row {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 14px;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 14px;
     border-bottom: 1px solid #1f1f1f;
   }
   .plan-row:last-child { border-bottom: none; }
-  .plan-info { flex: 1; min-width: 0; }
+  .plan-top {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
   .plan-title {
     font-size: 13px; font-weight: 600; color: #ddd;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .plan-steps { font-size: 11px; color: #999; margin-top: 1px; }
-  .plan-right {
-    display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    flex: 1; min-width: 0;
   }
   .plan-status {
     font-size: 10px; font-weight: 600; padding: 2px 7px;
     border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px;
+    flex-shrink: 0;
   }
   .status-awaiting { background: #78350f; color: #fbbf24; }
   .status-running { background: #064e3b; color: #34d399; }
   .status-paused { background: #272727; color: #aaa; }
-  .progress-mini {
-    width: 60px; height: 3px; background: #2a2a2a; border-radius: 2px; overflow: hidden;
+  .plan-bottom {
+    display: flex; align-items: center; gap: 10px;
   }
-  .progress-mini-fill { height: 100%; border-radius: 2px; }
+  .plan-steps { font-size: 11px; color: #999; flex-shrink: 0; }
+  .progress-bar {
+    flex: 1; height: 4px; background: #2a2a2a; border-radius: 2px; overflow: hidden;
+  }
+  .progress-bar-fill { height: 100%; border-radius: 2px; }
   .fill-amber { background: #f59e0b; }
   .fill-green { background: #34d399; }
   .fill-gray { background: #666; }
+
+  /* ── Attention "last seen" ──────────────────────── */
+  .attention-seen {
+    font-size: 10px; color: #888; margin-top: 2px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .attention-seen .seen-avatar {
+    width: 14px; height: 14px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 7px; font-weight: 700; color: #fff;
+  }
+  .attention-seen .seen-avatar.jessica-sm { background: #ec4899; }
+  .attention-seen .seen-avatar.marcus-sm { background: #f59e0b; }
+  .attention-seen .seen-avatar.you-sm { background: #6366f1; }
 
   /* ── Section Spacing ──────────────────────────── */
   .section-header {
@@ -325,6 +343,7 @@
       <div class="attention-text">
         <div class="attention-title">Payroll Runner needs approval</div>
         <div class="attention-sub">Q1 payroll calculation for 312 employees is ready and waiting for your sign-off</div>
+        <div class="attention-seen"><span class="seen-avatar jessica-sm">JP</span> Jessica viewed 1h ago</div>
       </div>
       <div class="attention-actions">
         <button class="btn-sm btn-primary">Approve</button>
@@ -337,6 +356,7 @@
       <div class="attention-text">
         <div class="attention-title">Benefits Enrollment failed</div>
         <div class="attention-sub">Dental plan sync encountered an error during enrollment processing. 14 employees affected.</div>
+        <div class="attention-seen"><span class="seen-avatar you-sm">Y</span> You viewed 30m ago</div>
       </div>
       <div class="attention-actions">
         <button class="btn-sm btn-amber">Investigate</button>
@@ -349,6 +369,7 @@
       <div class="attention-text">
         <div class="attention-title">Compliance Check complete</div>
         <div class="attention-sub">Annual compliance audit finished. 2 policy items flagged for your review before filing.</div>
+        <div class="attention-seen">No one has viewed this yet</div>
       </div>
       <div class="attention-actions">
         <button class="btn-sm btn-primary">Review</button>
@@ -414,40 +435,40 @@
 
       <div class="plan-list">
         <div class="plan-row">
-          <div class="plan-info">
+          <div class="plan-top">
             <div class="plan-title">Q1 Payroll Processing</div>
-            <div class="plan-steps">4 / 6 steps</div>
-          </div>
-          <div class="plan-right">
             <span class="plan-status status-awaiting">Awaiting</span>
-            <div class="progress-mini">
-              <div class="progress-mini-fill fill-amber" style="width: 66.6%"></div>
+          </div>
+          <div class="plan-bottom">
+            <span class="plan-steps">4 / 6 steps</span>
+            <div class="progress-bar">
+              <div class="progress-bar-fill fill-amber" style="width: 66.6%"></div>
             </div>
           </div>
         </div>
 
         <div class="plan-row">
-          <div class="plan-info">
+          <div class="plan-top">
             <div class="plan-title">New Hire Onboarding — Batch 12</div>
-            <div class="plan-steps">2 / 5 steps</div>
-          </div>
-          <div class="plan-right">
             <span class="plan-status status-running">Running</span>
-            <div class="progress-mini">
-              <div class="progress-mini-fill fill-green" style="width: 40%"></div>
+          </div>
+          <div class="plan-bottom">
+            <span class="plan-steps">2 / 5 steps</span>
+            <div class="progress-bar">
+              <div class="progress-bar-fill fill-green" style="width: 40%"></div>
             </div>
           </div>
         </div>
 
         <div class="plan-row">
-          <div class="plan-info">
+          <div class="plan-top">
             <div class="plan-title">Benefits Enrollment Setup</div>
-            <div class="plan-steps">1 / 4 steps</div>
-          </div>
-          <div class="plan-right">
             <span class="plan-status status-paused">Paused</span>
-            <div class="progress-mini">
-              <div class="progress-mini-fill fill-gray" style="width: 25%"></div>
+          </div>
+          <div class="plan-bottom">
+            <span class="plan-steps">1 / 4 steps</span>
+            <div class="progress-bar">
+              <div class="progress-bar-fill fill-gray" style="width: 25%"></div>
             </div>
           </div>
         </div>

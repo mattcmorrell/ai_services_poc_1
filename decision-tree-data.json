@@ -63,10 +63,10 @@
               "id": "H-v2C",
               "name": "Hybrid",
               "status": "exploring",
-              "note": "Full-width attention with severity pills (from A), Chats + Plans side-by-side in row 2 (from B), Activity open by default with show more toggle. Brighter text throughout. Synthesizes best of A and B per Katy feedback.",
+              "note": "Full-width attention with severity pills + last-seen indicators, Chats + Plans side-by-side (plans with stacked progress bars), Activity open by default. Brighter text. v3 adds: stacked plan layout for all widths, last-seen on attention items, team avatars in header.",
               "spawn": "Best of v2-A attention styling + v2-B density layout",
-              "versions": ["v1"],
-              "currentVersion": "v1",
+              "versions": ["v1", "v2", "v3"],
+              "currentVersion": "v3",
               "mockup": "mockups/client-home-mockups.html",
               "children": []
             }
