@@ -56,14 +56,10 @@ import { mockAgents } from "@/data/agents-data";
 import { defaultPayrollWorkflow } from "@/data/workflow-data";
 import { Message, Chat, Client, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactPanel } from "@/components/artifacts/artifact-panel";
-import { PlanPanel, PlanPanelPill } from "@/components/plan/plan-panel";
 import { parseArtifacts } from "@/lib/artifact-parser";
 import { parseActionPlan } from "@/lib/action-plan-parser";
 import { Agent } from "@/types/agent";
 import { ClientsView } from "@/components/clients/clients-view";
-
-const PLAN_APPROACHES = ["A", "B", "C"] as const;
-type PlanApproach = (typeof PLAN_APPROACHES)[number];
 
 const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14"] as const;
 type Variant = (typeof VARIANTS)[number];
@@ -101,7 +97,6 @@ export default function Home() {
   const [workflowPanelOpen, setWorkflowPanelOpen] = useState(false);
   const [selectedArtifactId, setSelectedArtifactId] = useState<string | null>(null);
   const [planPanelOpen, setPlanPanelOpen] = useState(false);
-  const [planApproach, setPlanApproach] = useState<PlanApproach>("A");
 
   const selectedChat = useMemo(
     () => chats.find((c) => c.id === selectedChatId),
@@ -694,7 +689,6 @@ export default function Home() {
                 isLoading={loadingChatId === selectedChatId}
                 activePlan={activePlan || undefined}
                 planPanelOpen={planPanelOpen}
-                planApproach={planApproach}
                 onOpenPlanPanel={() => setPlanPanelOpen(true)}
                 onPausePlan={handlePausePlan}
                 onStopPlan={handleStopPlan}
@@ -704,20 +698,6 @@ export default function Home() {
               <div className="flex flex-1 items-center justify-center text-muted-foreground">
                 Select a chat to start messaging
               </div>
-            )}
-            {/* Approach A: Right Rail PlanPanel */}
-            {planPanelOpen && activePlan && planApproach === "A" && !selectedArtifact && !workflowPanelOpen && (
-              <PlanPanel
-                plan={activePlan}
-                onClose={() => setPlanPanelOpen(false)}
-                onPause={handlePausePlan}
-                onStop={handleStopPlan}
-                onResume={handleResumePlan}
-              />
-            )}
-            {/* Approach A: Collapsed pill when panel is closed but plan is active */}
-            {!planPanelOpen && activePlan && planApproach === "A" && (
-              <PlanPanelPill plan={activePlan} onClick={() => setPlanPanelOpen(true)} />
             )}
             {selectedArtifact && chatPanelMode === "recent" && (
               <ArtifactPanel
@@ -794,23 +774,6 @@ export default function Home() {
 
       {/* Design variant toggle */}
       <div className="fixed bottom-4 right-4 z-[100] flex flex-col items-end gap-2">
-        {/* Plan approach switcher */}
-        <div className="flex items-center gap-1 rounded-full border border-[oklch(1_0_0_/_0.1)] bg-[oklch(0.15_0_0_/_0.9)] px-1.5 py-1 shadow-2xl backdrop-blur-md">
-          <span className="text-[10px] font-medium tracking-wide text-[oklch(0.4_0_0)] px-2">Plan</span>
-          {PLAN_APPROACHES.map((a) => (
-            <button
-              key={a}
-              onClick={() => setPlanApproach(a)}
-              className={`rounded-full px-3 py-1 text-[11px] font-medium tracking-wide transition-all ${
-                planApproach === a
-                  ? "bg-[oklch(0.6_0.15_200)] text-[oklch(0.1_0_0)] shadow-sm"
-                  : "text-[oklch(0.55_0_0)] hover:text-[oklch(0.8_0_0)]"
-              }`}
-            >
-              {a}
-            </button>
-          ))}
-        </div>
         <div className="flex items-center gap-1 rounded-full border border-[oklch(1_0_0_/_0.1)] bg-[oklch(0.15_0_0_/_0.9)] px-1.5 py-1 shadow-2xl backdrop-blur-md">
           {VARIANTS.map((v) => (
             <button

@@ -23,7 +23,6 @@ import { cn } from "@/lib/utils";
 import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactCard } from "@/components/artifacts/artifact-card";
 import { ActionCardCompact } from "@/components/chat/action-card-compact";
-import { PlanDock } from "@/components/plan/plan-dock";
 import { PlanSplitView } from "@/components/plan/plan-split-view";
 import { useResizable } from "@/components/ui/resize-handle";
 
@@ -42,7 +41,6 @@ interface ChatViewProps {
   // Plan panel props
   activePlan?: ActionPlan;
   planPanelOpen?: boolean;
-  planApproach?: "A" | "B" | "C";
   onOpenPlanPanel?: () => void;
   onPausePlan?: () => void;
   onStopPlan?: () => void;
@@ -72,7 +70,6 @@ export function ChatView({
   isLoading,
   activePlan,
   planPanelOpen,
-  planApproach = "A",
   onOpenPlanPanel,
   onPausePlan,
   onStopPlan,
@@ -91,8 +88,7 @@ export function ChatView({
     storageKey: "plan-split-width",
   });
 
-  const showSplitView = planApproach === "C" && activePlan && planPanelOpen;
-  const showDock = planApproach === "B" && activePlan;
+  const showSplitView = activePlan && planPanelOpen;
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -136,16 +132,6 @@ export function ChatView({
           <MoreHorizontal className="h-5 w-5" />
         </Button>
       </div>
-
-      {/* Approach B: Sticky Plan Dock */}
-      {showDock && onPausePlan && onStopPlan && onResumePlan && (
-        <PlanDock
-          plan={activePlan!}
-          onPause={onPausePlan}
-          onStop={onStopPlan}
-          onResume={onResumePlan}
-        />
-      )}
 
       {/* Messages */}
       <ScrollArea className="flex-1 px-6" ref={scrollRef}>

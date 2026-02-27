@@ -1,7 +1,7 @@
 {
   "title": "Product Decision Journal",
   "project": "AI Services POC — BambooHR Consultant App",
-  "lastUpdated": "2026-02-24",
+  "lastUpdated": "2026-02-27",
   "schema": {
     "version": 1,
     "nodeTypes": ["outcome", "opportunity", "solution", "experiment", "decision"],
@@ -37,6 +37,17 @@
       "reasoning": "HR consultants manage 5-50 clients and switch between them frequently throughout the day. The core UX question: how does a consultant select which client they're working with? Must feel fast, professional, and not lose context when switching. Prototyped 6 approaches (A-F), narrowed to 3 active candidates (B, C, E)."
     },
     {
+      "id": "OP4",
+      "title": "HRCs lose sight of plan progress when it scrolls out of chat",
+      "status": "active",
+      "date": "2026-02-27",
+      "parentId": "O2",
+      "reasoning": "The #1 visibility gap: ActionCard renders inline in chat and scrolls away as conversation continues. HRCs can't monitor what the agent is doing without scrolling away from the conversation. Need plan progress AND chat visible simultaneously. Requirements: tiered visibility (milestones in chat, thinking expandable), auto+toggle behavior, pause/stop/edit controls, non-undoable action gates, plan history as archive, cross-client persistence.",
+      "evidence": [
+        { "type": "firsthand", "source": "Designer", "quote": "I can only look at it while it's running which is like 5 seconds." }
+      ]
+    },
+    {
       "id": "OP1",
       "title": "Designers can't see the landscape of what's been explored",
       "status": "active",
@@ -55,6 +66,36 @@
     }
   ],
   "solutions": [
+    {
+      "id": "S10",
+      "title": "Plan Panel — Approach A: Right Rail (side panel)",
+      "status": "rejected",
+      "date": "2026-02-27",
+      "parentId": "OP4",
+      "reasoning": "Resizable panel to the right of chat (420px default), modeled on ArtifactPanel. Has a collapsed floating pill with progress ring when minimized. Rejected because it's visually identical to Approach C (split view) — both are right-side panels. No meaningful UX difference from the user's perspective. Architectural difference (page-level vs ChatView-internal) doesn't matter to the HRC.",
+      "relatedIds": ["S12", "D5"]
+    },
+    {
+      "id": "S11",
+      "title": "Plan Panel — Approach B: Sticky Dock (top bar)",
+      "status": "deferred",
+      "date": "2026-02-27",
+      "parentId": "OP4",
+      "reasoning": "Collapsible bar pinned above chat messages. Collapsed: 60px with status dot, title, progress bar, controls. Expanded: ~200px with step list and agent log. Zero horizontal space cost. Genuinely different UX from the side panel approaches. Parked because: interesting pattern that could work on client home pages for cross-client plan visibility, but for the chat view the split panel (C) gives more room for detail. May come back for dashboard/home use.",
+      "relatedIds": ["S12", "D5", "Q5"],
+      "evidence": [
+        { "type": "firsthand", "source": "Designer", "quote": "B is interesting, and we might be able to use that on the client home page actually when a plan is running." }
+      ]
+    },
+    {
+      "id": "S12",
+      "title": "Plan Panel — Approach C: Split View (internal to ChatView)",
+      "status": "chosen",
+      "date": "2026-02-27",
+      "parentId": "OP4",
+      "reasoning": "ChatView splits into two resizable panes — chat left, plan right (380px default). Internal to ChatView so page layout sees no change. Natural transition: when no plan is active, it's a single pane. Chosen because it provides the most detail space alongside chat, feels like a natural extension of the conversation, and the resize handle gives the HRC control.",
+      "relatedIds": ["S10", "S11", "D5"]
+    },
     {
       "id": "S1",
       "title": "Design Iteration Tracker (Tool 1)",
@@ -246,6 +287,17 @@
       ]
     },
     {
+      "id": "D5",
+      "title": "Plan panel: kill A, park B for home page, ship C (split view)",
+      "status": "chosen",
+      "date": "2026-02-27",
+      "reasoning": "Built 3 plan panel approaches (A: right rail, B: sticky dock, C: split view). A and C were visually identical — both right-side panels, just different render locations. Killed A. B (dock) is genuinely different UX (horizontal bar, zero horizontal cost) but limited detail space. Parked B with the insight that it could work on client home pages for cross-client plan visibility. Chose C (split view) for chat because it gives the most detail space and feels like a natural extension of the conversation.",
+      "relatedIds": ["S10", "S11", "S12", "OP4"],
+      "evidence": [
+        { "type": "firsthand", "source": "Designer", "quote": "Get rid of A. B is interesting, and we might be able to use that on the client home page actually when a plan is running. So park it for now and we'll continue with C." }
+      ]
+    },
+    {
       "id": "D1",
       "title": "Claude auto-maintains the journal via implicit capture",
       "status": "chosen",
@@ -275,6 +327,12 @@
     }
   ],
   "openQuestions": [
+    {
+      "id": "Q5",
+      "title": "Can the plan dock (Approach B) work on the client home page?",
+      "date": "2026-02-27",
+      "context": "Designer noted the sticky dock pattern could show running plans on client home/overview screens, not just inside chat. Would give cross-client plan visibility without navigating into a chat. Worth exploring when we build the client home page."
+    },
     {
       "id": "Q1",
       "title": "What are the exact heuristics for implicit decision capture?",

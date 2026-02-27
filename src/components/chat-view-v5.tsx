@@ -24,9 +24,8 @@ import { cn } from "@/lib/utils";
 import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactCard } from "@/components/artifacts/artifact-card";
 import { ActionCardCompact } from "@/components/chat/action-card-compact";
-import { PlanDock } from "@/components/plan/plan-dock";
 import { PlanSplitView } from "@/components/plan/plan-split-view";
-import { useResizable, ResizeHandle } from "@/components/ui/resize-handle";
+import { useResizable } from "@/components/ui/resize-handle";
 
 interface ChatViewProps {
   client: Client | null;
@@ -40,10 +39,9 @@ interface ChatViewProps {
   onWorkflowClick: (workflowId: string) => void;
   onArtifactClick: (artifactId: string) => void;
   isLoading: boolean;
-  // Plan panel props (optional — only passed for v5)
+  // Plan panel props
   activePlan?: ActionPlan;
   planPanelOpen?: boolean;
-  planApproach?: "A" | "B" | "C";
   onOpenPlanPanel?: () => void;
   onPausePlan?: () => void;
   onStopPlan?: () => void;
@@ -94,7 +92,6 @@ export function ChatView({
   isLoading,
   activePlan,
   planPanelOpen,
-  planApproach = "A",
   onOpenPlanPanel,
   onPausePlan,
   onStopPlan,
@@ -114,8 +111,7 @@ export function ChatView({
     storageKey: "plan-split-width",
   });
 
-  const showSplitView = planApproach === "C" && activePlan && planPanelOpen;
-  const showDock = planApproach === "B" && activePlan;
+  const showSplitView = activePlan && planPanelOpen;
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -180,16 +176,6 @@ export function ChatView({
           <MoreHorizontal className="h-4 w-4" style={{ color: "rgba(255, 255, 255, 0.35)" }} />
         </button>
       </div>
-
-      {/* Approach B: Sticky Plan Dock */}
-      {showDock && onPausePlan && onStopPlan && onResumePlan && (
-        <PlanDock
-          plan={activePlan!}
-          onPause={onPausePlan}
-          onStop={onStopPlan}
-          onResume={onResumePlan}
-        />
-      )}
 
       {/* Messages */}
       <ScrollArea className="relative z-10 flex-1 px-8" ref={scrollRef}>
