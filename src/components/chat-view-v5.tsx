@@ -143,42 +143,9 @@ export function ChatView({
     }));
   };
 
-  // Shared chat column content
+  // Shared chat column content (messages + input, no header)
   const chatContent = (
     <div className="flex flex-col h-full flex-1 min-w-0">
-      {/* Header */}
-      <div
-        className="relative z-10 flex items-center justify-between px-8 py-5 shrink-0"
-        style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.06)" }}
-      >
-        <div>
-          <h1
-            className="text-xl tracking-tight"
-            style={{ color: "rgba(255, 255, 255, 0.9)", fontWeight: 600 }}
-          >
-            {chatTitle}
-          </h1>
-          {client && (
-            <p
-              className="mt-0.5 text-xs font-light tracking-wide"
-              style={{ color: "rgba(255, 255, 255, 0.3)" }}
-            >
-              {client.name}
-            </p>
-          )}
-        </div>
-        <button
-          className="flex h-9 w-9 items-center justify-center transition-colors duration-200"
-          style={{
-            background: "rgba(255, 255, 255, 0.04)",
-            borderRadius: "9999px",
-            border: "1px solid rgba(255, 255, 255, 0.06)",
-          }}
-        >
-          <MoreHorizontal className="h-4 w-4" style={{ color: "rgba(255, 255, 255, 0.35)" }} />
-        </button>
-      </div>
-
       {/* Messages */}
       <ScrollArea className="relative z-10 flex-1 px-8" ref={scrollRef}>
         <div className={cn("mx-auto py-8", showSplitView ? "max-w-none" : "max-w-3xl")}>
@@ -537,36 +504,71 @@ export function ChatView({
         }} />
       </div>
 
-      {/* Chat column */}
-      {chatContent}
+      {/* Header — full width, above split */}
+      <div
+        className="relative z-10 flex items-center justify-between px-8 py-5 shrink-0"
+        style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.06)" }}
+      >
+        <div>
+          <h1
+            className="text-xl tracking-tight"
+            style={{ color: "rgba(255, 255, 255, 0.9)", fontWeight: 600 }}
+          >
+            {chatTitle}
+          </h1>
+          {client && (
+            <p
+              className="mt-0.5 text-xs font-light tracking-wide"
+              style={{ color: "rgba(255, 255, 255, 0.3)" }}
+            >
+              {client.name}
+            </p>
+          )}
+        </div>
+        <button
+          className="flex h-9 w-9 items-center justify-center transition-colors duration-200"
+          style={{
+            background: "rgba(255, 255, 255, 0.04)",
+            borderRadius: "9999px",
+            border: "1px solid rgba(255, 255, 255, 0.06)",
+          }}
+        >
+          <MoreHorizontal className="h-4 w-4" style={{ color: "rgba(255, 255, 255, 0.35)" }} />
+        </button>
+      </div>
 
-      {/* Approach C: Split view right pane */}
-      {showSplitView && activePlan && onPausePlan && onStopPlan && onResumePlan && (
-        <>
-          <div
-            className="w-px shrink-0 cursor-col-resize relative z-10"
-            style={{ background: "rgba(255,255,255,0.06)" }}
-            onMouseDown={onSplitDragStart}
-          >
-            <div className="absolute inset-y-0 -left-1 w-3" />
-          </div>
-          <div
-            className="shrink-0 relative z-10"
-            style={{
-              width: `${splitWidth}px`,
-              borderLeft: "1px solid rgba(255,255,255,0.04)",
-            }}
-          >
-            <PlanSplitView
-              plan={activePlan}
-              onClose={onClosePlanPanel || (() => {})}
-              onPause={onPausePlan}
-              onStop={onStopPlan}
-              onResume={onResumePlan}
-            />
-          </div>
-        </>
-      )}
+      {/* Content area — chat + optional split pane */}
+      <div className="flex flex-1 overflow-hidden min-h-0 relative z-10">
+        {chatContent}
+
+        {/* Split view right pane */}
+        {showSplitView && activePlan && onPausePlan && onStopPlan && onResumePlan && (
+          <>
+            <div
+              className="w-px shrink-0 cursor-col-resize"
+              style={{ background: "rgba(255,255,255,0.06)" }}
+              onMouseDown={onSplitDragStart}
+            >
+              <div className="absolute inset-y-0 -left-1 w-3" />
+            </div>
+            <div
+              className="shrink-0"
+              style={{
+                width: `${splitWidth}px`,
+                borderLeft: "1px solid rgba(255,255,255,0.04)",
+              }}
+            >
+              <PlanSplitView
+                plan={activePlan}
+                onClose={onClosePlanPanel || (() => {})}
+                onPause={onPausePlan}
+                onStop={onStopPlan}
+                onResume={onResumePlan}
+              />
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

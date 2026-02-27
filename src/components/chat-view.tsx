@@ -122,19 +122,6 @@ export function ChatView({
 
   const chatContent = (
     <div className="flex h-full flex-1 flex-col bg-background min-w-0">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-border px-6 py-4 shrink-0">
-        <div>
-          <h1 className="text-2xl font-semibold">{chatTitle}</h1>
-          {client && (
-            <p className="text-sm text-muted-foreground">{client.name}</p>
-          )}
-        </div>
-        <Button variant="ghost" size="icon">
-          <MoreHorizontal className="h-5 w-5" />
-        </Button>
-      </div>
-
       {/* Messages */}
       <ScrollArea className="flex-1 px-6" ref={scrollRef}>
         <div className={cn("mx-auto py-6", showSplitView ? "max-w-none" : "max-w-3xl")}>
@@ -320,29 +307,45 @@ export function ChatView({
   );
 
   return (
-    <div className="flex h-full flex-1 overflow-hidden">
-      {chatContent}
+    <div className="flex h-full flex-1 flex-col overflow-hidden bg-background">
+      {/* Header — full width, above split */}
+      <div className="flex items-center justify-between border-b border-border px-6 py-4 shrink-0">
+        <div>
+          <h1 className="text-2xl font-semibold">{chatTitle}</h1>
+          {client && (
+            <p className="text-sm text-muted-foreground">{client.name}</p>
+          )}
+        </div>
+        <Button variant="ghost" size="icon">
+          <MoreHorizontal className="h-5 w-5" />
+        </Button>
+      </div>
 
-      {/* Approach C: Split view right pane */}
-      {showSplitView && activePlan && onPausePlan && onStopPlan && onResumePlan && (
-        <>
-          <div
-            className="w-px shrink-0 cursor-col-resize bg-border hover:bg-primary/50 active:bg-primary relative"
-            onMouseDown={onSplitDragStart}
-          >
-            <div className="absolute inset-y-0 -left-1 w-3" />
-          </div>
-          <div className="shrink-0 border-l border-border" style={{ width: `${splitWidth}px` }}>
-            <PlanSplitView
-              plan={activePlan}
-              onClose={onClosePlanPanel || (() => {})}
-              onPause={onPausePlan}
-              onStop={onStopPlan}
-              onResume={onResumePlan}
-            />
-          </div>
-        </>
-      )}
+      {/* Content area — chat + optional split pane */}
+      <div className="flex flex-1 overflow-hidden min-h-0">
+        {chatContent}
+
+        {/* Split view right pane */}
+        {showSplitView && activePlan && onPausePlan && onStopPlan && onResumePlan && (
+          <>
+            <div
+              className="w-px shrink-0 cursor-col-resize bg-border hover:bg-primary/50 active:bg-primary relative"
+              onMouseDown={onSplitDragStart}
+            >
+              <div className="absolute inset-y-0 -left-1 w-3" />
+            </div>
+            <div className="shrink-0 border-l border-border" style={{ width: `${splitWidth}px` }}>
+              <PlanSplitView
+                plan={activePlan}
+                onClose={onClosePlanPanel || (() => {})}
+                onPause={onPausePlan}
+                onStop={onStopPlan}
+                onResume={onResumePlan}
+              />
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
