@@ -690,6 +690,7 @@ export default function Home() {
                 activePlan={activePlan || undefined}
                 planPanelOpen={planPanelOpen}
                 onOpenPlanPanel={() => setPlanPanelOpen(true)}
+                onClosePlanPanel={() => setPlanPanelOpen(false)}
                 onPausePlan={handlePausePlan}
                 onStopPlan={handleStopPlan}
                 onResumePlan={handleResumePlan}

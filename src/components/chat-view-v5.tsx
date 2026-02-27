@@ -43,6 +43,7 @@ interface ChatViewProps {
   activePlan?: ActionPlan;
   planPanelOpen?: boolean;
   onOpenPlanPanel?: () => void;
+  onClosePlanPanel?: () => void;
   onPausePlan?: () => void;
   onStopPlan?: () => void;
   onResumePlan?: () => void;
@@ -93,6 +94,7 @@ export function ChatView({
   activePlan,
   planPanelOpen,
   onOpenPlanPanel,
+  onClosePlanPanel,
   onPausePlan,
   onStopPlan,
   onResumePlan,
@@ -557,7 +559,7 @@ export function ChatView({
           >
             <PlanSplitView
               plan={activePlan}
-              onClose={() => {/* handled by parent */}}
+              onClose={onClosePlanPanel || (() => {})}
               onPause={onPausePlan}
               onStop={onStopPlan}
               onResume={onResumePlan}
