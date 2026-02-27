@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { ChatListPanel as ChatListPanelOriginal } from "@/components/chat-list-panel";
 import { ChatView as ChatViewOriginal } from "@/components/chat-view";
@@ -44,6 +44,9 @@ import { DashboardView as DashboardViewV12 } from "@/components/dashboard/dashbo
 import { ChatListPanel as ChatListPanelV13 } from "@/components/chat-list-panel-v13";
 import { ChatView as ChatViewV13 } from "@/components/chat-view-v13";
 import { DashboardView as DashboardViewV13 } from "@/components/dashboard/dashboard-view-v13";
+import { ChatListPanel as ChatListPanelV14 } from "@/components/chat-list-panel-v14";
+import { ChatView as ChatViewV14 } from "@/components/chat-view-v14";
+import { DashboardView as DashboardViewV14 } from "@/components/dashboard/dashboard-view-v14";
 import { AgentsView } from "@/components/agents/agents-view";
 import { ClientSelectDialog } from "@/components/agents/client-select-dialog";
 import { WorkflowPanel } from "@/components/workflow/workflow-panel";
@@ -53,12 +56,16 @@ import { mockAgents } from "@/data/agents-data";
 import { defaultPayrollWorkflow } from "@/data/workflow-data";
 import { Message, Chat, Client, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactPanel } from "@/components/artifacts/artifact-panel";
+import { PlanPanel, PlanPanelPill } from "@/components/plan/plan-panel";
 import { parseArtifacts } from "@/lib/artifact-parser";
 import { parseActionPlan } from "@/lib/action-plan-parser";
 import { Agent } from "@/types/agent";
 import { ClientsView } from "@/components/clients/clients-view";
 
-const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13"] as const;
+const PLAN_APPROACHES = ["A", "B", "C"] as const;
+type PlanApproach = (typeof PLAN_APPROACHES)[number];
+
+const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14"] as const;
 type Variant = (typeof VARIANTS)[number];
 
 const variantMap = {
@@ -76,10 +83,11 @@ const variantMap = {
   v11: { DashboardView: DashboardViewV11, ChatListPanel: ChatListPanelV11, ChatView: ChatViewV11 },
   v12: { DashboardView: DashboardViewV12, ChatListPanel: ChatListPanelV12, ChatView: ChatViewV12 },
   v13: { DashboardView: DashboardViewV13, ChatListPanel: ChatListPanelV13, ChatView: ChatViewV13 },
+  v14: { DashboardView: DashboardViewV14, ChatListPanel: ChatListPanelV14, ChatView: ChatViewV14 },
 };
 
 export default function Home() {
-  const [designVariant, setDesignVariant] = useState<Variant>("v5");
+  const [designVariant, setDesignVariant] = useState<Variant>("original");
   const { DashboardView, ChatListPanel, ChatView } = variantMap[designVariant];
 
   const [activeView, setActiveView] = useState("dashboard");
@@ -92,6 +100,8 @@ export default function Home() {
   const [selectedAgentForClient, setSelectedAgentForClient] = useState<Agent | null>(null);
   const [workflowPanelOpen, setWorkflowPanelOpen] = useState(false);
   const [selectedArtifactId, setSelectedArtifactId] = useState<string | null>(null);
+  const [planPanelOpen, setPlanPanelOpen] = useState(false);
+  const [planApproach, setPlanApproach] = useState<PlanApproach>("A");
 
   const selectedChat = useMemo(
     () => chats.find((c) => c.id === selectedChatId),
@@ -112,6 +122,89 @@ export default function Home() {
     }
     return null;
   }, [chats, selectedArtifactId]);
+
+  // Find the most recent plan in the current chat (any status except declined/stopped)
+  const activePlanMessage = useMemo(() => {
+    if (!selectedChat) return null;
+    const candidates = selectedChat.messages.filter(
+      (m) => m.actionPlan && !["declined", "stopped"].includes(m.actionPlan.status)
+    );
+    return candidates.length > 0 ? candidates[candidates.length - 1] : null;
+  }, [selectedChat]);
+
+  const activePlan = activePlanMessage?.actionPlan || null;
+
+  // Auto-open plan panel when a plan starts executing
+  // Auto-open plan panel whenever a plan exists
+  const lastPlanId = useRef<string | null>(null);
+  useEffect(() => {
+    if (activePlan && activePlan.id !== lastPlanId.current) {
+      setPlanPanelOpen(true);
+      lastPlanId.current = activePlan.id;
+    }
+    if (!activePlan) {
+      lastPlanId.current = null;
+    }
+  }, [activePlan]);
+
+  const handlePausePlan = useCallback(() => {
+    if (!activePlanMessage || !selectedChatId) return;
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat.id === selectedChatId
+          ? {
+              ...chat,
+              messages: chat.messages.map((msg) =>
+                msg.id === activePlanMessage.id && msg.actionPlan
+                  ? { ...msg, actionPlan: { ...msg.actionPlan, status: "paused" as const, pausedAt: new Date(), pausedBy: "HRC" } }
+                  : msg
+              ),
+            }
+          : chat
+      )
+    );
+  }, [activePlanMessage, selectedChatId]);
+
+  const handleStopPlan = useCallback(() => {
+    if (!activePlanMessage || !selectedChatId) return;
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat.id === selectedChatId
+          ? {
+              ...chat,
+              messages: chat.messages.map((msg) =>
+                msg.id === activePlanMessage.id && msg.actionPlan
+                  ? { ...msg, actionPlan: { ...msg.actionPlan, status: "stopped" as const } }
+                  : msg
+              ),
+            }
+          : chat
+      )
+    );
+    setPlanPanelOpen(false);
+  }, [activePlanMessage, selectedChatId]);
+
+  const handleResumePlan = useCallback(() => {
+    if (!activePlanMessage || !selectedChatId) return;
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat.id === selectedChatId
+          ? {
+              ...chat,
+              messages: chat.messages.map((msg) =>
+                msg.id === activePlanMessage.id && msg.actionPlan
+                  ? { ...msg, actionPlan: { ...msg.actionPlan, status: "executing" as const, pausedAt: undefined, pausedBy: undefined } }
+                  : msg
+              ),
+            }
+          : chat
+      )
+    );
+    // Re-trigger execution simulation for remaining steps
+    if (activePlanMessage.actionPlan) {
+      simulateExecutionForChat(activePlanMessage.id, activePlanMessage.actionPlan, selectedChatId);
+    }
+  }, [activePlanMessage, selectedChatId]);
 
   // --- Chat-ID-explicit handlers ---
 
@@ -599,11 +692,32 @@ export default function Home() {
                 onWorkflowClick={handleWorkflowClick}
                 onArtifactClick={setSelectedArtifactId}
                 isLoading={loadingChatId === selectedChatId}
+                activePlan={activePlan || undefined}
+                planPanelOpen={planPanelOpen}
+                planApproach={planApproach}
+                onOpenPlanPanel={() => setPlanPanelOpen(true)}
+                onPausePlan={handlePausePlan}
+                onStopPlan={handleStopPlan}
+                onResumePlan={handleResumePlan}
               />
             ) : (
               <div className="flex flex-1 items-center justify-center text-muted-foreground">
                 Select a chat to start messaging
               </div>
+            )}
+            {/* Approach A: Right Rail PlanPanel */}
+            {planPanelOpen && activePlan && planApproach === "A" && !selectedArtifact && !workflowPanelOpen && (
+              <PlanPanel
+                plan={activePlan}
+                onClose={() => setPlanPanelOpen(false)}
+                onPause={handlePausePlan}
+                onStop={handleStopPlan}
+                onResume={handleResumePlan}
+              />
+            )}
+            {/* Approach A: Collapsed pill when panel is closed but plan is active */}
+            {!planPanelOpen && activePlan && planApproach === "A" && (
+              <PlanPanelPill plan={activePlan} onClick={() => setPlanPanelOpen(true)} />
             )}
             {selectedArtifact && chatPanelMode === "recent" && (
               <ArtifactPanel
@@ -679,20 +793,39 @@ export default function Home() {
       />
 
       {/* Design variant toggle */}
-      <div className="fixed bottom-4 right-4 z-[100] flex items-center gap-1 rounded-full border border-[oklch(1_0_0_/_0.1)] bg-[oklch(0.15_0_0_/_0.9)] px-1.5 py-1 shadow-2xl backdrop-blur-md">
-        {VARIANTS.map((v) => (
-          <button
-            key={v}
-            onClick={() => setDesignVariant(v)}
-            className={`rounded-full px-3 py-1 text-[11px] font-medium tracking-wide transition-all ${
-              designVariant === v
-                ? "bg-[oklch(0.7_0.15_65)] text-[oklch(0.1_0_0)] shadow-sm"
-                : "text-[oklch(0.55_0_0)] hover:text-[oklch(0.8_0_0)]"
-            }`}
-          >
-            {v === "original" ? "OG" : v.toUpperCase()}
-          </button>
-        ))}
+      <div className="fixed bottom-4 right-4 z-[100] flex flex-col items-end gap-2">
+        {/* Plan approach switcher */}
+        <div className="flex items-center gap-1 rounded-full border border-[oklch(1_0_0_/_0.1)] bg-[oklch(0.15_0_0_/_0.9)] px-1.5 py-1 shadow-2xl backdrop-blur-md">
+          <span className="text-[10px] font-medium tracking-wide text-[oklch(0.4_0_0)] px-2">Plan</span>
+          {PLAN_APPROACHES.map((a) => (
+            <button
+              key={a}
+              onClick={() => setPlanApproach(a)}
+              className={`rounded-full px-3 py-1 text-[11px] font-medium tracking-wide transition-all ${
+                planApproach === a
+                  ? "bg-[oklch(0.6_0.15_200)] text-[oklch(0.1_0_0)] shadow-sm"
+                  : "text-[oklch(0.55_0_0)] hover:text-[oklch(0.8_0_0)]"
+              }`}
+            >
+              {a}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-1 rounded-full border border-[oklch(1_0_0_/_0.1)] bg-[oklch(0.15_0_0_/_0.9)] px-1.5 py-1 shadow-2xl backdrop-blur-md">
+          {VARIANTS.map((v) => (
+            <button
+              key={v}
+              onClick={() => setDesignVariant(v)}
+              className={`rounded-full px-3 py-1 text-[11px] font-medium tracking-wide transition-all ${
+                designVariant === v
+                  ? "bg-[oklch(0.7_0.15_65)] text-[oklch(0.1_0_0)] shadow-sm"
+                  : "text-[oklch(0.55_0_0)] hover:text-[oklch(0.8_0_0)]"
+              }`}
+            >
+              {v === "original" ? "OG" : v.toUpperCase()}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

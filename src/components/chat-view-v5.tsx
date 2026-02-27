@@ -23,7 +23,10 @@ import {
 import { cn } from "@/lib/utils";
 import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactCard } from "@/components/artifacts/artifact-card";
-import { ActionCard } from "@/components/chat/action-card";
+import { ActionCardCompact } from "@/components/chat/action-card-compact";
+import { PlanDock } from "@/components/plan/plan-dock";
+import { PlanSplitView } from "@/components/plan/plan-split-view";
+import { useResizable, ResizeHandle } from "@/components/ui/resize-handle";
 
 interface ChatViewProps {
   client: Client | null;
@@ -37,6 +40,14 @@ interface ChatViewProps {
   onWorkflowClick: (workflowId: string) => void;
   onArtifactClick: (artifactId: string) => void;
   isLoading: boolean;
+  // Plan panel props (optional — only passed for v5)
+  activePlan?: ActionPlan;
+  planPanelOpen?: boolean;
+  planApproach?: "A" | "B" | "C";
+  onOpenPlanPanel?: () => void;
+  onPausePlan?: () => void;
+  onStopPlan?: () => void;
+  onResumePlan?: () => void;
 }
 
 const glassVars: Record<string, string> = {
@@ -81,12 +92,30 @@ export function ChatView({
   onWorkflowClick,
   onArtifactClick,
   isLoading,
+  activePlan,
+  planPanelOpen,
+  planApproach = "A",
+  onOpenPlanPanel,
+  onPausePlan,
+  onStopPlan,
+  onResumePlan,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
   const [expandedThinking, setExpandedThinking] = useState<Record<string, boolean>>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Approach C: Split view resize
+  const { width: splitWidth, onDragStart: onSplitDragStart } = useResizable({
+    defaultWidth: 380,
+    minWidth: 300,
+    maxWidth: 500,
+    storageKey: "plan-split-width",
+  });
+
+  const showSplitView = planApproach === "C" && activePlan && planPanelOpen;
+  const showDock = planApproach === "B" && activePlan;
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -116,45 +145,12 @@ export function ChatView({
     }));
   };
 
-  return (
-    <div
-      className="v5-glass flex h-full flex-1 flex-col"
-      style={{
-        background: "#060608",
-        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        ...glassVars,
-      } as React.CSSProperties}
-    >
-      <style>{`
-        .v5-glass *, .v5-glass *::before, .v5-glass *::after {
-          border-color: rgba(255, 255, 255, 0.08) !important;
-        }
-        .v5-glass [class*="rounded-xl"],
-        .v5-glass [class*="rounded-lg"] {
-          border-radius: 20px !important;
-        }
-        .v5-glass [class*="rounded-full"] {
-          border-radius: 9999px !important;
-        }
-      `}</style>
-
-      {/* Ambient glow orbs */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div style={{
-          position: "absolute", top: "20%", right: "25%", width: "400px", height: "400px",
-          background: "radial-gradient(circle, rgba(100, 130, 200, 0.05) 0%, transparent 70%)",
-          filter: "blur(80px)",
-        }} />
-        <div style={{
-          position: "absolute", bottom: "15%", left: "20%", width: "350px", height: "350px",
-          background: "radial-gradient(circle, rgba(140, 100, 170, 0.04) 0%, transparent 70%)",
-          filter: "blur(80px)",
-        }} />
-      </div>
-
+  // Shared chat column content
+  const chatContent = (
+    <div className="flex flex-col h-full flex-1 min-w-0">
       {/* Header */}
       <div
-        className="relative z-10 flex items-center justify-between px-8 py-5"
+        className="relative z-10 flex items-center justify-between px-8 py-5 shrink-0"
         style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.06)" }}
       >
         <div>
@@ -185,9 +181,19 @@ export function ChatView({
         </button>
       </div>
 
+      {/* Approach B: Sticky Plan Dock */}
+      {showDock && onPausePlan && onStopPlan && onResumePlan && (
+        <PlanDock
+          plan={activePlan!}
+          onPause={onPausePlan}
+          onStop={onStopPlan}
+          onResume={onResumePlan}
+        />
+      )}
+
       {/* Messages */}
       <ScrollArea className="relative z-10 flex-1 px-8" ref={scrollRef}>
-        <div className="mx-auto max-w-3xl py-8">
+        <div className={cn("mx-auto py-8", showSplitView ? "max-w-none" : "max-w-3xl")}>
           {messages.map((message) => (
             <div key={message.id} className="mb-8">
               {/* Thinking toggle */}
@@ -265,15 +271,14 @@ export function ChatView({
                 />
               </div>
 
-              {/* Action Plan Card */}
+              {/* Action Plan — always compact inline, detail lives in panel/dock/split */}
               {message.actionPlan && (
                 <div className="mt-5">
-                  <ActionCard
+                  <ActionCardCompact
                     plan={message.actionPlan}
-                    workflow={message.workflow}
+                    onOpenPanel={onOpenPlanPanel || (() => {})}
                     onApprove={() => onApprove(message.id)}
                     onDecline={() => onDecline(message.id)}
-                    onWorkflowClick={onWorkflowClick}
                   />
                 </div>
               )}
@@ -408,8 +413,8 @@ export function ChatView({
       </ScrollArea>
 
       {/* Input */}
-      <div className="relative z-10 px-8 py-5" style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
-        <div className="mx-auto max-w-3xl">
+      <div className="relative z-10 px-8 py-5 shrink-0" style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
+        <div className={cn("mx-auto", showSplitView ? "max-w-none" : "max-w-3xl")}>
           <form onSubmit={handleSubmit}>
             <div
               className="p-3"
@@ -505,6 +510,75 @@ export function ChatView({
           </form>
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <div
+      className="v5-glass flex h-full flex-1 overflow-hidden"
+      style={{
+        background: "#060608",
+        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        ...glassVars,
+      } as React.CSSProperties}
+    >
+      <style>{`
+        .v5-glass *, .v5-glass *::before, .v5-glass *::after {
+          border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+        .v5-glass [class*="rounded-xl"],
+        .v5-glass [class*="rounded-lg"] {
+          border-radius: 20px !important;
+        }
+        .v5-glass [class*="rounded-full"] {
+          border-radius: 9999px !important;
+        }
+      `}</style>
+
+      {/* Ambient glow orbs */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div style={{
+          position: "absolute", top: "20%", right: "25%", width: "400px", height: "400px",
+          background: "radial-gradient(circle, rgba(100, 130, 200, 0.05) 0%, transparent 70%)",
+          filter: "blur(80px)",
+        }} />
+        <div style={{
+          position: "absolute", bottom: "15%", left: "20%", width: "350px", height: "350px",
+          background: "radial-gradient(circle, rgba(140, 100, 170, 0.04) 0%, transparent 70%)",
+          filter: "blur(80px)",
+        }} />
+      </div>
+
+      {/* Chat column */}
+      {chatContent}
+
+      {/* Approach C: Split view right pane */}
+      {showSplitView && activePlan && onPausePlan && onStopPlan && onResumePlan && (
+        <>
+          <div
+            className="w-px shrink-0 cursor-col-resize relative z-10"
+            style={{ background: "rgba(255,255,255,0.06)" }}
+            onMouseDown={onSplitDragStart}
+          >
+            <div className="absolute inset-y-0 -left-1 w-3" />
+          </div>
+          <div
+            className="shrink-0 relative z-10"
+            style={{
+              width: `${splitWidth}px`,
+              borderLeft: "1px solid rgba(255,255,255,0.04)",
+            }}
+          >
+            <PlanSplitView
+              plan={activePlan}
+              onClose={() => {/* handled by parent */}}
+              onPause={onPausePlan}
+              onStop={onStopPlan}
+              onResume={onResumePlan}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }

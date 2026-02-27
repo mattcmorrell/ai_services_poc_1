@@ -12,6 +12,8 @@ import {
   ArrowUpDown,
   ChevronRight,
   MoreHorizontal,
+  Pause,
+  Square,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -35,13 +37,18 @@ export function ActionCard({ plan, workflow, onApprove, onDecline, onWorkflowCli
   const isExecuting = plan.status === "executing";
   const isCompleted = plan.status === "completed";
   const isDeclined = plan.status === "declined";
+  const isPaused = plan.status === "paused";
+  const isStopped = plan.status === "stopped";
 
   const getStatusIcon = () => {
     if (isCompleted) {
       return <CheckCircle className="w-5 h-5 text-green-500" />;
     }
-    if (isDeclined) {
+    if (isDeclined || isStopped) {
       return <XCircle className="w-5 h-5 text-red-500" />;
+    }
+    if (isPaused) {
+      return <Pause className="w-5 h-5 text-yellow-500" />;
     }
     return <ClipboardList className="w-5 h-5 text-muted-foreground" />;
   };

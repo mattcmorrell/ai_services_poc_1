@@ -22,7 +22,10 @@ import {
 import { cn } from "@/lib/utils";
 import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactCard } from "@/components/artifacts/artifact-card";
-import { ActionCard } from "@/components/chat/action-card";
+import { ActionCardCompact } from "@/components/chat/action-card-compact";
+import { PlanDock } from "@/components/plan/plan-dock";
+import { PlanSplitView } from "@/components/plan/plan-split-view";
+import { useResizable } from "@/components/ui/resize-handle";
 
 interface ChatViewProps {
   client: Client | null;
@@ -36,6 +39,14 @@ interface ChatViewProps {
   onWorkflowClick: (workflowId: string) => void;
   onArtifactClick: (artifactId: string) => void;
   isLoading: boolean;
+  // Plan panel props
+  activePlan?: ActionPlan;
+  planPanelOpen?: boolean;
+  planApproach?: "A" | "B" | "C";
+  onOpenPlanPanel?: () => void;
+  onPausePlan?: () => void;
+  onStopPlan?: () => void;
+  onResumePlan?: () => void;
 }
 
 const models = [
@@ -59,12 +70,29 @@ export function ChatView({
   onWorkflowClick,
   onArtifactClick,
   isLoading,
+  activePlan,
+  planPanelOpen,
+  planApproach = "A",
+  onOpenPlanPanel,
+  onPausePlan,
+  onStopPlan,
+  onResumePlan,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
   const [expandedThinking, setExpandedThinking] = useState<Record<string, boolean>>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const { width: splitWidth, onDragStart: onSplitDragStart } = useResizable({
+    defaultWidth: 380,
+    minWidth: 300,
+    maxWidth: 500,
+    storageKey: "plan-split-width",
+  });
+
+  const showSplitView = planApproach === "C" && activePlan && planPanelOpen;
+  const showDock = planApproach === "B" && activePlan;
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -94,10 +122,10 @@ export function ChatView({
     }));
   };
 
-  return (
-    <div className="flex h-full flex-1 flex-col bg-background">
+  const chatContent = (
+    <div className="flex h-full flex-1 flex-col bg-background min-w-0">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border px-6 py-4">
+      <div className="flex items-center justify-between border-b border-border px-6 py-4 shrink-0">
         <div>
           <h1 className="text-2xl font-semibold">{chatTitle}</h1>
           {client && (
@@ -109,9 +137,19 @@ export function ChatView({
         </Button>
       </div>
 
+      {/* Approach B: Sticky Plan Dock */}
+      {showDock && onPausePlan && onStopPlan && onResumePlan && (
+        <PlanDock
+          plan={activePlan!}
+          onPause={onPausePlan}
+          onStop={onStopPlan}
+          onResume={onResumePlan}
+        />
+      )}
+
       {/* Messages */}
       <ScrollArea className="flex-1 px-6" ref={scrollRef}>
-        <div className="mx-auto max-w-3xl py-6">
+        <div className={cn("mx-auto py-6", showSplitView ? "max-w-none" : "max-w-3xl")}>
           {messages.map((message) => (
             <div key={message.id} className="mb-6">
               {message.role === "assistant" && message.thinking && (
@@ -153,15 +191,14 @@ export function ChatView({
                 />
               </div>
 
-              {/* Action Plan Card */}
+              {/* Action Plan — always compact inline, detail lives in panel/dock/split */}
               {message.actionPlan && (
                 <div className="mt-4">
-                  <ActionCard
+                  <ActionCardCompact
                     plan={message.actionPlan}
-                    workflow={message.workflow}
+                    onOpenPanel={onOpenPlanPanel || (() => {})}
                     onApprove={() => onApprove(message.id)}
                     onDecline={() => onDecline(message.id)}
-                    onWorkflowClick={onWorkflowClick}
                   />
                 </div>
               )}
@@ -246,8 +283,8 @@ export function ChatView({
       </ScrollArea>
 
       {/* Input */}
-      <div className="border-t border-border p-4">
-        <div className="mx-auto max-w-3xl">
+      <div className="border-t border-border p-4 shrink-0">
+        <div className={cn("mx-auto", showSplitView ? "max-w-none" : "max-w-3xl")}>
           <form onSubmit={handleSubmit}>
             <div className="rounded-xl border border-border bg-card p-3">
               <textarea
@@ -291,6 +328,33 @@ export function ChatView({
           </form>
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="flex h-full flex-1 overflow-hidden">
+      {chatContent}
+
+      {/* Approach C: Split view right pane */}
+      {showSplitView && activePlan && onPausePlan && onStopPlan && onResumePlan && (
+        <>
+          <div
+            className="w-px shrink-0 cursor-col-resize bg-border hover:bg-primary/50 active:bg-primary relative"
+            onMouseDown={onSplitDragStart}
+          >
+            <div className="absolute inset-y-0 -left-1 w-3" />
+          </div>
+          <div className="shrink-0 border-l border-border" style={{ width: `${splitWidth}px` }}>
+            <PlanSplitView
+              plan={activePlan}
+              onClose={() => {}}
+              onPause={onPausePlan}
+              onStop={onStopPlan}
+              onResume={onResumePlan}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }

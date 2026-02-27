@@ -47,10 +47,47 @@ const payrollActionPlan: ActionPlan = {
   title: "Run January Payroll",
   description: "Process payroll for all active employees at Black Mesa for the January pay period.",
   steps: [
-    { id: "step-1", description: "Collect and validate employee hours and salary data", status: "pending" },
-    { id: "step-2", description: "Calculate gross pay, deductions, and net pay", status: "pending" },
-    { id: "step-3", description: "Process direct deposits and generate pay stubs", status: "pending" },
-    { id: "step-4", description: "Report and remit payroll taxes", status: "pending" },
+    {
+      id: "step-1",
+      description: "Collect and validate employee hours and salary data",
+      status: "pending",
+      thinkingLog: [
+        "Pulling timesheet data from BambooHR for pay period Jan 1-31.",
+        "Cross-referencing with approved PTO requests — 3 employees had partial weeks.",
+        "Flagged: Dr. Vance has unapproved overtime (12 hrs). Proceeding with standard hours, will note for review.",
+      ],
+    },
+    {
+      id: "step-2",
+      description: "Calculate gross pay, deductions, and net pay",
+      status: "pending",
+      thinkingLog: [
+        "Applying 2024 tax brackets. 2 employees crossed bracket thresholds this month.",
+        "401(k) match cap reached for Dr. Kleiner — adjusting employer contribution.",
+        "New HSA election for Barney Calhoun taking effect this period.",
+      ],
+    },
+    {
+      id: "step-3",
+      description: "Process direct deposits and generate pay stubs",
+      status: "pending",
+      nonUndoable: true,
+      thinkingLog: [
+        "Initiating ACH transfers for 47 employees via integrated banking API.",
+        "This step triggers real money movement — requires HRC gate approval.",
+        "Pay stubs will be auto-generated and uploaded to employee self-service portal.",
+      ],
+    },
+    {
+      id: "step-4",
+      description: "Report and remit payroll taxes",
+      status: "pending",
+      nonUndoable: true,
+      thinkingLog: [
+        "Filing federal 941 deposit and state SUI contributions.",
+        "Deadline for this period: Feb 15. Filing 3 weeks early.",
+      ],
+    },
   ],
   metadata: {
     affectedCount: 47,

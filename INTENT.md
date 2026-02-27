@@ -409,3 +409,91 @@ Toggle system in `page.tsx`: `VARIANTS` array, `variantMap` object, `designVaria
 - User to review all 13 variants in browser and identify favorites
 - Potentially create more variants or refine top picks
 - Eventually select a final design direction and remove the toggle system
+
+---
+
+# INTENT — Persistent Plan Panel
+
+## Goal
+HRCs need to see plan progress AND chat simultaneously. Currently ActionCard renders inline in chat and scrolls out of view. Building 3 mockup approaches (switchable via prototype switcher) to find the right UX pattern.
+
+**User requirements:**
+- Tiered visibility: milestones in chat, agent thinking expandable, everything auditable
+- Auto + toggle: panel auto-appears on plan creation/execution, HRC can collapse
+- Pause/stop/edit: HRC controls over running plans, gates on non-undoable actions (payroll)
+- Plan history: mostly hidden, accessible as archive
+- Cross-client: plans keep running when switching clients
+
+## Current Direction
+Three approaches built and wired into v5 design variant, switchable via Plan A/B/C toggle (bottom-right, above design variant toggle).
+
+## What's Done
+
+### Type changes (`src/types/chat.ts`)
+- Added `"paused" | "stopped"` to `ActionPlan.status`
+- Added `nonUndoable`, `completedAt`, `thinkingLog` to `ActionPlanStep`
+- Added `pausedAt`, `pausedBy` to `ActionPlan`
+
+### Shared components (`src/components/plan/`)
+- `plan-step-timeline.tsx` — Reusable step list with progress bar, expandable thinking per step, non-undoable gate markers. Supports compact mode.
+- `plan-controls.tsx` — Pause/Stop/Resume button group + `PlanStatusBadge` component. Compact mode for tight spaces.
+- `plan-history.tsx` — Past plans list with status icons and summaries.
+
+### Approach A: Right Rail (`plan-panel.tsx`)
+- 420px resizable panel (320-600px) to right of chat, modeled on ArtifactPanel
+- Header with plan title + status badge, close button
+- Body with description, metadata stats, step timeline with expandable thinking
+- Footer with pause/stop/resume controls + past plans toggle
+- Collapsed state: floating pill at right edge with progress ring + step count
+- Chat shows `ActionCardCompact` ("View in panel →") when panel is open
+
+### Approach B: Sticky Dock (`plan-dock.tsx`)
+- Collapsible bar pinned above chat messages, below header
+- Collapsed (60px): status dot + title + active step + mini progress bar + controls + expand chevron
+- Expanded: compact step list + agent log flyout + completion summary
+- Zero horizontal space cost
+
+### Approach C: Split View (`plan-split-view.tsx`)
+- ChatView splits into two resizable panes internally
+- Left: chat (relaxed max-width), Right: plan content (300-500px, default 380px)
+- Resize handle between panes
+- When no plan active, split doesn't exist
+
+### State management (`page.tsx`)
+- `planPanelOpen` + `planApproach` state
+- `activePlanForChat` derived from current chat's messages
+- Auto-open on plan execution start
+- Pause/stop/resume handlers that update plan status in chat messages
+- Plan approach switcher (A/B/C) in bottom-right, above design variant toggle, only visible on v5
+
+### Mock data enhancements (`mock-data.ts`)
+- Payroll plan steps enriched with `thinkingLog` arrays (agent reasoning per step)
+- Steps 3-4 marked as `nonUndoable` (ACH transfers, tax filing)
+
+### Build verification
+- TypeScript: clean (`npx tsc --noEmit` passes)
+- Next.js: production build succeeds
+
+## How to Test
+1. `npm run dev` in `/Users/mmorrell/CascadeProjects/ai_services_poc_1`
+2. Select V5 design variant (bottom-right toggle)
+3. Select a plan approach (A/B/C) from the Plan toggle above the variant toggle
+4. Navigate to "January Payroll" chat (Black Mesa)
+5. Click "Approve" on the payroll plan
+6. Plan panel/dock/split should appear automatically
+7. Test Pause/Stop/Resume controls
+8. Collapse and re-expand (Approach A pill, Approach B chevron)
+9. Click step thinking expandables to see agent reasoning
+
+## Open Questions
+- Which approach feels best for HRCs managing multiple clients simultaneously?
+- Should the dock (B) auto-expand on step completions / non-undoable gates?
+- How should Approach C interact with ArtifactPanel / WorkflowPanel?
+- Cross-client persistence: when switching clients, should the plan panel stay for the previous client's plan?
+
+## Next Steps
+1. User reviews all 3 approaches in browser
+2. Iterate on winner(s) based on feedback
+3. Add non-undoable step gate UI (confirmation modal before proceeding)
+4. Add cross-client plan indicators on home/client screens
+5. Plan history populated with completed plans

@@ -8,6 +8,9 @@ export interface ActionPlanStep {
   id: string;
   description: string;
   status: "pending" | "in_progress" | "completed";
+  nonUndoable?: boolean;
+  completedAt?: Date;
+  thinkingLog?: string[];
 }
 
 export interface ActionPlan {
@@ -20,8 +23,10 @@ export interface ActionPlan {
     affectedLabel?: string; // e.g., "employees", "records"
     estimatedTime?: string; // e.g., "~5 min"
   };
-  status: "pending" | "approved" | "executing" | "completed" | "declined";
+  status: "pending" | "approved" | "executing" | "completed" | "declined" | "paused" | "stopped";
   completionSummary?: string; // e.g., "47 employees paid, $284,392.18 total disbursed"
+  pausedAt?: Date;
+  pausedBy?: string;
 }
 
 export interface Message {
