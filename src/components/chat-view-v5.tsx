@@ -25,6 +25,7 @@ import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactCard } from "@/components/artifacts/artifact-card";
 import { ActionCardCompact } from "@/components/chat/action-card-compact";
 import { PlanSplitView } from "@/components/plan/plan-split-view";
+import { PlanPanelPill } from "@/components/plan/plan-panel";
 import { useResizable } from "@/components/ui/resize-handle";
 
 interface ChatViewProps {
@@ -41,6 +42,7 @@ interface ChatViewProps {
   isLoading: boolean;
   // Plan panel props
   activePlan?: ActionPlan;
+  activePlanMessageId?: string;
   planPanelOpen?: boolean;
   onOpenPlanPanel?: () => void;
   onClosePlanPanel?: () => void;
@@ -92,6 +94,7 @@ export function ChatView({
   onArtifactClick,
   isLoading,
   activePlan,
+  activePlanMessageId,
   planPanelOpen,
   onOpenPlanPanel,
   onClosePlanPanel,
@@ -148,7 +151,7 @@ export function ChatView({
     <div className="flex flex-col h-full flex-1 min-w-0">
       {/* Messages */}
       <ScrollArea className="relative z-10 flex-1 px-8" ref={scrollRef}>
-        <div className={cn("mx-auto py-8", showSplitView ? "max-w-none" : "max-w-3xl")}>
+        <div className={cn("mx-auto py-8", "max-w-3xl")}>
           {messages.map((message) => (
             <div key={message.id} className="mb-8">
               {/* Thinking toggle */}
@@ -369,7 +372,7 @@ export function ChatView({
 
       {/* Input */}
       <div className="relative z-10 px-8 py-5 shrink-0" style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
-        <div className={cn("mx-auto", showSplitView ? "max-w-none" : "max-w-3xl")}>
+        <div className={cn("mx-auto", "max-w-3xl")}>
           <form onSubmit={handleSubmit}>
             <div
               className="p-3"
@@ -525,16 +528,21 @@ export function ChatView({
             </p>
           )}
         </div>
-        <button
-          className="flex h-9 w-9 items-center justify-center transition-colors duration-200"
-          style={{
-            background: "rgba(255, 255, 255, 0.04)",
-            borderRadius: "9999px",
-            border: "1px solid rgba(255, 255, 255, 0.06)",
-          }}
-        >
-          <MoreHorizontal className="h-4 w-4" style={{ color: "rgba(255, 255, 255, 0.35)" }} />
-        </button>
+        <div className="flex items-center gap-2">
+          {activePlan && !planPanelOpen && onOpenPlanPanel && (
+            <PlanPanelPill plan={activePlan} onClick={onOpenPlanPanel} />
+          )}
+          <button
+            className="flex h-9 w-9 items-center justify-center transition-colors duration-200"
+            style={{
+              background: "rgba(255, 255, 255, 0.04)",
+              borderRadius: "9999px",
+              border: "1px solid rgba(255, 255, 255, 0.06)",
+            }}
+          >
+            <MoreHorizontal className="h-4 w-4" style={{ color: "rgba(255, 255, 255, 0.35)" }} />
+          </button>
+        </div>
       </div>
 
       {/* Content area — chat + optional split pane */}
@@ -564,6 +572,8 @@ export function ChatView({
                 onPause={onPausePlan}
                 onStop={onStopPlan}
                 onResume={onResumePlan}
+                onApprove={activePlanMessageId ? () => onApprove(activePlanMessageId) : undefined}
+                onDecline={activePlanMessageId ? () => onDecline(activePlanMessageId) : undefined}
               />
             </div>
           </>

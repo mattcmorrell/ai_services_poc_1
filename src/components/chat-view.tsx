@@ -24,6 +24,7 @@ import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactCard } from "@/components/artifacts/artifact-card";
 import { ActionCardCompact } from "@/components/chat/action-card-compact";
 import { PlanSplitView } from "@/components/plan/plan-split-view";
+import { PlanPanelPill } from "@/components/plan/plan-panel";
 import { useResizable } from "@/components/ui/resize-handle";
 
 interface ChatViewProps {
@@ -40,6 +41,7 @@ interface ChatViewProps {
   isLoading: boolean;
   // Plan panel props
   activePlan?: ActionPlan;
+  activePlanMessageId?: string;
   planPanelOpen?: boolean;
   onOpenPlanPanel?: () => void;
   onClosePlanPanel?: () => void;
@@ -70,6 +72,7 @@ export function ChatView({
   onArtifactClick,
   isLoading,
   activePlan,
+  activePlanMessageId,
   planPanelOpen,
   onOpenPlanPanel,
   onClosePlanPanel,
@@ -124,7 +127,7 @@ export function ChatView({
     <div className="flex h-full flex-1 flex-col bg-background min-w-0">
       {/* Messages */}
       <ScrollArea className="flex-1 px-6" ref={scrollRef}>
-        <div className={cn("mx-auto py-6", showSplitView ? "max-w-none" : "max-w-3xl")}>
+        <div className="mx-auto py-6 max-w-3xl">
           {messages.map((message) => (
             <div key={message.id} className="mb-6">
               {message.role === "assistant" && message.thinking && (
@@ -259,7 +262,7 @@ export function ChatView({
 
       {/* Input */}
       <div className="border-t border-border p-4 shrink-0">
-        <div className={cn("mx-auto", showSplitView ? "max-w-none" : "max-w-3xl")}>
+        <div className="mx-auto max-w-3xl">
           <form onSubmit={handleSubmit}>
             <div className="rounded-xl border border-border bg-card p-3">
               <textarea
@@ -316,9 +319,14 @@ export function ChatView({
             <p className="text-sm text-muted-foreground">{client.name}</p>
           )}
         </div>
-        <Button variant="ghost" size="icon">
-          <MoreHorizontal className="h-5 w-5" />
-        </Button>
+        <div className="flex items-center gap-2">
+          {activePlan && !planPanelOpen && onOpenPlanPanel && (
+            <PlanPanelPill plan={activePlan} onClick={onOpenPlanPanel} />
+          )}
+          <Button variant="ghost" size="icon">
+            <MoreHorizontal className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
 
       {/* Content area — chat + optional split pane */}
@@ -341,6 +349,8 @@ export function ChatView({
                 onPause={onPausePlan}
                 onStop={onStopPlan}
                 onResume={onResumePlan}
+                onApprove={activePlanMessageId ? () => onApprove(activePlanMessageId) : undefined}
+                onDecline={activePlanMessageId ? () => onDecline(activePlanMessageId) : undefined}
               />
             </div>
           </>

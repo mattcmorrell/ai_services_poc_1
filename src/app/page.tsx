@@ -395,6 +395,9 @@ export default function Home() {
           return;
         }
 
+        // Check if this step is a non-undoable gate — auto-pause for confirmation
+        const isGate = steps[currentStep]?.nonUndoable;
+
         setChats((prev) =>
           prev.map((chat) =>
             chat.id === chatId
@@ -406,7 +409,8 @@ export default function Home() {
                       ...msg,
                       actionPlan: {
                         ...msg.actionPlan,
-                        status: "executing" as const,
+                        status: isGate ? ("paused" as const) : ("executing" as const),
+                        ...(isGate && { pausedAt: new Date(), pausedBy: "gate" }),
                         steps: msg.actionPlan.steps.map((step, idx) => ({
                           ...step,
                           status:
@@ -423,6 +427,9 @@ export default function Home() {
               : chat
           )
         );
+
+        // If gated, don't continue — the user must resume manually
+        if (isGate) return;
 
         setTimeout(() => {
           setChats((prev) =>
@@ -688,6 +695,7 @@ export default function Home() {
                 onArtifactClick={setSelectedArtifactId}
                 isLoading={loadingChatId === selectedChatId}
                 activePlan={activePlan || undefined}
+                activePlanMessageId={activePlanMessage?.id}
                 planPanelOpen={planPanelOpen}
                 onOpenPlanPanel={() => setPlanPanelOpen(true)}
                 onClosePlanPanel={() => setPlanPanelOpen(false)}

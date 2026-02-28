@@ -189,12 +189,11 @@ export function PlanPanelPill({
   return (
     <button
       onClick={onClick}
-      className="fixed right-4 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2.5 pl-2.5 pr-3.5 py-2 rounded-full transition-all duration-300 hover:scale-105 group"
+      className="flex items-center gap-2.5 pl-2.5 pr-3.5 py-2 rounded-full transition-all duration-300 hover:scale-105 group"
       style={{
         background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)",
         border: "1px solid rgba(255,255,255,0.1)",
         backdropFilter: "blur(20px)",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
       }}
     >
       {/* Progress ring */}
