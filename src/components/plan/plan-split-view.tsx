@@ -79,7 +79,7 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
                     {plan.metadata.affectedCount}
                   </span>
                   <span
-                    className="text-[10px] ml-1"
+                    className="text-xs ml-1"
                     style={{ color: "rgba(255,255,255,0.25)" }}
                   >
                     {plan.metadata.affectedLabel || "items"}
@@ -146,7 +146,7 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
             {onApprove && (
               <button
                 onClick={onApprove}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold transition-all"
                 style={{
                   background: "rgba(255,255,255,0.9)",
                   color: "#060608",
@@ -159,7 +159,7 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
             {onDecline && (
               <button
                 onClick={onDecline}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold transition-all"
                 style={{
                   background: "rgba(255,255,255,0.04)",
                   color: "rgba(255,255,255,0.5)",

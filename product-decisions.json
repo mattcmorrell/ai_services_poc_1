@@ -1,7 +1,7 @@
 {
   "title": "Product Decision Journal",
   "project": "AI Services POC — BambooHR Consultant App",
-  "lastUpdated": "2026-02-27",
+  "lastUpdated": "2026-02-28",
   "schema": {
     "version": 1,
     "nodeTypes": ["outcome", "opportunity", "solution", "experiment", "decision"],
@@ -318,6 +318,14 @@
       ]
     },
     {
+      "id": "D6",
+      "title": "Establish 12px floor and 12/13/14/16/20/24 type scale",
+      "status": "chosen",
+      "date": "2026-02-28",
+      "reasoning": "Font audit found ~60% of visible text was 10-12px. Nav labels at 10px, step numbers at 11px, status badges at 10px — all below comfortable reading size. Established 12px as the minimum floor. Buttons bumped from 12px to 13px with font-semibold to give them more visual weight for decision-critical actions (Approve/Decline on payroll plans). Custom text-[10px] and text-[11px] classes replaced with text-xs (12px) throughout. Compact step indicators kept at 10px as the one exception (tiny circles need tiny text).",
+      "relatedIds": ["OP4", "Q6"]
+    },
+    {
       "id": "D3",
       "title": "The ideal end-state is FigJam OST with Claude read/write",
       "status": "open",
@@ -356,6 +364,12 @@
       "title": "How does the trio's existing OST practice (if any) integrate?",
       "date": "2026-02-23",
       "context": "Trios should be building OSTs. If they already are (in FigJam, Miro, etc.), the journal shouldn't duplicate that work. Ideal: Claude reads the trio's OST and enriches it with design-session details."
+    },
+    {
+      "id": "Q6",
+      "title": "Should the app introduce a second typeface?",
+      "date": "2026-02-28",
+      "context": "Font audit revealed the entire app uses a single typeface (ui-sans-serif system font stack). A second typeface — e.g., a geometric sans for headings or a monospace for data/metrics — would help differentiate content types (navigation vs. body text vs. numerical data). Not needed yet but worth considering as the UI matures. Could also help distinguish agent-generated content from user-authored content."
     }
   ]
 }

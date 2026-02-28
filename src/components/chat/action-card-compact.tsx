@@ -73,13 +73,13 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
           >
             {plan.title}
           </div>
-          <div className="text-[11px]" style={{ color: "rgba(255,255,255,0.3)" }}>
+          <div className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
             {plan.steps.length} steps · {getStatusText()}
             {(isExecuting || isCompleted) && ` · ${completedSteps}/${plan.steps.length} complete`}
           </div>
         </div>
         <div
-          className="flex items-center gap-1 text-[11px] font-medium opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+          className="flex items-center gap-1 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
           style={{ color: "rgba(255,255,255,0.4)" }}
         >
           Details
@@ -96,7 +96,7 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
           {onApprove && (
             <button
               onClick={(e) => { e.stopPropagation(); onApprove(); }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold transition-all"
               style={{
                 background: "rgba(255,255,255,0.9)",
                 color: "#060608",
@@ -109,7 +109,7 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
           {onDecline && (
             <button
               onClick={(e) => { e.stopPropagation(); onDecline(); }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold transition-all"
               style={{
                 background: "rgba(255,255,255,0.04)",
                 color: "rgba(255,255,255,0.5)",

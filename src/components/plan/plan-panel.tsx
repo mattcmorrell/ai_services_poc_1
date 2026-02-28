@@ -233,10 +233,10 @@ export function PlanPanelPill({
       </svg>
 
       <div className="text-left">
-        <div className="text-[11px] font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
+        <div className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
           Plan
         </div>
-        <div className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+        <div className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
           {completedSteps}/{totalSteps}
           {isExecuting && " running"}
           {isPaused && " paused"}

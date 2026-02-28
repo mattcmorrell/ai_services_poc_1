@@ -27,13 +27,13 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
 
   const buttonBase = cn(
     "inline-flex items-center justify-center gap-1.5 transition-all duration-200",
-    compact ? "h-7 px-2.5 text-[11px] rounded-lg" : "h-8 px-3 text-xs rounded-lg",
+    compact ? "h-7 px-2.5 text-xs rounded-lg" : "h-8 px-3 text-[13px] rounded-lg",
   );
 
   if (confirmingStop) {
     return (
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-1.5 text-[11px]" style={{ color: "rgba(239, 68, 68, 0.8)" }}>
+        <div className="flex items-center gap-1.5 text-xs" style={{ color: "rgba(239, 68, 68, 0.8)" }}>
           <AlertTriangle className="w-3 h-3" />
           Stop? {completedSteps}/{plan.steps.length} steps done. Cannot resume.
         </div>
@@ -145,7 +145,7 @@ export function PlanStatusBadge({ status }: { status: ActionPlan["status"] }) {
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium"
+      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium"
       style={{ background: c.bg, color: c.text }}
     >
       <span

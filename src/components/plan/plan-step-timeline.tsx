@@ -40,7 +40,7 @@ export function PlanStepTimeline({ steps, compact = false }: PlanStepTimelinePro
             }}
           />
         </div>
-        <span className="text-[11px] tabular-nums" style={{ color: "rgba(255,255,255,0.35)" }}>
+        <span className="text-xs tabular-nums" style={{ color: "rgba(255,255,255,0.35)" }}>
           {completedCount}/{steps.length}
         </span>
       </div>
@@ -112,7 +112,7 @@ export function PlanStepTimeline({ steps, compact = false }: PlanStepTimelinePro
                   </span>
                   {step.nonUndoable && (
                     <span
-                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium"
+                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium"
                       style={{
                         background: "rgba(251, 191, 36, 0.1)",
                         color: "rgba(251, 191, 36, 0.8)",
@@ -127,7 +127,7 @@ export function PlanStepTimeline({ steps, compact = false }: PlanStepTimelinePro
 
                 {step.completedAt && isCompleted && (
                   <span
-                    className="text-[10px] mt-0.5 block"
+                    className="text-xs mt-0.5 block"
                     style={{ color: "rgba(255,255,255,0.2)" }}
                   >
                     Completed {step.completedAt.toLocaleTimeString()}
@@ -156,7 +156,7 @@ export function PlanStepTimeline({ steps, compact = false }: PlanStepTimelinePro
                 }}
               >
                 <div
-                  className="flex items-center gap-1.5 mb-2 text-[10px] font-medium uppercase tracking-wide"
+                  className="flex items-center gap-1.5 mb-2 text-xs font-medium uppercase tracking-wide"
                   style={{ color: "rgba(255,255,255,0.25)" }}
                 >
                   <Brain className="w-3 h-3" />
@@ -187,7 +187,7 @@ function StepIndicator({
 }) {
   const size = compact ? "w-4 h-4" : "w-6 h-6";
   const iconSize = compact ? "w-2.5 h-2.5" : "w-3 h-3";
-  const textSize = compact ? "text-[9px]" : "text-[11px]";
+  const textSize = compact ? "text-[10px]" : "text-xs";
 
   if (status === "completed") {
     return (
