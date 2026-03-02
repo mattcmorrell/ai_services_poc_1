@@ -43,9 +43,9 @@ const planStatusConfig: Record<string, { label: string; className: string }> = {
 };
 
 const planBarColor: Record<string, string> = {
-  awaiting: "bg-amber-500",
-  running: "bg-emerald-500",
-  paused: "bg-zinc-500",
+  awaiting: "bg-blue-500",
+  running: "bg-blue-500",
+  paused: "bg-blue-500/40",
 };
 
 // Mock enrichment data per client — in production this comes from the API
@@ -106,7 +106,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
           <div className="flex items-center gap-2 border-b border-border px-5 py-3">
             <AlertTriangle className="h-4 w-4 text-amber-400" />
             <span className="text-xs font-semibold uppercase tracking-wide">Needs Attention</span>
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[11px] font-bold text-white">
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1.5 text-[11px] font-semibold text-foreground/70">
               {homeData.attentionItems.length}
             </span>
           </div>
@@ -132,11 +132,11 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
                       <p className="mt-1.5 text-xs text-muted-foreground/60">No one has viewed this yet</p>
                     )}
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <button className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+                  <div className="flex shrink-0 items-center gap-3">
+                    <button className="rounded-md border border-primary/50 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10">
                       {item.primaryAction}
                     </button>
-                    <button className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                    <button className="text-xs text-muted-foreground transition-colors hover:text-foreground">
                       {item.secondaryAction}
                     </button>
                   </div>
