@@ -193,7 +193,20 @@ export function ChatView({
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => {
+                      window.open(
+                        "/interview",
+                        "customer-interview",
+                        "width=700,height=800,menubar=no,toolbar=no"
+                      );
+                    }}
+                    title="Open Customer Interview"
+                  >
                     <Mic className="h-4 w-4" />
                   </Button>
                 </div>
