@@ -51,7 +51,7 @@ export function DashboardView({
   };
 
   return (
-    <div className="flex h-full flex-1 flex-col bg-background">
+    <div className="flex h-full min-w-0 flex-1 flex-col bg-background">
       <div className="flex flex-1 flex-col items-center overflow-auto px-6 py-8">
         {/* Logo */}
         <div className="mb-8">
@@ -79,7 +79,7 @@ export function DashboardView({
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid w-full max-w-4xl grid-cols-1 gap-6 lg:grid-cols-[1fr_280px]">
+        <div className="grid w-full max-w-4xl grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
           <AgentsAttention agents={agents} onAgentClick={onAgentClick} />
           <TodoList
             todos={todos}

@@ -137,15 +137,15 @@ export function ActionCard({ plan, workflow, onApprove, onDecline, onWorkflowCli
 
       {/* Buttons */}
       {isPending && (
-        <div className="flex gap-3">
-          <Button onClick={onApprove} className="gap-2">
+        <div className="flex gap-2.5">
+          <Button onClick={onApprove} className="flex-1 gap-2 py-2.5">
             <Check className="w-4 h-4" />
-            Approve
+            Approve plan
           </Button>
           <Button
             variant="outline"
             onClick={onDecline}
-            className="gap-2 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50"
+            className="gap-2 py-2.5 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50"
           >
             <X className="w-4 h-4" />
             Decline

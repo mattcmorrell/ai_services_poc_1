@@ -45,6 +45,8 @@ interface ChatViewProps {
   onResumePlan?: () => void;
   onApproveGatedStep?: (gateMessageId: string) => void;
   onModifyGatedStep?: (gateMessageId: string) => void;
+  onApproveRequest?: (messageId: string) => void;
+  onDeclineRequest?: (messageId: string) => void;
 }
 
 const models = [
@@ -85,6 +87,8 @@ export function ChatView({
   onResumePlan,
   onApproveGatedStep,
   onModifyGatedStep,
+  onApproveRequest,
+  onDeclineRequest,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
@@ -96,6 +100,7 @@ export function ChatView({
     minWidth: 300,
     maxWidth: 500,
     storageKey: "plan-split-width",
+    side: "right",
   });
 
   const showSplitView = activePlan && planPanelOpen;
@@ -143,6 +148,8 @@ export function ChatView({
           onOpenPlanPanel={onOpenPlanPanel}
           onApproveGatedStep={onApproveGatedStep}
           onModifyGatedStep={onModifyGatedStep}
+          onApproveRequest={onApproveRequest}
+          onDeclineRequest={onDeclineRequest}
           isLoading={isLoading}
         />
       </ScrollArea>

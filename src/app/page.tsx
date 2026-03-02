@@ -59,6 +59,7 @@ import { ArtifactPanel } from "@/components/artifacts/artifact-panel";
 import { parseArtifacts } from "@/lib/artifact-parser";
 import { parseActionPlan } from "@/lib/action-plan-parser";
 import { parseClarifyingQuestions } from "@/lib/clarifying-questions-parser";
+import { parseApprovalRequest } from "@/lib/approval-request-parser";
 import { Agent } from "@/types/agent";
 import { ClientsView } from "@/components/clients/clients-view";
 
@@ -133,6 +134,7 @@ export default function Home() {
   // Auto-open plan panel when a plan starts executing
   // Auto-open plan panel whenever a plan exists
   const lastPlanId = useRef<string | null>(null);
+  const simulateExecutionRef = useRef<(messageId: string, plan: ActionPlan, chatId: string) => void>(() => {});
   useEffect(() => {
     if (activePlan && activePlan.id !== lastPlanId.current) {
       setPlanPanelOpen(true);
@@ -218,7 +220,7 @@ export default function Home() {
   // --- Chat-ID-explicit handlers ---
 
   const handleSendMessageForChat = useCallback(
-    async (content: string, chatId: string) => {
+    async (content: string, chatId: string, options?: { hidden?: boolean }) => {
       const chat = chats.find((c) => c.id === chatId);
       if (!chat) return;
 
@@ -229,6 +231,7 @@ export default function Home() {
         role: "user",
         content,
         timestamp: new Date(),
+        ...(options?.hidden && { hidden: true }),
       };
 
       setChats((prev) =>
@@ -263,8 +266,12 @@ export default function Home() {
         const afterCqContent = cqResult?.cleanedContent || artifactParsedContent;
 
         const actionPlanResult = parseActionPlan(afterCqContent);
-        const finalContent = actionPlanResult?.cleanedContent || afterCqContent;
+        const afterActionContent = actionPlanResult?.cleanedContent || afterCqContent;
         let actionPlan = actionPlanResult?.plan;
+
+        // Parse approval requests (e.g. "### Gate: approve Step 4")
+        const approvalResult = parseApprovalRequest(afterActionContent);
+        const finalContent = approvalResult?.cleanedContent || afterActionContent;
 
         // Safety net: for Time Off agent, ensure all steps are gated
         if (actionPlan && chat.agentId === "agent-timeoff") {
@@ -284,6 +291,7 @@ export default function Home() {
           artifactIds: newArtifacts.map((a) => a.id),
           actionPlan,
           clarifyingQuestions: cqResult?.questions,
+          approvalRequest: approvalResult?.approvalRequest,
           timestamp: new Date(),
         };
 
@@ -323,9 +331,9 @@ export default function Home() {
 
   // Wrapper for "recent" mode — uses selectedChatId
   const handleSendMessage = useCallback(
-    async (content: string) => {
+    async (content: string, options?: { hidden?: boolean }) => {
       if (!selectedChatId) return;
-      await handleSendMessageForChat(content, selectedChatId);
+      await handleSendMessageForChat(content, selectedChatId, options);
     },
     [selectedChatId, handleSendMessageForChat]
   );
@@ -521,9 +529,95 @@ export default function Home() {
         .join("\n") || "";
 
       const responseText = `Here are my answers:\n\n${formattedAnswers}`;
-      handleSendMessage(responseText);
+      handleSendMessage(responseText, { hidden: true });
     },
     [selectedChatId, chats, handleSendMessage]
+  );
+
+  const handleApproveRequest = useCallback(
+    (messageId: string) => {
+      if (!selectedChatId) return;
+      const chat = chats.find((c) => c.id === selectedChatId);
+      if (!chat) return;
+
+      // Mark the approval request as approved
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === selectedChatId
+            ? {
+                ...c,
+                messages: c.messages.map((m) =>
+                  m.id === messageId && m.approvalRequest
+                    ? { ...m, approvalRequest: { ...m.approvalRequest, approved: true } }
+                    : m
+                ),
+              }
+            : c
+        )
+      );
+
+      // Advance the active plan: mark current in-progress step as completed and resume
+      const planMsg = chat.messages.find(
+        (m) => m.actionPlan && (m.actionPlan.status === "executing" || m.actionPlan.status === "paused")
+      );
+      if (planMsg?.actionPlan) {
+        const currentIdx = planMsg.actionPlan.steps.findIndex(
+          (s) => s.status === "in_progress"
+        );
+        if (currentIdx !== -1) {
+          // Mark current step completed
+          const updatedSteps = planMsg.actionPlan.steps.map((step, idx) => ({
+            ...step,
+            status: idx <= currentIdx ? ("completed" as const) : step.status,
+          }));
+          const updatedPlan = { ...planMsg.actionPlan, status: "executing" as const, steps: updatedSteps };
+          setChats((prev) =>
+            prev.map((c) =>
+              c.id === selectedChatId
+                ? {
+                    ...c,
+                    messages: c.messages.map((m) =>
+                      m.id === planMsg.id
+                        ? { ...m, actionPlan: updatedPlan }
+                        : m
+                    ),
+                  }
+                : c
+            )
+          );
+          // Resume simulation from the next step
+          simulateExecutionRef.current(planMsg.id, updatedPlan, selectedChatId);
+        }
+      }
+
+      // Send approval as hidden message
+      handleSendMessage("Yes, approved.", { hidden: true });
+    },
+    [selectedChatId, chats, handleSendMessage]
+  );
+
+  const handleDeclineRequest = useCallback(
+    (messageId: string) => {
+      if (!selectedChatId) return;
+      // Mark the approval request as declined
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === selectedChatId
+            ? {
+                ...c,
+                messages: c.messages.map((m) =>
+                  m.id === messageId && m.approvalRequest
+                    ? { ...m, approvalRequest: { ...m.approvalRequest, approved: false } }
+                    : m
+                ),
+              }
+            : c
+        )
+      );
+      // Send decline — visible so user can explain
+      handleSendMessage("No, I'd like to make changes.");
+    },
+    [selectedChatId, handleSendMessage]
   );
 
   const simulateExecutionForChat = useCallback(
@@ -649,6 +743,7 @@ export default function Home() {
     },
     []
   );
+  simulateExecutionRef.current = simulateExecutionForChat;
 
   const handleNewChat = useCallback(
     (clientId: string): string => {
@@ -895,6 +990,8 @@ export default function Home() {
                 onResumePlan={handleResumePlan}
                 onApproveGatedStep={handleApproveGatedStep}
                 onModifyGatedStep={handleModifyGatedStep}
+                onApproveRequest={handleApproveRequest}
+                onDeclineRequest={handleDeclineRequest}
               />
             ) : (
               <div className="flex flex-1 items-center justify-center text-muted-foreground">

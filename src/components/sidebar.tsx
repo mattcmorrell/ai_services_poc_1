@@ -16,14 +16,14 @@ const navItems = [
 
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   return (
-    <div className="flex h-full w-16 flex-col items-center border-r border-border bg-card py-4">
-      <nav className="flex flex-1 flex-col items-center gap-2">
+    <div className="flex h-full w-20 flex-col items-center border-r border-border bg-card py-4 px-2">
+      <nav className="flex flex-1 flex-col items-center gap-2 w-full">
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={() => onViewChange(item.id)}
             className={cn(
-              "relative flex h-12 w-12 flex-col items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
+              "relative flex h-12 w-full flex-col items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
               activeView === item.id && "bg-accent text-accent-foreground"
             )}
           >
@@ -37,7 +37,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           </button>
         ))}
       </nav>
-      <button className="flex h-12 w-12 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
+      <button className="flex h-12 w-full items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
         <Settings className="h-5 w-5" />
       </button>
     </div>
