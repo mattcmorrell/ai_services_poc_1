@@ -4,109 +4,101 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AI Services POC - A Next.js 16 application for BambooHR consultants to manage client HR tasks through AI-powered agents. The app features a chat interface where AI assistants help with payroll, onboarding, benefits, and other HR operations.
+AI Services POC - A Next.js 16 single-page application for BambooHR consultants to manage client HR tasks through AI-powered agents. Features a chat interface with action plans (require approval), artifacts (code/tables/documents), clarifying questions, and workflow visualization.
 
 ## Commands
 
 - `npm run dev` - Start development server (localhost:3000)
 - `npm run build` - Build for production
-- `npm run lint` - Run ESLint (configured in eslint.config.mjs)
+- `npm run lint` - Run ESLint
 - `npm start` - Start production server
+
+No test framework is configured.
 
 ## Architecture
 
-### Single-Page App Structure
+### Single-Page App (src/app/page.tsx)
 
-The app is a single-page React application with multiple views (dashboard, chats, agents) controlled by `src/app/page.tsx`. All state (chats, agents, selected views, artifacts, workflows) is managed in this root component (~580 lines). State flows down to view components as props, and callbacks flow up to handle user actions.
+All state lives in the root `Home` component (~890 lines). Views are switched via `activeView` state (dashboard/chats/agents). Design variants are switched via `designVariant` state using a `variantMap` that maps to variant-specific component sets.
 
-**Key State in page.tsx:**
-- `chats` - All chat conversations
-- `agents` - Agent definitions
-- `activeView` - Current view (dashboard/chats/agents)
-- `selectedChatId` - Active chat
-- `selectedArtifactId` - Artifact being viewed in side panel
-- `workflowPanelOpen` - Workflow visualization state
+### Design Variant System
 
-### Key Flows
+15 design variants (original + v1-v14, where v14 re-exports v13) exist for design exploration. Each variant has 3 component files:
+- `chat-view-{variant}.tsx` - Chat interface
+- `chat-list-panel-{variant}.tsx` - Sidebar chat list
+- `dashboard/dashboard-view-{variant}.tsx` - Dashboard view
 
-**Chat Flow:**
+**Chat views use a shared `MessageList` component** (`src/components/chat/message-list.tsx`) with a `MessageListTheme` config for per-variant styling. This means functional changes to message rendering (action plans, clarifying questions, artifacts, thinking toggle, etc.) only need to be made once. Each chat-view file keeps its own header, input area, and decorative elements.
+
+Chat-list-panel and dashboard-view variants are NOT yet consolidated — changes to those still need manual replication across all variants.
+
+### Chat Message Flow
+
 1. User sends message → `handleSendMessage` in page.tsx
-2. Message posted to `/api/chat` with conversation history and optional agentId
-3. API route loads agent-specific system prompt if agentId provided (via `src/lib/prompt-loader.ts`)
-4. OpenAI response is parsed for artifacts and action plans
-5. Parsed content and extracted items stored in chat state
+2. POST to `/api/chat` with message history, clientName, and optional agentId
+3. API route loads agent-specific system prompt via `loadAgentPrompt()` if agentId provided
+4. Response parsed through three-stage pipeline:
+   - `parseArtifacts()` → extracts `<artifact>` tags, replaces with `[ARTIFACT:id]` placeholders
+   - `parseClarifyingQuestions()` → extracts `{"clarifyingQuestions":[...]}` JSON blocks
+   - `parseActionPlan()` → extracts JSON `{"plan":{...}}` or XML `<action_plan>` blocks
+5. Each parser cleans its content before passing to the next
+6. Parsed items stored on the Message object; new action plans auto-open the plan panel
 
-**Agent System:**
-- Agents are defined in `src/data/agents-data.ts`
-- Agent prompts are markdown files in `src/data/prompts/` with YAML frontmatter
-- Map agent IDs to prompt files in `src/data/prompts/index.ts`
-- `src/lib/prompt-loader.ts` loads and parses prompt files at runtime
+### Action Plan Execution
 
-**Adding a New Agent:**
-1. Create agent prompt markdown file in `src/data/prompts/` (with YAML frontmatter)
-2. Add mapping in `src/data/prompts/index.ts` (agentPromptMap)
+Plans have a status lifecycle: pending → approved → executing → completed/paused/stopped/declined. Steps execute sequentially via `simulateExecutionForChat`. Steps with `nonUndoable: true` pause execution and require manual resume (safety gate for irreversible operations).
+
+### Agent System
+
+- Agent definitions: `src/data/agents-data.ts` (16 agents with icons, favorites)
+- Agent prompts: Markdown files with YAML frontmatter in `src/data/prompts/`
+- Prompt file mapping: `src/data/prompts/index.ts` (`agentPromptMap`)
+- Loader: `src/lib/prompt-loader.ts` parses frontmatter for greeting + system prompt
+
+**Adding a new agent:**
+1. Create `src/data/prompts/agent-{name}.md` with YAML frontmatter (greeting field) and system prompt body
+2. Add entry in `src/data/prompts/index.ts`
 3. Add agent definition to `src/data/agents-data.ts`
 
-### LLM Response Parsing
+### Key Components
 
-The app extracts structured content from LLM responses:
+| Component | Purpose |
+|-----------|---------|
+| `chat/message-list.tsx` | Shared message renderer with `MessageListTheme` — all functional rendering lives here |
+| `chat/action-card.tsx` | Full action plan card with step timeline, approval buttons |
+| `chat/action-card-compact.tsx` | Compact plan card (used in OG + v5 variants with split plan panel) |
+| `chat/clarifying-questions-card.tsx` | Tabbed multi-step question form with selectable options |
+| `artifacts/artifact-card.tsx` | Artifact list items with type-specific icons |
+| `artifacts/artifact-panel.tsx` | Side panel for viewing artifact content |
+| `plan/plan-panel.tsx` | Resizable right-side panel for plan details and controls |
+| `workflow/workflow-panel.tsx` | XYFlow-based workflow visualization |
+| `sidebar.tsx` | Main navigation sidebar |
 
-**Artifacts** (`src/lib/artifact-parser.ts`): Content wrapped in `<artifact title="..." type="code|table|list|document">` tags is extracted and displayed in a side panel.
+### Radix ScrollArea
 
-**Action Plans** (`src/lib/action-plan-parser.ts`): High-stakes operations use `<action_plan>` tags with YAML-like syntax (title, description, steps). Plans require user approval before simulated execution.
+The app uses Radix `ScrollArea`. To programmatically scroll, query the viewport child element: `scrollRef.current?.querySelector('[data-radix-scroll-area-viewport]')` — do NOT use the root ref directly.
 
-### Styling
+## Tech Stack
 
-- **Tailwind CSS 4** - Utility-first CSS framework
-- **shadcn/ui** - Component library (New York style, configured in components.json)
-- **Tremor React** - Dashboard and chart components
-- **Lucide React** - Icon library
-- UI components are in `src/components/ui/` (button, dialog, dropdown-menu, input, scroll-area)
+- **Next.js 16** with App Router, React Compiler enabled
+- **React 18**, TypeScript strict mode
+- **Tailwind CSS 4** (`@import "tailwindcss"` syntax, oklch colors)
+- **shadcn/ui** (New York style, CSS variables)
+- **OpenAI SDK** — model: `gpt-5.2`, 2000 max completion tokens
+- **@xyflow/react** for workflow diagrams
+- **@tremor/react** for dashboard charts
+- **lucide-react** for icons
 
-### Directory Structure
-
-- `src/app/api/` - API routes (chat, agent-greeting)
-- `src/components/` - React components organized by feature (chat, dashboard, agents, workflow, artifacts, ui)
-- `src/data/` - Mock data and agent prompts
-- `src/lib/` - Utilities and parsers
-- `src/types/` - TypeScript interfaces
-
-### Tech Stack Notes
-
-- **Next.js 16** with App Router
-- **React 18** with React Compiler enabled (experimental optimization in next.config.ts)
-- **TypeScript** with strict mode
-- **OpenAI SDK** for LLM integration
-- **XYFlow** (@xyflow/react) for workflow visualization
-
-### Environment Variables
+## Environment Variables
 
 Requires `OPENAI_API_KEY` in `.env.local`
 
-### Path Alias
+## Path Alias
 
-`@/*` maps to `./src/*` (configured in tsconfig.json)
+`@/*` maps to `./src/*`
 
 ## Product Decision Journal
 
-The file `product-decisions.json` is a living record of product discovery decisions for this project, structured as an Opportunity Solution Tree (outcomes, opportunities, solutions, experiments, decisions).
+`product-decisions.json` is a living Opportunity Solution Tree. Read it first when resuming work or answering project history questions.
 
-### When resuming work or answering questions about project history
-- Read `product-decisions.json` first to understand what's been explored and why.
-
-### When to update it
-- A new solution or approach is explored → add a `solutions` entry
-- An experiment is run (prototype, test, research) → add an `experiments` entry
-- A fork-in-the-road decision is made → add a `decisions` entry with reasoning
-- An approach is rejected, deferred, or chosen → update the relevant entry's `status` and `reasoning`
-- A new question emerges → add to `openQuestions`
-- A question is resolved → remove it from `openQuestions` and capture the answer as a decision
-
-### Rules
-- Never delete entries. Change `status` instead (active, exploring, chosen, rejected, deferred, open).
-- Always capture `reasoning` — the *why*, not just the *what*.
-- Include `evidence` when available (user quotes, research findings, persona feedback).
-- Use `relatedIds` to link connected entries across the tree.
-- Use `parentId` to maintain the OST hierarchy (outcome → opportunity → solution → experiment).
-- Update `lastUpdated` when making changes.
-- This file is SEPARATE from the Design Iteration Tracker (`decision-tree-data.json`). They serve different purposes. Reference the iteration tracker via `artifact` fields when relevant, but don't merge them.
+**Rules:** Never delete entries — change `status` instead. Always capture `reasoning`. Use `relatedIds`/`parentId` for hierarchy. This file is separate from the Design Iteration Tracker (`decision-tree-data.json`).

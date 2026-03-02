@@ -29,6 +29,25 @@ export interface ActionPlan {
   pausedBy?: string;
 }
 
+export interface ClarifyingQuestionOption {
+  label: string;
+  description?: string;
+}
+
+export interface ClarifyingQuestion {
+  id: string;
+  header: string;
+  question: string;
+  options: ClarifyingQuestionOption[];
+  multiSelect?: boolean;
+}
+
+export interface ClarifyingQuestions {
+  questions: ClarifyingQuestion[];
+  answered?: boolean;
+  answers?: Record<string, string | string[]>;
+}
+
 export interface Message {
   id: string;
   role: "user" | "assistant";
@@ -40,6 +59,7 @@ export interface Message {
     description: string;
   };
   actionPlan?: ActionPlan;
+  clarifyingQuestions?: ClarifyingQuestions;
   artifactIds?: string[]; // References to artifacts created in this message
   requiresApproval?: boolean;
   approved?: boolean;

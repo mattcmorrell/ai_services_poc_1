@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import {
   MoreHorizontal,
   ChevronDown,
-  ChevronRight,
   ArrowUpDown,
   ThumbsUp,
   Plus,
@@ -21,8 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
-import { ArtifactCard } from "@/components/artifacts/artifact-card";
-import { ActionCard } from "@/components/chat/action-card";
+import { MessageList, MessageListTheme } from "@/components/chat/message-list";
 
 interface ChatViewProps {
   client: Client | null;
@@ -35,6 +33,7 @@ interface ChatViewProps {
   onDecline: (messageId: string) => void;
   onWorkflowClick: (workflowId: string) => void;
   onArtifactClick: (artifactId: string) => void;
+  onSubmitClarifyingAnswers?: (messageId: string, answers: Record<string, string | string[]>) => void;
   isLoading: boolean;
 }
 
@@ -47,6 +46,175 @@ const models = [
   "Gemini 2.0 Flash",
 ];
 
+const v2Theme: MessageListTheme = {
+  messageSpacing: "mb-6",
+  innerContainerClass: "mx-auto max-w-3xl py-6",
+  actionPlanVariant: "full",
+  actionPlanWrapperClass: "mt-4",
+
+  contentWrapperClass: (role) =>
+    cn(role === "user" && "text-right"),
+
+  userBubbleClass: "text-sm leading-relaxed inline-block border-2 px-4 py-2",
+  userBubbleStyle: {
+    borderColor: "#ff3b00",
+    background: "#1a0500",
+    color: "#ff8866",
+  },
+
+  assistantClass: "text-sm leading-relaxed",
+  assistantStyle: {
+    color: "#ccc",
+  },
+
+  contentTransform: (content) =>
+    content
+      .replace(
+        /\*\*(.*?)\*\*/g,
+        '<strong style="color:#fff;font-weight:700">$1</strong>'
+      )
+      .replace(/\n/g, "<br />"),
+
+  thinkingToggleClass: "mb-2 flex items-center gap-1 text-xs uppercase tracking-wider",
+  thinkingToggleStyle: { color: "#666" },
+  thinkingLabel: "[SHOW REASONING]",
+
+  thinkingBoxClass: "mb-4 border-l-2 p-4 text-xs leading-relaxed",
+  thinkingBoxStyle: {
+    borderColor: "#333",
+    background: "#0d0d0d",
+    color: "#666",
+  },
+
+  artifactWrapperClass: "mt-4 flex flex-wrap gap-2",
+
+  renderMessagePrefix: (message, index) => (
+    <div
+      className="mb-1 text-xs uppercase tracking-wider"
+      style={{ color: "#333", fontSize: "10px" }}
+    >
+      {message.role === "user" ? "USR" : "SYS"}::
+      {String(index).padStart(3, "0")}
+    </div>
+  ),
+
+  renderMessageSuffix: () => (
+    <div
+      className="mt-4 h-px"
+      style={{
+        background:
+          "repeating-linear-gradient(90deg, #1a1a1a 0, #1a1a1a 4px, transparent 4px, transparent 8px)",
+      }}
+    />
+  ),
+
+  renderLoading: () => (
+    <div className="mb-6">
+      <div
+        className="mb-1 text-xs uppercase tracking-wider"
+        style={{ color: "#333", fontSize: "10px" }}
+      >
+        SYS::PROCESSING
+      </div>
+      <div className="flex items-center gap-1">
+        <span
+          className="inline-block h-4 w-2 animate-pulse"
+          style={{ background: "#ff3b00" }}
+        />
+        <span
+          className="text-xs uppercase tracking-wider"
+          style={{ color: "#555" }}
+        >
+          GENERATING RESPONSE...
+        </span>
+      </div>
+    </div>
+  ),
+
+  renderWorkflowCard: (workflow, onClick) => (
+    <div
+      onClick={onClick}
+      className="mt-4 flex w-full cursor-pointer items-center gap-3 border-2 p-3 transition-none"
+      style={{
+        borderColor: "#333",
+        background: "#111",
+      }}
+      onMouseEnter={(e) =>
+        (e.currentTarget.style.borderColor = "#ff3b00")
+      }
+      onMouseLeave={(e) =>
+        (e.currentTarget.style.borderColor = "#333")
+      }
+    >
+      <div
+        className="flex h-10 w-10 items-center justify-center"
+        style={{ background: "#1a1a1a", border: "1px solid #333" }}
+      >
+        <ArrowUpDown className="h-5 w-5" style={{ color: "#ff3b00" }} />
+      </div>
+      <div className="flex-1">
+        <div
+          className="text-xs font-bold uppercase tracking-wider"
+          style={{ color: "#fff" }}
+        >
+          {workflow.name}
+        </div>
+        <div
+          className="text-xs uppercase tracking-wide"
+          style={{ color: "#666" }}
+        >
+          {workflow.description}
+        </div>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={(e) => e.stopPropagation()}
+        style={{ color: "#666" }}
+      >
+        <MoreHorizontal className="h-4 w-4" />
+      </Button>
+    </div>
+  ),
+
+  renderApprovalButton: (approved, onApprove) => (
+    <div className="mt-4">
+      <button
+        onClick={onApprove}
+        disabled={approved}
+        className="flex items-center gap-2 border-2 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-none"
+        style={
+          approved
+            ? {
+                borderColor: "#00ff41",
+                background: "#001a0a",
+                color: "#00ff41",
+                cursor: "default",
+              }
+            : {
+                borderColor: "#ff3b00",
+                background: "transparent",
+                color: "#ff3b00",
+                cursor: "pointer",
+              }
+        }
+      >
+        {approved ? (
+          <>
+            <Check className="h-4 w-4" />
+            AUTHORIZED
+          </>
+        ) : (
+          <>
+            <ThumbsUp className="h-4 w-4" />
+            AUTHORIZE
+          </>
+        )}
+      </button>
+    </div>
+  ),
+};
+
 export function ChatView({
   client,
   chatTitle,
@@ -58,13 +226,15 @@ export function ChatView({
   onDecline,
   onWorkflowClick,
   onArtifactClick,
+  onSubmitClarifyingAnswers,
   isLoading,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
-  const [expandedThinking, setExpandedThinking] = useState<Record<string, boolean>>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const monoFont = "'JetBrains Mono', 'Fira Code', 'Courier New', monospace";
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -86,15 +256,6 @@ export function ChatView({
       handleSubmit(e);
     }
   };
-
-  const toggleThinking = (messageId: string) => {
-    setExpandedThinking((prev) => ({
-      ...prev,
-      [messageId]: !prev[messageId],
-    }));
-  };
-
-  const monoFont = "'JetBrains Mono', 'Fira Code', 'Courier New', monospace";
 
   return (
     <div
@@ -151,238 +312,18 @@ export function ChatView({
 
       {/* Messages */}
       <ScrollArea className="flex-1 px-6" ref={scrollRef}>
-        <div className="mx-auto max-w-3xl py-6">
-          {messages.map((message, idx) => (
-            <div key={message.id} className="mb-6">
-              {/* Message index label */}
-              <div
-                className="mb-1 text-xs uppercase tracking-wider"
-                style={{ color: "#333", fontSize: "10px" }}
-              >
-                {message.role === "user" ? "USR" : "SYS"}::
-                {String(idx).padStart(3, "0")}
-              </div>
-
-              {/* Thinking toggle */}
-              {message.role === "assistant" && message.thinking && (
-                <button
-                  onClick={() => toggleThinking(message.id)}
-                  className="mb-2 flex items-center gap-1 text-xs uppercase tracking-wider"
-                  style={{ color: "#666" }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.color = "#ff3b00")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.color = "#666")
-                  }
-                >
-                  {expandedThinking[message.id] ? (
-                    <ChevronDown className="h-3 w-3" />
-                  ) : (
-                    <ChevronRight className="h-3 w-3" />
-                  )}
-                  [SHOW REASONING]
-                </button>
-              )}
-
-              {/* Thinking content */}
-              {message.thinking && expandedThinking[message.id] && (
-                <div
-                  className="mb-4 border-l-2 p-4 text-xs leading-relaxed"
-                  style={{
-                    borderColor: "#333",
-                    background: "#0d0d0d",
-                    color: "#666",
-                  }}
-                >
-                  {message.thinking}
-                </div>
-              )}
-
-              {/* Message content */}
-              <div
-                className={cn(
-                  message.role === "user" && "text-right"
-                )}
-              >
-                <div
-                  className={cn(
-                    "text-sm leading-relaxed",
-                    message.role === "user" && "inline-block border-2 px-4 py-2"
-                  )}
-                  style={
-                    message.role === "user"
-                      ? {
-                          borderColor: "#ff3b00",
-                          background: "#1a0500",
-                          color: "#ff8866",
-                        }
-                      : {
-                          color: "#ccc",
-                        }
-                  }
-                  dangerouslySetInnerHTML={{
-                    __html: message.content
-                      .replace(
-                        /\*\*(.*?)\*\*/g,
-                        '<strong style="color:#fff;font-weight:700">$1</strong>'
-                      )
-                      .replace(/\n/g, "<br />"),
-                  }}
-                />
-              </div>
-
-              {/* Action Plan Card */}
-              {message.actionPlan && (
-                <div className="mt-4">
-                  <ActionCard
-                    plan={message.actionPlan}
-                    workflow={message.workflow}
-                    onApprove={() => onApprove(message.id)}
-                    onDecline={() => onDecline(message.id)}
-                    onWorkflowClick={onWorkflowClick}
-                  />
-                </div>
-              )}
-
-              {/* Artifact cards */}
-              {message.artifactIds && message.artifactIds.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {message.artifactIds.map((artifactId) => {
-                    const artifact = artifacts.find((a) => a.id === artifactId);
-                    if (!artifact) return null;
-                    return (
-                      <ArtifactCard
-                        key={artifact.id}
-                        artifact={artifact}
-                        isSelected={selectedArtifactId === artifact.id}
-                        onClick={() => onArtifactClick(artifact.id)}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Standalone workflow card */}
-              {message.workflow && !message.actionPlan && (
-                <div
-                  onClick={() => onWorkflowClick(message.workflow!.id)}
-                  className="mt-4 flex w-full cursor-pointer items-center gap-3 border-2 p-3 transition-none"
-                  style={{
-                    borderColor: "#333",
-                    background: "#111",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.borderColor = "#ff3b00")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.borderColor = "#333")
-                  }
-                >
-                  <div
-                    className="flex h-10 w-10 items-center justify-center"
-                    style={{ background: "#1a1a1a", border: "1px solid #333" }}
-                  >
-                    <ArrowUpDown className="h-5 w-5" style={{ color: "#ff3b00" }} />
-                  </div>
-                  <div className="flex-1">
-                    <div
-                      className="text-xs font-bold uppercase tracking-wider"
-                      style={{ color: "#fff" }}
-                    >
-                      {message.workflow.name}
-                    </div>
-                    <div
-                      className="text-xs uppercase tracking-wide"
-                      style={{ color: "#666" }}
-                    >
-                      {message.workflow.description}
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => e.stopPropagation()}
-                    style={{ color: "#666" }}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-
-              {/* Approval button */}
-              {message.requiresApproval && (
-                <div className="mt-4">
-                  <button
-                    onClick={() => onApprove(message.id)}
-                    disabled={message.approved}
-                    className="flex items-center gap-2 border-2 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-none"
-                    style={
-                      message.approved
-                        ? {
-                            borderColor: "#00ff41",
-                            background: "#001a0a",
-                            color: "#00ff41",
-                            cursor: "default",
-                          }
-                        : {
-                            borderColor: "#ff3b00",
-                            background: "transparent",
-                            color: "#ff3b00",
-                            cursor: "pointer",
-                          }
-                    }
-                  >
-                    {message.approved ? (
-                      <>
-                        <Check className="h-4 w-4" />
-                        AUTHORIZED
-                      </>
-                    ) : (
-                      <>
-                        <ThumbsUp className="h-4 w-4" />
-                        AUTHORIZE
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-
-              {/* Separator line */}
-              <div
-                className="mt-4 h-px"
-                style={{
-                  background:
-                    "repeating-linear-gradient(90deg, #1a1a1a 0, #1a1a1a 4px, transparent 4px, transparent 8px)",
-                }}
-              />
-            </div>
-          ))}
-
-          {/* Loading indicator - blinking cursor style */}
-          {isLoading && (
-            <div className="mb-6">
-              <div
-                className="mb-1 text-xs uppercase tracking-wider"
-                style={{ color: "#333", fontSize: "10px" }}
-              >
-                SYS::PROCESSING
-              </div>
-              <div className="flex items-center gap-1">
-                <span
-                  className="inline-block h-4 w-2 animate-pulse"
-                  style={{ background: "#ff3b00" }}
-                />
-                <span
-                  className="text-xs uppercase tracking-wider"
-                  style={{ color: "#555" }}
-                >
-                  GENERATING RESPONSE...
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
+        <MessageList
+          messages={messages}
+          artifacts={artifacts}
+          selectedArtifactId={selectedArtifactId}
+          theme={v2Theme}
+          onApprove={onApprove}
+          onDecline={onDecline}
+          onWorkflowClick={onWorkflowClick}
+          onArtifactClick={onArtifactClick}
+          onSubmitClarifyingAnswers={onSubmitClarifyingAnswers}
+          isLoading={isLoading}
+        />
       </ScrollArea>
 
       {/* Input area */}

@@ -17,7 +17,7 @@ export const mockAgents: Agent[] = [
   },
   {
     id: "agent-timeoff",
-    name: "Create Time Off Policies",
+    name: "Time Off Policies",
     description: "Generates PTO and leave policies",
     icon: "palm-tree",
     isFavorite: true,

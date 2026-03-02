@@ -44,9 +44,9 @@ import { DashboardView as DashboardViewV12 } from "@/components/dashboard/dashbo
 import { ChatListPanel as ChatListPanelV13 } from "@/components/chat-list-panel-v13";
 import { ChatView as ChatViewV13 } from "@/components/chat-view-v13";
 import { DashboardView as DashboardViewV13 } from "@/components/dashboard/dashboard-view-v13";
-import { ChatListPanel as ChatListPanelV14 } from "@/components/chat-list-panel-v14";
-import { ChatView as ChatViewV14 } from "@/components/chat-view-v14";
-import { DashboardView as DashboardViewV14 } from "@/components/dashboard/dashboard-view-v14";
+import { ChatListPanel as ChatListPanelV14 } from "@/components/chat-list-panel-v13";
+import { ChatView as ChatViewV14 } from "@/components/chat-view-v13";
+import { DashboardView as DashboardViewV14 } from "@/components/dashboard/dashboard-view-v13";
 import { AgentsView } from "@/components/agents/agents-view";
 import { ClientSelectDialog } from "@/components/agents/client-select-dialog";
 import { WorkflowPanel } from "@/components/workflow/workflow-panel";
@@ -58,6 +58,7 @@ import { Message, Chat, Client, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactPanel } from "@/components/artifacts/artifact-panel";
 import { parseArtifacts } from "@/lib/artifact-parser";
 import { parseActionPlan } from "@/lib/action-plan-parser";
+import { parseClarifyingQuestions } from "@/lib/clarifying-questions-parser";
 import { Agent } from "@/types/agent";
 import { ClientsView } from "@/components/clients/clients-view";
 
@@ -180,7 +181,21 @@ export default function Home() {
   }, [activePlanMessage, selectedChatId]);
 
   const handleResumePlan = useCallback(() => {
-    if (!activePlanMessage || !selectedChatId) return;
+    if (!activePlanMessage || !selectedChatId || !activePlanMessage.actionPlan) return;
+
+    // Mark the current in_progress step as completed before resuming
+    const updatedSteps = activePlanMessage.actionPlan.steps.map(step =>
+      step.status === "in_progress" ? { ...step, status: "completed" as const, completedAt: new Date() } : step
+    );
+
+    const updatedPlan: ActionPlan = {
+      ...activePlanMessage.actionPlan,
+      status: "executing" as const,
+      steps: updatedSteps,
+      pausedAt: undefined,
+      pausedBy: undefined,
+    };
+
     setChats((prev) =>
       prev.map((chat) =>
         chat.id === selectedChatId
@@ -188,17 +203,16 @@ export default function Home() {
               ...chat,
               messages: chat.messages.map((msg) =>
                 msg.id === activePlanMessage.id && msg.actionPlan
-                  ? { ...msg, actionPlan: { ...msg.actionPlan, status: "executing" as const, pausedAt: undefined, pausedBy: undefined } }
+                  ? { ...msg, actionPlan: updatedPlan }
                   : msg
               ),
             }
           : chat
       )
     );
-    // Re-trigger execution simulation for remaining steps
-    if (activePlanMessage.actionPlan) {
-      simulateExecutionForChat(activePlanMessage.id, activePlanMessage.actionPlan, selectedChatId);
-    }
+
+    // Re-trigger execution simulation from next incomplete step
+    simulateExecutionForChat(activePlanMessage.id, updatedPlan, selectedChatId);
   }, [activePlanMessage, selectedChatId]);
 
   // --- Chat-ID-explicit handlers ---
@@ -244,9 +258,24 @@ export default function Home() {
 
         const { content: artifactParsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
 
-        const actionPlanResult = parseActionPlan(artifactParsedContent);
-        const finalContent = actionPlanResult?.cleanedContent || artifactParsedContent;
-        const actionPlan = actionPlanResult?.plan;
+        // Parse clarifying questions first, then action plans
+        const cqResult = parseClarifyingQuestions(artifactParsedContent);
+        const afterCqContent = cqResult?.cleanedContent || artifactParsedContent;
+
+        const actionPlanResult = parseActionPlan(afterCqContent);
+        const finalContent = actionPlanResult?.cleanedContent || afterCqContent;
+        let actionPlan = actionPlanResult?.plan;
+
+        // Safety net: for Time Off agent, ensure all steps are gated
+        if (actionPlan && chat.agentId === "agent-timeoff") {
+          actionPlan = {
+            ...actionPlan,
+            steps: actionPlan.steps.map(step => ({
+              ...step,
+              nonUndoable: true,
+            })),
+          };
+        }
 
         const assistantMessage: Message = {
           id: `msg-${Date.now() + 1}`,
@@ -254,6 +283,7 @@ export default function Home() {
           content: finalContent,
           artifactIds: newArtifacts.map((a) => a.id),
           actionPlan,
+          clarifyingQuestions: cqResult?.questions,
           timestamp: new Date(),
         };
 
@@ -365,10 +395,60 @@ export default function Home() {
     [selectedChatId, handleDeclineForChat]
   );
 
+  const handleSubmitClarifyingAnswers = useCallback(
+    (messageId: string, answers: Record<string, string | string[]>) => {
+      if (!selectedChatId) return;
+
+      // Find the message to get question headers for formatting
+      const chat = chats.find((c) => c.id === selectedChatId);
+      const msg = chat?.messages.find((m) => m.id === messageId);
+
+      // Mark the clarifying questions as answered in state
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === selectedChatId
+            ? {
+                ...c,
+                messages: c.messages.map((m) =>
+                  m.id === messageId && m.clarifyingQuestions
+                    ? {
+                        ...m,
+                        clarifyingQuestions: {
+                          ...m.clarifyingQuestions,
+                          answered: true,
+                          answers,
+                        },
+                      }
+                    : m
+                ),
+              }
+            : c
+        )
+      );
+
+      // Format answers into a readable user message
+      const formattedAnswers = msg?.clarifyingQuestions?.questions
+        .map((q) => {
+          const answer = answers[q.id];
+          const answerText = Array.isArray(answer)
+            ? answer.join(", ")
+            : answer || "No answer";
+          return `**${q.header}**: ${answerText}`;
+        })
+        .join("\n") || "";
+
+      const responseText = `Here are my answers:\n\n${formattedAnswers}`;
+      handleSendMessage(responseText);
+    },
+    [selectedChatId, chats, handleSendMessage]
+  );
+
   const simulateExecutionForChat = useCallback(
     (messageId: string, plan: ActionPlan, chatId: string) => {
       const steps = plan.steps;
-      let currentStep = 0;
+      // Start from first non-completed step (supports resume after gate)
+      let currentStep = steps.findIndex(s => s.status !== "completed");
+      if (currentStep === -1) currentStep = steps.length;
 
       const executeStep = () => {
         if (currentStep >= steps.length) {
@@ -544,8 +624,11 @@ export default function Home() {
 
         const { content: artifactParsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
 
-        const actionPlanResult = parseActionPlan(artifactParsedContent);
-        const finalContent = actionPlanResult?.cleanedContent || artifactParsedContent;
+        const cqResult = parseClarifyingQuestions(artifactParsedContent);
+        const afterCqContent = cqResult?.cleanedContent || artifactParsedContent;
+
+        const actionPlanResult = parseActionPlan(afterCqContent);
+        const finalContent = actionPlanResult?.cleanedContent || afterCqContent;
         const actionPlan = actionPlanResult?.plan;
 
         const assistantMessage: Message = {
@@ -554,6 +637,7 @@ export default function Home() {
           content: finalContent,
           artifactIds: newArtifacts.map((a) => a.id),
           actionPlan,
+          clarifyingQuestions: cqResult?.questions,
           timestamp: new Date(),
         };
 
@@ -693,6 +777,7 @@ export default function Home() {
                 onDecline={handleDecline}
                 onWorkflowClick={handleWorkflowClick}
                 onArtifactClick={setSelectedArtifactId}
+                onSubmitClarifyingAnswers={handleSubmitClarifyingAnswers}
                 isLoading={loadingChatId === selectedChatId}
                 activePlan={activePlan || undefined}
                 activePlanMessageId={activePlanMessage?.id}

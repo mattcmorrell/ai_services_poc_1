@@ -4,12 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import {
   MoreHorizontal,
   ChevronDown,
-  ChevronRight,
-  ArrowUpDown,
-  ThumbsUp,
   Plus,
   Mic,
-  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,13 +15,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
-import { ArtifactCard } from "@/components/artifacts/artifact-card";
-import { ActionCardCompact } from "@/components/chat/action-card-compact";
 import { PlanSplitView } from "@/components/plan/plan-split-view";
 import { PlanPanelPill } from "@/components/plan/plan-panel";
 import { useResizable } from "@/components/ui/resize-handle";
+import { MessageList, MessageListTheme } from "@/components/chat/message-list";
 
 interface ChatViewProps {
   client: Client | null;
@@ -38,6 +32,7 @@ interface ChatViewProps {
   onDecline: (messageId: string) => void;
   onWorkflowClick: (workflowId: string) => void;
   onArtifactClick: (artifactId: string) => void;
+  onSubmitClarifyingAnswers?: (messageId: string, answers: Record<string, string | string[]>) => void;
   isLoading: boolean;
   // Plan panel props
   activePlan?: ActionPlan;
@@ -59,6 +54,12 @@ const models = [
   "Gemini 2.0 Flash",
 ];
 
+const ogTheme: MessageListTheme = {
+  messageSpacing: "mb-6",
+  innerContainerClass: "mx-auto py-6 max-w-3xl",
+  actionPlanVariant: "compact",
+};
+
 export function ChatView({
   client,
   chatTitle,
@@ -70,6 +71,7 @@ export function ChatView({
   onDecline,
   onWorkflowClick,
   onArtifactClick,
+  onSubmitClarifyingAnswers,
   isLoading,
   activePlan,
   activePlanMessageId,
@@ -82,7 +84,6 @@ export function ChatView({
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
-  const [expandedThinking, setExpandedThinking] = useState<Record<string, boolean>>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -96,8 +97,9 @@ export function ChatView({
   const showSplitView = activePlan && planPanelOpen;
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    const viewport = scrollRef.current?.querySelector("[data-radix-scroll-area-viewport]") as HTMLElement | null;
+    if (viewport) {
+      viewport.scrollTop = viewport.scrollHeight;
     }
   }, [messages]);
 
@@ -106,6 +108,10 @@ export function ChatView({
     if (input.trim() && !isLoading) {
       onSendMessage(input.trim());
       setInput("");
+      if (inputRef.current) {
+        inputRef.current.style.height = "auto";
+        inputRef.current.style.overflowY = "hidden";
+      }
     }
   };
 
@@ -116,148 +122,23 @@ export function ChatView({
     }
   };
 
-  const toggleThinking = (messageId: string) => {
-    setExpandedThinking((prev) => ({
-      ...prev,
-      [messageId]: !prev[messageId],
-    }));
-  };
-
   const chatContent = (
     <div className="flex h-full flex-1 flex-col bg-background min-w-0">
       {/* Messages */}
       <ScrollArea className="flex-1 px-6" ref={scrollRef}>
-        <div className="mx-auto py-6 max-w-3xl">
-          {messages.map((message) => (
-            <div key={message.id} className="mb-6">
-              {message.role === "assistant" && message.thinking && (
-                <button
-                  onClick={() => toggleThinking(message.id)}
-                  className="mb-2 flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-                >
-                  {expandedThinking[message.id] ? (
-                    <ChevronDown className="h-4 w-4" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4" />
-                  )}
-                  Show thinking
-                </button>
-              )}
-
-              {message.thinking && expandedThinking[message.id] && (
-                <div className="mb-4 rounded-lg border border-border bg-muted/50 p-4 text-sm text-muted-foreground">
-                  {message.thinking}
-                </div>
-              )}
-
-              <div
-                className={cn(
-                  "prose prose-sm dark:prose-invert max-w-none",
-                  message.role === "user" && "text-right"
-                )}
-              >
-                <div
-                  className={cn(
-                    message.role === "user" &&
-                      "inline-block rounded-lg bg-muted px-4 py-2 text-foreground"
-                  )}
-                  dangerouslySetInnerHTML={{
-                    __html: message.content
-                      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                      .replace(/\n/g, "<br />"),
-                  }}
-                />
-              </div>
-
-              {/* Action Plan — always compact inline, detail lives in panel/dock/split */}
-              {message.actionPlan && (
-                <div className="mt-4">
-                  <ActionCardCompact
-                    plan={message.actionPlan}
-                    onOpenPanel={onOpenPlanPanel || (() => {})}
-                    onApprove={() => onApprove(message.id)}
-                    onDecline={() => onDecline(message.id)}
-                  />
-                </div>
-              )}
-
-              {/* Artifact cards */}
-              {message.artifactIds && message.artifactIds.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {message.artifactIds.map((artifactId) => {
-                    const artifact = artifacts.find((a) => a.id === artifactId);
-                    if (!artifact) return null;
-                    return (
-                      <ArtifactCard
-                        key={artifact.id}
-                        artifact={artifact}
-                        isSelected={selectedArtifactId === artifact.id}
-                        onClick={() => onArtifactClick(artifact.id)}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Standalone workflow card (only if no actionPlan) */}
-              {message.workflow && !message.actionPlan && (
-                <div
-                  onClick={() => onWorkflowClick(message.workflow!.id)}
-                  className="mt-4 flex w-full items-center gap-3 rounded-lg border border-border p-3 text-left transition-colors hover:bg-accent cursor-pointer"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                    <ArrowUpDown className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium">{message.workflow.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {message.workflow.description}
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-
-              {message.requiresApproval && (
-                <div className="mt-4">
-                  <Button
-                    onClick={() => onApprove(message.id)}
-                    disabled={message.approved}
-                    className={cn(
-                      "gap-2",
-                      message.approved &&
-                        "bg-green-600 hover:bg-green-600 text-white"
-                    )}
-                  >
-                    {message.approved ? (
-                      <>
-                        <Check className="h-4 w-4" />
-                        Approved
-                      </>
-                    ) : (
-                      <>
-                        <ThumbsUp className="h-4 w-4" />
-                        Approve
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-            </div>
-          ))}
-
-          {isLoading && (
-            <div className="mb-6">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <div className="h-2 w-2 animate-pulse rounded-full bg-current" />
-                <div className="h-2 w-2 animate-pulse rounded-full bg-current [animation-delay:0.2s]" />
-                <div className="h-2 w-2 animate-pulse rounded-full bg-current [animation-delay:0.4s]" />
-              </div>
-            </div>
-          )}
-        </div>
+        <MessageList
+          messages={messages}
+          artifacts={artifacts}
+          selectedArtifactId={selectedArtifactId}
+          theme={ogTheme}
+          onApprove={onApprove}
+          onDecline={onDecline}
+          onWorkflowClick={onWorkflowClick}
+          onArtifactClick={onArtifactClick}
+          onSubmitClarifyingAnswers={onSubmitClarifyingAnswers}
+          onOpenPlanPanel={onOpenPlanPanel}
+          isLoading={isLoading}
+        />
       </ScrollArea>
 
       {/* Input */}
@@ -268,11 +149,20 @@ export function ChatView({
               <textarea
                 ref={inputRef}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  const el = e.target;
+                  el.style.height = "auto";
+                  const lineHeight = 20;
+                  const maxHeight = lineHeight * 5.5;
+                  el.style.height = `${Math.min(el.scrollHeight, maxHeight)}px`;
+                  el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
+                }}
                 onKeyDown={handleKeyDown}
                 placeholder="Ask anything..."
                 rows={1}
                 className="w-full resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                style={{ lineHeight: "20px", overflowY: "hidden" }}
               />
               <div className="mt-2 flex items-center justify-between">
                 <Button type="button" variant="ghost" size="icon" className="h-8 w-8">

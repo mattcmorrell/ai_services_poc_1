@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import {
   MoreHorizontal,
   ChevronDown,
-  ChevronRight,
   ArrowUpDown,
   ThumbsUp,
   Plus,
@@ -22,8 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Client, Message, Artifact } from "@/types/chat";
-import { ArtifactCard } from "@/components/artifacts/artifact-card";
-import { ActionCard } from "@/components/chat/action-card";
+import { MessageList, MessageListTheme } from "@/components/chat/message-list";
 
 interface ChatViewProps {
   client: Client | null;
@@ -36,6 +34,7 @@ interface ChatViewProps {
   onDecline: (messageId: string) => void;
   onWorkflowClick: (workflowId: string) => void;
   onArtifactClick: (artifactId: string) => void;
+  onSubmitClarifyingAnswers?: (messageId: string, answers: Record<string, string | string[]>) => void;
   isLoading: boolean;
 }
 
@@ -71,6 +70,196 @@ const models = [
   "Gemini 2.0 Flash",
 ];
 
+const v4Theme: MessageListTheme = {
+  messageSpacing: "mb-8",
+  innerContainerClass: "mx-auto max-w-3xl py-8",
+  actionPlanVariant: "full",
+  actionPlanWrapperClass: "mt-5",
+
+  contentWrapperClass: (role) =>
+    cn(role === "user" && "text-right"),
+
+  userBubbleClass: "inline-block px-6 py-4",
+  userBubbleStyle: {
+    background: "#FF0000",
+    color: "#FFFFFF",
+    fontFamily: font,
+    fontSize: "0.9rem",
+    lineHeight: 1.6,
+    fontWeight: 500,
+    borderRadius: 0,
+  },
+
+  assistantStyle: {
+    fontFamily: font,
+    fontSize: "0.95rem",
+    lineHeight: 1.8,
+    color: "#000000",
+    fontWeight: 300,
+  },
+
+  contentTransform: (content) =>
+    content
+      .replace(/\*\*(.*?)\*\*/g, "<strong style='font-weight:900'>$1</strong>")
+      .replace(/\n/g, "<br />"),
+
+  thinkingToggleClass: "mb-3 flex items-center gap-1.5 transition-colors",
+  thinkingToggleStyle: {
+    color: "#666666",
+    fontFamily: font,
+    fontSize: "0.55rem",
+    letterSpacing: "0.3em",
+    textTransform: "uppercase" as const,
+    fontWeight: 700,
+  },
+  thinkingLabel: "REASONING",
+
+  thinkingBoxClass: "mb-4 p-5 text-sm",
+  thinkingBoxStyle: {
+    background: "#F5F5F5",
+    border: "1px solid #000000",
+    color: "#666666",
+    fontFamily: font,
+    lineHeight: 1.7,
+    fontSize: "0.8rem",
+    borderRadius: 0,
+  },
+
+  artifactWrapperClass: "mt-5 flex flex-wrap gap-3",
+
+  renderMessageSuffix: (message, index, total) => {
+    if (index < total - 1 && message.role === "assistant") {
+      return (
+        <div
+          style={{
+            height: "1px",
+            background: "#E5E5E5",
+            marginTop: "24px",
+          }}
+        />
+      );
+    }
+    return null;
+  },
+
+  renderLoading: () => (
+    <div className="mb-8 flex items-center gap-3">
+      <div
+        className="h-3 w-3 animate-pulse"
+        style={{ background: "#FF0000", borderRadius: 0 }}
+      />
+      <span
+        style={{
+          fontFamily: font,
+          fontSize: "0.6rem",
+          color: "#666666",
+          letterSpacing: "0.3em",
+          textTransform: "uppercase",
+          fontWeight: 500,
+        }}
+      >
+        PROCESSING
+      </span>
+    </div>
+  ),
+
+  renderWorkflowCard: (workflow, onClick) => (
+    <div
+      onClick={onClick}
+      className="mt-5 flex w-full items-center gap-4 p-4 cursor-pointer transition-all"
+      style={{
+        background: "#FFFFFF",
+        border: "2px solid #000000",
+        borderRadius: 0,
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = "#F5F5F5";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "#FFFFFF";
+      }}
+    >
+      <div
+        className="flex h-10 w-10 items-center justify-center"
+        style={{
+          background: "#FF0000",
+          color: "#FFFFFF",
+          borderRadius: 0,
+        }}
+      >
+        <ArrowUpDown className="h-5 w-5" />
+      </div>
+      <div className="flex-1">
+        <div
+          style={{
+            fontFamily: font,
+            fontWeight: 900,
+            color: "#000000",
+            fontSize: "0.85rem",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+          }}
+        >
+          {workflow.name}
+        </div>
+        <div
+          style={{
+            fontFamily: font,
+            fontSize: "0.75rem",
+            color: "#666666",
+            marginTop: "2px",
+            fontWeight: 300,
+          }}
+        >
+          {workflow.description}
+        </div>
+      </div>
+      <button
+        className="p-2 transition-colors"
+        style={{ color: "#000000", borderRadius: 0 }}
+        onClick={(e) => e.stopPropagation()}
+        onMouseEnter={(e) => (e.currentTarget.style.background = "#F5F5F5")}
+        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+      >
+        <MoreHorizontal className="h-4 w-4" />
+      </button>
+    </div>
+  ),
+
+  renderApprovalButton: (approved, onApprove) => (
+    <div className="mt-5">
+      <button
+        onClick={onApprove}
+        disabled={approved}
+        className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold transition-all"
+        style={{
+          background: approved ? "#000000" : "#FF0000",
+          color: "#FFFFFF",
+          fontFamily: font,
+          fontSize: "0.65rem",
+          letterSpacing: "0.2em",
+          textTransform: "uppercase",
+          borderRadius: 0,
+          cursor: approved ? "default" : "pointer",
+          border: "none",
+        }}
+      >
+        {approved ? (
+          <>
+            <Check className="h-4 w-4" />
+            APPROVED
+          </>
+        ) : (
+          <>
+            <ThumbsUp className="h-4 w-4" />
+            APPROVE
+          </>
+        )}
+      </button>
+    </div>
+  ),
+};
+
 export function ChatView({
   client,
   chatTitle,
@@ -82,11 +271,11 @@ export function ChatView({
   onDecline,
   onWorkflowClick,
   onArtifactClick,
+  onSubmitClarifyingAnswers,
   isLoading,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
-  const [expandedThinking, setExpandedThinking] = useState<Record<string, boolean>>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -109,13 +298,6 @@ export function ChatView({
       e.preventDefault();
       handleSubmit(e);
     }
-  };
-
-  const toggleThinking = (messageId: string) => {
-    setExpandedThinking((prev) => ({
-      ...prev,
-      [messageId]: !prev[messageId],
-    }));
   };
 
   return (
@@ -191,249 +373,18 @@ export function ChatView({
 
       {/* Messages */}
       <ScrollArea className="v4-chat flex-1 px-8" ref={scrollRef}>
-        <div className="mx-auto max-w-3xl py-8">
-          {messages.map((message, index) => (
-            <div key={message.id} className="mb-8">
-              {/* Thinking toggle */}
-              {message.role === "assistant" && message.thinking && (
-                <button
-                  onClick={() => toggleThinking(message.id)}
-                  className="mb-3 flex items-center gap-1.5 transition-colors"
-                  style={{
-                    color: "#666666",
-                    fontFamily: font,
-                    fontSize: "0.55rem",
-                    letterSpacing: "0.3em",
-                    textTransform: "uppercase",
-                    fontWeight: 700,
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = "#000000")}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = "#666666")}
-                >
-                  {expandedThinking[message.id] ? (
-                    <ChevronDown className="h-3.5 w-3.5" />
-                  ) : (
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  )}
-                  REASONING
-                </button>
-              )}
-
-              {/* Thinking content */}
-              {message.thinking && expandedThinking[message.id] && (
-                <div
-                  className="mb-4 p-5 text-sm"
-                  style={{
-                    background: "#F5F5F5",
-                    border: "1px solid #000000",
-                    color: "#666666",
-                    fontFamily: font,
-                    lineHeight: 1.7,
-                    fontSize: "0.8rem",
-                    borderRadius: 0,
-                  }}
-                >
-                  {message.thinking}
-                </div>
-              )}
-
-              {/* Message content */}
-              <div className={cn(message.role === "user" && "text-right")}>
-                <div
-                  className={cn(
-                    message.role === "user" && "inline-block px-6 py-4"
-                  )}
-                  style={{
-                    ...(message.role === "user"
-                      ? {
-                          background: "#FF0000",
-                          color: "#FFFFFF",
-                          fontFamily: font,
-                          fontSize: "0.9rem",
-                          lineHeight: 1.6,
-                          fontWeight: 500,
-                          borderRadius: 0,
-                        }
-                      : {
-                          fontFamily: font,
-                          fontSize: "0.95rem",
-                          lineHeight: 1.8,
-                          color: "#000000",
-                          fontWeight: 300,
-                        }),
-                  }}
-                  dangerouslySetInnerHTML={{
-                    __html: message.content
-                      .replace(/\*\*(.*?)\*\*/g, "<strong style='font-weight:900'>$1</strong>")
-                      .replace(/\n/g, "<br />"),
-                  }}
-                />
-              </div>
-
-              {/* Thin separator between messages */}
-              {index < messages.length - 1 && message.role === "assistant" && (
-                <div
-                  style={{
-                    height: "1px",
-                    background: "#E5E5E5",
-                    marginTop: "24px",
-                  }}
-                />
-              )}
-
-              {/* Action Plan Card */}
-              {message.actionPlan && (
-                <div className="mt-5">
-                  <ActionCard
-                    plan={message.actionPlan}
-                    workflow={message.workflow}
-                    onApprove={() => onApprove(message.id)}
-                    onDecline={() => onDecline(message.id)}
-                    onWorkflowClick={onWorkflowClick}
-                  />
-                </div>
-              )}
-
-              {/* Artifact cards */}
-              {message.artifactIds && message.artifactIds.length > 0 && (
-                <div className="mt-5 flex flex-wrap gap-3">
-                  {message.artifactIds.map((artifactId) => {
-                    const artifact = artifacts.find((a) => a.id === artifactId);
-                    if (!artifact) return null;
-                    return (
-                      <ArtifactCard
-                        key={artifact.id}
-                        artifact={artifact}
-                        isSelected={selectedArtifactId === artifact.id}
-                        onClick={() => onArtifactClick(artifact.id)}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Standalone workflow card */}
-              {message.workflow && !message.actionPlan && (
-                <div
-                  onClick={() => onWorkflowClick(message.workflow!.id)}
-                  className="mt-5 flex w-full items-center gap-4 p-4 cursor-pointer transition-all"
-                  style={{
-                    background: "#FFFFFF",
-                    border: "2px solid #000000",
-                    borderRadius: 0,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#F5F5F5";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#FFFFFF";
-                  }}
-                >
-                  <div
-                    className="flex h-10 w-10 items-center justify-center"
-                    style={{
-                      background: "#FF0000",
-                      color: "#FFFFFF",
-                      borderRadius: 0,
-                    }}
-                  >
-                    <ArrowUpDown className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <div
-                      style={{
-                        fontFamily: font,
-                        fontWeight: 900,
-                        color: "#000000",
-                        fontSize: "0.85rem",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.05em",
-                      }}
-                    >
-                      {message.workflow.name}
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: font,
-                        fontSize: "0.75rem",
-                        color: "#666666",
-                        marginTop: "2px",
-                        fontWeight: 300,
-                      }}
-                    >
-                      {message.workflow.description}
-                    </div>
-                  </div>
-                  <button
-                    className="p-2 transition-colors"
-                    style={{ color: "#000000", borderRadius: 0 }}
-                    onClick={(e) => e.stopPropagation()}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "#F5F5F5")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-
-              {/* Approval button */}
-              {message.requiresApproval && (
-                <div className="mt-5">
-                  <button
-                    onClick={() => onApprove(message.id)}
-                    disabled={message.approved}
-                    className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold transition-all"
-                    style={{
-                      background: message.approved ? "#000000" : "#FF0000",
-                      color: "#FFFFFF",
-                      fontFamily: font,
-                      fontSize: "0.65rem",
-                      letterSpacing: "0.2em",
-                      textTransform: "uppercase",
-                      borderRadius: 0,
-                      cursor: message.approved ? "default" : "pointer",
-                      border: "none",
-                    }}
-                  >
-                    {message.approved ? (
-                      <>
-                        <Check className="h-4 w-4" />
-                        APPROVED
-                      </>
-                    ) : (
-                      <>
-                        <ThumbsUp className="h-4 w-4" />
-                        APPROVE
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-
-          {/* Loading indicator — red blinking square */}
-          {isLoading && (
-            <div className="mb-8 flex items-center gap-3">
-              <div
-                className="h-3 w-3 animate-pulse"
-                style={{ background: "#FF0000", borderRadius: 0 }}
-              />
-              <span
-                style={{
-                  fontFamily: font,
-                  fontSize: "0.6rem",
-                  color: "#666666",
-                  letterSpacing: "0.3em",
-                  textTransform: "uppercase",
-                  fontWeight: 500,
-                }}
-              >
-                PROCESSING
-              </span>
-            </div>
-          )}
-        </div>
+        <MessageList
+          messages={messages}
+          artifacts={artifacts}
+          selectedArtifactId={selectedArtifactId}
+          theme={v4Theme}
+          onApprove={onApprove}
+          onDecline={onDecline}
+          onWorkflowClick={onWorkflowClick}
+          onArtifactClick={onArtifactClick}
+          onSubmitClarifyingAnswers={onSubmitClarifyingAnswers}
+          isLoading={isLoading}
+        />
       </ScrollArea>
 
       {/* Input area */}

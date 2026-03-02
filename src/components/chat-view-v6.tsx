@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import {
   MoreHorizontal,
   ChevronDown,
-  ChevronRight,
   ArrowUpDown,
   ThumbsUp,
   Plus,
@@ -21,8 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
-import { ArtifactCard } from "@/components/artifacts/artifact-card";
-import { ActionCard } from "@/components/chat/action-card";
+import { MessageList, MessageListTheme } from "@/components/chat/message-list";
 
 interface ChatViewProps {
   client: Client | null;
@@ -35,6 +33,10 @@ interface ChatViewProps {
   onDecline: (messageId: string) => void;
   onWorkflowClick: (workflowId: string) => void;
   onArtifactClick: (artifactId: string) => void;
+  onSubmitClarifyingAnswers?: (
+    messageId: string,
+    answers: Record<string, string | string[]>
+  ) => void;
   isLoading: boolean;
 }
 
@@ -47,6 +49,96 @@ const models = [
   "Gemini 2.0 Flash",
 ];
 
+const v6Theme: MessageListTheme = {
+  messageSpacing: "mb-6 v6cv-msg",
+  innerContainerClass: "mx-auto max-w-3xl py-6",
+  actionPlanVariant: "full",
+  actionPlanWrapperClass: "mt-4",
+
+  contentWrapperClass: (role) =>
+    cn(
+      "prose prose-sm dark:prose-invert max-w-none",
+      role === "user" && "text-right"
+    ),
+
+  userBubbleClass: "v6cv-user-bubble inline-block rounded-xl px-4 py-2.5",
+  assistantClass: "v6cv-assistant-text",
+
+  thinkingToggleClass: "v6cv-thinking-btn mb-2 flex items-center gap-1",
+  thinkingLabel: <>{"> "}show_reasoning()</>,
+
+  thinkingBoxClass: "v6cv-thinking-block mb-4 p-4",
+
+  renderLoading: () => (
+    <div className="mb-6">
+      <div className="flex items-center gap-2.5">
+        <div className="v6cv-typing-dot h-2 w-2 rounded-full bg-current" />
+        <div
+          className="v6cv-typing-dot h-2 w-2 rounded-full bg-current"
+          style={{ animationDelay: "0.2s" }}
+        />
+        <div
+          className="v6cv-typing-dot h-2 w-2 rounded-full bg-current"
+          style={{ animationDelay: "0.4s" }}
+        />
+        <span className="text-[#3a4a6a] font-mono text-xs ml-2 tracking-wider">
+          PROCESSING
+        </span>
+      </div>
+    </div>
+  ),
+
+  renderWorkflowCard: (workflow, onClick) => (
+    <div
+      onClick={onClick}
+      className="v6cv-workflow-card mt-4 flex w-full items-center gap-3 p-3 text-left cursor-pointer"
+    >
+      <div className="v6cv-workflow-icon flex h-10 w-10 items-center justify-center rounded-lg">
+        <ArrowUpDown className="h-5 w-5" />
+      </div>
+      <div className="flex-1">
+        <div className="font-medium text-[#e0e0ff]">{workflow.name}</div>
+        <div className="text-sm text-[#5a6a8a] font-mono text-xs">
+          {workflow.description}
+        </div>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="v6cv-icon-btn"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <MoreHorizontal className="h-4 w-4" />
+      </Button>
+    </div>
+  ),
+
+  renderApprovalButton: (approved, onApprove) => (
+    <div className="mt-4">
+      <Button
+        onClick={onApprove}
+        disabled={approved}
+        className={cn(
+          "gap-2",
+          approved ? "v6cv-approved-btn" : "v6cv-approve-btn"
+        )}
+      >
+        {approved ? (
+          <>
+            <Check className="h-4 w-4" />
+            AUTHORIZED
+          </>
+        ) : (
+          <>
+            <ThumbsUp className="h-4 w-4" />
+            AUTHORIZE
+          </>
+        )}
+      </Button>
+    </div>
+  ),
+};
+
 export function ChatView({
   client,
   chatTitle,
@@ -58,11 +150,11 @@ export function ChatView({
   onDecline,
   onWorkflowClick,
   onArtifactClick,
+  onSubmitClarifyingAnswers,
   isLoading,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
-  const [expandedThinking, setExpandedThinking] = useState<Record<string, boolean>>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -85,13 +177,6 @@ export function ChatView({
       e.preventDefault();
       handleSubmit(e);
     }
-  };
-
-  const toggleThinking = (messageId: string) => {
-    setExpandedThinking((prev) => ({
-      ...prev,
-      [messageId]: !prev[messageId],
-    }));
   };
 
   const vars = {
@@ -410,141 +495,18 @@ export function ChatView({
 
       {/* Messages */}
       <ScrollArea className="flex-1 px-6 relative z-10" ref={scrollRef}>
-        <div className="mx-auto max-w-3xl py-6">
-          {messages.map((message) => (
-            <div key={message.id} className="mb-6 v6cv-msg">
-              {message.role === "assistant" && message.thinking && (
-                <button
-                  onClick={() => toggleThinking(message.id)}
-                  className="v6cv-thinking-btn mb-2 flex items-center gap-1"
-                >
-                  {expandedThinking[message.id] ? (
-                    <ChevronDown className="h-4 w-4" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4" />
-                  )}
-                  {">"} show_reasoning()
-                </button>
-              )}
-
-              {message.thinking && expandedThinking[message.id] && (
-                <div className="v6cv-thinking-block mb-4 p-4">
-                  {message.thinking}
-                </div>
-              )}
-
-              <div
-                className={cn(
-                  "prose prose-sm dark:prose-invert max-w-none",
-                  message.role === "user" && "text-right"
-                )}
-              >
-                <div
-                  className={cn(
-                    message.role === "user"
-                      ? "v6cv-user-bubble inline-block rounded-xl px-4 py-2.5"
-                      : "v6cv-assistant-text"
-                  )}
-                  dangerouslySetInnerHTML={{
-                    __html: message.content
-                      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                      .replace(/\n/g, "<br />"),
-                  }}
-                />
-              </div>
-
-              {/* Action Plan Card */}
-              {message.actionPlan && (
-                <div className="mt-4">
-                  <ActionCard
-                    plan={message.actionPlan}
-                    workflow={message.workflow}
-                    onApprove={() => onApprove(message.id)}
-                    onDecline={() => onDecline(message.id)}
-                    onWorkflowClick={onWorkflowClick}
-                  />
-                </div>
-              )}
-
-              {/* Artifact cards */}
-              {message.artifactIds && message.artifactIds.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {message.artifactIds.map((artifactId) => {
-                    const artifact = artifacts.find((a) => a.id === artifactId);
-                    if (!artifact) return null;
-                    return (
-                      <ArtifactCard
-                        key={artifact.id}
-                        artifact={artifact}
-                        isSelected={selectedArtifactId === artifact.id}
-                        onClick={() => onArtifactClick(artifact.id)}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Standalone workflow card */}
-              {message.workflow && !message.actionPlan && (
-                <div
-                  onClick={() => onWorkflowClick(message.workflow!.id)}
-                  className="v6cv-workflow-card mt-4 flex w-full items-center gap-3 p-3 text-left cursor-pointer"
-                >
-                  <div className="v6cv-workflow-icon flex h-10 w-10 items-center justify-center rounded-lg">
-                    <ArrowUpDown className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-[#e0e0ff]">{message.workflow.name}</div>
-                    <div className="text-sm text-[#5a6a8a] font-mono text-xs">
-                      {message.workflow.description}
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="icon" className="v6cv-icon-btn" onClick={(e) => e.stopPropagation()}>
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-
-              {message.requiresApproval && (
-                <div className="mt-4">
-                  <Button
-                    onClick={() => onApprove(message.id)}
-                    disabled={message.approved}
-                    className={cn(
-                      "gap-2",
-                      message.approved
-                        ? "v6cv-approved-btn"
-                        : "v6cv-approve-btn"
-                    )}
-                  >
-                    {message.approved ? (
-                      <>
-                        <Check className="h-4 w-4" />
-                        AUTHORIZED
-                      </>
-                    ) : (
-                      <>
-                        <ThumbsUp className="h-4 w-4" />
-                        AUTHORIZE
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-            </div>
-          ))}
-
-          {isLoading && (
-            <div className="mb-6">
-              <div className="flex items-center gap-2.5">
-                <div className="v6cv-typing-dot h-2 w-2 rounded-full bg-current" />
-                <div className="v6cv-typing-dot h-2 w-2 rounded-full bg-current" style={{ animationDelay: "0.2s" }} />
-                <div className="v6cv-typing-dot h-2 w-2 rounded-full bg-current" style={{ animationDelay: "0.4s" }} />
-                <span className="text-[#3a4a6a] font-mono text-xs ml-2 tracking-wider">PROCESSING</span>
-              </div>
-            </div>
-          )}
-        </div>
+        <MessageList
+          messages={messages}
+          artifacts={artifacts}
+          selectedArtifactId={selectedArtifactId}
+          theme={v6Theme}
+          onApprove={onApprove}
+          onDecline={onDecline}
+          onWorkflowClick={onWorkflowClick}
+          onArtifactClick={onArtifactClick}
+          onSubmitClarifyingAnswers={onSubmitClarifyingAnswers}
+          isLoading={isLoading}
+        />
       </ScrollArea>
 
       {/* Input */}

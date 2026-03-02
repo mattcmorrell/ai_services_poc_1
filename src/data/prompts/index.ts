@@ -3,5 +3,5 @@ export const agentPromptMap: Record<string, string> = {
   "agent-handbook": "agent-handbook",
   // Add more agents here as prompts are created
   // "agent-payroll": "agent-payroll",
-  // "agent-timeoff": "agent-timeoff",
+  "agent-timeoff": "agent-timeoff",
 };

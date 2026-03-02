@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import {
   MoreHorizontal,
   ChevronDown,
-  ChevronRight,
   ArrowUpDown,
   ThumbsUp,
   Plus,
@@ -12,7 +11,6 @@ import {
   Check,
   SendHorizontal,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
@@ -22,8 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
-import { ArtifactCard } from "@/components/artifacts/artifact-card";
-import { ActionCard } from "@/components/chat/action-card";
+import { MessageList, MessageListTheme } from "@/components/chat/message-list";
 
 interface ChatViewProps {
   client: Client | null;
@@ -36,6 +33,10 @@ interface ChatViewProps {
   onDecline: (messageId: string) => void;
   onWorkflowClick: (workflowId: string) => void;
   onArtifactClick: (artifactId: string) => void;
+  onSubmitClarifyingAnswers?: (
+    messageId: string,
+    answers: Record<string, string | string[]>
+  ) => void;
   isLoading: boolean;
 }
 
@@ -69,6 +70,169 @@ const models = [
   "Gemini 2.0 Flash",
 ];
 
+const v7Theme: MessageListTheme = {
+  messageSpacing: "mb-8",
+  innerContainerClass: "mx-auto max-w-3xl py-8",
+  actionPlanVariant: "full",
+  actionPlanWrapperClass: "mt-5",
+
+  contentWrapperClass: (role) =>
+    cn("flex", role === "user" ? "justify-end" : "justify-start"),
+
+  userBubbleClass: "max-w-[85%] text-sm leading-relaxed px-5 py-3",
+  userBubbleStyle: {
+    background: "rgba(107, 143, 114, 0.1)",
+    border: "1px solid rgba(107, 143, 114, 0.15)",
+    borderRadius: "20px",
+    color: "#2C3E2D",
+    fontWeight: 400,
+    fontFamily: "'DM Sans', sans-serif",
+  },
+
+  assistantClass: "max-w-[85%] text-sm leading-relaxed",
+  assistantStyle: {
+    color: "#1E2E1F",
+    fontWeight: 400,
+    fontFamily: "'DM Sans', sans-serif",
+    lineHeight: 1.7,
+  },
+
+  contentTransform: (content: string) =>
+    content
+      .replace(
+        /\*\*(.*?)\*\*/g,
+        '<strong style="color: #1A2A1B; font-weight: 600">$1</strong>'
+      )
+      .replace(/\n/g, "<br />"),
+
+  thinkingToggleClass:
+    "mb-2 flex items-center gap-1.5 text-xs tracking-wide transition-colors duration-200",
+  thinkingToggleStyle: {
+    color: "#5A7360",
+    fontFamily: "'DM Sans', sans-serif",
+    fontWeight: 400,
+  },
+  thinkingLabel: (
+    <span style={{ fontStyle: "italic", fontFamily: "'Crimson Pro', serif" }}>
+      Thinking...
+    </span>
+  ),
+
+  thinkingBoxClass: "mb-4 p-4 text-sm",
+  thinkingBoxStyle: {
+    background: "rgba(107, 143, 114, 0.04)",
+    border: "1px solid rgba(107, 143, 114, 0.1)",
+    borderRadius: "18px",
+    color: "#3D5340",
+    fontStyle: "italic",
+    fontFamily: "'Crimson Pro', serif",
+    fontWeight: 400,
+    lineHeight: 1.7,
+  },
+
+  renderLoading: () => (
+    <div className="mb-6 flex items-center gap-2.5">
+      <div
+        className="h-1.5 w-1.5 animate-pulse rounded-full"
+        style={{ background: "#6B8F72" }}
+      />
+      <div
+        className="h-1.5 w-1.5 animate-pulse rounded-full [animation-delay:0.2s]"
+        style={{ background: "#8BAF92" }}
+      />
+      <div
+        className="h-1.5 w-1.5 animate-pulse rounded-full [animation-delay:0.4s]"
+        style={{ background: "#6B8068" }}
+      />
+    </div>
+  ),
+
+  renderWorkflowCard: (workflow, onClick) => (
+    <div
+      onClick={onClick}
+      className="mt-4 flex w-full cursor-pointer items-center gap-3 p-4 transition-all duration-300"
+      style={{
+        background: "rgba(255, 255, 255, 0.7)",
+        border: "1px solid rgba(107, 143, 114, 0.12)",
+        borderRadius: "20px",
+        backdropFilter: "blur(12px)",
+      }}
+    >
+      <div
+        className="flex h-10 w-10 items-center justify-center"
+        style={{
+          background: "rgba(107, 143, 114, 0.08)",
+          borderRadius: "12px",
+          border: "1px solid rgba(107, 143, 114, 0.1)",
+        }}
+      >
+        <ArrowUpDown className="h-5 w-5" style={{ color: "#6B8F72" }} />
+      </div>
+      <div className="flex-1">
+        <div className="text-sm" style={{ color: "#2C3E2D", fontWeight: 500 }}>
+          {workflow.name}
+        </div>
+        <div className="text-xs" style={{ color: "#5A7360", fontWeight: 400 }}>
+          {workflow.description}
+        </div>
+      </div>
+      <button
+        className="flex h-8 w-8 items-center justify-center"
+        style={{
+          background: "rgba(107, 143, 114, 0.06)",
+          borderRadius: "9999px",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <MoreHorizontal
+          className="h-4 w-4"
+          style={{ color: "#6B8068" }}
+        />
+      </button>
+    </div>
+  ),
+
+  renderApprovalButton: (approved, onApprove) => (
+    <div className="mt-4">
+      <button
+        onClick={onApprove}
+        disabled={approved}
+        className="flex items-center gap-2 px-5 py-2.5 text-sm transition-all duration-300"
+        style={
+          approved
+            ? {
+                background: "rgba(107, 143, 114, 0.1)",
+                border: "1px solid rgba(107, 143, 114, 0.15)",
+                borderRadius: "9999px",
+                color: "#6B8F72",
+                fontWeight: 500,
+              }
+            : {
+                background: "#6B8F72",
+                border: "1px solid #5A7D61",
+                borderRadius: "9999px",
+                color: "#FAFCFA",
+                fontWeight: 500,
+                boxShadow: "0 2px 8px rgba(107, 143, 114, 0.25)",
+              }
+        }
+      >
+        {approved ? (
+          <>
+            <Check className="h-4 w-4" />
+            Approved
+          </>
+        ) : (
+          <>
+            <ThumbsUp className="h-4 w-4" />
+            Approve
+          </>
+        )}
+      </button>
+    </div>
+  ),
+};
+
 export function ChatView({
   client,
   chatTitle,
@@ -80,11 +244,11 @@ export function ChatView({
   onDecline,
   onWorkflowClick,
   onArtifactClick,
+  onSubmitClarifyingAnswers,
   isLoading,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
-  const [expandedThinking, setExpandedThinking] = useState<Record<string, boolean>>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -107,13 +271,6 @@ export function ChatView({
       e.preventDefault();
       handleSubmit(e);
     }
-  };
-
-  const toggleThinking = (messageId: string) => {
-    setExpandedThinking((prev) => ({
-      ...prev,
-      [messageId]: !prev[messageId],
-    }));
   };
 
   return (
@@ -221,229 +378,18 @@ export function ChatView({
 
       {/* Messages */}
       <ScrollArea className="relative z-10 flex-1 px-8" ref={scrollRef}>
-        <div className="mx-auto max-w-3xl py-8">
-          {messages.map((message) => (
-            <div key={message.id} className="mb-8">
-              {/* Thinking toggle */}
-              {message.role === "assistant" && message.thinking && (
-                <button
-                  onClick={() => toggleThinking(message.id)}
-                  className="mb-2 flex items-center gap-1.5 text-xs tracking-wide transition-colors duration-200"
-                  style={{
-                    color: "#5A7360",
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: 400,
-                  }}
-                >
-                  {expandedThinking[message.id] ? (
-                    <ChevronDown className="h-3.5 w-3.5" />
-                  ) : (
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  )}
-                  <span style={{ fontStyle: "italic", fontFamily: "'Crimson Pro', serif" }}>Thinking...</span>
-                </button>
-              )}
-
-              {/* Thinking content */}
-              {message.thinking && expandedThinking[message.id] && (
-                <div
-                  className="mb-4 p-4 text-sm"
-                  style={{
-                    background: "rgba(107, 143, 114, 0.04)",
-                    border: "1px solid rgba(107, 143, 114, 0.1)",
-                    borderRadius: "18px",
-                    color: "#3D5340",
-                    fontStyle: "italic",
-                    fontFamily: "'Crimson Pro', serif",
-                    fontWeight: 400,
-                    lineHeight: 1.7,
-                  }}
-                >
-                  {message.thinking}
-                </div>
-              )}
-
-              {/* Message content */}
-              <div
-                className={cn(
-                  "flex",
-                  message.role === "user" ? "justify-end" : "justify-start"
-                )}
-              >
-                <div
-                  className={cn(
-                    "max-w-[85%] text-sm leading-relaxed",
-                    message.role === "user" ? "px-5 py-3" : ""
-                  )}
-                  style={
-                    message.role === "user"
-                      ? {
-                          background: "rgba(107, 143, 114, 0.1)",
-                          border: "1px solid rgba(107, 143, 114, 0.15)",
-                          borderRadius: "20px",
-                          color: "#2C3E2D",
-                          fontWeight: 400,
-                          fontFamily: "'DM Sans', sans-serif",
-                        }
-                      : {
-                          color: "#1E2E1F",
-                          fontWeight: 400,
-                          fontFamily: "'DM Sans', sans-serif",
-                          lineHeight: 1.7,
-                        }
-                  }
-                  dangerouslySetInnerHTML={{
-                    __html: message.content
-                      .replace(
-                        /\*\*(.*?)\*\*/g,
-                        '<strong style="color: #1A2A1B; font-weight: 600">$1</strong>'
-                      )
-                      .replace(/\n/g, "<br />"),
-                  }}
-                />
-              </div>
-
-              {/* Action Plan Card */}
-              {message.actionPlan && (
-                <div className="mt-5">
-                  <ActionCard
-                    plan={message.actionPlan}
-                    workflow={message.workflow}
-                    onApprove={() => onApprove(message.id)}
-                    onDecline={() => onDecline(message.id)}
-                    onWorkflowClick={onWorkflowClick}
-                  />
-                </div>
-              )}
-
-              {/* Artifact cards */}
-              {message.artifactIds && message.artifactIds.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {message.artifactIds.map((artifactId) => {
-                    const artifact = artifacts.find((a) => a.id === artifactId);
-                    if (!artifact) return null;
-                    return (
-                      <ArtifactCard
-                        key={artifact.id}
-                        artifact={artifact}
-                        isSelected={selectedArtifactId === artifact.id}
-                        onClick={() => onArtifactClick(artifact.id)}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Standalone workflow card */}
-              {message.workflow && !message.actionPlan && (
-                <div
-                  onClick={() => onWorkflowClick(message.workflow!.id)}
-                  className="mt-4 flex w-full cursor-pointer items-center gap-3 p-4 transition-all duration-300"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.7)",
-                    border: "1px solid rgba(107, 143, 114, 0.12)",
-                    borderRadius: "20px",
-                    backdropFilter: "blur(12px)",
-                  }}
-                >
-                  <div
-                    className="flex h-10 w-10 items-center justify-center"
-                    style={{
-                      background: "rgba(107, 143, 114, 0.08)",
-                      borderRadius: "12px",
-                      border: "1px solid rgba(107, 143, 114, 0.1)",
-                    }}
-                  >
-                    <ArrowUpDown className="h-5 w-5" style={{ color: "#6B8F72" }} />
-                  </div>
-                  <div className="flex-1">
-                    <div
-                      className="text-sm"
-                      style={{ color: "#2C3E2D", fontWeight: 500 }}
-                    >
-                      {message.workflow.name}
-                    </div>
-                    <div
-                      className="text-xs"
-                      style={{ color: "#5A7360", fontWeight: 400 }}
-                    >
-                      {message.workflow.description}
-                    </div>
-                  </div>
-                  <button
-                    className="flex h-8 w-8 items-center justify-center"
-                    style={{
-                      background: "rgba(107, 143, 114, 0.06)",
-                      borderRadius: "9999px",
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <MoreHorizontal className="h-4 w-4" style={{ color: "#6B8068" }} />
-                  </button>
-                </div>
-              )}
-
-              {/* Approval button */}
-              {message.requiresApproval && (
-                <div className="mt-4">
-                  <button
-                    onClick={() => onApprove(message.id)}
-                    disabled={message.approved}
-                    className="flex items-center gap-2 px-5 py-2.5 text-sm transition-all duration-300"
-                    style={
-                      message.approved
-                        ? {
-                            background: "rgba(107, 143, 114, 0.1)",
-                            border: "1px solid rgba(107, 143, 114, 0.15)",
-                            borderRadius: "9999px",
-                            color: "#6B8F72",
-                            fontWeight: 500,
-                          }
-                        : {
-                            background: "#6B8F72",
-                            border: "1px solid #5A7D61",
-                            borderRadius: "9999px",
-                            color: "#FAFCFA",
-                            fontWeight: 500,
-                            boxShadow: "0 2px 8px rgba(107, 143, 114, 0.25)",
-                          }
-                    }
-                  >
-                    {message.approved ? (
-                      <>
-                        <Check className="h-4 w-4" />
-                        Approved
-                      </>
-                    ) : (
-                      <>
-                        <ThumbsUp className="h-4 w-4" />
-                        Approve
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-
-          {/* Loading indicator */}
-          {isLoading && (
-            <div className="mb-6 flex items-center gap-2.5">
-              <div
-                className="h-1.5 w-1.5 animate-pulse rounded-full"
-                style={{ background: "#6B8F72" }}
-              />
-              <div
-                className="h-1.5 w-1.5 animate-pulse rounded-full [animation-delay:0.2s]"
-                style={{ background: "#8BAF92" }}
-              />
-              <div
-                className="h-1.5 w-1.5 animate-pulse rounded-full [animation-delay:0.4s]"
-                style={{ background: "#6B8068" }}
-              />
-            </div>
-          )}
-        </div>
+        <MessageList
+          messages={messages}
+          artifacts={artifacts}
+          selectedArtifactId={selectedArtifactId}
+          theme={v7Theme}
+          onApprove={onApprove}
+          onDecline={onDecline}
+          onWorkflowClick={onWorkflowClick}
+          onArtifactClick={onArtifactClick}
+          onSubmitClarifyingAnswers={onSubmitClarifyingAnswers}
+          isLoading={isLoading}
+        />
       </ScrollArea>
 
       {/* Input */}

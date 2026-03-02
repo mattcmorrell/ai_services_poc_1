@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import {
   MoreHorizontal,
   ChevronDown,
-  ChevronRight,
   ArrowUpDown,
   ThumbsUp,
   Plus,
@@ -22,8 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Client, Message, Artifact } from "@/types/chat";
-import { ArtifactCard } from "@/components/artifacts/artifact-card";
-import { ActionCard } from "@/components/chat/action-card";
+import { MessageList, MessageListTheme } from "@/components/chat/message-list";
 
 interface ChatViewProps {
   client: Client | null;
@@ -36,6 +34,7 @@ interface ChatViewProps {
   onDecline: (messageId: string) => void;
   onWorkflowClick: (workflowId: string) => void;
   onArtifactClick: (artifactId: string) => void;
+  onSubmitClarifyingAnswers?: (messageId: string, answers: Record<string, string | string[]>) => void;
   isLoading: boolean;
 }
 
@@ -67,6 +66,177 @@ const models = [
   "Gemini 2.0 Flash",
 ];
 
+const v3Theme: MessageListTheme = {
+  messageSpacing: "mb-8",
+  innerContainerClass: "mx-auto max-w-3xl py-8",
+  actionPlanVariant: "full",
+  actionPlanWrapperClass: "mt-5",
+
+  contentWrapperClass: (role) =>
+    cn(role === "user" && "text-right"),
+
+  userBubbleClass: "inline-block rounded-2xl px-5 py-3",
+  userBubbleStyle: {
+    background: c.bgUserBubble,
+    color: c.textOnAccent,
+    fontFamily: c.sans,
+    fontSize: "0.9rem",
+    lineHeight: 1.6,
+    boxShadow: "0 2px 8px rgba(139, 111, 71, 0.15)",
+  },
+
+  assistantStyle: {
+    fontFamily: c.serif,
+    fontSize: "0.95rem",
+    lineHeight: 1.8,
+    color: c.text,
+  },
+
+  contentTransform: (content) =>
+    content
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\n/g, "<br />"),
+
+  thinkingToggleClass: "mb-3 flex items-center gap-1.5 transition-colors",
+  thinkingToggleStyle: {
+    color: c.textMuted,
+    fontFamily: c.sans,
+    fontSize: "0.75rem",
+    letterSpacing: "0.05em",
+    textTransform: "uppercase" as const,
+  },
+  thinkingLabel: "Reasoning",
+
+  thinkingBoxClass: "mb-4 rounded-xl p-5 text-sm",
+  thinkingBoxStyle: {
+    background: c.bgCream,
+    border: `1px solid ${c.borderLight}`,
+    color: c.textSecondary,
+    fontFamily: c.sans,
+    lineHeight: 1.7,
+    fontStyle: "italic",
+  },
+
+  artifactWrapperClass: "mt-5 flex flex-wrap gap-3",
+
+  renderLoading: () => (
+    <div className="mb-8 flex items-center gap-3">
+      <div className="flex items-center gap-1.5">
+        <div
+          className="h-1.5 w-1.5 rounded-full animate-pulse"
+          style={{ background: c.accent, opacity: 0.6 }}
+        />
+        <div
+          className="h-1.5 w-1.5 rounded-full animate-pulse [animation-delay:0.2s]"
+          style={{ background: c.accent, opacity: 0.6 }}
+        />
+        <div
+          className="h-1.5 w-1.5 rounded-full animate-pulse [animation-delay:0.4s]"
+          style={{ background: c.accent, opacity: 0.6 }}
+        />
+      </div>
+      <span
+        style={{
+          fontFamily: c.sans,
+          fontSize: "0.75rem",
+          color: c.textMuted,
+          fontStyle: "italic",
+        }}
+      >
+        Composing...
+      </span>
+    </div>
+  ),
+
+  renderWorkflowCard: (workflow, onClick) => (
+    <div
+      onClick={onClick}
+      className="mt-5 flex w-full items-center gap-4 rounded-2xl p-4 cursor-pointer transition-all"
+      style={{
+        background: c.bgWhite,
+        border: `1px solid ${c.borderLight}`,
+        boxShadow: c.warmShadow,
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = "0 4px 24px rgba(160, 140, 110, 0.12)";
+        e.currentTarget.style.borderColor = "rgba(200, 185, 166, 0.5)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = c.warmShadow;
+        e.currentTarget.style.borderColor = "rgba(200, 185, 166, 0.2)";
+      }}
+    >
+      <div
+        className="flex h-10 w-10 items-center justify-center rounded-xl"
+        style={{ background: c.accentSoft, color: c.accent }}
+      >
+        <ArrowUpDown className="h-5 w-5" />
+      </div>
+      <div className="flex-1">
+        <div
+          style={{
+            fontFamily: c.serif,
+            fontWeight: 600,
+            color: c.text,
+            fontSize: "0.9rem",
+          }}
+        >
+          {workflow.name}
+        </div>
+        <div
+          style={{
+            fontFamily: c.sans,
+            fontSize: "0.8rem",
+            color: c.textMuted,
+            marginTop: "2px",
+          }}
+        >
+          {workflow.description}
+        </div>
+      </div>
+      <button
+        className="rounded-xl p-2 transition-colors"
+        style={{ color: c.textMuted }}
+        onClick={(e) => e.stopPropagation()}
+        onMouseEnter={(e) => (e.currentTarget.style.background = c.bgCream)}
+        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+      >
+        <MoreHorizontal className="h-4 w-4" />
+      </button>
+    </div>
+  ),
+
+  renderApprovalButton: (approved, onApprove) => (
+    <div className="mt-5">
+      <button
+        onClick={onApprove}
+        disabled={approved}
+        className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium transition-all"
+        style={{
+          background: approved ? "#6B8F71" : c.accent,
+          color: c.textOnAccent,
+          fontFamily: c.sans,
+          opacity: approved ? 0.9 : 1,
+          boxShadow: "0 2px 8px rgba(139, 111, 71, 0.2)",
+          cursor: approved ? "default" : "pointer",
+        }}
+      >
+        {approved ? (
+          <>
+            <Check className="h-4 w-4" />
+            Approved
+          </>
+        ) : (
+          <>
+            <ThumbsUp className="h-4 w-4" />
+            Approve
+          </>
+        )}
+      </button>
+    </div>
+  ),
+};
+
 export function ChatView({
   client,
   chatTitle,
@@ -78,11 +248,11 @@ export function ChatView({
   onDecline,
   onWorkflowClick,
   onArtifactClick,
+  onSubmitClarifyingAnswers,
   isLoading,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
-  const [expandedThinking, setExpandedThinking] = useState<Record<string, boolean>>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -105,13 +275,6 @@ export function ChatView({
       e.preventDefault();
       handleSubmit(e);
     }
-  };
-
-  const toggleThinking = (messageId: string) => {
-    setExpandedThinking((prev) => ({
-      ...prev,
-      [messageId]: !prev[messageId],
-    }));
   };
 
   return (
@@ -194,234 +357,18 @@ export function ChatView({
 
       {/* Messages */}
       <ScrollArea className="v3-chat-view flex-1 px-8" ref={scrollRef}>
-        <div className="mx-auto max-w-3xl py-8">
-          {messages.map((message) => (
-            <div key={message.id} className="mb-8">
-              {/* Thinking toggle */}
-              {message.role === "assistant" && message.thinking && (
-                <button
-                  onClick={() => toggleThinking(message.id)}
-                  className="mb-3 flex items-center gap-1.5 transition-colors"
-                  style={{
-                    color: c.textMuted,
-                    fontFamily: c.sans,
-                    fontSize: "0.75rem",
-                    letterSpacing: "0.05em",
-                    textTransform: "uppercase",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = c.text)}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = c.textMuted)}
-                >
-                  {expandedThinking[message.id] ? (
-                    <ChevronDown className="h-3.5 w-3.5" />
-                  ) : (
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  )}
-                  Reasoning
-                </button>
-              )}
-
-              {/* Thinking content */}
-              {message.thinking && expandedThinking[message.id] && (
-                <div
-                  className="mb-4 rounded-xl p-5 text-sm"
-                  style={{
-                    background: c.bgCream,
-                    border: `1px solid ${c.borderLight}`,
-                    color: c.textSecondary,
-                    fontFamily: c.sans,
-                    lineHeight: 1.7,
-                    fontStyle: "italic",
-                  }}
-                >
-                  {message.thinking}
-                </div>
-              )}
-
-              {/* Message content */}
-              <div className={cn(message.role === "user" && "text-right")}>
-                <div
-                  className={cn(
-                    message.role === "user" && "inline-block rounded-2xl px-5 py-3"
-                  )}
-                  style={{
-                    ...(message.role === "user"
-                      ? {
-                          background: c.bgUserBubble,
-                          color: c.textOnAccent,
-                          fontFamily: c.sans,
-                          fontSize: "0.9rem",
-                          lineHeight: 1.6,
-                          boxShadow: "0 2px 8px rgba(139, 111, 71, 0.15)",
-                        }
-                      : {
-                          fontFamily: c.serif,
-                          fontSize: "0.95rem",
-                          lineHeight: 1.8,
-                          color: c.text,
-                        }),
-                  }}
-                  dangerouslySetInnerHTML={{
-                    __html: message.content
-                      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                      .replace(/\n/g, "<br />"),
-                  }}
-                />
-              </div>
-
-              {/* Action Plan Card */}
-              {message.actionPlan && (
-                <div className="mt-5">
-                  <ActionCard
-                    plan={message.actionPlan}
-                    workflow={message.workflow}
-                    onApprove={() => onApprove(message.id)}
-                    onDecline={() => onDecline(message.id)}
-                    onWorkflowClick={onWorkflowClick}
-                  />
-                </div>
-              )}
-
-              {/* Artifact cards */}
-              {message.artifactIds && message.artifactIds.length > 0 && (
-                <div className="mt-5 flex flex-wrap gap-3">
-                  {message.artifactIds.map((artifactId) => {
-                    const artifact = artifacts.find((a) => a.id === artifactId);
-                    if (!artifact) return null;
-                    return (
-                      <ArtifactCard
-                        key={artifact.id}
-                        artifact={artifact}
-                        isSelected={selectedArtifactId === artifact.id}
-                        onClick={() => onArtifactClick(artifact.id)}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Standalone workflow card */}
-              {message.workflow && !message.actionPlan && (
-                <div
-                  onClick={() => onWorkflowClick(message.workflow!.id)}
-                  className="mt-5 flex w-full items-center gap-4 rounded-2xl p-4 cursor-pointer transition-all"
-                  style={{
-                    background: c.bgWhite,
-                    border: `1px solid ${c.borderLight}`,
-                    boxShadow: c.warmShadow,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = "0 4px 24px rgba(160, 140, 110, 0.12)";
-                    e.currentTarget.style.borderColor = "rgba(200, 185, 166, 0.5)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = c.warmShadow;
-                    e.currentTarget.style.borderColor = "rgba(200, 185, 166, 0.2)";
-                  }}
-                >
-                  <div
-                    className="flex h-10 w-10 items-center justify-center rounded-xl"
-                    style={{ background: c.accentSoft, color: c.accent }}
-                  >
-                    <ArrowUpDown className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <div
-                      style={{
-                        fontFamily: c.serif,
-                        fontWeight: 600,
-                        color: c.text,
-                        fontSize: "0.9rem",
-                      }}
-                    >
-                      {message.workflow.name}
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: c.sans,
-                        fontSize: "0.8rem",
-                        color: c.textMuted,
-                        marginTop: "2px",
-                      }}
-                    >
-                      {message.workflow.description}
-                    </div>
-                  </div>
-                  <button
-                    className="rounded-xl p-2 transition-colors"
-                    style={{ color: c.textMuted }}
-                    onClick={(e) => e.stopPropagation()}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = c.bgCream)}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-
-              {/* Approval button */}
-              {message.requiresApproval && (
-                <div className="mt-5">
-                  <button
-                    onClick={() => onApprove(message.id)}
-                    disabled={message.approved}
-                    className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium transition-all"
-                    style={{
-                      background: message.approved ? "#6B8F71" : c.accent,
-                      color: c.textOnAccent,
-                      fontFamily: c.sans,
-                      opacity: message.approved ? 0.9 : 1,
-                      boxShadow: "0 2px 8px rgba(139, 111, 71, 0.2)",
-                      cursor: message.approved ? "default" : "pointer",
-                    }}
-                  >
-                    {message.approved ? (
-                      <>
-                        <Check className="h-4 w-4" />
-                        Approved
-                      </>
-                    ) : (
-                      <>
-                        <ThumbsUp className="h-4 w-4" />
-                        Approve
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-
-          {/* Loading indicator */}
-          {isLoading && (
-            <div className="mb-8 flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <div
-                  className="h-1.5 w-1.5 rounded-full animate-pulse"
-                  style={{ background: c.accent, opacity: 0.6 }}
-                />
-                <div
-                  className="h-1.5 w-1.5 rounded-full animate-pulse [animation-delay:0.2s]"
-                  style={{ background: c.accent, opacity: 0.6 }}
-                />
-                <div
-                  className="h-1.5 w-1.5 rounded-full animate-pulse [animation-delay:0.4s]"
-                  style={{ background: c.accent, opacity: 0.6 }}
-                />
-              </div>
-              <span
-                style={{
-                  fontFamily: c.sans,
-                  fontSize: "0.75rem",
-                  color: c.textMuted,
-                  fontStyle: "italic",
-                }}
-              >
-                Composing...
-              </span>
-            </div>
-          )}
-        </div>
+        <MessageList
+          messages={messages}
+          artifacts={artifacts}
+          selectedArtifactId={selectedArtifactId}
+          theme={v3Theme}
+          onApprove={onApprove}
+          onDecline={onDecline}
+          onWorkflowClick={onWorkflowClick}
+          onArtifactClick={onArtifactClick}
+          onSubmitClarifyingAnswers={onSubmitClarifyingAnswers}
+          isLoading={isLoading}
+        />
       </ScrollArea>
 
       {/* Input area */}

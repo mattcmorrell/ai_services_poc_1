@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import {
   MoreHorizontal,
   ChevronDown,
-  ChevronRight,
   ArrowUpDown,
   ThumbsUp,
   Plus,
@@ -12,7 +11,6 @@ import {
   Check,
   SendHorizontal,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
@@ -20,10 +18,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
-import { ArtifactCard } from "@/components/artifacts/artifact-card";
-import { ActionCard } from "@/components/chat/action-card";
+import { Client, Message, Artifact } from "@/types/chat";
+import {
+  MessageList,
+  MessageListTheme,
+} from "@/components/chat/message-list";
 
 interface ChatViewProps {
   client: Client | null;
@@ -36,6 +35,10 @@ interface ChatViewProps {
   onDecline: (messageId: string) => void;
   onWorkflowClick: (workflowId: string) => void;
   onArtifactClick: (artifactId: string) => void;
+  onSubmitClarifyingAnswers?: (
+    messageId: string,
+    answers: Record<string, string | string[]>
+  ) => void;
   isLoading: boolean;
 }
 
@@ -71,6 +74,212 @@ const models = [
 
 const ACCENT_COLORS = ["#E930FF", "#30FFB0", "#FF3060", "#FFEE30", "#30B0FF"];
 
+const v13Theme: MessageListTheme = {
+  messageSpacing: "mb-8",
+  innerContainerClass: "mx-auto max-w-3xl py-8",
+  actionPlanVariant: "full",
+  actionPlanWrapperClass: "mt-5",
+
+  contentWrapperClass: (role) =>
+    role === "user" ? "flex justify-end" : "flex justify-start",
+
+  userBubbleClass: "max-w-[85%] text-sm leading-relaxed v13-user-msg px-5 py-3",
+  userBubbleStyle: {
+    borderRadius: "2px 12px 12px 12px",
+    color: "#E8E0FF",
+    fontWeight: 400,
+    fontSize: "13px",
+  },
+
+  assistantClass: "max-w-[85%] text-sm leading-relaxed v13-assistant-msg",
+  assistantStyle: {
+    color: "rgba(232, 224, 255, 0.8)",
+    fontWeight: 400,
+    lineHeight: 1.9,
+    fontSize: "13px",
+  },
+
+  contentTransform: (content: string) =>
+    content
+      .replace(
+        /\*\*(.*?)\*\*/g,
+        `<strong style="font-weight: 700; animation: v13-bold-cycle 5s linear infinite; display: inline-block; text-shadow: 0 0 6px currentColor">$1</strong>`
+      )
+      .replace(/\n/g, "<br />"),
+
+  thinkingToggleClass:
+    "mb-2 flex items-center gap-1.5 text-xs tracking-widest transition-colors duration-200",
+  thinkingToggleStyle: {
+    fontFamily: "'Creepster', cursive",
+    fontSize: "12px",
+    letterSpacing: "2px",
+    color: "#E930FF",
+    textShadow: "0 0 8px rgba(233, 48, 255, 0.3)",
+  },
+  thinkingLabel: <span>CHANNELING THE VOID</span>,
+
+  thinkingBoxClass: "mb-4 p-4 text-sm",
+  thinkingBoxStyle: {
+    background: "rgba(233, 48, 255, 0.02)",
+    border: "1px dashed rgba(233, 48, 255, 0.1)",
+    color: "rgba(232, 224, 255, 0.55)",
+    fontStyle: "italic",
+    fontFamily: "'IBM Plex Mono', monospace",
+    lineHeight: 1.8,
+    fontSize: "13px",
+  },
+
+  renderLoading: () => (
+    <div className="mb-6 flex items-center gap-3">
+      <div className="relative" style={{ width: "30px", height: "30px" }}>
+        {/* Orbiting dots */}
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="absolute"
+            style={{
+              width: "4px",
+              height: "4px",
+              borderRadius: "50%",
+              background: ACCENT_COLORS[i],
+              top: "50%",
+              left: "50%",
+              marginTop: "-2px",
+              marginLeft: "-2px",
+              animation: `v13-ritual-orbit ${2 + i * 0.3}s linear infinite`,
+              animationDelay: `${i * 0.25}s`,
+              boxShadow: `0 0 6px ${ACCENT_COLORS[i]}`,
+            }}
+          />
+        ))}
+        {/* Center sigil */}
+        <div
+          className="absolute"
+          style={{
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            fontSize: "8px",
+            color: "#E930FF",
+            animation: "v13-ritual-pulse 1.5s ease-in-out infinite",
+          }}
+        >
+          ⛧
+        </div>
+      </div>
+      <span
+        style={{
+          fontFamily: "'Creepster', cursive",
+          fontSize: "11px",
+          color: "rgba(233, 48, 255, 0.6)",
+          letterSpacing: "3px",
+          textShadow: "0 0 6px rgba(233, 48, 255, 0.2)",
+        }}
+      >
+        SUMMONING...
+      </span>
+    </div>
+  ),
+
+  renderWorkflowCard: (workflow, onClick) => (
+    <div
+      onClick={onClick}
+      className="mt-4 flex w-full cursor-pointer items-center gap-3 p-4 transition-all duration-300"
+      style={{
+        background: "rgba(232, 224, 255, 0.02)",
+        border: "1px solid rgba(48, 176, 255, 0.12)",
+        animation: "v13-morph-border 12s ease-in-out infinite",
+        boxShadow: "inset 0 0 20px rgba(48, 176, 255, 0.02)",
+      }}
+    >
+      <div
+        className="flex h-10 w-10 items-center justify-center"
+        style={{
+          background: "rgba(48, 176, 255, 0.06)",
+          border: "1px double rgba(48, 176, 255, 0.12)",
+        }}
+      >
+        <ArrowUpDown className="h-5 w-5" style={{ color: "#30B0FF" }} />
+      </div>
+      <div className="flex-1">
+        <div
+          style={{
+            fontFamily: "'Silkscreen', cursive",
+            color: "#E8E0FF",
+            fontWeight: 700,
+            fontSize: "9px",
+            letterSpacing: "1px",
+          }}
+        >
+          {workflow.name.toUpperCase()}
+        </div>
+        <div
+          className="mt-1"
+          style={{
+            color: "rgba(232, 224, 255, 0.5)",
+            fontSize: "12px",
+          }}
+        >
+          {workflow.description}
+        </div>
+      </div>
+      <button
+        className="flex h-8 w-8 items-center justify-center"
+        style={{ background: "rgba(232, 224, 255, 0.02)" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <MoreHorizontal className="h-4 w-4" style={{ color: "rgba(232, 224, 255, 0.3)" }} />
+      </button>
+    </div>
+  ),
+
+  renderApprovalButton: (approved, onApprove) => (
+    <div className="mt-4">
+      <button
+        onClick={onApprove}
+        disabled={approved}
+        className="flex items-center gap-2 px-6 py-3 text-sm transition-all duration-300"
+        style={
+          approved
+            ? {
+                background: "rgba(48, 255, 176, 0.06)",
+                border: "1px double rgba(48, 255, 176, 0.15)",
+                color: "#30FFB0",
+                fontWeight: 600,
+                fontFamily: "'Silkscreen', cursive",
+                fontSize: "9px",
+                letterSpacing: "2px",
+                textShadow: "0 0 6px rgba(48, 255, 176, 0.3)",
+              }
+            : {
+                background: "linear-gradient(135deg, rgba(255, 48, 96, 0.15) 0%, rgba(233, 48, 255, 0.15) 100%)",
+                border: "2px solid rgba(255, 48, 96, 0.3)",
+                color: "#FF3060",
+                fontWeight: 700,
+                fontFamily: "'Silkscreen', cursive",
+                fontSize: "9px",
+                letterSpacing: "3px",
+                animation: "v13-launch-pulse 2s ease-in-out infinite",
+                textShadow: "0 0 8px rgba(255, 48, 96, 0.4)",
+              }
+        }
+      >
+        {approved ? (
+          <>
+            <Check className="h-4 w-4" />
+            SEQUENCE COMPLETE
+          </>
+        ) : (
+          <>
+            <ThumbsUp className="h-4 w-4" />
+            LAUNCH SEQUENCE
+          </>
+        )}
+      </button>
+    </div>
+  ),
+};
+
 export function ChatView({
   client,
   chatTitle,
@@ -82,17 +291,18 @@ export function ChatView({
   onDecline,
   onWorkflowClick,
   onArtifactClick,
+  onSubmitClarifyingAnswers,
   isLoading,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
-  const [expandedThinking, setExpandedThinking] = useState<Record<string, boolean>>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    const viewport = scrollRef.current?.querySelector("[data-radix-scroll-area-viewport]") as HTMLElement | null;
+    if (viewport) {
+      viewport.scrollTop = viewport.scrollHeight;
     }
   }, [messages]);
 
@@ -101,6 +311,11 @@ export function ChatView({
     if (input.trim() && !isLoading) {
       onSendMessage(input.trim());
       setInput("");
+      // Reset textarea height after clearing
+      if (inputRef.current) {
+        inputRef.current.style.height = "auto";
+        inputRef.current.style.overflowY = "hidden";
+      }
     }
   };
 
@@ -109,13 +324,6 @@ export function ChatView({
       e.preventDefault();
       handleSubmit(e);
     }
-  };
-
-  const toggleThinking = (messageId: string) => {
-    setExpandedThinking((prev) => ({
-      ...prev,
-      [messageId]: !prev[messageId],
-    }));
   };
 
   return (
@@ -318,273 +526,18 @@ export function ChatView({
 
       {/* Messages */}
       <ScrollArea className="relative z-10 flex-1 px-8" ref={scrollRef}>
-        <div className="mx-auto max-w-3xl py-8">
-          {messages.map((message, msgIdx) => (
-            <div key={message.id} className="mb-8">
-              {/* Thinking toggle */}
-              {message.role === "assistant" && message.thinking && (
-                <button
-                  onClick={() => toggleThinking(message.id)}
-                  className="mb-2 flex items-center gap-1.5 text-xs tracking-widest transition-colors duration-200"
-                  style={{
-                    fontFamily: "'Creepster', cursive",
-                    fontSize: "12px",
-                    letterSpacing: "2px",
-                    color: "#E930FF",
-                    textShadow: "0 0 8px rgba(233, 48, 255, 0.3)",
-                  }}
-                >
-                  {expandedThinking[message.id] ? (
-                    <ChevronDown className="h-3.5 w-3.5" />
-                  ) : (
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  )}
-                  <span>CHANNELING THE VOID</span>
-                </button>
-              )}
-
-              {/* Thinking content */}
-              {message.thinking && expandedThinking[message.id] && (
-                <div
-                  className="mb-4 p-4 text-sm"
-                  style={{
-                    background: "rgba(233, 48, 255, 0.02)",
-                    border: "1px dashed rgba(233, 48, 255, 0.1)",
-                    color: "rgba(232, 224, 255, 0.55)",
-                    fontStyle: "italic",
-                    fontFamily: "'IBM Plex Mono', monospace",
-                    lineHeight: 1.8,
-                    fontSize: "13px",
-                  }}
-                >
-                  {message.thinking}
-                </div>
-              )}
-
-              {/* Message content */}
-              <div
-                className={cn(
-                  "flex",
-                  message.role === "user" ? "justify-end" : "justify-start"
-                )}
-              >
-                <div
-                  className={cn(
-                    "max-w-[85%] text-sm leading-relaxed",
-                    message.role === "user" ? "v13-user-msg px-5 py-3" : "v13-assistant-msg"
-                  )}
-                  style={
-                    message.role === "user"
-                      ? {
-                          borderRadius: "2px 12px 12px 12px",
-                          color: "#E8E0FF",
-                          fontWeight: 400,
-                          fontSize: "13px",
-                        }
-                      : {
-                          color: "rgba(232, 224, 255, 0.8)",
-                          fontWeight: 400,
-                          lineHeight: 1.9,
-                          fontSize: "13px",
-                        }
-                  }
-                  dangerouslySetInnerHTML={{
-                    __html: message.content
-                      .replace(
-                        /\*\*(.*?)\*\*/g,
-                        `<strong style="font-weight: 700; animation: v13-bold-cycle 5s linear infinite; display: inline-block; text-shadow: 0 0 6px currentColor">\$1</strong>`
-                      )
-                      .replace(/\n/g, "<br />"),
-                  }}
-                />
-              </div>
-
-              {/* Action Plan Card */}
-              {message.actionPlan && (
-                <div className="mt-5">
-                  <ActionCard
-                    plan={message.actionPlan}
-                    workflow={message.workflow}
-                    onApprove={() => onApprove(message.id)}
-                    onDecline={() => onDecline(message.id)}
-                    onWorkflowClick={onWorkflowClick}
-                  />
-                </div>
-              )}
-
-              {/* Artifact cards */}
-              {message.artifactIds && message.artifactIds.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {message.artifactIds.map((artifactId) => {
-                    const artifact = artifacts.find((a) => a.id === artifactId);
-                    if (!artifact) return null;
-                    return (
-                      <ArtifactCard
-                        key={artifact.id}
-                        artifact={artifact}
-                        isSelected={selectedArtifactId === artifact.id}
-                        onClick={() => onArtifactClick(artifact.id)}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Standalone workflow card */}
-              {message.workflow && !message.actionPlan && (
-                <div
-                  onClick={() => onWorkflowClick(message.workflow!.id)}
-                  className="mt-4 flex w-full cursor-pointer items-center gap-3 p-4 transition-all duration-300"
-                  style={{
-                    background: "rgba(232, 224, 255, 0.02)",
-                    border: "1px solid rgba(48, 176, 255, 0.12)",
-                    animation: "v13-morph-border 12s ease-in-out infinite",
-                    boxShadow: "inset 0 0 20px rgba(48, 176, 255, 0.02)",
-                  }}
-                >
-                  <div
-                    className="flex h-10 w-10 items-center justify-center"
-                    style={{
-                      background: "rgba(48, 176, 255, 0.06)",
-                      border: "1px double rgba(48, 176, 255, 0.12)",
-                    }}
-                  >
-                    <ArrowUpDown className="h-5 w-5" style={{ color: "#30B0FF" }} />
-                  </div>
-                  <div className="flex-1">
-                    <div
-                      style={{
-                        fontFamily: "'Silkscreen', cursive",
-                        color: "#E8E0FF",
-                        fontWeight: 700,
-                        fontSize: "9px",
-                        letterSpacing: "1px",
-                      }}
-                    >
-                      {message.workflow.name.toUpperCase()}
-                    </div>
-                    <div
-                      className="mt-1"
-                      style={{
-                        color: "rgba(232, 224, 255, 0.5)",
-                        fontSize: "12px",
-                      }}
-                    >
-                      {message.workflow.description}
-                    </div>
-                  </div>
-                  <button
-                    className="flex h-8 w-8 items-center justify-center"
-                    style={{ background: "rgba(232, 224, 255, 0.02)" }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <MoreHorizontal className="h-4 w-4" style={{ color: "rgba(232, 224, 255, 0.3)" }} />
-                  </button>
-                </div>
-              )}
-
-              {/* Approval button — Launch Sequence */}
-              {message.requiresApproval && (
-                <div className="mt-4">
-                  <button
-                    onClick={() => onApprove(message.id)}
-                    disabled={message.approved}
-                    className="flex items-center gap-2 px-6 py-3 text-sm transition-all duration-300"
-                    style={
-                      message.approved
-                        ? {
-                            background: "rgba(48, 255, 176, 0.06)",
-                            border: "1px double rgba(48, 255, 176, 0.15)",
-                            color: "#30FFB0",
-                            fontWeight: 600,
-                            fontFamily: "'Silkscreen', cursive",
-                            fontSize: "9px",
-                            letterSpacing: "2px",
-                            textShadow: "0 0 6px rgba(48, 255, 176, 0.3)",
-                          }
-                        : {
-                            background: "linear-gradient(135deg, rgba(255, 48, 96, 0.15) 0%, rgba(233, 48, 255, 0.15) 100%)",
-                            border: "2px solid rgba(255, 48, 96, 0.3)",
-                            color: "#FF3060",
-                            fontWeight: 700,
-                            fontFamily: "'Silkscreen', cursive",
-                            fontSize: "9px",
-                            letterSpacing: "3px",
-                            animation: "v13-launch-pulse 2s ease-in-out infinite",
-                            textShadow: "0 0 8px rgba(255, 48, 96, 0.4)",
-                          }
-                    }
-                  >
-                    {message.approved ? (
-                      <>
-                        <Check className="h-4 w-4" />
-                        SEQUENCE COMPLETE
-                      </>
-                    ) : (
-                      <>
-                        <ThumbsUp className="h-4 w-4" />
-                        LAUNCH SEQUENCE
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-
-          {/* Loading — Ritual in progress */}
-          {isLoading && (
-            <div className="mb-6 flex items-center gap-3">
-              <div className="relative" style={{ width: "30px", height: "30px" }}>
-                {/* Orbiting dots */}
-                {[0, 1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="absolute"
-                    style={{
-                      width: "4px",
-                      height: "4px",
-                      borderRadius: "50%",
-                      background: ACCENT_COLORS[i],
-                      top: "50%",
-                      left: "50%",
-                      marginTop: "-2px",
-                      marginLeft: "-2px",
-                      animation: `v13-ritual-orbit ${2 + i * 0.3}s linear infinite`,
-                      animationDelay: `${i * 0.25}s`,
-                      boxShadow: `0 0 6px ${ACCENT_COLORS[i]}`,
-                    }}
-                  />
-                ))}
-                {/* Center sigil */}
-                <div
-                  className="absolute"
-                  style={{
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    fontSize: "8px",
-                    color: "#E930FF",
-                    animation: "v13-ritual-pulse 1.5s ease-in-out infinite",
-                  }}
-                >
-                  ⛧
-                </div>
-              </div>
-              <span
-                style={{
-                  fontFamily: "'Creepster', cursive",
-                  fontSize: "11px",
-                  color: "rgba(233, 48, 255, 0.6)",
-                  letterSpacing: "3px",
-                  textShadow: "0 0 6px rgba(233, 48, 255, 0.2)",
-                }}
-              >
-                SUMMONING...
-              </span>
-            </div>
-          )}
-        </div>
+        <MessageList
+          messages={messages}
+          artifacts={artifacts}
+          selectedArtifactId={selectedArtifactId}
+          theme={v13Theme}
+          onApprove={onApprove}
+          onDecline={onDecline}
+          onWorkflowClick={onWorkflowClick}
+          onArtifactClick={onArtifactClick}
+          onSubmitClarifyingAnswers={onSubmitClarifyingAnswers}
+          isLoading={isLoading}
+        />
       </ScrollArea>
 
       {/* Input — The Summoning Circle */}
@@ -638,7 +591,16 @@ export function ChatView({
               <textarea
                 ref={inputRef}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  // Auto-expand height up to 5.5 lines
+                  const el = e.target;
+                  el.style.height = "auto";
+                  const lineHeight = 20;
+                  const maxHeight = lineHeight * 5.5;
+                  el.style.height = `${Math.min(el.scrollHeight, maxHeight)}px`;
+                  el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
+                }}
                 onKeyDown={handleKeyDown}
                 placeholder="Speak your incantation..."
                 rows={1}
@@ -649,6 +611,8 @@ export function ChatView({
                   fontFamily: "'IBM Plex Mono', monospace",
                   caretColor: "#E930FF",
                   fontSize: "13px",
+                  lineHeight: "20px",
+                  overflowY: "hidden",
                 }}
               />
               <div className="mt-2 flex items-center justify-between">
