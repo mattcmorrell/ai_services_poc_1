@@ -17,6 +17,7 @@ import { ActionCard } from "@/components/chat/action-card";
 import { ActionCardCompact } from "@/components/chat/action-card-compact";
 import { ClarifyingQuestionsCard } from "@/components/chat/clarifying-questions-card";
 import { GateApprovalCard } from "@/components/chat/gate-approval-card";
+import { ApprovalRequestCard } from "@/components/chat/approval-request-card";
 
 export interface MessageListTheme {
   /** Message container spacing, e.g. "mb-6" or "mb-8" */
@@ -95,6 +96,8 @@ interface MessageListProps {
   onOpenPlanPanel?: () => void;
   onApproveGatedStep?: (gateMessageId: string) => void;
   onModifyGatedStep?: (gateMessageId: string) => void;
+  onApproveRequest?: (messageId: string) => void;
+  onDeclineRequest?: (messageId: string) => void;
 
   isLoading: boolean;
 }
@@ -117,6 +120,8 @@ export function MessageList({
   onOpenPlanPanel,
   onApproveGatedStep,
   onModifyGatedStep,
+  onApproveRequest,
+  onDeclineRequest,
   isLoading,
 }: MessageListProps) {
   const [expandedThinking, setExpandedThinking] = useState<
@@ -248,6 +253,17 @@ export function MessageList({
               />
             );
           })()}
+
+          {/* Approval Request Card */}
+          {message.approvalRequest && (
+            <ApprovalRequestCard
+              question={message.approvalRequest.question}
+              title={message.approvalRequest.title}
+              approved={message.approvalRequest.approved}
+              onApprove={() => onApproveRequest?.(message.id)}
+              onDecline={() => onDeclineRequest?.(message.id)}
+            />
+          )}
 
           {/* Artifact cards */}
           {message.artifactIds && message.artifactIds.length > 0 && (

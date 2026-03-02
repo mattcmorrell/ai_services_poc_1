@@ -1,33 +1,26 @@
 "use client";
 
 import { useEffect, useCallback } from "react";
-import { Check, ShieldAlert, Pencil, X } from "lucide-react";
-import { ActionPlan } from "@/types/chat";
+import { Check, ShieldCheck, X } from "lucide-react";
 
-interface GateApprovalCardProps {
-  gateApproval: {
-    planMessageId: string;
-    stepIndex: number;
-    stepDescription: string;
-  };
-  /** Current status of the linked action plan */
-  planStatus: ActionPlan["status"] | undefined;
-  /** Status of this specific step ("pending" | "in_progress" | "completed") */
-  stepStatus: string | undefined;
+interface ApprovalRequestCardProps {
+  question: string;
+  title?: string;
+  approved?: boolean;
   onApprove: () => void;
-  onModify: () => void;
+  onDecline: () => void;
 }
 
-export function GateApprovalCard({
-  gateApproval,
-  planStatus,
-  stepStatus,
+export function ApprovalRequestCard({
+  question,
+  title,
+  approved,
   onApprove,
-  onModify,
-}: GateApprovalCardProps) {
-  const isApproved = stepStatus === "completed";
-  const isDeclined = planStatus === "declined" || planStatus === "stopped";
-  const isPending = !isApproved && !isDeclined;
+  onDecline,
+}: ApprovalRequestCardProps) {
+  const isPending = approved === undefined;
+  const isApproved = approved === true;
+  const isDeclined = approved === false;
 
   // Keyboard shortcut: Enter to approve when pending
   const handleKeyDown = useCallback(
@@ -57,13 +50,11 @@ export function GateApprovalCard({
       <div className="mt-4 rounded-lg border border-emerald-500/20 bg-card/50 px-4 py-3 max-w-[520px]">
         <div className="flex items-center gap-2 text-[12px] tracking-wide uppercase text-emerald-500/70">
           <Check size={12} />
-          <span>
-            Step {gateApproval.stepIndex + 1} approved
-          </span>
+          <span>Approved</span>
         </div>
-        <p className="text-[12px] text-foreground/50 mt-1">
-          {gateApproval.stepDescription}
-        </p>
+        {title && (
+          <p className="text-[12px] text-foreground/50 mt-1">{title}</p>
+        )}
       </div>
     );
   }
@@ -74,13 +65,11 @@ export function GateApprovalCard({
       <div className="mt-4 rounded-lg border border-red-500/20 bg-card/50 px-4 py-3 max-w-[520px]">
         <div className="flex items-center gap-2 text-[12px] tracking-wide uppercase text-red-400/70">
           <X size={12} />
-          <span>
-            Step {gateApproval.stepIndex + 1} — plan modified
-          </span>
+          <span>Declined</span>
         </div>
-        <p className="text-[12px] text-foreground/50 mt-1">
-          Describe your changes below.
-        </p>
+        {title && (
+          <p className="text-[12px] text-foreground/50 mt-1">{title}</p>
+        )}
       </div>
     );
   }
@@ -91,22 +80,17 @@ export function GateApprovalCard({
       {/* Header */}
       <div className="flex items-center gap-2.5 px-5 py-3 border-b border-border bg-muted/30">
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted/60">
-          <ShieldAlert className="w-4 h-4 text-foreground/40" />
+          <ShieldCheck className="w-4 h-4 text-foreground/40" />
         </div>
-        <div>
-          <div className="text-[12px] font-medium tracking-wide uppercase text-muted-foreground">
-            Step {gateApproval.stepIndex + 1} — Approval required
-          </div>
+        <div className="text-[12px] font-medium tracking-wide uppercase text-muted-foreground">
+          {title || "Approval required"}
         </div>
       </div>
 
       {/* Body */}
       <div className="p-5">
-        <p className="text-[13px] text-foreground leading-relaxed mb-1.5">
-          {gateApproval.stepDescription}
-        </p>
-        <p className="text-[11px] text-foreground/40">
-          This action cannot be easily undone and requires your confirmation.
+        <p className="text-[13px] text-foreground leading-relaxed">
+          {question}
         </p>
       </div>
 
@@ -117,14 +101,14 @@ export function GateApprovalCard({
           className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 bg-emerald-600 text-white cursor-pointer hover:bg-emerald-500"
         >
           <Check className="w-3.5 h-3.5" />
-          Approve & continue
+          Approve
         </button>
         <button
-          onClick={onModify}
+          onClick={onDecline}
           className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 bg-transparent text-red-400 cursor-pointer hover:bg-red-500/10 border border-red-500/30"
         >
-          <Pencil className="w-3.5 h-3.5" />
-          Modify
+          <X className="w-3.5 h-3.5" />
+          Decline
         </button>
       </div>
     </div>

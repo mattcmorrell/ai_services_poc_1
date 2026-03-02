@@ -59,6 +59,7 @@ import { ArtifactPanel } from "@/components/artifacts/artifact-panel";
 import { parseArtifacts } from "@/lib/artifact-parser";
 import { parseActionPlan } from "@/lib/action-plan-parser";
 import { parseClarifyingQuestions } from "@/lib/clarifying-questions-parser";
+import { parseApprovalRequest } from "@/lib/approval-request-parser";
 import { Agent } from "@/types/agent";
 import { ClientsView } from "@/components/clients/clients-view";
 
@@ -264,8 +265,12 @@ export default function Home() {
         const afterCqContent = cqResult?.cleanedContent || artifactParsedContent;
 
         const actionPlanResult = parseActionPlan(afterCqContent);
-        const finalContent = actionPlanResult?.cleanedContent || afterCqContent;
+        const afterActionContent = actionPlanResult?.cleanedContent || afterCqContent;
         let actionPlan = actionPlanResult?.plan;
+
+        // Parse approval requests (e.g. "### Gate: approve Step 4")
+        const approvalResult = parseApprovalRequest(afterActionContent);
+        const finalContent = approvalResult?.cleanedContent || afterActionContent;
 
         // Safety net: for Time Off agent, ensure all steps are gated
         if (actionPlan && chat.agentId === "agent-timeoff") {
@@ -285,6 +290,7 @@ export default function Home() {
           artifactIds: newArtifacts.map((a) => a.id),
           actionPlan,
           clarifyingQuestions: cqResult?.questions,
+          approvalRequest: approvalResult?.approvalRequest,
           timestamp: new Date(),
         };
 
@@ -525,6 +531,54 @@ export default function Home() {
       handleSendMessage(responseText, { hidden: true });
     },
     [selectedChatId, chats, handleSendMessage]
+  );
+
+  const handleApproveRequest = useCallback(
+    (messageId: string) => {
+      if (!selectedChatId) return;
+      // Mark the approval request as approved
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === selectedChatId
+            ? {
+                ...c,
+                messages: c.messages.map((m) =>
+                  m.id === messageId && m.approvalRequest
+                    ? { ...m, approvalRequest: { ...m.approvalRequest, approved: true } }
+                    : m
+                ),
+              }
+            : c
+        )
+      );
+      // Send approval as hidden message
+      handleSendMessage("Yes, approved.", { hidden: true });
+    },
+    [selectedChatId, handleSendMessage]
+  );
+
+  const handleDeclineRequest = useCallback(
+    (messageId: string) => {
+      if (!selectedChatId) return;
+      // Mark the approval request as declined
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === selectedChatId
+            ? {
+                ...c,
+                messages: c.messages.map((m) =>
+                  m.id === messageId && m.approvalRequest
+                    ? { ...m, approvalRequest: { ...m.approvalRequest, approved: false } }
+                    : m
+                ),
+              }
+            : c
+        )
+      );
+      // Send decline — visible so user can explain
+      handleSendMessage("No, I'd like to make changes.");
+    },
+    [selectedChatId, handleSendMessage]
   );
 
   const simulateExecutionForChat = useCallback(
@@ -896,6 +950,8 @@ export default function Home() {
                 onResumePlan={handleResumePlan}
                 onApproveGatedStep={handleApproveGatedStep}
                 onModifyGatedStep={handleModifyGatedStep}
+                onApproveRequest={handleApproveRequest}
+                onDeclineRequest={handleDeclineRequest}
               />
             ) : (
               <div className="flex flex-1 items-center justify-center text-muted-foreground">

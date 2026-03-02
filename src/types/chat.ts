@@ -68,6 +68,11 @@ export interface Message {
     stepIndex: number;       // 0-based index of the gated step
     stepDescription: string; // Human-readable step description
   };
+  approvalRequest?: {
+    question: string;
+    title?: string;
+    approved?: boolean;
+  };
   hidden?: boolean;
   timestamp: Date;
 }

@@ -90,26 +90,22 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
       {/* Approve/Decline for pending plans */}
       {isPending && (onApprove || onDecline) && (
         <div
-          className="flex items-center gap-2 px-4 py-2.5"
+          className="flex gap-2.5 px-3 py-3"
           style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}
         >
           {onApprove && (
             <button
               onClick={(e) => { e.stopPropagation(); onApprove(); }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold transition-all"
-              style={{
-                background: "rgba(255,255,255,0.9)",
-                color: "#060608",
-              }}
+              className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
             >
               <Check className="w-3.5 h-3.5" />
-              Approve
+              Approve plan
             </button>
           )}
           {onDecline && (
             <button
               onClick={(e) => { e.stopPropagation(); onDecline(); }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold transition-all"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 cursor-pointer"
               style={{
                 background: "rgba(255,255,255,0.04)",
                 color: "rgba(255,255,255,0.5)",
