@@ -134,6 +134,7 @@ export default function Home() {
   // Auto-open plan panel when a plan starts executing
   // Auto-open plan panel whenever a plan exists
   const lastPlanId = useRef<string | null>(null);
+  const simulateExecutionRef = useRef<(messageId: string, plan: ActionPlan, chatId: string) => void>(() => {});
   useEffect(() => {
     if (activePlan && activePlan.id !== lastPlanId.current) {
       setPlanPanelOpen(true);
@@ -536,6 +537,9 @@ export default function Home() {
   const handleApproveRequest = useCallback(
     (messageId: string) => {
       if (!selectedChatId) return;
+      const chat = chats.find((c) => c.id === selectedChatId);
+      if (!chat) return;
+
       // Mark the approval request as approved
       setChats((prev) =>
         prev.map((c) =>
@@ -551,10 +555,45 @@ export default function Home() {
             : c
         )
       );
+
+      // Advance the active plan: mark current in-progress step as completed and resume
+      const planMsg = chat.messages.find(
+        (m) => m.actionPlan && (m.actionPlan.status === "executing" || m.actionPlan.status === "paused")
+      );
+      if (planMsg?.actionPlan) {
+        const currentIdx = planMsg.actionPlan.steps.findIndex(
+          (s) => s.status === "in_progress"
+        );
+        if (currentIdx !== -1) {
+          // Mark current step completed
+          const updatedSteps = planMsg.actionPlan.steps.map((step, idx) => ({
+            ...step,
+            status: idx <= currentIdx ? ("completed" as const) : step.status,
+          }));
+          const updatedPlan = { ...planMsg.actionPlan, status: "executing" as const, steps: updatedSteps };
+          setChats((prev) =>
+            prev.map((c) =>
+              c.id === selectedChatId
+                ? {
+                    ...c,
+                    messages: c.messages.map((m) =>
+                      m.id === planMsg.id
+                        ? { ...m, actionPlan: updatedPlan }
+                        : m
+                    ),
+                  }
+                : c
+            )
+          );
+          // Resume simulation from the next step
+          simulateExecutionRef.current(planMsg.id, updatedPlan, selectedChatId);
+        }
+      }
+
       // Send approval as hidden message
       handleSendMessage("Yes, approved.", { hidden: true });
     },
-    [selectedChatId, handleSendMessage]
+    [selectedChatId, chats, handleSendMessage]
   );
 
   const handleDeclineRequest = useCallback(
@@ -704,6 +743,7 @@ export default function Home() {
     },
     []
   );
+  simulateExecutionRef.current = simulateExecutionForChat;
 
   const handleNewChat = useCallback(
     (clientId: string): string => {
