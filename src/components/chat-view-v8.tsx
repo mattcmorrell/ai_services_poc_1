@@ -38,6 +38,8 @@ interface ChatViewProps {
     answers: Record<string, string | string[]>
   ) => void;
   isLoading: boolean;
+  onApproveGatedStep?: (gateMessageId: string) => void;
+  onModifyGatedStep?: (gateMessageId: string) => void;
 }
 
 const darkVars: Record<string, string> = {
@@ -267,6 +269,8 @@ export function ChatView({
   onArtifactClick,
   onSubmitClarifyingAnswers,
   isLoading,
+  onApproveGatedStep,
+  onModifyGatedStep,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
@@ -415,6 +419,8 @@ export function ChatView({
           onWorkflowClick={onWorkflowClick}
           onArtifactClick={onArtifactClick}
           onSubmitClarifyingAnswers={onSubmitClarifyingAnswers}
+          onApproveGatedStep={onApproveGatedStep}
+          onModifyGatedStep={onModifyGatedStep}
           isLoading={isLoading}
         />
       </ScrollArea>

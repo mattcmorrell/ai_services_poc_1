@@ -50,6 +50,8 @@ interface ChatViewProps {
   onPausePlan?: () => void;
   onStopPlan?: () => void;
   onResumePlan?: () => void;
+  onApproveGatedStep?: (gateMessageId: string) => void;
+  onModifyGatedStep?: (gateMessageId: string) => void;
 }
 
 const glassVars: Record<string, string> = {
@@ -268,6 +270,8 @@ export function ChatView({
   onPausePlan,
   onStopPlan,
   onResumePlan,
+  onApproveGatedStep,
+  onModifyGatedStep,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
@@ -321,6 +325,8 @@ export function ChatView({
           onArtifactClick={onArtifactClick}
           onSubmitClarifyingAnswers={onSubmitClarifyingAnswers}
           onOpenPlanPanel={onOpenPlanPanel}
+          onApproveGatedStep={onApproveGatedStep}
+          onModifyGatedStep={onModifyGatedStep}
           isLoading={isLoading}
         />
       </ScrollArea>

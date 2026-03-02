@@ -16,6 +16,7 @@ import { ArtifactCard } from "@/components/artifacts/artifact-card";
 import { ActionCard } from "@/components/chat/action-card";
 import { ActionCardCompact } from "@/components/chat/action-card-compact";
 import { ClarifyingQuestionsCard } from "@/components/chat/clarifying-questions-card";
+import { GateApprovalCard } from "@/components/chat/gate-approval-card";
 
 export interface MessageListTheme {
   /** Message container spacing, e.g. "mb-6" or "mb-8" */
@@ -92,6 +93,8 @@ interface MessageListProps {
     answers: Record<string, string | string[]>
   ) => void;
   onOpenPlanPanel?: () => void;
+  onApproveGatedStep?: (gateMessageId: string) => void;
+  onModifyGatedStep?: (gateMessageId: string) => void;
 
   isLoading: boolean;
 }
@@ -112,6 +115,8 @@ export function MessageList({
   onArtifactClick,
   onSubmitClarifyingAnswers,
   onOpenPlanPanel,
+  onApproveGatedStep,
+  onModifyGatedStep,
   isLoading,
 }: MessageListProps) {
   const [expandedThinking, setExpandedThinking] = useState<
@@ -227,6 +232,22 @@ export function MessageList({
               />
             </div>
           )}
+
+          {/* Gate Approval Card */}
+          {message.gateApproval && (() => {
+            const planMsg = messages.find(
+              (m) => m.id === message.gateApproval!.planMessageId
+            );
+            return (
+              <GateApprovalCard
+                gateApproval={message.gateApproval}
+                planStatus={planMsg?.actionPlan?.status}
+                stepStatus={planMsg?.actionPlan?.steps[message.gateApproval.stepIndex]?.status}
+                onApprove={() => onApproveGatedStep?.(message.id)}
+                onModify={() => onModifyGatedStep?.(message.id)}
+              />
+            );
+          })()}
 
           {/* Artifact cards */}
           {message.artifactIds && message.artifactIds.length > 0 && (

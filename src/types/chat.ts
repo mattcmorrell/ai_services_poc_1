@@ -63,6 +63,11 @@ export interface Message {
   artifactIds?: string[]; // References to artifacts created in this message
   requiresApproval?: boolean;
   approved?: boolean;
+  gateApproval?: {
+    planMessageId: string;   // Links to the message that has the actionPlan
+    stepIndex: number;       // 0-based index of the gated step
+    stepDescription: string; // Human-readable step description
+  };
   timestamp: Date;
 }
 

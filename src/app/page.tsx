@@ -395,6 +395,89 @@ export default function Home() {
     [selectedChatId, handleDeclineForChat]
   );
 
+  const handleApproveGatedStep = useCallback(
+    (gateMessageId: string) => {
+      if (!selectedChatId) return;
+      const chat = chats.find((c) => c.id === selectedChatId);
+      if (!chat) return;
+
+      const gateMsg = chat.messages.find((m) => m.id === gateMessageId);
+      if (!gateMsg?.gateApproval) return;
+
+      const planMsg = chat.messages.find((m) => m.id === gateMsg.gateApproval!.planMessageId);
+      if (!planMsg?.actionPlan) return;
+
+      // Mark the current in_progress step as completed before resuming
+      const updatedSteps = planMsg.actionPlan.steps.map((step) =>
+        step.status === "in_progress"
+          ? { ...step, status: "completed" as const, completedAt: new Date() }
+          : step
+      );
+
+      const updatedPlan: ActionPlan = {
+        ...planMsg.actionPlan,
+        status: "executing" as const,
+        steps: updatedSteps,
+        pausedAt: undefined,
+        pausedBy: undefined,
+      };
+
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === selectedChatId
+            ? {
+                ...c,
+                messages: c.messages.map((msg) =>
+                  msg.id === planMsg.id && msg.actionPlan
+                    ? { ...msg, actionPlan: updatedPlan }
+                    : msg
+                ),
+              }
+            : c
+        )
+      );
+
+      simulateExecutionForChat(planMsg.id, updatedPlan, selectedChatId);
+    },
+    [selectedChatId, chats]
+  );
+
+  const handleModifyGatedStep = useCallback(
+    (gateMessageId: string) => {
+      if (!selectedChatId) return;
+      const chat = chats.find((c) => c.id === selectedChatId);
+      if (!chat) return;
+
+      const gateMsg = chat.messages.find((m) => m.id === gateMessageId);
+      if (!gateMsg?.gateApproval) return;
+
+      const planMessageId = gateMsg.gateApproval.planMessageId;
+
+      // Decline the plan so the user can describe changes
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === selectedChatId
+            ? {
+                ...c,
+                messages: c.messages.map((msg) =>
+                  msg.id === planMessageId && msg.actionPlan
+                    ? {
+                        ...msg,
+                        actionPlan: {
+                          ...msg.actionPlan,
+                          status: "declined" as const,
+                        },
+                      }
+                    : msg
+                ),
+              }
+            : c
+        )
+      );
+    },
+    [selectedChatId, chats]
+  );
+
   const handleSubmitClarifyingAnswers = useCallback(
     (messageId: string, answers: Record<string, string | string[]>) => {
       if (!selectedChatId) return;
@@ -508,8 +591,31 @@ export default function Home() {
           )
         );
 
-        // If gated, don't continue — the user must resume manually
-        if (isGate) return;
+        // If gated, inject a chat message and stop — the user must approve via chat or plan panel
+        if (isGate) {
+          const rawDesc = steps[currentStep]?.description || `Step ${currentStep + 1}`;
+          // Strip "Step N:" prefix if the LLM already included it
+          const stepDesc = rawDesc.replace(/^Step\s*\d+\s*:\s*/i, "");
+          const gateMessage: Message = {
+            id: `msg-gate-${Date.now()}-${currentStep}`,
+            role: "assistant",
+            content: `**Step ${currentStep + 1}: ${stepDesc}** requires your approval before proceeding. This action cannot be easily undone.`,
+            gateApproval: {
+              planMessageId: messageId,
+              stepIndex: currentStep,
+              stepDescription: stepDesc,
+            },
+            timestamp: new Date(),
+          };
+          setChats((prev) =>
+            prev.map((chat) =>
+              chat.id === chatId
+                ? { ...chat, messages: [...chat.messages, gateMessage] }
+                : chat
+            )
+          );
+          return;
+        }
 
         setTimeout(() => {
           setChats((prev) =>
@@ -787,6 +893,8 @@ export default function Home() {
                 onPausePlan={handlePausePlan}
                 onStopPlan={handleStopPlan}
                 onResumePlan={handleResumePlan}
+                onApproveGatedStep={handleApproveGatedStep}
+                onModifyGatedStep={handleModifyGatedStep}
               />
             ) : (
               <div className="flex flex-1 items-center justify-center text-muted-foreground">

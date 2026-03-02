@@ -36,6 +36,8 @@ interface ChatViewProps {
   onArtifactClick: (artifactId: string) => void;
   onSubmitClarifyingAnswers?: (messageId: string, answers: Record<string, string | string[]>) => void;
   isLoading: boolean;
+  onApproveGatedStep?: (gateMessageId: string) => void;
+  onModifyGatedStep?: (gateMessageId: string) => void;
 }
 
 const models = [
@@ -156,6 +158,8 @@ export function ChatView({
   onArtifactClick,
   onSubmitClarifyingAnswers,
   isLoading,
+  onApproveGatedStep,
+  onModifyGatedStep,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
@@ -230,6 +234,8 @@ export function ChatView({
           onWorkflowClick={onWorkflowClick}
           onArtifactClick={onArtifactClick}
           onSubmitClarifyingAnswers={onSubmitClarifyingAnswers}
+          onApproveGatedStep={onApproveGatedStep}
+          onModifyGatedStep={onModifyGatedStep}
           isLoading={isLoading}
         />
       </ScrollArea>
