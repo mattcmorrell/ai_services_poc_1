@@ -4,7 +4,7 @@ export const mockAgents: Agent[] = [
   {
     id: "agent-payroll",
     name: "Payroll Runner",
-    description: "Runs a payroll",
+    description: "End-to-end payroll processing with anomaly detection and approval gates",
     icon: "banknote",
     isFavorite: true,
   },

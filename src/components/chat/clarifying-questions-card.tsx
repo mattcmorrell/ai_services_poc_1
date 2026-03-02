@@ -82,32 +82,12 @@ export function ClarifyingQuestionsCard({
   // Answered state: compact read-only summary
   if (isAnswered && savedAnswers) {
     return (
-      <div
-        style={{
-          background: "rgba(232, 224, 255, 0.02)",
-          border: "1px solid rgba(48, 255, 176, 0.15)",
-          borderRadius: "8px",
-          padding: "14px 18px",
-          maxWidth: "520px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            marginBottom: "10px",
-            fontSize: "11px",
-            fontFamily: "'IBM Plex Mono', monospace",
-            letterSpacing: "1px",
-            textTransform: "uppercase",
-            color: "rgba(48, 255, 176, 0.7)",
-          }}
-        >
+      <div className="rounded-lg border border-emerald-500/20 bg-card/50 px-4 py-3 max-w-[520px]">
+        <div className="flex items-center gap-2 mb-2.5 text-[12px] tracking-wide uppercase text-emerald-500/70">
           <Check size={12} />
           <span>Questions answered</span>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+        <div className="flex flex-col gap-1.5">
           {questions.map((q) => {
             const answer = savedAnswers[q.id];
             const answerText = Array.isArray(answer)
@@ -116,23 +96,12 @@ export function ClarifyingQuestionsCard({
             return (
               <div
                 key={q.id}
-                style={{
-                  display: "flex",
-                  gap: "8px",
-                  fontSize: "12px",
-                  lineHeight: 1.5,
-                }}
+                className="flex gap-2 text-[12px] leading-relaxed"
               >
-                <span
-                  style={{
-                    color: "rgba(232, 224, 255, 0.5)",
-                    fontFamily: "'IBM Plex Mono', monospace",
-                    flexShrink: 0,
-                  }}
-                >
+                <span className="text-muted-foreground shrink-0">
                   {q.header}:
                 </span>
-                <span style={{ color: "#E8E0FF" }}>{answerText}</span>
+                <span className="text-foreground">{answerText}</span>
               </div>
             );
           })}
@@ -143,24 +112,9 @@ export function ClarifyingQuestionsCard({
 
   // Active state: tabbed question UI
   return (
-    <div
-      style={{
-        background: "rgba(232, 224, 255, 0.02)",
-        border: "1px solid rgba(255, 255, 255, 0.06)",
-        borderRadius: "8px",
-        overflow: "hidden",
-        maxWidth: "520px",
-      }}
-    >
+    <div className="rounded-lg border border-border bg-card/50 overflow-hidden max-w-[520px]">
       {/* Tab bar */}
-      <div
-        style={{
-          display: "flex",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
-          background: "rgba(232, 224, 255, 0.01)",
-          overflowX: "auto",
-        }}
-      >
+      <div className="flex border-b border-border bg-muted/30 overflow-x-auto">
         {questions.map((q, idx) => {
           const hasAnswer = (() => {
             const a = answers[q.id];
@@ -174,31 +128,14 @@ export function ClarifyingQuestionsCard({
             <button
               key={q.id}
               onClick={() => setActiveTab(idx)}
-              style={{
-                padding: "9px 16px",
-                fontSize: "12px",
-                fontFamily: "'IBM Plex Mono', monospace",
-                color: isActive
-                  ? "#E8E0FF"
-                  : "rgba(232, 224, 255, 0.4)",
-                borderBottom: isActive
-                  ? "2px solid #E930FF"
-                  : "2px solid transparent",
-                background: "transparent",
-                border: "none",
-                borderBottomWidth: "2px",
-                borderBottomStyle: "solid",
-                borderBottomColor: isActive ? "#E930FF" : "transparent",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                whiteSpace: "nowrap",
-                transition: "color 0.15s ease",
-              }}
+              className={`px-4 py-2.5 text-[12px] border-b-2 bg-transparent cursor-pointer flex items-center gap-1.5 whitespace-nowrap transition-colors duration-150 ${
+                isActive
+                  ? "text-foreground border-primary"
+                  : "text-muted-foreground border-transparent hover:text-foreground/70"
+              }`}
             >
               {hasAnswer && (
-                <Check size={10} style={{ color: "#30FFB0" }} />
+                <Check size={10} className="text-emerald-500" />
               )}
               {q.header}
             </button>
@@ -208,26 +145,13 @@ export function ClarifyingQuestionsCard({
 
       {/* Question area */}
       {currentQuestion && (
-        <div style={{ padding: "16px 20px" }}>
-          <p
-            style={{
-              fontSize: "13px",
-              color: "#E8E0FF",
-              marginBottom: "16px",
-              lineHeight: 1.6,
-            }}
-          >
+        <div className="p-4 px-5">
+          <p className="text-[13px] text-foreground mb-4 leading-relaxed">
             {currentQuestion.question}
           </p>
 
           {/* Option cards */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-            }}
-          >
+          <div className="flex flex-col gap-2">
             {currentQuestion.options.map((option) => {
               const isSelected = currentQuestion.multiSelect
                 ? (
@@ -243,40 +167,23 @@ export function ClarifyingQuestionsCard({
                       ? handleMultiSelect(currentQuestion.id, option.label)
                       : handleSelect(currentQuestion.id, option.label)
                   }
-                  style={{
-                    padding: "10px 14px",
-                    textAlign: "left",
-                    background: isSelected
-                      ? "rgba(233, 48, 255, 0.08)"
-                      : "rgba(232, 224, 255, 0.02)",
-                    border: isSelected
-                      ? "1px solid rgba(233, 48, 255, 0.3)"
-                      : "1px solid rgba(255, 255, 255, 0.06)",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    transition: "all 0.15s ease",
-                    width: "100%",
-                  }}
+                  className={`p-2.5 px-3.5 text-left rounded-md cursor-pointer transition-all duration-150 w-full border ${
+                    isSelected
+                      ? "bg-primary/10 border-primary/30"
+                      : "bg-muted/30 border-border hover:border-border/80 hover:bg-muted/50"
+                  }`}
                 >
                   <div
-                    style={{
-                      fontSize: "13px",
-                      color: isSelected
-                        ? "#E8E0FF"
-                        : "rgba(232, 224, 255, 0.7)",
-                      fontWeight: isSelected ? 500 : 400,
-                    }}
+                    className={`text-[13px] ${
+                      isSelected
+                        ? "text-foreground font-medium"
+                        : "text-muted-foreground"
+                    }`}
                   >
                     {option.label}
                   </div>
                   {option.description && (
-                    <div
-                      style={{
-                        fontSize: "11px",
-                        color: "rgba(232, 224, 255, 0.35)",
-                        marginTop: "2px",
-                      }}
-                    >
+                    <div className="text-[11px] text-muted-foreground/60 mt-0.5">
                       {option.description}
                     </div>
                   )}
@@ -293,29 +200,18 @@ export function ClarifyingQuestionsCard({
                 <>
                   <button
                     onClick={() => handleOtherSelect(currentQuestion.id)}
-                    style={{
-                      padding: "10px 14px",
-                      textAlign: "left",
-                      background: isOtherSelected
-                        ? "rgba(233, 48, 255, 0.08)"
-                        : "rgba(232, 224, 255, 0.02)",
-                      border: isOtherSelected
-                        ? "1px solid rgba(233, 48, 255, 0.3)"
-                        : "1px solid rgba(255, 255, 255, 0.06)",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease",
-                      width: "100%",
-                    }}
+                    className={`p-2.5 px-3.5 text-left rounded-md cursor-pointer transition-all duration-150 w-full border ${
+                      isOtherSelected
+                        ? "bg-primary/10 border-primary/30"
+                        : "bg-muted/30 border-border hover:border-border/80 hover:bg-muted/50"
+                    }`}
                   >
                     <div
-                      style={{
-                        fontSize: "13px",
-                        color: isOtherSelected
-                          ? "#E8E0FF"
-                          : "rgba(232, 224, 255, 0.7)",
-                        fontWeight: isOtherSelected ? 500 : 400,
-                      }}
+                      className={`text-[13px] ${
+                        isOtherSelected
+                          ? "text-foreground font-medium"
+                          : "text-muted-foreground"
+                      }`}
                     >
                       Other
                     </div>
@@ -333,17 +229,7 @@ export function ClarifyingQuestionsCard({
                       }
                       placeholder="Type your answer..."
                       autoFocus
-                      style={{
-                        padding: "8px 12px",
-                        background: "rgba(232, 224, 255, 0.03)",
-                        border: "1px solid rgba(233, 48, 255, 0.15)",
-                        borderRadius: "6px",
-                        color: "#E8E0FF",
-                        fontSize: "13px",
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        outline: "none",
-                        width: "100%",
-                      }}
+                      className="p-2 px-3 bg-muted/30 border border-primary/20 rounded-md text-foreground text-[13px] outline-none w-full focus:border-primary/40"
                     />
                   )}
                 </>
@@ -354,34 +240,15 @@ export function ClarifyingQuestionsCard({
       )}
 
       {/* Submit button */}
-      <div
-        style={{
-          padding: "12px 20px",
-          borderTop: "1px solid rgba(255, 255, 255, 0.06)",
-        }}
-      >
+      <div className="p-3 px-5 border-t border-border">
         <button
           onClick={handleSubmit}
           disabled={!allAnswered}
-          style={{
-            width: "100%",
-            padding: "10px",
-            background: allAnswered
-              ? "linear-gradient(135deg, #E930FF 0%, #FF3060 100%)"
-              : "rgba(232, 224, 255, 0.05)",
-            border: "none",
-            borderRadius: "6px",
-            color: allAnswered ? "#050510" : "rgba(232, 224, 255, 0.3)",
-            fontSize: "12px",
-            fontWeight: 600,
-            fontFamily: "'IBM Plex Mono', monospace",
-            letterSpacing: "1px",
-            cursor: allAnswered ? "pointer" : "not-allowed",
-            boxShadow: allAnswered
-              ? "0 0 12px rgba(233, 48, 255, 0.3)"
-              : "none",
-            transition: "all 0.2s ease",
-          }}
+          className={`w-full py-2.5 border-none rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 ${
+            allAnswered
+              ? "bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
+              : "bg-muted/50 text-muted-foreground/40 cursor-not-allowed"
+          }`}
         >
           Submit answers ({answeredCount}/{questions.length})
         </button>

@@ -671,7 +671,7 @@ export default function Home() {
 
   const handleAgentClick = (agentId: string) => {
     const agentClientMap: Record<string, string> = {
-      "agent-1": "1",
+      "agent-1": "4",
       "agent-2": "2",
       "agent-3": "5",
       "agent-4": "3",

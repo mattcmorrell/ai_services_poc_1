@@ -5,9 +5,9 @@ export const mockAgentAttention: AgentAttention[] = [
     id: "agent-1",
     agentName: "Payroll Runner",
     agentIcon: "banknote",
-    clientName: "Cactus Jack's Jerky Shack",
-    message: "I need you to authorize something. We need to do something about it pretty soon.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 43), // 5:17 AM equivalent
+    clientName: "Black Mesa",
+    message: "Anomaly found: Jeff Hardy has 0 hours logged this period (avg 82 hrs). Need your decision before payroll can proceed.",
+    timestamp: new Date(Date.now() - 1000 * 60 * 2), // 2 min ago
     isUrgent: true,
   },
   {

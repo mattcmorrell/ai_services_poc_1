@@ -44,84 +44,177 @@ const onboardingArtifact: Artifact = {
 
 const payrollActionPlan: ActionPlan = {
   id: "plan-1",
-  title: "Run January Payroll",
-  description: "Process payroll for all active employees at Black Mesa for the January pay period.",
+  title: "Run January Payroll for Black Mesa",
+  description: "End-to-end payroll processing for 47 active employees, pay period Jan 1–31, 2026.",
   steps: [
     {
       id: "step-1",
-      description: "Collect and validate employee hours and salary data",
-      status: "pending",
+      description: "Create payroll run for Jan 1–31",
+      status: "completed",
+      completedAt: new Date(Date.now() - 4 * 60 * 1000),
       thinkingLog: [
-        "Pulling timesheet data from BambooHR for pay period Jan 1-31.",
-        "Cross-referencing with approved PTO requests — 3 employees had partial weeks.",
-        "Flagged: Dr. Vance has unapproved overtime (12 hrs). Proceeding with standard hours, will note for review.",
+        "Confirmed biweekly pay schedule — this is the second January run (Jan 16-31).",
+        "47 active employees on payroll. 2 status changes: Maria Chen started Jan 20 (prorate), Leon Webb terminated Jan 24 (final check needed).",
+        "Pay date: Feb 5, 2026.",
       ],
     },
     {
       id: "step-2",
-      description: "Calculate gross pay, deductions, and net pay",
-      status: "pending",
+      description: "Collect and validate employee hours and salary data",
+      status: "completed",
+      completedAt: new Date(Date.now() - 3 * 60 * 1000),
       thinkingLog: [
-        "Applying 2024 tax brackets. 2 employees crossed bracket thresholds this month.",
-        "401(k) match cap reached for Dr. Kleiner — adjusting employer contribution.",
-        "New HSA election for Barney Calhoun taking effect this period.",
+        "Pulled timesheet data for 31 hourly employees. 16 salaried employees confirmed at current rates.",
+        "3 employees had approved PTO overlapping this period — hours adjusted accordingly.",
+        "1 missing timesheet flagged: Jeff Hardy — no hours submitted. Escalating to anomaly review.",
+        "Leon Webb's final check requires payout of 42 accrued PTO hours at $34.50/hr.",
       ],
     },
     {
       id: "step-3",
-      description: "Process direct deposits and generate pay stubs",
-      status: "pending",
-      nonUndoable: true,
+      description: "Review individual employees against previous payroll",
+      status: "in_progress",
       thinkingLog: [
-        "Initiating ACH transfers for 47 employees via integrated banking API.",
-        "This step triggers real money movement — requires HRC gate approval.",
-        "Pay stubs will be auto-generated and uploaded to employee self-service portal.",
+        "Comparing current period against previous 3 pay periods for all 47 employees.",
+        "ANOMALY: Jeff Hardy — 0 hours this period. Previous 3 periods: 84, 80, 82 hours (avg 82 hrs). No PTO request on file, no status change recorded.",
+        "ANOMALY: Dr. Eli Vance — 58 overtime hours vs. 3-period average of 12 hrs. That's a 383% increase.",
+        "ANOMALY: Barney Calhoun — new HSA deduction of $125/pay period starting this run. Verified against benefits enrollment effective Jan 15.",
+        "Remaining 44 employees are within normal variance (<10% from averages).",
       ],
     },
     {
       id: "step-4",
+      description: "Review total payroll amounts against previous payrolls",
+      status: "pending",
+      thinkingLog: [],
+    },
+    {
+      id: "step-5",
+      description: "Approve payroll run",
+      status: "pending",
+      nonUndoable: true,
+      thinkingLog: [],
+    },
+    {
+      id: "step-6",
+      description: "Approve fund transfer",
+      status: "pending",
+      nonUndoable: true,
+      thinkingLog: [],
+    },
+    {
+      id: "step-7",
+      description: "Process direct deposits and generate pay stubs",
+      status: "pending",
+      nonUndoable: true,
+      thinkingLog: [],
+    },
+    {
+      id: "step-8",
       description: "Report and remit payroll taxes",
       status: "pending",
       nonUndoable: true,
-      thinkingLog: [
-        "Filing federal 941 deposit and state SUI contributions.",
-        "Deadline for this period: Feb 15. Filing 3 weeks early.",
-      ],
+      thinkingLog: [],
     },
   ],
   metadata: {
     affectedCount: 47,
     affectedLabel: "employees",
-    estimatedTime: "~5 min",
+    estimatedTime: "~10 min",
   },
-  status: "pending",
+  status: "executing",
 };
 
 const payrollMessages: Message[] = [
   {
-    id: "msg-0",
+    id: "msg-p-0",
     role: "user",
     content: "Run payroll for January",
+    timestamp: new Date(Date.now() - 8 * 60 * 1000),
+  },
+  {
+    id: "msg-p-1",
+    role: "assistant",
+    content: "I'll run the January payroll for Black Mesa. This covers the Jan 16–31 pay period on your biweekly schedule, with a pay date of Feb 5. I have 47 active employees to process.\n\nHere's the full plan — every step requires your approval before I proceed:",
+    thinking: `Black Mesa is on a biweekly pay schedule. January has two pay periods: Jan 1-15 and Jan 16-31. The user said "January" — I'll run the second period (Jan 16-31) since the first would have already been processed. 47 active employees on file. Pay date would be Feb 5 per the standard biweekly cadence.
+
+This is a high-stakes process — I need to break it into clear steps with gates at every irreversible action. The anomaly review steps (3 and 4) are where I add the most value by catching errors before money moves.`,
+    actionPlan: payrollActionPlan,
+    timestamp: new Date(Date.now() - 7 * 60 * 1000),
+  },
+  {
+    id: "msg-p-2",
+    role: "user",
+    content: "Looks good, go ahead",
+    timestamp: new Date(Date.now() - 6 * 60 * 1000),
+  },
+  {
+    id: "msg-p-3",
+    role: "assistant",
+    content: "**Step 1 complete — Payroll run created.**\n\nPay period: Jan 16–31, 2026 · Pay date: Feb 5, 2026\n\n- **47 active employees** included\n- **2 status changes** to note:\n  - **Maria Chen** — started Jan 20, prorated to 8 working days\n  - **Leon Webb** — terminated Jan 24, final check required (includes 42 hrs accrued PTO payout at $34.50/hr)\n\nMoving to Step 2 — collecting hours and salary data.",
+    thinking: `Payroll run created. Two notable status changes during this period that will need special handling:
+
+1. Maria Chen is a new hire starting Jan 20 — need to prorate her salary for 8 working days out of the 12 in this period.
+2. Leon Webb was terminated Jan 24 — this is his final paycheck. Need to include payout of 42 accrued PTO hours at his rate of $34.50/hr = $1,449.00 added to final check. Also need to handle COBRA notification trigger.
+
+Neither of these blocks proceeding, but both need to be visible to the consultant.`,
     timestamp: new Date(Date.now() - 5 * 60 * 1000),
   },
   {
-    id: "msg-1",
+    id: "msg-p-4",
     role: "assistant",
-    content: "I'll run the January payroll for Black Mesa. Here's my plan - please review and approve when ready:",
-    thinking: `The user is asking me to run payroll for Black Mesa Inc. This is a complex multi-step process that involves:
-1. Data collection and validation
-2. Payroll calculations
-3. Payment processing
-4. Tax reporting
+    content: "**Step 2 complete — Hours and salary data collected.**\n\n| Category | Count | Notes |\n|----------|-------|-------|\n| Hourly employees | 31 | Timesheets pulled |\n| Salaried employees | 16 | Rates confirmed |\n| Approved PTO overlaps | 3 | Hours adjusted |\n| Missing timesheets | 1 | Jeff Hardy — no hours submitted |\n| Final check | 1 | Leon Webb — includes 42 hrs PTO payout |\n\nOne gap: **Jeff Hardy has no timesheet on file for this period.** I'll flag this in the anomaly review next.\n\nMoving to Step 3 — reviewing individual employees against previous payrolls.",
+    thinking: `Data collection complete. 31 hourly employees all have timesheets except Jeff Hardy — his is completely missing. No PTO request, no leave of absence, no status change. This is the kind of thing that needs to be caught before payroll runs.
 
-I should break this down into clear steps and present a plan for approval before executing. This gives the HR consultant visibility into what I'm about to do and allows them to catch any issues before they become problems.`,
-    actionPlan: payrollActionPlan,
-    workflow: {
-      id: "wf-1",
-      name: "Black Mesa Payroll Workflow",
-      description: "View detailed workflow",
+3 employees had approved PTO that overlapped this period — their hours have been adjusted to reflect actual working hours plus PTO hours. Standard handling.
+
+Leon Webb's final check is straightforward — regular hours through Jan 24 plus the 42-hour PTO payout.
+
+The Jeff Hardy situation needs to go to the consultant in Step 3. Could be a simple oversight (forgot to submit) or something more concerning.`,
+    timestamp: new Date(Date.now() - 4 * 60 * 1000),
+  },
+  {
+    id: "msg-p-5",
+    role: "assistant",
+    content: "**Step 3 — Individual employee review: 3 anomalies found.**\n\nI compared all 47 employees against their previous 3 pay periods. 44 are within normal variance. Here are the 3 that need your attention:\n\n**1. Jeff Hardy — 0 hours (critical)**\nJeff logged 0 hours this period. His last 3 periods: 84, 80, 82 hours (avg 82 hrs biweekly). There's no PTO request, no leave of absence, and no status change on file. This looks like a missing timesheet — but I want you to decide how to handle it.\n\n**2. Dr. Eli Vance — 58 overtime hours**\nDr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase. His base hours (80) are normal — it's the OT that's unusual. Could be a legitimate crunch period, but it's a $4,132.50 difference in gross pay.\n\n**3. Barney Calhoun — new HSA deduction**\nBarney has a new HSA deduction of $125/pay period starting this run. This matches a benefits enrollment change effective Jan 15 — just flagging it so you're aware.\n\nI need to know how to handle the first two before I can move on:",
+    clarifyingQuestions: {
+      questions: [
+        {
+          id: "hardy_zero_hours",
+          header: "Hardy",
+          question: "Jeff Hardy has 0 hours logged this period but averaged 82 hours over his last 3 pay periods. No PTO, leave, or status change on file. How should I handle this?",
+          options: [
+            { label: "Exclude from this run", description: "Skip Jeff entirely — pay him in a supplemental run once his timesheet is submitted" },
+            { label: "Include at previous average", description: "Use his 82-hour average as a placeholder and reconcile next period" },
+            { label: "Include with 0 hours", description: "Process him at 0 hours — he'll get a $0 check (deductions may still apply)" },
+            { label: "Hold entire payroll", description: "Pause the run until Jeff's timesheet is resolved" },
+          ],
+          multiSelect: false,
+        },
+        {
+          id: "vance_overtime",
+          header: "Vance OT",
+          question: "Dr. Eli Vance logged 58 overtime hours this period — 383% above his 3-period average of 12 hours. This adds $4,132.50 to his gross pay. How should I proceed?",
+          options: [
+            { label: "Approve as submitted", description: "The overtime is legitimate — process at 1.5x rate as reported" },
+            { label: "Cap at department limit", description: "Apply the 30-hour departmental OT cap — excess requires manager sign-off" },
+            { label: "Flag for manager review", description: "Process base pay now, hold OT portion pending manager approval" },
+          ],
+          multiSelect: false,
+        },
+      ],
+      answered: false,
     },
-    timestamp: new Date(),
+    thinking: `Anomaly review complete. Three items to surface:
+
+1. CRITICAL — Jeff Hardy at 0 hours. This is almost certainly a missing timesheet, not an actual zero-hour period. His history is consistent (80-84 hrs). Options: exclude him from this run and do a supplemental, use his average as placeholder, or process at 0. I'd recommend excluding — paying $0 is worse than paying late if it's just a missing timesheet.
+
+2. NOTABLE — Dr. Vance's overtime is way outside normal range. 58 hours OT on top of 80 base = 138 total hours in a biweekly period. That's almost 10 hours/day every day including weekends. Could be legitimate for a research crunch, but the consultant should verify.
+
+3. INFORMATIONAL — Barney's new HSA deduction is clean, just making it visible since it's a change from previous periods.
+
+I'll present 1 and 2 as clarifying questions since they need decisions. Barney's is informational only.`,
+    timestamp: new Date(Date.now() - 2 * 60 * 1000),
   },
 ];
 
@@ -150,6 +243,7 @@ export const mockChats: Chat[] = [
   {
     id: "chat-1",
     clientId: "4",
+    agentId: "agent-payroll",
     title: "January Payroll",
     hasUnread: true,
     updatedAt: new Date(Date.now() - 2 * 60 * 1000), // 2 min ago

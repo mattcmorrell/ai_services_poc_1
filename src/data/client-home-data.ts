@@ -224,8 +224,8 @@ const clientHomeData: Record<string, ClientHomeData> = {
       {
         id: "att-4-1",
         severity: "blocking",
-        title: "Security clearance renewals overdue",
-        description: "12 researchers have expired clearances. Lab access will be revoked in 48 hours.",
+        title: "Anomaly found in January Payroll Run",
+        description: "Jeff Hardy has 0 hours logged this period (avg 82 hrs). Payroll Runner is paused waiting for your decision.",
         lastSeen: null,
         primaryAction: "Review",
         secondaryAction: "View Details",
@@ -241,7 +241,7 @@ const clientHomeData: Record<string, ClientHomeData> = {
       },
     ],
     activePlans: [
-      { id: "plan-4-1", title: "Security Clearance Batch Renewal", status: "awaiting", completedSteps: 0, totalSteps: 5 },
+      { id: "plan-4-1", title: "January Payroll Run", status: "paused", completedSteps: 2, totalSteps: 8 },
       { id: "plan-4-2", title: "Q2 Grant Distribution", status: "running", completedSteps: 2, totalSteps: 4 },
       { id: "plan-4-3", title: "Lab Safety Re-certification", status: "running", completedSteps: 4, totalSteps: 6 },
     ],
