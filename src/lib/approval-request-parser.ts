@@ -14,32 +14,27 @@ interface ParsedApprovalRequest {
  * Parses approval requests from LLM response content.
  * Detects patterns like:
  *   ### Gate: approve Step N
- *   Do you approve ... ?
+ *   ### If you approve Step N, I will:
+ *   Do you approve ... ? (possibly spanning multiple lines)
  *
  * Returns parsed approval request and cleaned content, or null if none found.
  */
 export function parseApprovalRequest(
   content: string
 ): ParsedApprovalRequest | null {
-  // Pattern 1: "### Gate:" header followed by approval question
-  // Captures the gate section header and everything after it
-  const gateRegex =
-    /\n---\s*\n+###\s*Gate[:\s][^\n]*\n([\s\S]*?)$/i;
+  // Pattern 1: "### Gate:" header (with or without preceding ---)
+  const gateRegex = /\n(?:---\s*\n+)?###\s*Gate[:\s][^\n]*\n([\s\S]*?)$/i;
   const gateMatch = content.match(gateRegex);
 
   if (gateMatch) {
     const gateSection = gateMatch[0];
     const gateBody = gateMatch[1].trim();
 
-    // Extract the question (last sentence ending with ?)
-    const questionMatch = gateBody.match(/([^\n]*\?)\s*$/);
-    const question = questionMatch
-      ? questionMatch[1].trim()
-      : gateBody;
-
-    // Extract title from ### Gate: header
+    const question = extractTrailingQuestion(gateBody) || gateBody;
     const titleMatch = gateSection.match(/###\s*Gate[:\s]+(.+)/i);
-    const title = titleMatch ? titleMatch[1].trim().replace(/\?$/, "") : undefined;
+    const title = titleMatch
+      ? titleMatch[1].trim().replace(/\?$/, "")
+      : undefined;
 
     return {
       approvalRequest: { question, title },
@@ -47,42 +42,67 @@ export function parseApprovalRequest(
     };
   }
 
-  // Pattern 2: standalone "### Gate:" without preceding ---
-  const gateRegex2 =
-    /\n###\s*Gate[:\s][^\n]*\n([\s\S]*?)$/i;
-  const gateMatch2 = content.match(gateRegex2);
+  // Pattern 2: "### If you approve Step N" header section
+  const ifApproveRegex =
+    /\n###\s*If you approve[^\n]*\n([\s\S]*?)$/i;
+  const ifApproveMatch = content.match(ifApproveRegex);
 
-  if (gateMatch2) {
-    const gateSection = gateMatch2[0];
-    const gateBody = gateMatch2[1].trim();
+  if (ifApproveMatch) {
+    const section = ifApproveMatch[0];
+    const body = ifApproveMatch[1].trim();
 
-    const questionMatch = gateBody.match(/([^\n]*\?)\s*$/);
-    const question = questionMatch
-      ? questionMatch[1].trim()
-      : gateBody;
-
-    const titleMatch = gateSection.match(/###\s*Gate[:\s]+(.+)/i);
-    const title = titleMatch ? titleMatch[1].trim().replace(/\?$/, "") : undefined;
+    const question = extractTrailingQuestion(body) || body;
 
     return {
-      approvalRequest: { question, title },
-      cleanedContent: content.slice(0, content.indexOf(gateSection)).trimEnd(),
+      approvalRequest: { question },
+      cleanedContent: content
+        .slice(0, content.indexOf(section))
+        .trimEnd(),
     };
   }
 
-  // Pattern 3: Text ending with "Do you approve..." question (last 2 lines)
-  const lines = content.trimEnd().split("\n");
-  if (lines.length >= 2) {
-    const lastLine = lines[lines.length - 1].trim();
-    const approveMatch = lastLine.match(
-      /^(do you (?:approve|confirm|authorize)[^?]*\?)\s*$/i
-    );
-    if (approveMatch) {
-      const question = approveMatch[1];
-      return {
-        approvalRequest: { question },
-        cleanedContent: lines.slice(0, -1).join("\n").trimEnd(),
-      };
+  // Pattern 3: Text ending with a "Do you approve/confirm/authorize..." question
+  // May span multiple lines, so check the last few lines combined
+  const question = extractTrailingQuestion(content);
+  if (question) {
+    const idx = content.lastIndexOf(question);
+    return {
+      approvalRequest: { question },
+      cleanedContent: content.slice(0, idx).trimEnd(),
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Looks at the tail of a text block for a question starting with
+ * "Do you approve/confirm/authorize..." that may wrap across lines.
+ * Strips markdown bold (**) from the extracted question.
+ */
+function extractTrailingQuestion(text: string): string | null {
+  const trimmed = text.trimEnd();
+
+  // Strip trailing markdown bold/italic then check for ?
+  const stripped = trimmed.replace(/[\s*_]+$/, "");
+  if (!stripped.endsWith("?")) return null;
+
+  const lines = trimmed.split("\n");
+
+  // Try last 1, 2, or 3 lines combined (to handle wrapping)
+  for (let n = 1; n <= Math.min(3, lines.length); n++) {
+    const candidate = lines
+      .slice(-n)
+      .map((l) => l.trim())
+      .join(" ");
+
+    // Strip markdown bold/italic for matching
+    const plain = candidate.replace(/\*\*/g, "").replace(/__/g, "");
+
+    if (
+      /^do you (?:approve|confirm|authorize)\b/i.test(plain)
+    ) {
+      return candidate;
     }
   }
 
