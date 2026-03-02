@@ -23,6 +23,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
     minWidth: 320,
     maxWidth: 600,
     storageKey: "plan-panel-width",
+    side: "right",
   });
   const [showHistory, setShowHistory] = useState(false);
 

@@ -7,6 +7,8 @@ interface UseResizableOptions {
   minWidth?: number;
   maxWidth?: number;
   storageKey?: string;
+  /** Which side of the viewport the panel is on. "right" inverts drag direction. Defaults to "left". */
+  side?: "left" | "right";
 }
 
 export function useResizable({
@@ -14,6 +16,7 @@ export function useResizable({
   minWidth = 200,
   maxWidth = 480,
   storageKey,
+  side = "left",
 }: UseResizableOptions) {
   const [width, setWidth] = useState(defaultWidth);
   const isDragging = useRef(false);
@@ -54,8 +57,9 @@ export function useResizable({
     const onMouseMove = (e: MouseEvent) => {
       if (!isDragging.current) return;
       const delta = e.clientX - startX.current;
+      const effectiveDelta = side === "right" ? -delta : delta;
       setWidth(
-        Math.max(minWidth, Math.min(maxWidth, startWidth.current + delta))
+        Math.max(minWidth, Math.min(maxWidth, startWidth.current + effectiveDelta))
       );
     };
 
@@ -79,7 +83,7 @@ export function useResizable({
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mouseup", onMouseUp);
     };
-  }, [minWidth, maxWidth, storageKey]);
+  }, [minWidth, maxWidth, storageKey, side]);
 
   return { width, onDragStart };
 }

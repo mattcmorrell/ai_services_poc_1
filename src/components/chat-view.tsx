@@ -96,6 +96,7 @@ export function ChatView({
     minWidth: 300,
     maxWidth: 500,
     storageKey: "plan-split-width",
+    side: "right",
   });
 
   const showSplitView = activePlan && planPanelOpen;
