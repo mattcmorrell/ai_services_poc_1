@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { Check } from "lucide-react";
 import { ClarifyingQuestions } from "@/types/chat";
 
@@ -23,12 +23,12 @@ export function ClarifyingQuestionsCard({
   const currentQuestion = questions[activeTab];
   const isAnswered = answered === true;
 
-  const handleSelect = (questionId: string, label: string) => {
+  const handleSelect = useCallback((questionId: string, label: string) => {
     if (isAnswered) return;
     setAnswers((prev) => ({ ...prev, [questionId]: label }));
-  };
+  }, [isAnswered]);
 
-  const handleMultiSelect = (questionId: string, label: string) => {
+  const handleMultiSelect = useCallback((questionId: string, label: string) => {
     if (isAnswered) return;
     setAnswers((prev) => {
       const current = (prev[questionId] as string[]) || [];
@@ -40,7 +40,7 @@ export function ClarifyingQuestionsCard({
           : [...current, label],
       };
     });
-  };
+  }, [isAnswered]);
 
   const handleOtherSelect = (questionId: string) => {
     if (isAnswered) return;
@@ -64,13 +64,15 @@ export function ClarifyingQuestionsCard({
     }
   };
 
-  const answeredCount = questions.filter((q) => {
-    const answer = answers[q.id];
-    if (!answer) return false;
-    if (typeof answer === "string" && answer === "Other: ") return false;
-    if (Array.isArray(answer)) return answer.length > 0;
+  const hasAnswer = (questionId: string) => {
+    const a = answers[questionId];
+    if (!a) return false;
+    if (typeof a === "string" && a === "Other: ") return false;
+    if (Array.isArray(a)) return a.length > 0;
     return true;
-  }).length;
+  };
+
+  const answeredCount = questions.filter((q) => hasAnswer(q.id)).length;
 
   const allAnswered = answeredCount === questions.length;
 
@@ -78,6 +80,26 @@ export function ClarifyingQuestionsCard({
     if (!allAnswered || isAnswered) return;
     onSubmitAnswers(answers);
   };
+
+  // Number key shortcut to select options
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (isAnswered || !currentQuestion) return;
+    // Ignore if user is typing in an input
+    if ((e.target as HTMLElement).tagName === "INPUT" || (e.target as HTMLElement).tagName === "TEXTAREA") return;
+    const num = parseInt(e.key, 10);
+    if (isNaN(num) || num < 1 || num > currentQuestion.options.length) return;
+    const option = currentQuestion.options[num - 1];
+    if (currentQuestion.multiSelect) {
+      handleMultiSelect(currentQuestion.id, option.label);
+    } else {
+      handleSelect(currentQuestion.id, option.label);
+    }
+  }, [isAnswered, currentQuestion, handleMultiSelect, handleSelect]);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   // Answered state: compact read-only summary
   if (isAnswered && savedAnswers) {
@@ -116,13 +138,7 @@ export function ClarifyingQuestionsCard({
       {/* Tab bar */}
       <div className="flex border-b border-border bg-muted/30 overflow-x-auto">
         {questions.map((q, idx) => {
-          const hasAnswer = (() => {
-            const a = answers[q.id];
-            if (!a) return false;
-            if (typeof a === "string" && a === "Other: ") return false;
-            if (Array.isArray(a)) return a.length > 0;
-            return true;
-          })();
+          const tabAnswered = hasAnswer(q.id);
           const isActive = idx === activeTab;
           return (
             <button
@@ -134,7 +150,7 @@ export function ClarifyingQuestionsCard({
                   : "text-muted-foreground border-transparent hover:text-foreground/70"
               }`}
             >
-              {hasAnswer && (
+              {tabAnswered && (
                 <Check size={10} className="text-emerald-500" />
               )}
               {q.header}
@@ -152,7 +168,7 @@ export function ClarifyingQuestionsCard({
 
           {/* Option cards */}
           <div className="flex flex-col gap-2">
-            {currentQuestion.options.map((option) => {
+            {currentQuestion.options.map((option, idx) => {
               const isSelected = currentQuestion.multiSelect
                 ? (
                     (answers[currentQuestion.id] as string[]) || []
@@ -167,26 +183,39 @@ export function ClarifyingQuestionsCard({
                       ? handleMultiSelect(currentQuestion.id, option.label)
                       : handleSelect(currentQuestion.id, option.label)
                   }
-                  className={`p-2.5 px-3.5 text-left rounded-md cursor-pointer transition-all duration-150 w-full border ${
+                  className={`p-2.5 px-3.5 text-left rounded-md cursor-pointer transition-all duration-150 w-full border flex items-start gap-3 ${
                     isSelected
                       ? "bg-primary/10 border-primary/30"
                       : "bg-muted/30 border-border hover:border-border/80 hover:bg-muted/50"
                   }`}
                 >
-                  <div
-                    className={`text-[13px] ${
-                      isSelected
-                        ? "text-foreground font-medium"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    {option.label}
-                  </div>
-                  {option.description && (
-                    <div className="text-[11px] text-muted-foreground/60 mt-0.5">
-                      {option.description}
+                  <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[12px] font-medium ${
+                    isSelected
+                      ? "bg-primary/20 text-foreground"
+                      : "bg-muted/60 text-foreground/50"
+                  }`}>
+                    {idx + 1}
+                  </span>
+                  <div className="min-w-0 pt-0.5">
+                    <div
+                      className={`text-[13px] ${
+                        isSelected
+                          ? "text-foreground font-medium"
+                          : "text-foreground/70"
+                      }`}
+                    >
+                      {option.label}
                     </div>
-                  )}
+                    {option.description && (
+                      <div className={`text-[11px] mt-0.5 ${
+                        isSelected
+                          ? "text-foreground/60"
+                          : "text-foreground/45"
+                      }`}>
+                        {option.description}
+                      </div>
+                    )}
+                  </div>
                 </button>
               );
             })}
@@ -210,7 +239,7 @@ export function ClarifyingQuestionsCard({
                       className={`text-[13px] ${
                         isOtherSelected
                           ? "text-foreground font-medium"
-                          : "text-muted-foreground"
+                          : "text-foreground/70"
                       }`}
                     >
                       Other
@@ -239,19 +268,33 @@ export function ClarifyingQuestionsCard({
         </div>
       )}
 
-      {/* Submit button */}
+      {/* Action button */}
       <div className="p-3 px-5 border-t border-border">
-        <button
-          onClick={handleSubmit}
-          disabled={!allAnswered}
-          className={`w-full py-2.5 border-none rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 ${
-            allAnswered
-              ? "bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
-              : "bg-muted/50 text-muted-foreground/40 cursor-not-allowed"
-          }`}
-        >
-          Submit answers ({answeredCount}/{questions.length})
-        </button>
+        {activeTab < questions.length - 1 ? (
+          <button
+            onClick={() => setActiveTab(activeTab + 1)}
+            disabled={!hasAnswer(currentQuestion.id)}
+            className={`w-full py-2.5 border-none rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 ${
+              hasAnswer(currentQuestion.id)
+                ? "bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
+                : "bg-muted/50 text-muted-foreground/40 cursor-not-allowed"
+            }`}
+          >
+            Next
+          </button>
+        ) : (
+          <button
+            onClick={handleSubmit}
+            disabled={!allAnswered}
+            className={`w-full py-2.5 border-none rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 ${
+              allAnswered
+                ? "bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
+                : "bg-muted/50 text-muted-foreground/40 cursor-not-allowed"
+            }`}
+          >
+            Submit answers ({answeredCount}/{questions.length})
+          </button>
+        )}
       </div>
     </div>
   );
