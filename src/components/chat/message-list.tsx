@@ -134,7 +134,7 @@ export function MessageList({
 
   return (
     <div className={theme.innerContainerClass || "mx-auto max-w-3xl py-6"}>
-      {messages.map((message, msgIdx) => (
+      {messages.filter((m) => !m.hidden).map((message, msgIdx) => (
         <div key={message.id} className={theme.messageSpacing}>
           {/* Optional message prefix */}
           {theme.renderMessagePrefix?.(message, msgIdx)}

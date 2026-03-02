@@ -68,6 +68,7 @@ export interface Message {
     stepIndex: number;       // 0-based index of the gated step
     stepDescription: string; // Human-readable step description
   };
+  hidden?: boolean;
   timestamp: Date;
 }
 

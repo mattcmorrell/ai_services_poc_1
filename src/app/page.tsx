@@ -218,7 +218,7 @@ export default function Home() {
   // --- Chat-ID-explicit handlers ---
 
   const handleSendMessageForChat = useCallback(
-    async (content: string, chatId: string) => {
+    async (content: string, chatId: string, options?: { hidden?: boolean }) => {
       const chat = chats.find((c) => c.id === chatId);
       if (!chat) return;
 
@@ -229,6 +229,7 @@ export default function Home() {
         role: "user",
         content,
         timestamp: new Date(),
+        ...(options?.hidden && { hidden: true }),
       };
 
       setChats((prev) =>
@@ -323,9 +324,9 @@ export default function Home() {
 
   // Wrapper for "recent" mode — uses selectedChatId
   const handleSendMessage = useCallback(
-    async (content: string) => {
+    async (content: string, options?: { hidden?: boolean }) => {
       if (!selectedChatId) return;
-      await handleSendMessageForChat(content, selectedChatId);
+      await handleSendMessageForChat(content, selectedChatId, options);
     },
     [selectedChatId, handleSendMessageForChat]
   );
@@ -521,7 +522,7 @@ export default function Home() {
         .join("\n") || "";
 
       const responseText = `Here are my answers:\n\n${formattedAnswers}`;
-      handleSendMessage(responseText);
+      handleSendMessage(responseText, { hidden: true });
     },
     [selectedChatId, chats, handleSendMessage]
   );
