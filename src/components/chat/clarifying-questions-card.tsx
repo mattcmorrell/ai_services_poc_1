@@ -81,11 +81,22 @@ export function ClarifyingQuestionsCard({
     onSubmitAnswers(answers);
   };
 
-  // Number key shortcut to select options
+  // Keyboard shortcuts: number keys to select, Enter to advance/submit
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (isAnswered || !currentQuestion) return;
     // Ignore if user is typing in an input
     if ((e.target as HTMLElement).tagName === "INPUT" || (e.target as HTMLElement).tagName === "TEXTAREA") return;
+
+    if (e.key === "Enter") {
+      if (!hasAnswer(currentQuestion.id)) return;
+      if (activeTab < questions.length - 1) {
+        setActiveTab(activeTab + 1);
+      } else if (allAnswered) {
+        onSubmitAnswers(answers);
+      }
+      return;
+    }
+
     const num = parseInt(e.key, 10);
     if (isNaN(num) || num < 1 || num > currentQuestion.options.length) return;
     const option = currentQuestion.options[num - 1];
@@ -94,7 +105,7 @@ export function ClarifyingQuestionsCard({
     } else {
       handleSelect(currentQuestion.id, option.label);
     }
-  }, [isAnswered, currentQuestion, handleMultiSelect, handleSelect]);
+  }, [isAnswered, currentQuestion, handleMultiSelect, handleSelect, activeTab, questions.length, allAnswered, answers, onSubmitAnswers]);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
