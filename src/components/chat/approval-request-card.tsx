@@ -90,7 +90,7 @@ export function ApprovalRequestCard({
       {/* Body */}
       <div className="p-5">
         <p className="text-[13px] text-foreground leading-relaxed">
-          {question}
+          {question.replace(/\*\*/g, "")}
         </p>
       </div>
 
