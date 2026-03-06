@@ -8,6 +8,22 @@ Stable product principles, architectural understanding, and design decisions for
 
 An AI-powered workspace for BambooHR HR Consultants (HRCs). HRCs manage 5-50 clients each and spend their days switching between clients, prepping for meetings, running payroll, tracking compliance deadlines, and responding to issues. Pandopticon gives them AI agents that handle the mechanical work while the HRC stays in control of decisions.
 
+## Integration Landscape
+
+> **Visual diagram:** `mockups/system-architecture.html` — open in a browser to see the full integration map with read/write connections.
+
+Pandopticon is an **intelligence layer**, not a system of record. It reads from source systems, synthesizes context, and surfaces actionable insights. Source systems own the data.
+
+| System | Role | Read | Write | Status |
+|--------|------|------|-------|--------|
+| **BambooHR** | HR Platform (employee, payroll, benefits, compliance) | Yes | Yes | Core |
+| **Google Calendar / Outlook** | Schedule — trigger proactive prep, deadline awareness | Yes | No | Exploring |
+| **Google Meet / Zoom** | Meeting intelligence — decisions, action items, unresolved questions | Yes | No | Exploring |
+| **Salesforce** | Task/case management — deadlines, status updates | Yes | Yes | Exploring |
+| **Google Drive** | File context — policies, SOWs, checklists | Yes | No | Exploring |
+| **Gmail** | Conversation monitor — client email threads, draft replies | Yes | Yes | Exploring |
+| **Slack** | Team communication — monitor channels, post updates | Yes | Yes | Exploring |
+
 ## Core JTBD
 
 **"Help me prep for my next meeting."** This is the highest-value job. Everything else (payroll, compliance, benefits) feeds into this — an HRC's day is structured around client meetings, and the quality of those meetings determines client retention.
@@ -108,6 +124,8 @@ Each view answers a different question. Calendar/schedule data should surface at
 ---
 
 ## Salesforce Integration (Open Question — Interviews Starting 2026-03-09)
+
+> See also: [Integration Map](#integration-landscape) and `mockups/system-architecture.html`
 
 ### Context
 HRCs use Salesforce for task tracking, deadline management, and basic project management. Discovery interviews starting Monday 3/9 to understand pain points and whether Pandopticon should handle these use cases.

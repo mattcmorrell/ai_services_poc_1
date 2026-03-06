@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pandopticon — System Architecture</title>
+<title>Pandopticon — Integration Map</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -37,10 +37,10 @@
   }
   .pando-logo {
     width: 44px; height: 44px;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: transparent;
     border-radius: 11px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px; font-weight: 700; color: white; flex-shrink: 0;
+    flex-shrink: 0;
   }
   .pando-block h2 { font-size: 24px; font-weight: 700; }
   .pando-block .tagline { font-size: 16px; color: #64748b; margin-left: auto; }
@@ -87,6 +87,7 @@
   .sor-salesforce .sor-icon { background: #0d2137; }
   .sor-drive .sor-icon { background: #1a2a1a; }
   .sor-gmail .sor-icon { background: #1e293b; }
+  .sor-slack .sor-icon { background: #1a1a2e; }
 
   /* ── Lines container ───────────────────────────── */
   .lines-zone {
@@ -128,19 +129,11 @@
   .ll-read-swatch { background: #3b82f6; }
   .ll-write-swatch { background-image: repeating-linear-gradient(90deg, #34d399 0px, #34d399 4px, transparent 4px, transparent 7px); }
 
-  /* ── Principle ─────────────────────────────────── */
-  .principle {
-    margin-top: 28px; text-align: center; padding: 18px 24px;
-    background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.12);
-    border-radius: 10px;
-  }
-  .principle p { font-size: 16px; color: #94a3b8; line-height: 1.6; }
-  .principle strong { color: #e2e8f0; }
 </style>
 </head>
 <body>
 
-<h1>Pandopticon System Architecture</h1>
+<h1>Pandopticon Integration Map</h1>
 <p class="subtitle">Intelligence layer, not a system of record. Pandopticon reads from source systems, synthesizes context, and surfaces actionable insights.</p>
 
 <div class="diagram">
@@ -160,7 +153,7 @@
     </div>
     <div class="sor-card sor-calendar" data-read="true" data-write="false" data-dir="above">
       <span class="sor-badge badge-exploring">Exploring</span>
-      <div class="sor-icon"><svg viewBox="0 0 28 28" width="28" height="28"><rect x="4" y="6" width="20" height="18" rx="2" fill="none" stroke="#4285F4" stroke-width="2"/><line x1="4" y1="12" x2="24" y2="12" stroke="#4285F4" stroke-width="2"/><line x1="10" y1="6" x2="10" y2="3" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/><line x1="18" y1="6" x2="18" y2="3" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/><text x="14" y="22" text-anchor="middle" font-size="9" font-weight="700" fill="#4285F4" font-family="system-ui">31</text></svg></div>
+      <div class="sor-icon"><img src="google-calendar.svg" alt="Google Calendar" style="width:28px;height:28px;"></div>
       <h3>Google Calendar / Outlook</h3>
       <div class="role">Schedule</div>
       <ul class="value">
@@ -171,7 +164,7 @@
     </div>
     <div class="sor-card sor-meetings" data-read="true" data-write="false" data-dir="above">
       <span class="sor-badge badge-exploring">Exploring</span>
-      <div class="sor-icon"><svg viewBox="0 0 28 28" width="28" height="28"><rect x="3" y="8" width="16" height="12" rx="2" fill="none" stroke="#00AC47" stroke-width="2"/><path d="M19 11l6-3v12l-6-3z" fill="none" stroke="#00AC47" stroke-width="2" stroke-linejoin="round"/></svg></div>
+      <div class="sor-icon"><img src="google-meet.svg" alt="Google Meet" style="width:28px;height:28px;"></div>
       <h3>Google Meet / Zoom</h3>
       <div class="role">Meeting Intelligence</div>
       <ul class="value">
@@ -187,7 +180,7 @@
 
   <!-- Pandopticon -->
   <div class="pando-block" id="pando">
-    <div class="pando-logo">P</div>
+    <div class="pando-logo"><img src="../public/Pandopticon-logo-pudy-only.png" alt="Pandopticon" style="width:34px;height:34px;border-radius:8px;"></div>
     <h2>Pandopticon</h2>
     <div class="tagline">Intelligence layer &mdash; connection, not extraction</div>
   </div>
@@ -196,10 +189,10 @@
   <div class="lines-zone" id="lines-bottom"></div>
 
   <!-- Bottom row: systems below Pandopticon -->
-  <div class="sor-row" id="row-bottom">
+  <div class="sor-row" id="row-bottom" style="grid-template-columns: repeat(4, 1fr);">
     <div class="sor-card sor-salesforce" data-read="true" data-write="true" data-dir="below">
       <span class="sor-badge badge-exploring">Exploring</span>
-      <div class="sor-icon"><svg viewBox="0 0 28 28" width="28" height="28"><path d="M11.5 6C9.5 6 8 7.8 8 10c-2.5.5-4 2.5-4 5 0 3 2.5 5 5.5 5h13c2.5 0 4.5-2 4.5-4.5S25 11 22.5 11c0-3-2.5-5-5-5-1.5 0-3 .7-3.8 1.8C13 7 12.3 6 11.5 6z" fill="none" stroke="#00A1E0" stroke-width="1.8"/></svg></div>
+      <div class="sor-icon"><img src="salesforce.svg" alt="Salesforce" style="width:28px;height:28px;"></div>
       <h3>Salesforce</h3>
       <div class="role">Task / Case Management</div>
       <ul class="value">
@@ -210,7 +203,7 @@
     </div>
     <div class="sor-card sor-drive" data-read="true" data-write="false" data-dir="below">
       <span class="sor-badge badge-exploring">Exploring</span>
-      <div class="sor-icon"><svg viewBox="0 0 28 28" width="28" height="28"><path d="M10 4l-8 14h8l8-14z" fill="none" stroke="#FBBC04" stroke-width="1.8" stroke-linejoin="round"/><path d="M18 4l8 14h-8" fill="none" stroke="#34A853" stroke-width="1.8" stroke-linejoin="round"/><path d="M2 18h24l-4 7H6z" fill="none" stroke="#4285F4" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+      <div class="sor-icon"><img src="google-drive.svg" alt="Google Drive" style="width:28px;height:28px;"></div>
       <h3>Google Drive</h3>
       <div class="role">File Context</div>
       <ul class="value">
@@ -221,7 +214,7 @@
     </div>
     <div class="sor-card sor-gmail" data-read="true" data-write="true" data-dir="below">
       <span class="sor-badge badge-exploring">Exploring</span>
-      <div class="sor-icon"><svg viewBox="0 0 28 28" width="28" height="28"><rect x="3" y="7" width="22" height="14" rx="2" fill="none" stroke="#EA4335" stroke-width="1.8"/><path d="M3 7l11 8 11-8" fill="none" stroke="#EA4335" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+      <div class="sor-icon"><img src="gmail.svg" alt="Gmail" style="width:28px;height:28px;"></div>
       <h3>Gmail</h3>
       <div class="role">Conversation Monitor</div>
       <ul class="value">
@@ -230,16 +223,20 @@
         <li>Draft replies from Pandopticon</li>
       </ul>
     </div>
+    <div class="sor-card sor-slack" data-read="true" data-write="true" data-dir="below">
+      <span class="sor-badge badge-exploring">Exploring</span>
+      <div class="sor-icon"><img src="slack.svg" alt="Slack" style="width:28px;height:28px;"></div>
+      <h3>Slack</h3>
+      <div class="role">Team Communication</div>
+      <ul class="value">
+        <li>Monitor client-related channels</li>
+        <li>Surface context for agents</li>
+        <li>Post updates &amp; notifications</li>
+      </ul>
+    </div>
   </div>
 
 
-  <div class="principle">
-    <p><strong>Core principle:</strong> Pandopticon never becomes the system of record.
-    Source systems own the data. Our job is <strong>connection</strong> &mdash;
-    understanding data in context, synthesizing across sources,
-    and surfacing actionable intelligence so HRCs spend less time clicking
-    and more time advising.</p>
-  </div>
 
 </div>
 
