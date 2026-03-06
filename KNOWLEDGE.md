@@ -107,6 +107,36 @@ Each view answers a different question. Calendar/schedule data should surface at
 
 ---
 
+## Salesforce Integration (Open Question — Interviews Starting 2026-03-09)
+
+### Context
+HRCs use Salesforce for task tracking, deadline management, and basic project management. Discovery interviews starting Monday 3/9 to understand pain points and whether Pandopticon should handle these use cases.
+
+### Working Hypothesis: Intelligence Layer, Not Replacement
+Same principle as calendar — Pandopticon reads and reacts, doesn't become the system of record. Rebuilding Salesforce's CRUD functionality is a maintenance trap.
+
+### Two Buckets of Pain (to validate in interviews)
+1. **CRUD pain** — "too many clicks to log a task," "confusing views," "forget to update it." This is Salesforce being bad at UX. Not our problem to solve — Salesforce will always be better at being Salesforce.
+2. **Intelligence pain** — "can't see what's urgent across clients," "don't know what to prep," "miss deadlines because nothing connects." This is exactly what Pandopticon solves. Adding Salesforce data to the intelligence pipeline (prep briefs, dashboard, client home) is a natural extension.
+
+### Potential Integration Play
+- **Read** from Salesforce: tasks, deadlines, case status → feed into dashboard, client home, prep briefs as another data source
+- **Surface** in existing places: no new Salesforce tab, just richer context in the surfaces we've already built
+- **Write back** via agents: "mark this task complete," "log this meeting note" → so HRCs don't context-switch to Salesforce for simple updates
+- **Never own the data**: Salesforce remains source of truth for tasks/cases
+
+### Interview Questions
+- "Walk me through how you start your day — where do you look first?"
+- "When you're prepping for a client meeting, what tabs do you have open?"
+- "What falls through the cracks, and why?"
+- "If Pandopticon could pull in your Salesforce data, what would you want to *see*? What would you want it to *do*?"
+- "What do you track in Salesforce vs. what you track in your head / spreadsheets / sticky notes?"
+
+### Key Risk
+If interviews reveal that the CRUD pain is the dominant issue (not the intelligence pain), we have a harder decision — because solving CRUD means building a task manager, which is a different product.
+
+---
+
 ## Action Plan Execution Model
 
 Plans have a lifecycle: `pending → approved → executing → completed/paused/stopped/declined`. Steps execute sequentially. Steps marked `nonUndoable: true` pause execution and require explicit approval — this is the safety gate for irreversible operations (payroll processing, tax filing, sending notices).

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandopticon — System Architecture</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #0a0e1a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    padding: 48px 32px;
+  }
+
+  h1 { text-align: center; font-size: 36px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .subtitle {
+    text-align: center; font-size: 18px; color: #64748b; margin-bottom: 48px;
+    max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.5;
+  }
+
+  .diagram { max-width: 1100px; margin: 0 auto; position: relative; }
+
+  /* ── Pandopticon ───────────────────────────────── */
+  .pando-block {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 2px solid #3b82f6;
+    border-radius: 16px;
+    padding: 22px 28px;
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    z-index: 2;
+  }
+  .pando-logo {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700; color: white; flex-shrink: 0;
+  }
+  .pando-block h2 { font-size: 24px; font-weight: 700; }
+  .pando-block .tagline { font-size: 16px; color: #64748b; margin-left: auto; }
+
+  /* ── SOR cards ─────────────────────────────────── */
+  .sor-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .sor-card {
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 14px;
+    padding: 18px 16px 14px;
+    text-align: center;
+    position: relative;
+  }
+  .sor-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px; font-size: 22px; font-weight: 600;
+  }
+  .sor-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 3px; }
+  .sor-card .role { font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .sor-card .value { font-size: 14px; color: #94a3b8; line-height: 1.6; text-align: left; padding: 0 4px; }
+  .sor-card .value li { margin-bottom: 3px; }
+
+  .sor-badge {
+    position: absolute; top: -10px; right: 10px;
+    font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px;
+    text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  .badge-live { background: #065f46; color: #6ee7b7; }
+  .badge-exploring { background: #713f12; color: #fbbf24; }
+
+  .sor-icon img { width: 28px; height: 28px; object-fit: contain; }
+  .sor-bamboo .sor-icon { background: #064e3b; }
+  .sor-calendar .sor-icon { background: #1e3a5f; }
+  .sor-meetings .sor-icon { background: #1e293b; }
+  .sor-salesforce .sor-icon { background: #0d2137; }
+  .sor-drive .sor-icon { background: #1a2a1a; }
+  .sor-gmail .sor-icon { background: #1e293b; }
+
+  /* ── Lines container ───────────────────────────── */
+  .lines-zone {
+    position: relative;
+    height: 72px;
+    z-index: 1;
+  }
+  .lines-zone svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow: visible;
+  }
+  .lines-zone .line-labels {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .line-label {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+  }
+  .ll-read { background: #0a0e1a; color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+  .ll-write { background: #0a0e1a; color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
+
+  /* ── Legend ─────────────────────────────────────── */
+  .legend {
+    display: flex; justify-content: center; gap: 28px; margin-top: 28px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 10px; color: #64748b; }
+  .legend-line { width: 24px; height: 2px; border-radius: 1px; }
+  .ll-read-swatch { background: #3b82f6; }
+  .ll-write-swatch { background-image: repeating-linear-gradient(90deg, #34d399 0px, #34d399 4px, transparent 4px, transparent 7px); }
+
+  /* ── Principle ─────────────────────────────────── */
+  .principle {
+    margin-top: 28px; text-align: center; padding: 18px 24px;
+    background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.12);
+    border-radius: 10px;
+  }
+  .principle p { font-size: 16px; color: #94a3b8; line-height: 1.6; }
+  .principle strong { color: #e2e8f0; }
+</style>
+</head>
+<body>
+
+<h1>Pandopticon System Architecture</h1>
+<p class="subtitle">Intelligence layer, not a system of record. Pandopticon reads from source systems, synthesizes context, and surfaces actionable insights.</p>
+
+<div class="diagram">
+
+  <!-- Top row: systems above Pandopticon -->
+  <div class="sor-row" id="row-top">
+    <div class="sor-card sor-bamboo" data-read="true" data-write="true" data-dir="above">
+      <span class="sor-badge badge-live">Core</span>
+      <div class="sor-icon"><svg viewBox="0 0 28 28" width="28" height="28"><path d="M14 3C10 3 7 6 7 10c0 2 1 4 3 5.5C8 17 6 20 6 24h4c0-3 2-6 4-7 2 1 4 4 4 7h4c0-4-2-7-4-8.5 2-1.5 3-3.5 3-5.5 0-4-3-7-7-7zm0 4c1.7 0 3 1.3 3 3s-1.3 3-3 3-3-1.3-3-3 1.3-3 3-3z" fill="#73C46C"/></svg></div>
+      <h3>BambooHR</h3>
+      <div class="role">HR Platform</div>
+      <ul class="value">
+        <li>Employee, payroll, benefits data</li>
+        <li>Compliance status</li>
+        <li>Ground truth for all client work</li>
+      </ul>
+    </div>
+    <div class="sor-card sor-calendar" data-read="true" data-write="false" data-dir="above">
+      <span class="sor-badge badge-exploring">Exploring</span>
+      <div class="sor-icon"><svg viewBox="0 0 28 28" width="28" height="28"><rect x="4" y="6" width="20" height="18" rx="2" fill="none" stroke="#4285F4" stroke-width="2"/><line x1="4" y1="12" x2="24" y2="12" stroke="#4285F4" stroke-width="2"/><line x1="10" y1="6" x2="10" y2="3" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/><line x1="18" y1="6" x2="18" y2="3" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/><text x="14" y="22" text-anchor="middle" font-size="9" font-weight="700" fill="#4285F4" font-family="system-ui">31</text></svg></div>
+      <h3>Google Calendar / Outlook</h3>
+      <div class="role">Schedule</div>
+      <ul class="value">
+        <li>Next meeting per client</li>
+        <li>Trigger proactive prep</li>
+        <li>Deadline awareness</li>
+      </ul>
+    </div>
+    <div class="sor-card sor-meetings" data-read="true" data-write="false" data-dir="above">
+      <span class="sor-badge badge-exploring">Exploring</span>
+      <div class="sor-icon"><svg viewBox="0 0 28 28" width="28" height="28"><rect x="3" y="8" width="16" height="12" rx="2" fill="none" stroke="#00AC47" stroke-width="2"/><path d="M19 11l6-3v12l-6-3z" fill="none" stroke="#00AC47" stroke-width="2" stroke-linejoin="round"/></svg></div>
+      <h3>Google Meet / Zoom</h3>
+      <div class="role">Meeting Intelligence</div>
+      <ul class="value">
+        <li>Decisions &amp; action items</li>
+        <li>Unresolved questions</li>
+        <li>Close the loop between meetings</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Lines: top row → Pandopticon -->
+  <div class="lines-zone" id="lines-top"></div>
+
+  <!-- Pandopticon -->
+  <div class="pando-block" id="pando">
+    <div class="pando-logo">P</div>
+    <h2>Pandopticon</h2>
+    <div class="tagline">Intelligence layer &mdash; connection, not extraction</div>
+  </div>
+
+  <!-- Lines: Pandopticon → bottom row -->
+  <div class="lines-zone" id="lines-bottom"></div>
+
+  <!-- Bottom row: systems below Pandopticon -->
+  <div class="sor-row" id="row-bottom">
+    <div class="sor-card sor-salesforce" data-read="true" data-write="true" data-dir="below">
+      <span class="sor-badge badge-exploring">Exploring</span>
+      <div class="sor-icon"><svg viewBox="0 0 28 28" width="28" height="28"><path d="M11.5 6C9.5 6 8 7.8 8 10c-2.5.5-4 2.5-4 5 0 3 2.5 5 5.5 5h13c2.5 0 4.5-2 4.5-4.5S25 11 22.5 11c0-3-2.5-5-5-5-1.5 0-3 .7-3.8 1.8C13 7 12.3 6 11.5 6z" fill="none" stroke="#00A1E0" stroke-width="1.8"/></svg></div>
+      <h3>Salesforce</h3>
+      <div class="role">Task / Case Management</div>
+      <ul class="value">
+        <li>Open tasks &amp; cases per client</li>
+        <li>Update status without switching apps</li>
+        <li>Feed deadlines into prep briefs</li>
+      </ul>
+    </div>
+    <div class="sor-card sor-drive" data-read="true" data-write="false" data-dir="below">
+      <span class="sor-badge badge-exploring">Exploring</span>
+      <div class="sor-icon"><svg viewBox="0 0 28 28" width="28" height="28"><path d="M10 4l-8 14h8l8-14z" fill="none" stroke="#FBBC04" stroke-width="1.8" stroke-linejoin="round"/><path d="M18 4l8 14h-8" fill="none" stroke="#34A853" stroke-width="1.8" stroke-linejoin="round"/><path d="M2 18h24l-4 7H6z" fill="none" stroke="#4285F4" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+      <h3>Google Drive</h3>
+      <div class="role">File Context</div>
+      <ul class="value">
+        <li>Client checklists, policies, SOWs</li>
+        <li>Agents reference real docs</li>
+        <li>Stop re-creating existing work</li>
+      </ul>
+    </div>
+    <div class="sor-card sor-gmail" data-read="true" data-write="true" data-dir="below">
+      <span class="sor-badge badge-exploring">Exploring</span>
+      <div class="sor-icon"><svg viewBox="0 0 28 28" width="28" height="28"><rect x="3" y="7" width="22" height="14" rx="2" fill="none" stroke="#EA4335" stroke-width="1.8"/><path d="M3 7l11 8 11-8" fill="none" stroke="#EA4335" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+      <h3>Gmail</h3>
+      <div class="role">Conversation Monitor</div>
+      <ul class="value">
+        <li>Client context from email threads</li>
+        <li>Eliminate AI context gap</li>
+        <li>Draft replies from Pandopticon</li>
+      </ul>
+    </div>
+  </div>
+
+
+  <div class="principle">
+    <p><strong>Core principle:</strong> Pandopticon never becomes the system of record.
+    Source systems own the data. Our job is <strong>connection</strong> &mdash;
+    understanding data in context, synthesizing across sources,
+    and surfacing actionable intelligence so HRCs spend less time clicking
+    and more time advising.</p>
+  </div>
+
+</div>
+
+<script>
+function drawZone(zoneId, rowId, direction) {
+  const zone = document.getElementById(zoneId);
+  const zoneRect = zone.getBoundingClientRect();
+  const cards = document.querySelectorAll(`#${rowId} .sor-card`);
+
+  // Clear
+  zone.innerHTML = '';
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;overflow:visible;';
+  zone.appendChild(svg);
+
+  const labels = document.createElement('div');
+  labels.className = 'line-labels';
+  zone.appendChild(labels);
+
+  const h = zoneRect.height;
+
+  cards.forEach(card => {
+    const cardRect = card.getBoundingClientRect();
+    const cx = cardRect.left + cardRect.width / 2 - zoneRect.left;
+    const hasWrite = card.dataset.write === 'true';
+    const readX = hasWrite ? cx - 22 : cx;
+    const writeX = cx + 22;
+
+    // For "above" row: read arrow goes from top→bottom (pulling from system above into Pandopticon)
+    // For "below" row: read arrow goes from top→bottom (pushing from Pandopticon down to read system)
+    // Visually: read = blue solid, write = green dashed
+
+    if (direction === 'above') {
+      // Read: system feeds down into Pandopticon (arrow at bottom)
+      drawLine(svg, readX, 0, readX, h, '#3b82f6', false);
+      drawArrow(svg, readX, h, 'down', '#3b82f6');
+      addLabel(labels, readX, h * 0.5, 'READ', 'read');
+
+      if (hasWrite) {
+        // Write: Pandopticon pushes up to system (arrow at top)
+        drawLine(svg, writeX, h, writeX, 0, '#34d399', true);
+        drawArrow(svg, writeX, 0, 'up', '#34d399');
+        addLabel(labels, writeX, h * 0.5, 'WRITE', 'write');
+      }
+    } else {
+      // Read: Pandopticon pulls down from system (arrow at bottom)
+      drawLine(svg, readX, 0, readX, h, '#3b82f6', false);
+      drawArrow(svg, readX, h, 'down', '#3b82f6');
+      addLabel(labels, readX, h * 0.5, 'READ', 'read');
+
+      if (hasWrite) {
+        // Write: system pushes up to Pandopticon (arrow at top)
+        drawLine(svg, writeX, h, writeX, 0, '#34d399', true);
+        drawArrow(svg, writeX, 0, 'up', '#34d399');
+        addLabel(labels, writeX, h * 0.5, 'WRITE', 'write');
+      }
+    }
+  });
+}
+
+function drawLine(svg, x1, y1, x2, y2, color, dashed) {
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+  line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+  line.setAttribute('stroke', color);
+  line.setAttribute('stroke-width', '2');
+  line.setAttribute('opacity', '0.55');
+  if (dashed) line.setAttribute('stroke-dasharray', '6 3');
+  svg.appendChild(line);
+}
+
+function drawArrow(svg, x, y, dir, color) {
+  const a = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  if (dir === 'down') {
+    a.setAttribute('points', `${x-4},${y-7} ${x+4},${y-7} ${x},${y}`);
+  } else {
+    a.setAttribute('points', `${x-4},${y+7} ${x+4},${y+7} ${x},${y}`);
+  }
+  a.setAttribute('fill', color);
+  a.setAttribute('opacity', '0.55');
+  svg.appendChild(a);
+}
+
+function addLabel(container, x, y, text, type) {
+  const el = document.createElement('span');
+  el.className = `line-label ll-${type}`;
+  el.textContent = text;
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  container.appendChild(el);
+}
+
+function draw() {
+  drawZone('lines-top', 'row-top', 'above');
+  drawZone('lines-bottom', 'row-bottom', 'below');
+}
+
+draw();
+window.addEventListener('resize', draw);
+</script>
+
+</body>
+</html>
