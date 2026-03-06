@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 AI Services POC - A Next.js 16 single-page application for BambooHR consultants to manage client HR tasks through AI-powered agents. Features a chat interface with action plans (require approval), artifacts (code/tables/documents), clarifying questions, and workflow visualization.
 
+**Read `KNOWLEDGE.md` before making product decisions.** It captures stable product principles, the core JTBD, information architecture, calendar integration strategy, and meeting intelligence design.
+
 ## Commands
 
 - `npm run dev` - Start development server (localhost:3000)

@@ -6,6 +6,7 @@ import { ClientHomeTab } from "./client-home-tab";
 import { SidebarList } from "./approaches/sidebar-list";
 import { ChatView } from "@/components/chat-view";
 import { Chat, Client } from "@/types/chat";
+import { ProjectPlan, ExtractedPlanData } from "@/types/project-plan";
 import { MessageSquare } from "lucide-react";
 
 import { PrototypeSwitcher, ApproachConfig } from "./prototype-switcher";
@@ -38,6 +39,10 @@ interface ClientsViewProps {
   loadingChatId: string | null;
   chatPanelMode: "recent" | "clients";
   onChatPanelModeChange: (mode: "recent" | "clients") => void;
+  projectPlans?: Record<string, ProjectPlan[]>;
+  onImportProjectPlan?: (clientId: string, extractedPlan: ExtractedPlanData) => void;
+  onResolveAmbiguity?: (planId: string, itemId: string, resolvedValue: string) => void;
+  onPrepBrief?: (clientId: string) => void;
 }
 
 export function ClientsView({
@@ -52,6 +57,10 @@ export function ClientsView({
   loadingChatId,
   chatPanelMode,
   onChatPanelModeChange,
+  projectPlans,
+  onImportProjectPlan,
+  onResolveAmbiguity,
+  onPrepBrief,
 }: ClientsViewProps) {
   // ── Approach switcher state ───────────────────────────────────────
   const [currentApproach, setCurrentApproach] = useState("C");
@@ -220,7 +229,7 @@ export function ClientsView({
   const stubTabContent = selectedClientId && client ? (
     <div className="flex flex-1 overflow-hidden">
       <div className={activeTabId === "home" ? "flex flex-1 overflow-hidden" : "hidden"}>
-        <ClientHomeTab client={client} chats={clientChats} onOpenChat={openChat} />
+        <ClientHomeTab client={client} chats={clientChats} onOpenChat={openChat} projectPlans={projectPlans?.[client.id] ?? []} onImportProjectPlan={onImportProjectPlan} onResolveAmbiguity={onResolveAmbiguity} onPrepBrief={onPrepBrief} />
       </div>
       {tabs
         .filter((t): t is Extract<ClientTab, { type: "chat" }> => t.type === "chat")
@@ -245,7 +254,7 @@ export function ClientsView({
   const productionTabContent = selectedClientId && client ? (
     <div className="flex flex-1 overflow-hidden">
       <div className={activeTabId === "home" ? "flex flex-1 overflow-hidden" : "hidden"}>
-        <ClientHomeTab client={client} chats={clientChats} onOpenChat={openChat} />
+        <ClientHomeTab client={client} chats={clientChats} onOpenChat={openChat} projectPlans={projectPlans?.[client.id] ?? []} onImportProjectPlan={onImportProjectPlan} onResolveAmbiguity={onResolveAmbiguity} onPrepBrief={onPrepBrief} />
       </div>
       {tabs
         .filter((t): t is Extract<ClientTab, { type: "chat" }> => t.type === "chat")

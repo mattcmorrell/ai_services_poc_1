@@ -75,7 +75,7 @@ Keep artifact titles concise but descriptive. You can include text before/after 
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, clientName, agentId } = await request.json();
+    const { messages, clientName, agentId, projectPlanContext } = await request.json();
 
     // Load agent-specific prompt if agentId is provided
     let systemPrompt = defaultSystemPrompt;
@@ -86,8 +86,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    let systemContent = systemPrompt + `\n\nYou are currently assisting with the client: ${clientName}`;
+    if (projectPlanContext) {
+      systemContent += `\n\n${projectPlanContext}`;
+    }
+
     const formattedMessages = [
-      { role: "system" as const, content: systemPrompt + `\n\nYou are currently assisting with the client: ${clientName}` },
+      { role: "system" as const, content: systemContent },
       ...messages.map((msg: { role: string; content: string }) => ({
         role: msg.role as "user" | "assistant",
         content: msg.content,

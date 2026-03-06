@@ -113,4 +113,11 @@ export const mockAgents: Agent[] = [
     icon: "party-popper",
     isFavorite: false,
   },
+  {
+    id: "agent-meeting-prep",
+    name: "Meeting Prep",
+    description: "Generates pre-meeting briefs by synthesizing client data across chats, plans, and deadlines",
+    icon: "sparkles",
+    isFavorite: true,
+  },
 ];

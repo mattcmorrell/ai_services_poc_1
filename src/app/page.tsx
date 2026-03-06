@@ -62,6 +62,28 @@ import { parseClarifyingQuestions } from "@/lib/clarifying-questions-parser";
 import { parseApprovalRequest } from "@/lib/approval-request-parser";
 import { Agent } from "@/types/agent";
 import { ClientsView } from "@/components/clients/clients-view";
+import { getNextClientMeeting, getClientDeadlines, formatEventTime, formatDaysUntil } from "@/data/calendar-data";
+import { getClientTranscripts } from "@/data/meeting-transcripts";
+import { ProjectPlan, ExtractedPlanData } from "@/types/project-plan";
+import { getAllProjectPlans } from "@/data/project-plan-data";
+
+function buildPlanContext(plans?: ProjectPlan[]): string | undefined {
+  if (!plans || plans.length === 0) return undefined;
+  const lines = plans.map((plan) => {
+    const currentPhase = plan.phases.find((p) => p.status === "in_progress");
+    const nextMs = plan.phases
+      .flatMap((p) => p.milestones)
+      .filter((ms) => !ms.completed)
+      .sort((a, b) => a.date.localeCompare(b.date))[0];
+    const unresolvedCount = plan.ambiguousItems.filter((a) => !a.resolved).length;
+    let line = `- "${plan.title}"`;
+    if (currentPhase) line += `: Phase ${currentPhase.order} (${currentPhase.name}) in progress.`;
+    if (nextMs) line += ` Next milestone: ${nextMs.title} (${nextMs.date}).`;
+    if (unresolvedCount > 0) line += ` ${unresolvedCount} dates flagged as ambiguous.`;
+    return line;
+  });
+  return `CLIENT PROJECT PLANS:\n${lines.join("\n")}`;
+}
 
 const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14"] as const;
 type Variant = (typeof VARIANTS)[number];
@@ -99,6 +121,45 @@ export default function Home() {
   const [workflowPanelOpen, setWorkflowPanelOpen] = useState(false);
   const [selectedArtifactId, setSelectedArtifactId] = useState<string | null>(null);
   const [planPanelOpen, setPlanPanelOpen] = useState(false);
+  const [projectPlans, setProjectPlans] = useState<Record<string, ProjectPlan[]>>(getAllProjectPlans());
+
+  const handleImportProjectPlan = useCallback((clientId: string, extractedPlan: ExtractedPlanData) => {
+    const newPlan: ProjectPlan = {
+      id: `plan-import-${Date.now()}`,
+      clientId,
+      title: extractedPlan.title,
+      description: extractedPlan.description,
+      phases: extractedPlan.phases,
+      importedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      sourceType: "manual",
+      version: 1,
+      ambiguousItems: extractedPlan.ambiguousItems,
+    };
+    setProjectPlans((prev) => ({
+      ...prev,
+      [clientId]: [...(prev[clientId] || []), newPlan],
+    }));
+  }, []);
+
+  const handleResolveAmbiguity = useCallback((planId: string, itemId: string, resolvedValue: string) => {
+    setProjectPlans((prev) => {
+      const updated: Record<string, ProjectPlan[]> = {};
+      for (const [cid, plans] of Object.entries(prev)) {
+        updated[cid] = plans.map((plan) => {
+          if (plan.id !== planId) return plan;
+          return {
+            ...plan,
+            updatedAt: new Date().toISOString(),
+            ambiguousItems: plan.ambiguousItems.map((item) =>
+              item.id === itemId ? { ...item, resolved: true, resolvedValue } : item
+            ),
+          };
+        });
+      }
+      return updated;
+    });
+  }, []);
 
   const selectedChat = useMemo(
     () => chats.find((c) => c.id === selectedChatId),
@@ -254,6 +315,7 @@ export default function Home() {
             ),
             clientName: chatClient?.name || "Unknown Client",
             agentId: chat.agentId,
+            projectPlanContext: chat.clientId ? buildPlanContext(projectPlans[chat.clientId]) : undefined,
           }),
         });
 
@@ -326,7 +388,7 @@ export default function Home() {
         setLoadingChatId(null);
       }
     },
-    [chats]
+    [chats, projectPlans]
   );
 
   // Wrapper for "recent" mode — uses selectedChatId
@@ -924,6 +986,136 @@ export default function Home() {
     setChatPanelMode("recent");
   };
 
+  const handlePrepBrief = useCallback(
+    (clientId: string) => {
+      const client = mockClients.find((c) => c.id === clientId);
+      if (!client) return;
+
+      // Gather context from all data sources
+      const clientChats = chats.filter((c) => c.clientId === clientId);
+      const nextMeeting = getNextClientMeeting(clientId);
+      const deadlines = getClientDeadlines(clientId);
+      const transcripts = getClientTranscripts(clientId);
+      const latestTranscript = transcripts[0];
+
+      // Build recent chat summaries
+      const recentChatSummaries = clientChats
+        .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+        .slice(0, 5)
+        .map((chat) => {
+          const lastMsg = chat.messages.filter((m) => m.role === "assistant").slice(-1)[0];
+          const activePlans = chat.messages
+            .filter((m) => m.actionPlan && !["declined", "stopped", "completed"].includes(m.actionPlan.status))
+            .map((m) => `- Plan: "${m.actionPlan!.title}" (${m.actionPlan!.status}, ${m.actionPlan!.steps.filter((s) => s.status === "completed").length}/${m.actionPlan!.steps.length} steps done)`);
+          return `Chat: "${chat.title}"\n  Last message: ${lastMsg?.content.slice(0, 150) || "No messages"}...\n  ${activePlans.length > 0 ? "Active plans:\n  " + activePlans.join("\n  ") : "No active plans"}`;
+        })
+        .join("\n\n");
+
+      // Build deadline context
+      const deadlineContext = deadlines.length > 0
+        ? deadlines.map((d) => `- ${d.complianceCategory || d.title}: ${formatDaysUntil(d)} — ${d.description || ""}`).join("\n")
+        : "No upcoming deadlines.";
+
+      // Build meeting context
+      const meetingContext = nextMeeting
+        ? `Title: ${nextMeeting.title}\nWhen: ${formatEventTime(nextMeeting)}\nAttendees: ${nextMeeting.attendees?.join(", ") || "TBD"}\nDescription: ${nextMeeting.description || "None"}`
+        : "No upcoming meeting scheduled.";
+
+      // Build last meeting transcript context
+      const transcriptContext = latestTranscript
+        ? `Last meeting: "${latestTranscript.title}" (${latestTranscript.meetingDate.toLocaleDateString()})\nSummary: ${latestTranscript.summary}\nDecisions made:\n${latestTranscript.decisions.map((d) => `- ${d.text}`).join("\n")}\nAction items:\n${latestTranscript.actionItems.map((a) => `- ${a.text} (${a.assignee || "unassigned"}${a.dueDate ? ", due: " + a.dueDate : ""})`).join("\n")}\nUnresolved questions:\n${latestTranscript.unresolvedQuestions.map((q) => `- ${q}`).join("\n")}`
+        : "No previous meeting notes available.";
+
+      const contextMessage = `Prep a meeting brief for my upcoming meeting with **${client.name}**.
+
+Here's everything I have:
+
+**NEXT MEETING**
+${meetingContext}
+
+**RECENT CHATS**
+${recentChatSummaries}
+
+**UPCOMING DEADLINES**
+${deadlineContext}
+
+**LAST MEETING NOTES**
+${transcriptContext}
+
+Please synthesize all of this into a structured meeting brief.`;
+
+      // Create the chat with the meeting prep agent, including the user message
+      const newChatId = `chat-${Date.now()}`;
+      const userMessage: Message = {
+        id: `msg-${Date.now()}`,
+        role: "user",
+        content: contextMessage,
+        timestamp: new Date(),
+        hidden: true,
+      };
+      const newChat: Chat = {
+        id: newChatId,
+        clientId: client.id,
+        agentId: "agent-meeting-prep",
+        title: `Meeting Prep - ${client.name}`,
+        hasUnread: false,
+        updatedAt: new Date(),
+        messages: [userMessage],
+        artifacts: [],
+      };
+
+      setChats((prev) => [newChat, ...prev]);
+      setSelectedChatId(newChatId);
+      setActiveView("chats");
+      setChatPanelMode("recent");
+      setLoadingChatId(newChatId);
+
+      // Call API directly to avoid stale closure issues
+      fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: contextMessage }],
+          clientName: client.name,
+          agentId: "agent-meeting-prep",
+          projectPlanContext: client.id ? buildPlanContext(projectPlans[client.id]) : undefined,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          const { content: artifactParsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
+          const cqResult = parseClarifyingQuestions(artifactParsedContent);
+          const afterCqContent = cqResult?.cleanedContent || artifactParsedContent;
+          const actionPlanResult = parseActionPlan(afterCqContent);
+          const finalContent = actionPlanResult?.cleanedContent || afterCqContent;
+          const approvalResult = parseApprovalRequest(finalContent);
+          const cleanContent = approvalResult?.cleanedContent || finalContent;
+
+          const assistantMessage: Message = {
+            id: `msg-${Date.now() + 1}`,
+            role: "assistant",
+            content: cleanContent,
+            artifactIds: newArtifacts.map((a) => a.id),
+            actionPlan: actionPlanResult?.plan,
+            clarifyingQuestions: cqResult?.questions,
+            approvalRequest: approvalResult?.approvalRequest,
+            timestamp: new Date(),
+          };
+
+          setChats((prev) =>
+            prev.map((c) =>
+              c.id === newChatId
+                ? { ...c, messages: [...c.messages, assistantMessage], artifacts: [...c.artifacts, ...newArtifacts], updatedAt: new Date() }
+                : c
+            )
+          );
+        })
+        .catch((err) => console.error("Prep brief failed:", err))
+        .finally(() => setLoadingChatId(null));
+    },
+    [chats, handleSendMessageForChat]
+  );
+
   const handleToggleFavorite = (agentId: string) => {
     setAgents((prev) =>
       prev.map((agent) =>
@@ -948,6 +1140,7 @@ export default function Home() {
           onAgentClick={handleAgentClick}
           onSendMessage={handleDashboardMessage}
           onAgentSelected={handleAgentSelectedFromDashboard}
+          onPrepBrief={handlePrepBrief}
         />
       );
     }
@@ -1036,6 +1229,10 @@ export default function Home() {
               loadingChatId={loadingChatId}
               chatPanelMode={chatPanelMode}
               onChatPanelModeChange={setChatPanelMode}
+              projectPlans={projectPlans}
+              onImportProjectPlan={handleImportProjectPlan}
+              onResolveAmbiguity={handleResolveAmbiguity}
+              onPrepBrief={handlePrepBrief}
             />
           </div>
         </>

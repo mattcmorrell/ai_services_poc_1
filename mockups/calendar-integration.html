@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendar Integration Mockup - Pandopticon</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0f; color: #e4e4e7; }
+
+  .layout { display: grid; grid-template-columns: 260px 320px 1fr; height: 100vh; }
+
+  /* ─── Sidebar ─── */
+  .sidebar { background: #111118; border-right: 1px solid #1e1e2a; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .sidebar-logo { font-size: 15px; font-weight: 600; color: #fff; padding: 8px 12px 20px; letter-spacing: -0.3px; }
+  .sidebar-logo span { color: #6366f1; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; color: #a1a1aa; cursor: pointer; transition: all 0.15s; }
+  .nav-item:hover { background: #1a1a26; color: #d4d4d8; }
+  .nav-item.active { background: #1e1b4b; color: #a5b4fc; }
+  .nav-item svg { width: 18px; height: 18px; opacity: 0.7; }
+  .nav-item.active svg { opacity: 1; }
+  .nav-divider { height: 1px; background: #1e1e2a; margin: 8px 0; }
+  .nav-badge { margin-left: auto; background: #6366f1; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 10px; }
+
+  /* ─── Chat List Panel ─── */
+  .chat-list { background: #0e0e16; border-right: 1px solid #1e1e2a; display: flex; flex-direction: column; }
+  .chat-list-header { padding: 16px 16px 12px; border-bottom: 1px solid #1e1e2a; }
+  .chat-list-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 10px; }
+
+  .sort-tabs { display: flex; gap: 4px; background: #1a1a26; border-radius: 8px; padding: 3px; }
+  .sort-tab { flex: 1; text-align: center; font-size: 12px; padding: 5px 8px; border-radius: 6px; color: #71717a; cursor: pointer; transition: all 0.15s; }
+  .sort-tab.active { background: #27274a; color: #a5b4fc; font-weight: 500; }
+  .sort-tab:hover:not(.active) { color: #a1a1aa; }
+
+  .chat-items { flex: 1; overflow-y: auto; padding: 8px; }
+  .chat-item { padding: 12px; border-radius: 10px; cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
+  .chat-item:hover { background: #1a1a26; }
+  .chat-item.active { background: #1e1b4b; }
+  .chat-item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .chat-item-name { font-size: 13.5px; font-weight: 500; color: #e4e4e7; }
+  .chat-item-time { font-size: 11px; color: #52525b; }
+  .chat-item-preview { font-size: 12.5px; color: #71717a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; }
+
+  .meeting-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px 2px 6px; border-radius: 6px; font-weight: 500; }
+  .meeting-badge.urgent { background: #3b1320; color: #fca5a5; }
+  .meeting-badge.soon { background: #1e1b4b; color: #a5b4fc; }
+  .meeting-badge.later { background: #172320; color: #86efac; }
+  .meeting-badge svg { width: 12px; height: 12px; }
+
+  .deadline-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px 2px 6px; border-radius: 6px; font-weight: 500; background: #2a1f0e; color: #fcd34d; margin-left: 4px; }
+  .deadline-badge svg { width: 12px; height: 12px; }
+
+  /* ─── Main Content ─── */
+  .main { display: flex; flex-direction: column; overflow: hidden; }
+  .main-header { padding: 16px 24px; border-bottom: 1px solid #1e1e2a; display: flex; align-items: center; justify-content: space-between; }
+  .main-header h2 { font-size: 16px; font-weight: 600; color: #fff; }
+  .header-subtitle { font-size: 12.5px; color: #71717a; margin-top: 2px; }
+
+  .main-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* ─── Dashboard Widgets ─── */
+  .widget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .widget { background: #111118; border: 1px solid #1e1e2a; border-radius: 12px; padding: 20px; }
+  .widget-full { grid-column: 1 / -1; }
+  .widget h3 { font-size: 13.5px; font-weight: 600; color: #d4d4d8; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .widget h3 svg { width: 16px; height: 16px; color: #6366f1; }
+
+  /* ─── Today's Schedule Widget ─── */
+  .schedule-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #1a1a26; }
+  .schedule-item:last-child { border-bottom: none; }
+  .schedule-time { font-size: 12px; color: #6366f1; font-weight: 500; min-width: 60px; padding-top: 2px; }
+  .schedule-time.now { color: #f87171; }
+  .schedule-content { flex: 1; }
+  .schedule-title { font-size: 13px; font-weight: 500; color: #e4e4e7; margin-bottom: 2px; }
+  .schedule-meta { font-size: 11.5px; color: #52525b; }
+  .schedule-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .schedule-dot.meeting { background: #6366f1; }
+  .schedule-dot.deadline { background: #f59e0b; }
+  .schedule-dot.checkin { background: #10b981; }
+  .schedule-dot.now-ring { background: #f87171; box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.2); }
+
+  /* ─── AI Prep Card ─── */
+  .prep-card { background: linear-gradient(135deg, #1e1b4b 0%, #172340 100%); border: 1px solid #312e81; border-radius: 10px; padding: 14px 16px; margin-top: 4px; }
+  .prep-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .prep-card-header span { font-size: 12px; font-weight: 600; color: #a5b4fc; }
+  .prep-card-header .sparkle { color: #818cf8; }
+  .prep-items { display: flex; flex-direction: column; gap: 4px; }
+  .prep-item { font-size: 12px; color: #c7d2fe; padding-left: 12px; position: relative; }
+  .prep-item::before { content: ''; position: absolute; left: 0; top: 6px; width: 4px; height: 4px; border-radius: 50%; background: #818cf8; }
+
+  /* ─── Upcoming Deadlines Widget ─── */
+  .deadline-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #1a1a26; }
+  .deadline-item:last-child { border-bottom: none; }
+  .deadline-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .deadline-icon.red { background: #3b1320; color: #fca5a5; }
+  .deadline-icon.yellow { background: #2a1f0e; color: #fcd34d; }
+  .deadline-icon.blue { background: #1e1b4b; color: #a5b4fc; }
+  .deadline-info { flex: 1; }
+  .deadline-info .title { font-size: 13px; font-weight: 500; color: #e4e4e7; }
+  .deadline-info .client { font-size: 11.5px; color: #52525b; }
+  .deadline-days { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
+  .deadline-days.red { background: #3b1320; color: #fca5a5; }
+  .deadline-days.yellow { background: #2a1f0e; color: #fcd34d; }
+  .deadline-days.blue { background: #1e1b4b; color: #a5b4fc; }
+
+  /* ─── Agent Suggestion Banner ─── */
+  .agent-banner { background: linear-gradient(90deg, #1e1b4b, #172340); border: 1px solid #312e81; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
+  .agent-avatar { width: 40px; height: 40px; border-radius: 10px; background: #312e81; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .agent-banner-content { flex: 1; }
+  .agent-banner-content .title { font-size: 13px; font-weight: 500; color: #e4e4e7; margin-bottom: 2px; }
+  .agent-banner-content .desc { font-size: 12px; color: #818cf8; }
+  .agent-banner-actions { display: flex; gap: 8px; }
+  .btn { padding: 7px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; }
+  .btn-primary { background: #6366f1; color: #fff; }
+  .btn-primary:hover { background: #7c7ff7; }
+  .btn-ghost { background: transparent; color: #a5b4fc; border: 1px solid #312e81; }
+  .btn-ghost:hover { background: #1e1b4b; }
+
+  /* ─── Chat View: Meeting Context Bar ─── */
+  .meeting-context-bar { background: #1e1b4b; border-bottom: 1px solid #312e81; padding: 10px 24px; display: flex; align-items: center; gap: 12px; font-size: 12.5px; }
+  .meeting-context-bar .clock { color: #818cf8; display: flex; align-items: center; gap: 6px; }
+  .meeting-context-bar .clock svg { width: 14px; height: 14px; }
+  .meeting-context-bar .meeting-title { color: #c7d2fe; font-weight: 500; }
+  .meeting-context-bar .meeting-time { color: #6366f1; }
+  .meeting-context-bar .prep-btn { margin-left: auto; }
+
+  /* ─── Chat Messages ─── */
+  .messages { display: flex; flex-direction: column; gap: 16px; flex: 1; }
+  .message { max-width: 680px; }
+  .message.assistant { padding: 14px 16px; background: #111118; border: 1px solid #1e1e2a; border-radius: 12px; }
+  .message .sender { font-size: 11.5px; font-weight: 600; color: #6366f1; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .message .text { font-size: 13.5px; line-height: 1.6; color: #d4d4d8; }
+
+  /* ─── Action Plan Step: Schedule Meeting ─── */
+  .plan-step { background: #111118; border: 1px solid #1e1e2a; border-radius: 12px; padding: 16px; max-width: 680px; }
+  .plan-step-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .plan-step-number { width: 22px; height: 22px; border-radius: 6px; background: #1e1b4b; color: #a5b4fc; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  .plan-step-title { font-size: 13px; font-weight: 500; color: #e4e4e7; }
+  .plan-step-tag { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: #2a1f0e; color: #fcd34d; margin-left: auto; }
+
+  .calendar-preview { background: #0e0e16; border: 1px solid #1e1e2a; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+  .cal-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; margin-bottom: 6px; }
+  .cal-row:last-child { margin-bottom: 0; }
+  .cal-label { color: #52525b; min-width: 70px; }
+  .cal-value { color: #d4d4d8; }
+  .cal-value.highlight { color: #a5b4fc; }
+
+  .plan-step-actions { display: flex; gap: 8px; }
+
+  /* ─── Annotation ─── */
+  .annotation { position: relative; margin: 24px 0; padding: 16px 20px; background: #1a1726; border: 1px dashed #4338ca; border-radius: 10px; }
+  .annotation-label { font-size: 11px; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .annotation-text { font-size: 12.5px; color: #c7d2fe; line-height: 1.5; }
+
+  /* ─── Section Label ─── */
+  .section-label { font-size: 11px; font-weight: 700; color: #52525b; text-transform: uppercase; letter-spacing: 1px; padding: 24px 0 8px; border-bottom: 1px solid #1e1e2a; margin-bottom: 4px; }
+  .section-label:first-child { padding-top: 0; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #27274a; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ─── Sidebar ─── -->
+  <div class="sidebar">
+    <div class="sidebar-logo"><span>P</span>andopticon</div>
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Chats
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Calendar
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Agents
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </div>
+  </div>
+
+  <!-- ─── Chat List Panel ─── -->
+  <div class="chat-list">
+    <div class="chat-list-header">
+      <div class="chat-list-title">Client Chats</div>
+      <div class="sort-tabs">
+        <div class="sort-tab">Recent</div>
+        <div class="sort-tab active">Next Meeting</div>
+        <div class="sort-tab">Deadline</div>
+      </div>
+    </div>
+    <div class="chat-items">
+
+      <div class="chat-item active">
+        <div class="chat-item-top">
+          <span class="chat-item-name">Meridian Health Group</span>
+          <span class="chat-item-time">10:42 AM</span>
+        </div>
+        <div class="chat-item-preview">Reviewing updated benefits enrollment...</div>
+        <span class="meeting-badge urgent">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Meeting in 2h
+        </span>
+      </div>
+
+      <div class="chat-item">
+        <div class="chat-item-top">
+          <span class="chat-item-name">TechVentures Inc</span>
+          <span class="chat-item-time">Yesterday</span>
+        </div>
+        <div class="chat-item-preview">I-9 verification deadline approaching for...</div>
+        <span class="meeting-badge soon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Meeting tomorrow 9am
+        </span>
+        <span class="deadline-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          I-9 due Fri
+        </span>
+      </div>
+
+      <div class="chat-item">
+        <div class="chat-item-top">
+          <span class="chat-item-name">Oakridge Manufacturing</span>
+          <span class="chat-item-time">Yesterday</span>
+        </div>
+        <div class="chat-item-preview">COBRA notice needs to go out by...</div>
+        <span class="meeting-badge later">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Meeting Thu 2pm
+        </span>
+      </div>
+
+      <div class="chat-item">
+        <div class="chat-item-top">
+          <span class="chat-item-name">Summit Financial</span>
+          <span class="chat-item-time">Mon</span>
+        </div>
+        <div class="chat-item-preview">Quarterly compliance review prep...</div>
+        <span class="meeting-badge later">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Meeting next Mon
+        </span>
+      </div>
+
+      <div class="chat-item">
+        <div class="chat-item-top">
+          <span class="chat-item-name">BluePeak Logistics</span>
+          <span class="chat-item-time">Mar 1</span>
+        </div>
+        <div class="chat-item-preview">New hire onboarding package updates...</div>
+        <span class="deadline-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Enrollment closes Mar 10
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── Main Content ─── -->
+  <div class="main">
+    <div class="main-header">
+      <div>
+        <h2>Dashboard</h2>
+        <div class="header-subtitle">Wednesday, March 5, 2026</div>
+      </div>
+    </div>
+
+    <div class="main-body">
+
+      <!-- Agent Suggestion Banner -->
+      <div class="agent-banner">
+        <div class="agent-avatar">&#9889;</div>
+        <div class="agent-banner-content">
+          <div class="title">You have a meeting with Meridian Health Group in 2 hours</div>
+          <div class="desc">Want me to prep a benefits enrollment status report?</div>
+        </div>
+        <div class="agent-banner-actions">
+          <button class="btn btn-primary">Prep Report</button>
+          <button class="btn btn-ghost">Dismiss</button>
+        </div>
+      </div>
+
+      <div class="widget-grid">
+
+        <!-- Today's Schedule -->
+        <div class="widget">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Today's Schedule
+          </h3>
+
+          <div class="schedule-item">
+            <div class="schedule-dot now-ring"></div>
+            <div class="schedule-time now">Now</div>
+            <div class="schedule-content">
+              <div class="schedule-title">Focus Time - Client Reviews</div>
+              <div class="schedule-meta">9:00 AM - 11:00 AM</div>
+            </div>
+          </div>
+
+          <div class="schedule-item">
+            <div class="schedule-dot meeting"></div>
+            <div class="schedule-time">12:30p</div>
+            <div class="schedule-content">
+              <div class="schedule-title">Meridian Health - Benefits Review</div>
+              <div class="schedule-meta">Google Meet &middot; 45 min &middot; with Sarah Chen</div>
+              <div class="prep-card">
+                <div class="prep-card-header">
+                  <span class="sparkle">&#10024;</span>
+                  <span>AI Prep Ready</span>
+                </div>
+                <div class="prep-items">
+                  <div class="prep-item">Benefits enrollment: 78% complete (up from 62%)</div>
+                  <div class="prep-item">3 pending action items from last meeting</div>
+                  <div class="prep-item">Open question: dental plan tier selection</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="schedule-item">
+            <div class="schedule-dot checkin"></div>
+            <div class="schedule-time">2:00p</div>
+            <div class="schedule-content">
+              <div class="schedule-title">TechVentures - Weekly Check-in</div>
+              <div class="schedule-meta">Recurring &middot; 30 min</div>
+            </div>
+          </div>
+
+          <div class="schedule-item">
+            <div class="schedule-dot deadline"></div>
+            <div class="schedule-time">EOD</div>
+            <div class="schedule-content">
+              <div class="schedule-title">COBRA Notice - Oakridge Mfg</div>
+              <div class="schedule-meta">Compliance deadline &middot; 2 employees</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Deadlines -->
+        <div class="widget">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Upcoming Deadlines
+          </h3>
+
+          <div class="deadline-item">
+            <div class="deadline-icon red">!</div>
+            <div class="deadline-info">
+              <div class="title">COBRA Notice - Oakridge Mfg</div>
+              <div class="client">2 terminated employees &middot; 44-day window</div>
+            </div>
+            <div class="deadline-days red">Today</div>
+          </div>
+
+          <div class="deadline-item">
+            <div class="deadline-icon yellow">&#9888;</div>
+            <div class="deadline-info">
+              <div class="title">I-9 Verification - TechVentures</div>
+              <div class="client">3 new hires &middot; Section 2 completion</div>
+            </div>
+            <div class="deadline-days yellow">2 days</div>
+          </div>
+
+          <div class="deadline-item">
+            <div class="deadline-icon blue">&#8986;</div>
+            <div class="deadline-info">
+              <div class="title">Open Enrollment Closes - BluePeak</div>
+              <div class="client">12 of 47 employees haven't enrolled</div>
+            </div>
+            <div class="deadline-days blue">5 days</div>
+          </div>
+
+          <div class="deadline-item">
+            <div class="deadline-icon blue">&#8986;</div>
+            <div class="deadline-info">
+              <div class="title">Quarterly Review - Summit Financial</div>
+              <div class="client">Compliance audit + benefits utilization</div>
+            </div>
+            <div class="deadline-days blue">8 days</div>
+          </div>
+        </div>
+
+        <!-- ─── Chat View Mock (full width) ─── -->
+        <div class="widget widget-full" style="padding: 0; overflow: hidden;">
+          <div style="padding: 16px 20px; border-bottom: 1px solid #1e1e2a; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <h3 style="margin-bottom: 2px;">Chat View: Meeting Context Bar + Schedule Step</h3>
+              <div style="font-size: 11.5px; color: #52525b;">How calendar data appears inside a chat conversation</div>
+            </div>
+          </div>
+
+          <!-- Meeting Context Bar -->
+          <div class="meeting-context-bar">
+            <div class="clock">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <span class="meeting-title">Meridian Health - Benefits Review</span>
+            <span class="meeting-time">in 2 hours (12:30 PM)</span>
+            <button class="btn btn-ghost prep-btn" style="font-size: 11px; padding: 4px 10px;">Prep Brief</button>
+          </div>
+
+          <div style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+
+            <div class="message assistant">
+              <div class="sender">Benefits Agent</div>
+              <div class="text">I've drafted an action plan for the Meridian Health benefits enrollment follow-up. Step 3 will schedule a follow-up meeting with Sarah Chen after the enrollment window closes.</div>
+            </div>
+
+            <!-- Action Plan Step: Schedule Meeting -->
+            <div class="plan-step">
+              <div class="plan-step-header">
+                <div class="plan-step-number">3</div>
+                <div class="plan-step-title">Schedule follow-up meeting with Sarah Chen</div>
+                <div class="plan-step-tag">Creates Calendar Event</div>
+              </div>
+
+              <div class="calendar-preview">
+                <div class="cal-row">
+                  <span class="cal-label">Title</span>
+                  <span class="cal-value">Meridian Health - Enrollment Wrap-up</span>
+                </div>
+                <div class="cal-row">
+                  <span class="cal-label">When</span>
+                  <span class="cal-value highlight">Mar 17, 2026 &middot; 10:00 - 10:30 AM</span>
+                </div>
+                <div class="cal-row">
+                  <span class="cal-label">Attendees</span>
+                  <span class="cal-value">You, Sarah Chen (sarah@meridianhealth.com)</span>
+                </div>
+                <div class="cal-row">
+                  <span class="cal-label">Notes</span>
+                  <span class="cal-value" style="color: #71717a;">Auto-generated from enrollment action plan</span>
+                </div>
+              </div>
+
+              <div class="plan-step-actions">
+                <button class="btn btn-primary">Approve & Schedule</button>
+                <button class="btn btn-ghost">Edit Details</button>
+                <button class="btn btn-ghost" style="color: #71717a; border-color: #27274a;">Skip</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div> <!-- /widget-grid -->
+
+      <!-- ─── Annotations ─── -->
+      <div class="section-label">Design Notes</div>
+
+      <div class="annotation">
+        <div class="annotation-label">Chat List Sort</div>
+        <div class="annotation-text">
+          Three sort modes: <strong>Recent</strong> (default today), <strong>Next Meeting</strong> (sorted by soonest calendar event linked to client), <strong>Deadline</strong> (sorted by soonest compliance/task deadline). Meeting badges are always visible regardless of sort mode - sort just changes the order.
+        </div>
+      </div>
+
+      <div class="annotation">
+        <div class="annotation-label">Meeting Badges</div>
+        <div class="annotation-text">
+          Three urgency tiers: <strong style="color:#fca5a5;">Red</strong> = within 3 hours, <strong style="color:#a5b4fc;">Blue</strong> = within 48 hours, <strong style="color:#86efac;">Green</strong> = this week. Deadline badges (amber) are separate and can appear alongside meeting badges. Badges show on chat items regardless of view or sort.
+        </div>
+      </div>
+
+      <div class="annotation">
+        <div class="annotation-label">Proactive Agent Banner</div>
+        <div class="annotation-text">
+          Appears on dashboard when a meeting is &lt; 3 hours away. Links to the relevant agent with a one-click action. Dismissible. Only one banner at a time (most urgent meeting wins).
+        </div>
+      </div>
+
+      <div class="annotation">
+        <div class="annotation-label">Calendar as Source of Truth</div>
+        <div class="annotation-text">
+          Pandopticon reads from the calendar and reacts. "Schedule Meeting" action plan steps create events on approval (writes to calendar). The meeting context bar in chat view pulls from calendar data to show upcoming meetings for the active client. No calendar UI needed in Pandopticon itself - it's a smart overlay.
+        </div>
+      </div>
+
+    </div> <!-- /main-body -->
+  </div> <!-- /main -->
+
+</div> <!-- /layout -->
+
+</body>
+</html>

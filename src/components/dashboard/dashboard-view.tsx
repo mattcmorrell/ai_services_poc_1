@@ -9,6 +9,9 @@ import { TodoList } from "./todo-list";
 import { AgentAttention, TodoItem, SuggestedAction } from "@/types/dashboard";
 import { Client } from "@/types/chat";
 import { Agent } from "@/types/agent";
+import { TodaysSchedule } from "./todays-schedule";
+import { UpcomingDeadlines } from "./upcoming-deadlines";
+import { ProactivePrepBanner } from "./proactive-prep-banner";
 
 interface DashboardViewProps {
   clients: Client[];
@@ -19,6 +22,7 @@ interface DashboardViewProps {
   onAgentClick: (agentId: string) => void;
   onSendMessage: (message: string, client: Client | null, chipPosition: number) => void;
   onAgentSelected: (agent: Agent) => void;
+  onPrepBrief?: (clientId: string) => void;
 }
 
 export function DashboardView({
@@ -30,6 +34,7 @@ export function DashboardView({
   onAgentClick,
   onSendMessage,
   onAgentSelected,
+  onPrepBrief,
 }: DashboardViewProps) {
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos);
 
@@ -76,6 +81,17 @@ export function DashboardView({
             actions={suggestedActions}
             onActionClick={(prompt) => onSendMessage(prompt, null, -1)}
           />
+        </div>
+
+        {/* Proactive Prep Banner */}
+        <div className="mb-6 w-full max-w-4xl">
+          <ProactivePrepBanner onPrepClick={onPrepBrief ? (clientId) => onPrepBrief(clientId) : undefined} />
+        </div>
+
+        {/* Schedule + Deadlines Row */}
+        <div className="mb-6 grid w-full max-w-4xl grid-cols-1 gap-6 lg:grid-cols-2">
+          <TodaysSchedule onPrepClick={onPrepBrief ? (event) => { if (event.clientId) onPrepBrief(event.clientId); } : undefined} />
+          <UpcomingDeadlines />
         </div>
 
         {/* Main Content Grid */}
