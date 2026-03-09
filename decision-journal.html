@@ -439,6 +439,26 @@
     color: #e4e4e7;
     line-height: 1.7;
   }
+  .fmt-list {
+    margin: 8px 0 4px 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .fmt-list li {
+    line-height: 1.6;
+  }
+  ol.fmt-list {
+    list-style: decimal;
+  }
+  ul.fmt-list {
+    list-style: disc;
+  }
+  .fmt-trailing {
+    margin-top: 8px;
+    line-height: 1.6;
+  }
   .detail-evidence {
     border-left: 2px solid #2a2a35;
     padding: 8px 16px;
@@ -492,6 +512,21 @@
   .detail-artifact:hover {
     border-color: #60a5fa44;
     background: rgba(96,165,250,0.06);
+  }
+  .detail-artifact-embed-wrap {
+    width: calc(100% + 80px);
+    margin-left: -40px;
+    overflow: hidden;
+    border: 1px solid #2a2a35;
+    border-radius: 8px;
+    margin-top: 12px;
+    background: #0a0e1a;
+  }
+  .detail-artifact-embed {
+    border: none;
+    border-radius: 8px;
+    transform-origin: top left;
+    display: block;
   }
   .detail-open-items {
     list-style: none;
@@ -1091,6 +1126,101 @@ function getChildren(id) {
 }
 
 // ══════════════════════════════════════════
+// ARTIFACT IFRAME AUTO-FIT
+// ══════════════════════════════════════════
+function fitArtifactIframe(iframe) {
+  function doFit() {
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      const naturalW = 1200;
+      // Temporarily expand to measure true content height
+      iframe.style.width = naturalW + 'px';
+      iframe.style.height = '10000px';
+      iframe.style.transform = 'none';
+      iframe.parentElement.style.height = 'auto';
+      requestAnimationFrame(() => {
+        try {
+          const contentH = doc.documentElement.scrollHeight;
+          const wrapW = iframe.parentElement.clientWidth;
+          const scale = wrapW / naturalW;
+          iframe.style.width = naturalW + 'px';
+          iframe.style.height = contentH + 'px';
+          iframe.style.transform = `scale(${scale})`;
+          iframe.parentElement.style.height = Math.ceil(contentH * scale) + 'px';
+        } catch(e) {}
+      });
+    } catch(e) {
+      iframe.style.width = '100%';
+      iframe.style.height = '600px';
+    }
+  }
+  // Initial fit after embedded JS renders
+  setTimeout(doFit, 200);
+  // Re-fit on resize
+  window.addEventListener('resize', doFit);
+}
+
+// ══════════════════════════════════════════
+// TEXT FORMATTING
+// ══════════════════════════════════════════
+function formatReasoning(text) {
+  if (!text) return '';
+  let result = text;
+
+  // Pattern: inline numbered list with (1) (2) (3) etc.
+  const parenNumbered = result.match(/\(\d+\)\s/g);
+  if (parenNumbered && parenNumbered.length >= 2) {
+    const parts = result.split(/\(\d+\)\s/);
+    const intro = parts[0].replace(/[\s:.]+$/, '');
+    const rawItems = parts.slice(1);
+
+    // For the last item, separate trailing prose after the list content.
+    // Heuristic: a sentence starting with "Capital word:" is a new topic.
+    const lastRaw = rawItems[rawItems.length - 1];
+    let lastItem = lastRaw;
+    let trailing = '';
+    const sentences = lastRaw.split(/\.\s+/);
+    if (sentences.length > 1) {
+      let splitIdx = -1;
+      for (let i = 1; i < sentences.length; i++) {
+        if (/^[A-Z][^.]*:/.test(sentences[i])) { splitIdx = i; break; }
+      }
+      if (splitIdx > 0) {
+        lastItem = sentences.slice(0, splitIdx).join('. ');
+        trailing = sentences.slice(splitIdx).join('. ');
+        if (lastRaw.endsWith('.')) trailing += '.';
+      }
+    }
+
+    const items = rawItems.slice(0, -1).map(s => s.replace(/\.\s*$/, '').trim());
+    items.push(lastItem.replace(/\.\s*$/, '').trim());
+
+    if (items.length >= 2) {
+      result = (intro ? intro + ':' : '') + '<ol class="fmt-list">';
+      for (const item of items) { result += `<li>${item}</li>`; }
+      result += '</ol>';
+      if (trailing.trim()) result += `<p class="fmt-trailing">${trailing.trim()}</p>`;
+    }
+    return result;
+  }
+
+  // Pattern: sentences starting with a dash after a period
+  const dashItems = result.match(/(?:^|\.\s)[-–—]\s/g);
+  if (dashItems && dashItems.length >= 2) {
+    const parts = result.split(/(?:^|\.\s)[-–—]\s/);
+    const intro = parts[0].replace(/[\s:.]+$/, '');
+    const items = parts.slice(1).map(s => s.replace(/\.\s*$/, '').trim()).filter(Boolean);
+    if (items.length >= 2) {
+      result = (intro ? intro + ':' : '') + '<ul class="fmt-list">';
+      for (const item of items) { result += `<li>${item}</li>`; }
+      result += '</ul>';
+    }
+  }
+
+  return result;
+}
+
+// ══════════════════════════════════════════
 // VIEW SWITCHING
 // ══════════════════════════════════════════
 function switchView(view) {
@@ -1358,7 +1488,7 @@ function renderChildCard(child, borderColor) {
   h += `<span class="status-badge status-${child.status}">${child.status}</span>`;
   h += `</div>`;
   h += `<div class="detail-card-title">${child.title}</div>`;
-  if (child.reasoning) h += `<div class="detail-card-reasoning">${child.reasoning}</div>`;
+  if (child.reasoning) h += `<div class="detail-card-reasoning">${formatReasoning(child.reasoning)}</div>`;
   // Evidence
   if (child.evidence && child.evidence.length) {
     for (const ev of child.evidence) {
@@ -1428,7 +1558,7 @@ function renderDetail(id) {
   if (node.reasoning) {
     html += `<div class="detail-section">`;
     html += `<div class="detail-section-label">Reasoning</div>`;
-    html += `<div class="detail-reasoning">${node.reasoning}</div>`;
+    html += `<div class="detail-reasoning">${formatReasoning(node.reasoning)}</div>`;
     html += `</div>`;
   }
 
@@ -1436,7 +1566,7 @@ function renderDetail(id) {
   if (node.context) {
     html += `<div class="detail-section">`;
     html += `<div class="detail-section-label">Context</div>`;
-    html += `<div class="detail-reasoning">${node.context}</div>`;
+    html += `<div class="detail-reasoning">${formatReasoning(node.context)}</div>`;
     html += `</div>`;
   }
 
@@ -1464,11 +1594,14 @@ function renderDetail(id) {
     html += `</ul></div>`;
   }
 
-  // Artifact link
+  // Artifact link + embed
   if (node.artifact) {
     html += `<div class="detail-section">`;
     html += `<div class="detail-section-label">Artifact</div>`;
     html += `<a class="detail-artifact" href="${node.artifact}" target="_blank">&#9654; ${node.artifact}</a>`;
+    if (node.artifact.endsWith('.html')) {
+      html += `<div class="detail-artifact-embed-wrap"><iframe class="detail-artifact-embed" src="${node.artifact}" frameborder="0" onload="fitArtifactIframe(this)"></iframe></div>`;
+    }
     html += `</div>`;
   }
 
@@ -1706,10 +1839,10 @@ function renderTimeline() {
       html += `<span class="timeline-entry-title">${node.title}</span>`;
       html += `</div>`;
       if (node.reasoning) {
-        html += `<div class="timeline-entry-reasoning">${node.reasoning}</div>`;
+        html += `<div class="timeline-entry-reasoning">${formatReasoning(node.reasoning)}</div>`;
       }
       if (node.context) {
-        html += `<div class="timeline-entry-reasoning">${node.context}</div>`;
+        html += `<div class="timeline-entry-reasoning">${formatReasoning(node.context)}</div>`;
       }
       if (node.evidence && node.evidence.length) {
         for (const ev of node.evidence) {
@@ -1764,10 +1897,10 @@ function renderReader() {
       html += `</div>`;
 
       if (item.reasoning) {
-        html += `<div class="reader-card-reasoning">${item.reasoning}</div>`;
+        html += `<div class="reader-card-reasoning">${formatReasoning(item.reasoning)}</div>`;
       }
       if (item.context) {
-        html += `<div class="reader-card-reasoning">${item.context}</div>`;
+        html += `<div class="reader-card-reasoning">${formatReasoning(item.context)}</div>`;
       }
 
       if (item.evidence && item.evidence.length) {

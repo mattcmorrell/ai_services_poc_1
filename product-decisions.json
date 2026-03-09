@@ -1,11 +1,11 @@
 {
   "title": "Product Decision Journal",
   "project": "AI Services POC — BambooHR Consultant App",
-  "lastUpdated": "2026-03-09T18:00:00Z",
+  "lastUpdated": "2026-03-09T21:00:00Z",
   "schema": {
     "version": 1,
     "nodeTypes": ["outcome", "opportunity", "solution", "experiment", "decision"],
-    "statuses": ["active", "exploring", "chosen", "rejected", "deferred", "open"]
+    "statuses": ["active", "exploring", "chosen", "rejected", "deferred", "open", "solved"]
   },
   "outcomes": [
     {
@@ -21,7 +21,7 @@
     },
     {
       "id": "O2",
-      "title": "BHR consultants can work as fast as they think",
+      "title": "Reduce work around the work",
       "status": "active",
       "date": "2026-02-20",
       "reasoning": "The AI Services POC is building tools for BambooHR HR consultants who manage multiple clients. The core product question: can we make the consultant's daily workflow — switching contexts, managing payroll, onboarding, benefits — feel effortless? The app should disappear and let the consultant focus on their clients, not the tool."
@@ -31,7 +31,7 @@
     {
       "id": "OP3",
       "title": "Consultants need a fast, intuitive way to switch between client workspaces",
-      "status": "active",
+      "status": "solved",
       "date": "2026-02-20",
       "parentId": "O2",
       "reasoning": "HR consultants manage 5-50 clients and switch between them frequently throughout the day. The core UX question: how does a consultant select which client they're working with? Must feel fast, professional, and not lose context when switching. Prototyped 6 approaches (A-F), narrowed to 3 active candidates (B, C, E)."
@@ -39,7 +39,7 @@
     {
       "id": "OP4",
       "title": "HRCs lose sight of plan progress when it scrolls out of chat",
-      "status": "active",
+      "status": "solved",
       "date": "2026-02-27",
       "parentId": "O2",
       "reasoning": "The #1 visibility gap: ActionCard renders inline in chat and scrolls away as conversation continues. HRCs can't monitor what the agent is doing without scrolling away from the conversation. Need plan progress AND chat visible simultaneously. Requirements: tiered visibility (milestones in chat, thinking expandable), auto+toggle behavior, pause/stop/edit controls, non-undoable action gates, plan history as archive, cross-client persistence.",
@@ -48,12 +48,29 @@
       ]
     },
     {
+      "id": "OP7",
+      "title": "HRCs spend time manually prepping for client meetings",
+      "status": "active",
+      "date": "2026-03-09",
+      "parentId": "O2",
+      "reasoning": "Before every client meeting, HRCs manually gather context — open BambooHR, check Salesforce tasks, review recent emails, look at project plan status. This is repetitive, time-consuming, and easy to miss things. If Pandopticon knows a meeting is coming, it should automatically synthesize a prep brief from all available context so the HRC walks in ready."
+    },
+    {
       "id": "OP6",
-      "title": "No clear map of how Pandopticon connects to external systems",
+      "title": "Need to understand how Pandopticon connects to external systems",
       "status": "active",
       "date": "2026-03-09",
       "parentId": "O2",
       "reasoning": "Pandopticon's value comes from synthesizing data across multiple systems of record. Without a clear integration map, it's hard to communicate the vision, plan API work, or prioritize which integrations to build first. Need a visual artifact that shows every system, its role, and whether Pandopticon reads, writes, or both."
+    },
+    {
+      "id": "OP8",
+      "title": "HRCs context-switch to Salesforce for task/deadline visibility and simple updates",
+      "status": "active",
+      "date": "2026-03-09",
+      "parentId": "O2",
+      "reasoning": "HRCs use Salesforce for task tracking, deadline management, and basic project management. Throughout the day they switch between Pandopticon and Salesforce to check what's due, update task status, and log notes. This context-switching is pure 'work around the work' — the data exists in Salesforce but isn't surfaced where HRCs are already working. Two distinct pain buckets: (1) CRUD pain — too many clicks to log/update tasks in Salesforce's UI, and (2) intelligence pain — can't see what's urgent across clients, nothing connects tasks to meetings/action plans/deadlines. Discovery interviews starting 3/9 to validate which bucket dominates.",
+      "relatedIds": ["OP6", "Q10"]
     },
     {
       "id": "OP5",
@@ -154,7 +171,7 @@
     {
       "id": "S5",
       "title": "Approach B: Dropdown Switcher — compact dropdown in tab bar",
-      "status": "exploring",
+      "status": "deferred",
       "date": "2026-02-20",
       "parentId": "OP3",
       "reasoning": "Compact dropdown trigger in the tab bar area. Open to search/switch clients. Attention indicator on trigger shows pending items. Minimal space usage, fast switching, ⌘K hint for power users. One of two front-runner approaches.",
@@ -163,7 +180,7 @@
     {
       "id": "S6",
       "title": "Approach C: Sidebar List — persistent collapsible client panel",
-      "status": "exploring",
+      "status": "chosen",
       "date": "2026-02-20",
       "parentId": "OP3",
       "reasoning": "Persistent sidebar (w-56, collapsible to w-12) with client avatars, names, unread badges, urgency indicators, and search. Fastest switching — client is always one click away. Collapsible to reclaim space. The other front-runner approach.",
@@ -184,7 +201,7 @@
     {
       "id": "S8",
       "title": "Approach E: Tab Groups — multi-client grouped tabs in a single bar",
-      "status": "exploring",
+      "status": "deferred",
       "date": "2026-02-22",
       "parentId": "OP3",
       "reasoning": "All clients' chat tabs visible in one bar, grouped by client with colored headers. Each group has a client avatar chip followed by that client's chat tabs. Interesting Chrome-like model. Not a front-runner but kept open out of curiosity to see if it can be made to work at scale.",
@@ -215,6 +232,15 @@
       "relatedIds": ["OP5"]
     },
     {
+      "id": "S15",
+      "title": "Calendar Integration + Meeting Prep Agent + Proactive Briefing Flow",
+      "status": "active",
+      "date": "2026-03-09",
+      "parentId": "OP7",
+      "reasoning": "Three-part feature: (1) Calendar integration surfaces upcoming meetings on dashboard and client home — next meeting badge, countdown, attendees. (2) Meeting Prep Agent (agent-meeting-prep) generates context briefs by synthesizing client data, recent activity, open tasks, and project plan status. (3) Proactive briefing flow — 'Prep for meeting' button on client home triggers auto-creation of a chat with the meeting prep agent, pre-loaded with client context. The agent responds with a structured brief covering recent changes, open items, talking points, and post-meeting actions.",
+      "relatedIds": ["OP7", "D9"]
+    },
+    {
       "id": "S14",
       "title": "Integration Map — visual diagram of all system connections",
       "status": "active",
@@ -223,6 +249,15 @@
       "reasoning": "HTML diagram showing Pandopticon's relationship to 7 systems of record: BambooHR (Core, R+W), Google Calendar (Exploring, R), Google Meet/Zoom (Exploring, R), Salesforce (Exploring, R+W), Google Drive (Exploring, R), Gmail (Exploring, R+W), Slack (Exploring, R+W). Sandwich layout with 3 systems above Pandopticon, 4 below, with SVG-drawn read/write connection lines. Uses real brand logos. Living document — updates as integration status changes.",
       "artifact": "mockups/system-architecture.html",
       "relatedIds": ["OP6", "D8"]
+    },
+    {
+      "id": "S16",
+      "title": "Salesforce as intelligence layer data source + agent write-back",
+      "status": "exploring",
+      "date": "2026-03-09",
+      "parentId": "OP8",
+      "reasoning": "Follows the established intelligence-layer pattern (same as calendar, Meet, Gmail). Three capabilities: (1) Read — pull tasks, deadlines, case status into dashboard, client home, and prep briefs as another data source. No new Salesforce tab. (2) Surface — enrich existing views with Salesforce context (e.g., 'Client has 3 overdue tasks' on client home, task deadlines in prep briefs). (3) Write-back via agents — 'mark this task complete,' 'log this meeting note' so HRCs don't context-switch for simple updates. Feasibility assessment: straightforward if staying in the intelligence layer. The integration pattern (read→synthesize→surface) already exists for BambooHR and calendar. POC implementation is ~1-2 days: mock salesforce-data.ts, add Tasks section to client home, feed into prep briefs, add agent write-back. Production considerations: Salesforce OAuth is non-trivial, and org-specific custom objects/fields require a flexible mapping layer.",
+      "relatedIds": ["OP8", "D8", "S14", "S15", "Q10"]
     },
     {
       "id": "S3",
@@ -369,6 +404,14 @@
       "relatedIds": ["S13", "OP5"]
     },
     {
+      "id": "D9",
+      "title": "Meeting prep is proactive and agent-driven, not a static page",
+      "status": "chosen",
+      "date": "2026-03-09",
+      "reasoning": "Instead of building a 'meeting prep page' that the HRC navigates to, the prep brief is generated on-demand by a specialized agent in a chat. The HRC clicks 'Prep for meeting' on client home → a new chat opens with the Meeting Prep Agent → the agent synthesizes all available context into a conversational brief. This means the HRC can ask follow-up questions, drill into specifics, or request changes — it's interactive prep, not a static document.",
+      "relatedIds": ["S15", "OP7"]
+    },
+    {
       "id": "D8",
       "title": "Pandopticon is an intelligence layer across all integrations — never the system of record",
       "status": "chosen",
@@ -421,6 +464,18 @@
       "title": "Should project plan import support PDF parsing natively?",
       "date": "2026-03-09",
       "context": "Current POC uses text paste as fallback for PDFs. Real deployment would need server-side PDF text extraction (pdf-parse, pdfjs). Worth adding when we move past the demo stage."
+    },
+    {
+      "id": "Q9",
+      "title": "What does the post-meeting flow look like?",
+      "date": "2026-03-09",
+      "context": "Pre-meeting prep is built. The natural complement: after a meeting ends, AI processes the transcript/recording, extracts a structured summary (decisions, action items, open questions), and proposes updates — mark tasks complete, create new tasks, update project plan status. This closes the loop between meetings. Not yet designed."
+    },
+    {
+      "id": "Q10",
+      "title": "Should Salesforce integration focus on read-only or read+write?",
+      "date": "2026-03-09",
+      "context": "Interviews starting 3/9. If CRUD pain dominates (too many clicks to log a task), HRCs will want write-back. If intelligence pain dominates (can't see what's urgent across clients), read-only into prep briefs and dashboards may be enough. The answer determines API scope and maintenance burden. Feasibility note: either path is technically manageable — the read→synthesize→surface pattern already exists. Write-back adds Salesforce OAuth + field mapping complexity but is scoped to simple updates (mark complete, log note), not building a full task CRUD. Key risk: if CRUD pain dominates, it means building a task manager — that's a different product."
     },
     {
       "id": "Q8",
