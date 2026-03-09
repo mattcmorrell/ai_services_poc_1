@@ -1,7 +1,7 @@
 {
   "title": "Product Decision Journal",
   "project": "AI Services POC — BambooHR Consultant App",
-  "lastUpdated": "2026-02-28",
+  "lastUpdated": "2026-03-09T18:00:00Z",
   "schema": {
     "version": 1,
     "nodeTypes": ["outcome", "opportunity", "solution", "experiment", "decision"],
@@ -46,6 +46,22 @@
       "evidence": [
         { "type": "firsthand", "source": "Designer", "quote": "I can only look at it while it's running which is like 5 seconds." }
       ]
+    },
+    {
+      "id": "OP6",
+      "title": "No clear map of how Pandopticon connects to external systems",
+      "status": "active",
+      "date": "2026-03-09",
+      "parentId": "O2",
+      "reasoning": "Pandopticon's value comes from synthesizing data across multiple systems of record. Without a clear integration map, it's hard to communicate the vision, plan API work, or prioritize which integrations to build first. Need a visual artifact that shows every system, its role, and whether Pandopticon reads, writes, or both."
+    },
+    {
+      "id": "OP5",
+      "title": "Project plan dates are buried in PDFs with no visibility in Pandopticon",
+      "status": "active",
+      "date": "2026-03-09",
+      "parentId": "O2",
+      "reasoning": "HRCs manage multiple clients with overlapping project timelines (performance management rollouts, HRIS migrations, etc.). Currently, project plan dates are buried in PDFs and slide decks. No single view to see what's coming up across clients, which makes prioritization and meeting prep harder. This feature lets HRCs import project plans, extracts dates/phases via AI, and surfaces them in the client workspace."
     },
     {
       "id": "OP1",
@@ -190,6 +206,25 @@
       ]
     },
     {
+      "id": "S13",
+      "title": "Project Plan Import & Timeline on Client Home Tab",
+      "status": "active",
+      "date": "2026-03-09",
+      "parentId": "OP5",
+      "reasoning": "Full-width Project Plans section on client home tab with: (1) AI-powered import from pasted text/files via /api/extract-plan, (2) expandable inline timeline with phase blocks, milestones, today marker, (3) date confidence indicators (exact/inferred/ambiguous) with inline resolution UI, (4) AI memory injection — plan context appended to chat system prompts so the AI references upcoming milestones and deadlines. Mock data uses real Ashtead PM plan on Black Mesa + fictional plan on Aperture Science. Empty state CTA for clients without plans.",
+      "relatedIds": ["OP5"]
+    },
+    {
+      "id": "S14",
+      "title": "Integration Map — visual diagram of all system connections",
+      "status": "active",
+      "date": "2026-03-09",
+      "parentId": "OP6",
+      "reasoning": "HTML diagram showing Pandopticon's relationship to 7 systems of record: BambooHR (Core, R+W), Google Calendar (Exploring, R), Google Meet/Zoom (Exploring, R), Salesforce (Exploring, R+W), Google Drive (Exploring, R), Gmail (Exploring, R+W), Slack (Exploring, R+W). Sandwich layout with 3 systems above Pandopticon, 4 below, with SVG-drawn read/write connection lines. Uses real brand logos. Living document — updates as integration status changes.",
+      "artifact": "mockups/system-architecture.html",
+      "relatedIds": ["OP6", "D8"]
+    },
+    {
       "id": "S3",
       "title": "Key decision: Two separate tools, not one",
       "status": "chosen",
@@ -326,6 +361,22 @@
       "relatedIds": ["OP4", "Q6"]
     },
     {
+      "id": "D7",
+      "title": "Project plans live on client home tab with inline expandable timeline",
+      "status": "chosen",
+      "date": "2026-03-09",
+      "reasoning": "Plans surface as compact cards in a full-width section between Recent Chats/Active Plans and Recent Activity. Click to expand inline timeline (not a separate page/panel). This keeps plans contextual to the client without adding navigation layers. The timeline uses phase-colored left borders, milestone bullets, a today marker, and amber highlights for ambiguous dates. AI extraction handles the import (GPT parses phases/milestones/dates from pasted text), with a mock fallback for demo reliability.",
+      "relatedIds": ["S13", "OP5"]
+    },
+    {
+      "id": "D8",
+      "title": "Pandopticon is an intelligence layer across all integrations — never the system of record",
+      "status": "chosen",
+      "date": "2026-03-09",
+      "reasoning": "Same principle applied universally: BambooHR owns HR data, Salesforce owns tasks/cases, Google Calendar owns schedule, Gmail owns email, Slack owns messages, Drive owns files. Pandopticon reads from all, synthesizes context, surfaces insights, and can write back simple updates (mark task complete, draft reply) — but never becomes where the data lives. This avoids the maintenance trap of rebuilding each system's CRUD and keeps Pandopticon focused on the intelligence gap between systems.",
+      "relatedIds": ["S14", "OP6"]
+    },
+    {
       "id": "D3",
       "title": "The ideal end-state is FigJam OST with Claude read/write",
       "status": "open",
@@ -364,6 +415,18 @@
       "title": "How does the trio's existing OST practice (if any) integrate?",
       "date": "2026-02-23",
       "context": "Trios should be building OSTs. If they already are (in FigJam, Miro, etc.), the journal shouldn't duplicate that work. Ideal: Claude reads the trio's OST and enriches it with design-session details."
+    },
+    {
+      "id": "Q7",
+      "title": "Should project plan import support PDF parsing natively?",
+      "date": "2026-03-09",
+      "context": "Current POC uses text paste as fallback for PDFs. Real deployment would need server-side PDF text extraction (pdf-parse, pdfjs). Worth adding when we move past the demo stage."
+    },
+    {
+      "id": "Q8",
+      "title": "What's the right integration priority order after BambooHR?",
+      "date": "2026-03-09",
+      "context": "Seven systems mapped but only BambooHR is core. Salesforce interviews starting 3/9 will inform whether it's next. Calendar/Meet are natural fits for meeting prep flow already prototyped. Gmail and Slack are passive monitoring plays. Google Drive is a context enrichment play. Need to sequence based on HRC pain intensity and API feasibility."
     },
     {
       "id": "Q6",
