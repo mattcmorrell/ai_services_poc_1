@@ -12,6 +12,7 @@ const MIME = {
   '.js': 'text/javascript',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
 };
 
 const server = http.createServer((req, res) => {

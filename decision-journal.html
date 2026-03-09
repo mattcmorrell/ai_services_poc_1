@@ -239,10 +239,10 @@
     background: var(--select-bg);
   }
   .tree-node.ancestor {
-    border-left: 3px solid var(--node-color, #52525b);
+    box-shadow: inset 3px 0 0 var(--node-color, #52525b);
   }
   .tree-opp-label.ancestor {
-    border-left: 3px solid var(--node-color, #52525b);
+    box-shadow: inset 3px 0 0 var(--node-color, #52525b);
   }
   .tree-node .node-dot {
     width: 6px;
@@ -1163,19 +1163,40 @@ function fitArtifactIframe(iframe) {
 // ══════════════════════════════════════════
 // TEXT FORMATTING
 // ══════════════════════════════════════════
+function splitCommasRespectingParens(str) {
+  const items = [];
+  let depth = 0, inQuote = false, current = '';
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    if (ch === '\'' && !inQuote && str.slice(i).match(/^'[^']+'/)) inQuote = true;
+    else if (ch === '\'' && inQuote) inQuote = false;
+    if (!inQuote) {
+      if (ch === '(' || ch === '[') depth++;
+      else if (ch === ')' || ch === ']') depth = Math.max(0, depth - 1);
+    }
+    if (ch === ',' && depth === 0 && !inQuote) {
+      items.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+  if (current.trim()) items.push(current.trim());
+  return items;
+}
+
 function formatReasoning(text) {
   if (!text) return '';
   let result = text;
 
-  // Pattern: inline numbered list with (1) (2) (3) etc.
+  // ── Pattern 1: inline numbered list (1) (2) (3) → <ol> ──
   const parenNumbered = result.match(/\(\d+\)\s/g);
   if (parenNumbered && parenNumbered.length >= 2) {
     const parts = result.split(/\(\d+\)\s/);
     const intro = parts[0].replace(/[\s:.]+$/, '');
     const rawItems = parts.slice(1);
 
-    // For the last item, separate trailing prose after the list content.
-    // Heuristic: a sentence starting with "Capital word:" is a new topic.
+    // Separate trailing prose from last item
     const lastRaw = rawItems[rawItems.length - 1];
     let lastItem = lastRaw;
     let trailing = '';
@@ -1204,7 +1225,50 @@ function formatReasoning(text) {
     return result;
   }
 
-  // Pattern: sentences starting with a dash after a period
+  // ── Pattern 2: colon-introduced comma list → <ul> ──
+  // "label: item, item, item" where 3+ comma-separated items
+  let bestMatch = null;
+  let bestCount = 0;
+  const colonRegex = /:\s+/g;
+  let m;
+  while ((m = colonRegex.exec(result)) !== null) {
+    const colonEnd = m.index + m[0].length;
+    const before = result.slice(0, m.index);
+    const after = result.slice(colonEnd);
+
+    // Skip colons inside parentheses
+    const openParens = (before.match(/\(/g) || []).length;
+    const closeParens = (before.match(/\)/g) || []).length;
+    if (openParens > closeParens) continue;
+
+    // Find end of the list: next ". " followed by a capital letter, or end of text
+    const listEndMatch = after.match(/\.\s+[A-Z]/);
+    const listText = listEndMatch
+      ? after.slice(0, listEndMatch.index)
+      : after.replace(/\.\s*$/, '');
+    const trailing = listEndMatch ? after.slice(listEndMatch.index + 2) : '';
+
+    const items = splitCommasRespectingParens(listText);
+    if (items.length >= 3 && items.length > bestCount) {
+      // Clean "and " prefix on last item
+      const last = items[items.length - 1];
+      if (last.startsWith('and ')) items[items.length - 1] = last.slice(4);
+
+      bestMatch = { before: before, items, trailing: trailing.trim() };
+      bestCount = items.length;
+    }
+  }
+
+  if (bestMatch) {
+    result = bestMatch.before + ':';
+    result += '<ul class="fmt-list">';
+    for (const item of bestMatch.items) { result += `<li>${item}</li>`; }
+    result += '</ul>';
+    if (bestMatch.trailing) result += `<p class="fmt-trailing">${bestMatch.trailing}</p>`;
+    return result;
+  }
+
+  // ── Pattern 3: dash-separated items → <ul> ──
   const dashItems = result.match(/(?:^|\.\s)[-–—]\s/g);
   if (dashItems && dashItems.length >= 2) {
     const parts = result.split(/(?:^|\.\s)[-–—]\s/);
@@ -1314,7 +1378,13 @@ function renderTree() {
 
     const opportunities = getChildren(outcome.id).filter(n => n._type === 'opportunity');
     for (const opp of opportunities) {
-      html += treeNodeHTML(opp, 1);
+      const solutions = getChildren(opp.id)
+        .filter(n => n._type === 'solution' && (!activeOnly || ACTIVE_STATUSES.includes(n.status)));
+      const hasChildren = solutions.length > 0;
+      html += treeNodeHTML(opp, 1, false, hasChildren);
+      for (const sol of solutions) {
+        html += treeNodeHTML(sol, 2, true, false, true);
+      }
     }
   }
 
@@ -1342,8 +1412,21 @@ function renderTree() {
 
   panel.querySelectorAll('.tree-node').forEach(el => {
     el.addEventListener('click', (e) => {
-      if (el.classList.contains('collapsible') && e.target.closest('.node-expand')) {
-        toggleCollapsibleNode(el);
+      const node = getNode(el.dataset.id);
+      if (el.classList.contains('collapsible')) {
+        const isCollapsed = el.classList.contains('collapsed');
+        const clickedCaret = !!e.target.closest('.node-expand');
+        if (isCollapsed) {
+          // Closed → always open
+          toggleCollapsibleNode(el);
+        } else if (clickedCaret) {
+          // Open + clicked caret → close
+          toggleCollapsibleNode(el);
+        }
+        // Open + clicked body → stay open, just select
+        selectNode(el.dataset.id);
+      } else if (node && (node._type === 'solution' || node._type === 'experiment')) {
+        drillToNode(el.dataset.id);
       } else {
         selectNode(el.dataset.id);
       }
@@ -1387,15 +1470,35 @@ function setSectionVisibility(labelEl, hidden) {
 
 function toggleCollapsibleNode(nodeEl) {
   const isCollapsed = nodeEl.classList.toggle('collapsed');
+  // Determine this node's indent level
+  const nodeIndent = getIndentLevel(nodeEl);
   let el = nodeEl.nextElementSibling;
   while (el) {
-    // Stop at next collapsible node or top-level section label
-    if (el.classList.contains('collapsible')) break;
     if (el.classList.contains('tree-section-label') && !el.classList.contains('tree-sub-label')) break;
-
-    el.style.display = isCollapsed ? 'none' : '';
+    // Stop at a sibling or higher-level node (same or lower indent)
+    if (el.classList.contains('tree-node')) {
+      const elIndent = getIndentLevel(el);
+      if (elIndent <= nodeIndent) break;
+    }
+    if (isCollapsed) {
+      el.style.display = 'none';
+    } else {
+      // When expanding, show direct children but keep nested collapsed items hidden
+      const elIndent = getIndentLevel(el);
+      if (elIndent === nodeIndent + 1) {
+        el.style.display = '';
+      }
+      // Deeper items stay hidden (their parent opportunity is still collapsed)
+    }
     el = el.nextElementSibling;
   }
+}
+
+function getIndentLevel(el) {
+  for (let i = 0; i <= 4; i++) {
+    if (el.classList.contains('tree-indent-' + i)) return i;
+  }
+  return 0;
 }
 
 
@@ -1409,7 +1512,7 @@ function treeNodeHTML(node, indent, startHidden, collapsible, hideTypeLabel) {
   if (indent) classes += ` tree-indent-${Math.min(indent, 4)}`;
   if (isEmphasis) classes += ' emphasis';
   if (isSettled && !activeFilter && !activeOnly) classes += ' inactive';
-  if (collapsible) classes += ' collapsible';
+  if (collapsible) classes += ' collapsible collapsed';
 
   let style = `--node-color:${color};--select-bg:${color}2e;`;
   if (isEmphasis) {
@@ -1419,7 +1522,8 @@ function treeNodeHTML(node, indent, startHidden, collapsible, hideTypeLabel) {
 
   const typeLabel = hideTypeLabel ? '' : (node._type || '');
   const chevronHTML = collapsible ? `<div class="node-expand"><span class="chevron">&#9660;</span></div>` : '';
-  const dotHTML = node._type === 'outcome' ? '' : `<div class="node-dot" style="background:${color};${isEmphasis ? 'box-shadow:0 0 6px ' + color + '66' : ''}"></div>`;
+  const hideDot = node._type === 'outcome' || (node._type === 'opportunity' && collapsible);
+  const dotHTML = hideDot ? '' : `<div class="node-dot" style="background:${color};${isEmphasis ? 'box-shadow:0 0 6px ' + color + '66' : ''}"></div>`;
   const statusAttr = node.status ? ` data-status="${node.status}"` : '';
   return `<div class="${classes}" data-id="${node.id}"${statusAttr} style="${style}">
     ${chevronHTML}
@@ -1453,21 +1557,8 @@ function selectNode(id) {
 // Keeps the nearest tree-level ancestor highlighted in the left panel
 function drillToNode(id) {
   detailNodeId = id;
-  // Walk up to find nearest ancestor that's in the tree (outcome or opportunity)
-  const treeTypes = ['outcome', 'opportunity'];
-  let node = getNode(id);
-  let treeAncestor = null;
-  while (node) {
-    if (treeTypes.includes(node._type)) {
-      treeAncestor = node.id;
-      break;
-    }
-    node = node.parentId ? getNode(node.parentId) : null;
-  }
-  if (treeAncestor) {
-    selectedNodeId = treeAncestor;
-  }
-  highlightTree(selectedNodeId);
+  selectedNodeId = id;
+  highlightTree(id);
   renderDetail(id);
 }
 
