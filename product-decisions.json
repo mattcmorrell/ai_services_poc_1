@@ -1,7 +1,7 @@
 {
   "title": "Product Decision Journal",
   "project": "AI Services POC — BambooHR Consultant App",
-  "lastUpdated": "2026-03-11T12:00:00Z",
+  "lastUpdated": "2026-03-11T14:00:00Z",
   "schema": {
     "version": 1,
     "nodeTypes": ["outcome", "opportunity", "solution", "experiment", "decision"],
@@ -535,8 +535,16 @@
       "title": "Pandopticon is an intelligence layer across all integrations — never the system of record",
       "status": "chosen",
       "date": "2026-03-09",
-      "reasoning": "Same principle applied universally: BambooHR owns HR data, Salesforce owns tasks/cases, Google Calendar owns schedule, Gmail owns email, Slack owns messages, Drive owns files. Pandopticon reads from all, synthesizes context, surfaces insights, and can write back simple updates (mark task complete, draft reply) — but never becomes where the data lives. This avoids the maintenance trap of rebuilding each system's CRUD and keeps Pandopticon focused on the intelligence gap between systems.",
-      "relatedIds": ["S14", "OP6"]
+      "reasoning": "Same principle applied universally: BambooHR owns HR data, Salesforce owns tasks/cases, Google Calendar owns schedule, Gmail owns email, Slack owns messages, Drive owns files. Pandopticon reads from all, synthesizes context, surfaces insights, and can write back simple updates (mark task complete, draft reply) — but never becomes where the data lives. This avoids the maintenance trap of rebuilding each system's CRUD and keeps Pandopticon focused on the intelligence gap between systems. Refined in D10: this extends to files — Pandopticon links to files in their source systems rather than hosting copies. The UX for managing linked files is an instance of a broader agent context management problem (Q12).",
+      "relatedIds": ["S14", "OP6", "D10", "Q12"]
+    },
+    {
+      "id": "D10",
+      "title": "Pandopticon is an orchestration/intelligence layer, not a file host — pull context, don't store files",
+      "status": "chosen",
+      "date": "2026-03-11",
+      "reasoning": "Files already have homes (Google Sheets for plans, Google Docs for profile docs, Google Drive for policies). The value isn't the file — it's the intelligence about the file ('open enrollment is due in 4 days'). Uploading files to Pandopticon creates stale copies — the exact anti-pattern that led us to live Google Sheets integration over one-time import. Discovery confirmed: HRCs have their files organized in Google Workspace. The pain isn't 'I can't find my files' — it's 'nothing connects my files to my meetings to my tasks to my deadlines.' Pandopticon reads from source systems via API and surfaces intelligence. Fallback: if API access is blocked (OAuth approval, IT gatekeeping), manual import is a degraded mode (S13 already built). The UX for linking files will feel similar to hosting files — HRCs need to manage what files are connected to each client, which files agents have context on. But the underlying architecture is links and reads, not uploads and storage. The bigger frame: HRCs need a way to manage agent context — what data the scheduling, prioritization, and project management agents can see. File linking is one instance of this; other instances include which Salesforce tasks, which Attention recordings, which Google Docs to include. This is a general UX problem: agent context management.",
+      "relatedIds": ["D8", "S18", "S19", "S13", "OP10", "Q12"]
     },
     {
       "id": "D3",
@@ -581,20 +589,23 @@
     {
       "id": "Q7",
       "title": "Should project plan import support PDF parsing natively?",
-      "date": "2026-03-09",
-      "context": "Current POC uses text paste as fallback for PDFs. Real deployment would need server-side PDF text extraction (pdf-parse, pdfjs). Worth adding when we move past the demo stage."
+      "status": "solved",
+      "date": "2026-03-11",
+      "context": "Moot. The direction is live Google Sheets linking (S18), not file import. PDF parsing was relevant when we assumed plans would be uploaded to Pandopticon. With the 'pull context, don't host files' decision (D10), project plans stay in Sheets and Pandopticon reads them via API. Manual import (S13) remains as a fallback if API access is blocked, but investing in PDF parsing for a fallback path isn't worth it."
     },
     {
       "id": "Q9",
       "title": "What does the post-meeting flow look like?",
-      "date": "2026-03-10",
-      "context": "Pre-meeting prep is built. The natural complement: after a meeting ends, AI processes the transcript/recording, extracts a structured summary (decisions, action items, open questions), and proposes updates — mark tasks complete, create new tasks, update project plan status. This closes the loop between meetings. Attention.tech changes the picture significantly — it already does the extraction (extractedIntelligence field with action items, decisions, next steps) and can auto-sync to Salesforce. Pandopticon's job becomes connection, not extraction: take Attention's structured output and link it to existing client state (action plans, open questions, project timelines). Not yet designed."
+      "status": "solved",
+      "date": "2026-03-11",
+      "context": "Designed. After a meeting: (1) Attention captures extractedIntelligence (action items, decisions, next steps). (2) Pandopticon reads it, matches items to existing client state. (3) Agent proposes updates: write date changes back to Google Sheets (project plan), append call summary to Google Docs (Customer Profile Doc), update action plans, create tasks, resolve open questions. (4) HRC approves → one write cascades to Sheet, Pandopticon views, and client-facing site. No auto-sync to Salesforce (Pandopticon reads both sources directly). Still needs to be built, but the design question is answered."
     },
     {
       "id": "Q10",
       "title": "Should Salesforce integration focus on read-only or read+write?",
+      "status": "solved",
       "date": "2026-03-11",
-      "context": "Discovery revealed a third pain bucket: duplicate work. HRCs maintain real plans in spreadsheets then update Salesforce separately. Salesforce is more of a billing trigger and task template engine than a daily planning tool — the Customer Profile Doc (Google Docs) is the real source of truth. This shifts the answer: read+write is still valuable but scoped to syncing status back from Pandopticon (so HRCs stop manually updating Salesforce after updating their spreadsheet). Katie also wants a manager dashboard for cross-project progress — Pandopticon could serve this need by reading Salesforce task data and presenting it better than Salesforce does natively."
+      "context": "Read+write, scoped. Discovery revealed Salesforce is a billing trigger and task template engine, not the daily planning tool. Read: pull task templates, deadlines, hours data. Write: sync status back so HRCs stop manually updating Salesforce after updating their spreadsheet. Not full CRUD — Pandopticon handles simple updates (mark complete, log note, push deadline) via agent write-back. The bigger question has shifted to Q13/Q14: how much project management should Pandopticon own, and how do we minimize double data entry if Salesforce stays in the picture."
     },
     {
       "id": "Q8",
@@ -613,6 +624,44 @@
       "title": "Should the app introduce a second typeface?",
       "date": "2026-02-28",
       "context": "Font audit revealed the entire app uses a single typeface (ui-sans-serif system font stack). A second typeface — e.g., a geometric sans for headings or a monospace for data/metrics — would help differentiate content types (navigation vs. body text vs. numerical data). Not needed yet but worth considering as the UI matures. Could also help distinguish agent-generated content from user-authored content."
+    },
+    {
+      "id": "Q12",
+      "title": "How do HRCs manage agent context? (What data do agents see per client?)",
+      "date": "2026-03-11",
+      "relatedIds": ["D10", "Q13"],
+      "context": "Pandopticon pulls context from source systems rather than hosting files (D10). But HRCs need to manage what's linked: which Google Sheets are the project plans, which Google Doc is the profile doc, which Salesforce tasks are relevant, which Attention recordings to include. This is file linking on the surface, but the deeper problem is agent context management — the HRC is curating what the scheduling, prioritization, and project management agents can see and reason about. The UX will feel similar to 'uploading files to a project' (familiar pattern), but the underlying operation is linking, not storing. Open questions: Should linking be per-client or per-agent? Auto-discovered or manual? What does the management UI look like on Client Home? How much should agents auto-discover context vs. wait for the HRC to explicitly link it?"
+    },
+    {
+      "id": "Q13",
+      "title": "How much orchestration/project management do HRCs need in Pandopticon?",
+      "date": "2026-03-11",
+      "context": "Pandopticon is an intelligence and orchestration layer (D8, D10). But there's a spectrum: at one end, it just surfaces insights from other systems ('you have 3 overdue tasks'). At the other end, it becomes the place where HRCs actually manage projects — create tasks, assign owners, track progress, sequence work. Discovery shows HRCs currently do this across Sheets + Salesforce + Google Docs, poorly. The question: what's the optimal amount of project management to pull into Pandopticon? Too little and it's just a dashboard — useful but not indispensable. Too much and we're building a project management tool, which is a different product and competes with Salesforce. The sweet spot is probably: Pandopticon handles prioritization and judgement ('what should I do next across all my clients?'), orchestrates updates across systems via agents, and surfaces a unified view — but doesn't try to be the task CRUD layer. Related to Q14: if Salesforce stays as the task backend, how much PM does Pandopticon need to own?",
+      "relatedIds": ["D8", "D10", "OP8", "OP10", "Q14"]
+    },
+    {
+      "id": "Q14",
+      "title": "If Salesforce stays as the task backend, how do we minimize double data entry and psychic damage?",
+      "date": "2026-03-11",
+      "context": "Salesforce is entrenched — BHR uses it for billing triggers, task templates, hours tracking, and Katie's management oversight. Even if Pandopticon becomes the daily workspace, Salesforce probably doesn't go away. The risk: HRCs end up maintaining state in both places. Discovery already found this is the #1 pain — 'consultants maintain real plan in spreadsheets, then update Salesforce separately.' Pandopticon could make this worse (now it's THREE places) or solve it (Pandopticon as the single pane of glass that syncs to Salesforce automatically). Key strategies to explore: (1) Agent-mediated sync — HRC works in Pandopticon, agent writes status back to Salesforce automatically. (2) Salesforce as read-only input — pull templates and deadlines in, but stop asking HRCs to update Salesforce manually. (3) Replace Salesforce's task tracking entirely — if Pandopticon + Sheets handles project plans and the client-facing site handles client visibility, what does Salesforce still do that can't be moved? (4) Accept coexistence but minimize friction — auto-sync what can be synced, make the rest one-click from Pandopticon. The answer depends heavily on what Katie and BHR leadership are willing to change about their Salesforce usage.",
+      "relatedIds": ["OP8", "Q13", "D10", "S16"]
+    },
+    {
+      "id": "Q15",
+      "title": "How does the client-facing rendered site handle auth and security?",
+      "date": "2026-03-11",
+      "context": "Approach A (S20) proposes a Pandopticon-hosted site where clients see their project plan via a bookmarked URL. Security options: (1) Unguessable token URLs (like Google Docs 'anyone with the link' sharing) — simplest, no login required, but anyone with the URL can view. (2) Simple auth — email + magic link, or password per client. (3) SSO tied to BHR's client portal if one exists. The right answer depends on how sensitive the data is (project plan milestones and dates, probably low sensitivity) and how much friction is acceptable for clients. Token URLs are probably fine for v1.",
+      "relatedIds": ["S20", "S23", "OP10"]
+    },
+    {
+      "id": "Q16",
+      "title": "What's the relationship between the client-facing site and Katie's desired client portal?",
+      "date": "2026-03-11",
+      "context": "Discovery surfaced that Katie wants 'clients could log in and see progress against project plan' (a future Salesforce feature that doesn't exist yet). The rendered site (S20) does exactly this — but outside Salesforce. Is S20 the seed of Katie's client portal? If so, it could grow to include meeting summaries, document links, progress history (Approach D / S23). This would give BambooHR a branded client-facing product that Salesforce can't deliver. Worth validating with Katie: would a branded project plan URL per client solve the client visibility problem she described?",
+      "relatedIds": ["S20", "S23", "OP10"],
+      "evidence": [
+        { "type": "research", "source": "HRC Workflow FigJam (discovery)", "quote": "Future feature (not built): Clients could log in and see progress against Project Plan" }
+      ]
     }
   ]
 }

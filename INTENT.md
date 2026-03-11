@@ -1,3 +1,65 @@
+# PROJECT STATUS: ON ICE (March 2026)
+
+> **Read this first when resuming.** Then read `KNOWLEDGE.md` for the full product knowledge base.
+
+## Where We Left Off
+
+The project shifted from UI prototyping to **integration architecture and product strategy**. The last active work was researching how Pandopticon connects to HRCs' real tools (Google Docs, Sheets, Attention, Salesforce) and designing the flows between them.
+
+## What's Built (Code)
+
+- **15 design variants** (OG + v1-v14) — visual exploration, no winner picked yet
+- **Client navigation** — 6 approaches prototyped (A-F), C (sidebar) chosen
+- **Plan panel** — 3 approaches (A-C), C (split view) chosen
+- **Dashboard** — calendar integration, meeting prep agent, proactive briefing flow
+- **Client Home** — project plans with AI import, next meeting, deadlines
+- **Decision journal** — `product-decisions.json` + `decision-journal.html` viewer (port 3334)
+- **Integration map** — `mockups/system-architecture.html` (10 systems diagrammed)
+
+## What's Designed But Not Built
+
+- **Google Docs integration** — read Customer Profile Doc + auto-append call summaries (S19)
+- **Google Sheets live linking** — replace one-time import with live sync + agent write-back (S18)
+- **Attention.tech integration** — read extractedIntelligence for prep briefs and post-meeting flow (S17)
+- **Client-facing project plan site** — rendered from Sheets, always-current URL for clients (S20)
+- **Post-meeting flow** — Attention → agent proposes updates → cascade to Sheets + Docs + Pandopticon
+
+## Critical Discovery Finding
+
+**The Customer Profile Doc (Google Docs) is the real source of truth** — not Salesforce. A single Google Doc per client accumulates everything. Salesforce's role is narrower than assumed: it's a billing trigger and task template engine, not the daily planning tool. HRCs maintain plans in spreadsheets then duplicate into Salesforce (the #1 "work around the work").
+
+Source: FigJam board `AI-Services` node 216:1103 — full HRC workflow mapped from discovery research. Captured in KNOWLEDGE.md under "Current HRC Workflow (As-Is)."
+
+## Key Architectural Decisions
+
+- **D8**: Pandopticon is an intelligence layer, never the system of record
+- **D10**: Pull context via API, don't host files. UX feels like file hosting (linking), but architecture is reads and writes to source systems
+- **Client-facing plan**: HRC edits via chat → agent writes to Google Sheet → rendered site updates. One sentence, three surfaces.
+
+## Open Questions Needing Stakeholder Input
+
+These can't be answered without Katie / BHR leadership:
+
+- **Q13**: How much project management should Pandopticon own? (Dashboard vs. full PM tool)
+- **Q14**: If Salesforce stays, how do we minimize double data entry? (Agent-mediated sync? Replace SF task tracking? Accept coexistence?)
+- **Q16**: Is the rendered client site the seed of Katie's desired client portal?
+
+## What's Outdated
+
+- The "AI Services — Project Plans" todo (uploading files, storing files on company page) is superseded by D10 (pull context, don't host files) and live Google Sheets integration (S18)
+- INTENT sections below for Client Tabs, Plan Panel, Visual Design — the decisions are made but the sections reflect the exploration phase, not current state
+
+## Files That Matter
+
+| File | What it is |
+|------|-----------|
+| `KNOWLEDGE.md` | **Start here.** All product knowledge, integration research, HRC workflow, architectural principles |
+| `product-decisions.json` | Full OST — every decision, solution, experiment, open question with reasoning |
+| `decision-journal.html` | Visual viewer for the OST (run `node decision-journal-server.js`, open localhost:3334) |
+| `mockups/system-architecture.html` | Integration map diagram (10 systems) |
+
+---
+
 # INTENT — Client Tabs Feature
 
 ## Goal

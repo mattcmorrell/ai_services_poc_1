@@ -731,6 +731,20 @@ Salesforce integration is straightforward if we stay in the intelligence layer. 
 
 ---
 
+## Pull Context, Don't Host Files
+
+> See also: product-decisions.json (D10, Q12)
+
+Pandopticon links to files in their source systems rather than hosting copies. Files already have homes — Google Sheets for plans, Google Docs for profile docs, Google Drive for policies. Uploading creates stale copies (the exact anti-pattern that led to live Sheets integration over one-time import). The value isn't the file — it's the intelligence about the file.
+
+**Fallback:** If API access is blocked (OAuth approval, IT gatekeeping), manual import is a degraded mode. S13 (project plan import) already exists for this. The architecture should prefer live integration and fall back to import if needed — not the other way around.
+
+**The UX will feel like file hosting.** HRCs need to manage what's linked to each client — which Sheets are the project plans, which Doc is the profile doc, which Drive folder has the policies. This looks like "uploading files to a project" from the HRC's perspective, but the underlying operation is linking and reading, not uploading and storing.
+
+**The bigger frame: agent context management.** File linking is one instance of a general problem — HRCs need a way to manage what data the scheduling, prioritization, and project management agents can see and reason about. Which files, which Salesforce tasks, which Attention recordings, which Google Docs. This is an open design question (Q12).
+
+---
+
 ## Action Plan Execution Model
 
 Plans have a lifecycle: `pending → approved → executing → completed/paused/stopped/declined`. Steps execute sequentially. Steps marked `nonUndoable: true` pause execution and require explicit approval — this is the safety gate for irreversible operations (payroll processing, tax filing, sending notices).
