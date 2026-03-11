@@ -18,6 +18,7 @@ export interface ActivePlan {
   status: "awaiting" | "running" | "paused";
   completedSteps: number;
   totalSteps: number;
+  projectId?: string; // links to a Project if this agent task belongs to one
 }
 
 export interface TeamMember {
@@ -75,8 +76,8 @@ const clientHomeData: Record<string, ClientHomeData> = {
       },
     ],
     activePlans: [
-      { id: "plan-1-1", title: "Q1 Payroll Processing", status: "running", completedSteps: 4, totalSteps: 6 },
-      { id: "plan-1-2", title: "New Hire Onboarding — Batch 12", status: "running", completedSteps: 2, totalSteps: 5 },
+      { id: "plan-1-1", title: "Q1 Payroll Processing", status: "running", completedSteps: 4, totalSteps: 6, projectId: "proj-1-1" },
+      { id: "plan-1-2", title: "New Hire Onboarding — Batch 12", status: "running", completedSteps: 2, totalSteps: 5, projectId: "proj-1-2" },
       { id: "plan-1-3", title: "Benefits Enrollment Setup", status: "paused", completedSteps: 1, totalSteps: 4 },
     ],
     teamMembers: [
@@ -143,8 +144,8 @@ const clientHomeData: Record<string, ClientHomeData> = {
       },
     ],
     activePlans: [
-      { id: "plan-2-1", title: "Annual Performance Reviews", status: "awaiting", completedSteps: 0, totalSteps: 8 },
-      { id: "plan-2-2", title: "HRIS Data Migration — Phase 2", status: "running", completedSteps: 5, totalSteps: 7 },
+      { id: "plan-2-1", title: "Annual Performance Reviews", status: "awaiting", completedSteps: 0, totalSteps: 8, projectId: "proj-2-1" },
+      { id: "plan-2-2", title: "HRIS Data Migration — Phase 2", status: "running", completedSteps: 5, totalSteps: 7, projectId: "proj-2-2" },
       { id: "plan-2-3", title: "Compliance Training Rollout", status: "running", completedSteps: 3, totalSteps: 5 },
     ],
     teamMembers: [
@@ -192,7 +193,7 @@ const clientHomeData: Record<string, ClientHomeData> = {
       },
     ],
     activePlans: [
-      { id: "plan-3-1", title: "Station Crew Rotation — Q2", status: "running", completedSteps: 3, totalSteps: 6 },
+      { id: "plan-3-1", title: "Station Crew Rotation — Q2", status: "running", completedSteps: 3, totalSteps: 6, projectId: "proj-3-1" },
       { id: "plan-3-2", title: "Hazard Pay Reconciliation", status: "paused", completedSteps: 1, totalSteps: 4 },
     ],
     teamMembers: [
@@ -242,8 +243,8 @@ const clientHomeData: Record<string, ClientHomeData> = {
     ],
     activePlans: [
       { id: "plan-4-1", title: "January Payroll Run", status: "paused", completedSteps: 2, totalSteps: 8 },
-      { id: "plan-4-2", title: "Q2 Grant Distribution", status: "running", completedSteps: 2, totalSteps: 4 },
-      { id: "plan-4-3", title: "Lab Safety Re-certification", status: "running", completedSteps: 4, totalSteps: 6 },
+      { id: "plan-4-2", title: "Q2 Grant Distribution", status: "running", completedSteps: 2, totalSteps: 4, projectId: "proj-4-1" },
+      { id: "plan-4-3", title: "Lab Safety Re-certification", status: "running", completedSteps: 4, totalSteps: 6, projectId: "proj-4-2" },
     ],
     teamMembers: [
       { name: "You", initials: "Y", color: "bg-blue-500" },
@@ -299,7 +300,7 @@ const clientHomeData: Record<string, ClientHomeData> = {
       },
     ],
     activePlans: [
-      { id: "plan-5-1", title: "New Hire Onboarding — March", status: "running", completedSteps: 3, totalSteps: 7 },
+      { id: "plan-5-1", title: "New Hire Onboarding — March", status: "running", completedSteps: 3, totalSteps: 7, projectId: "proj-5-1" },
       { id: "plan-5-2", title: "Contractor Audit", status: "paused", completedSteps: 1, totalSteps: 3 },
     ],
     teamMembers: [
@@ -356,8 +357,8 @@ const clientHomeData: Record<string, ClientHomeData> = {
       },
     ],
     activePlans: [
-      { id: "plan-6-1", title: "Q1 Tax Filing", status: "running", completedSteps: 5, totalSteps: 6 },
-      { id: "plan-6-2", title: "Promotion Cycle — Spring", status: "awaiting", completedSteps: 0, totalSteps: 5 },
+      { id: "plan-6-1", title: "Q1 Tax Filing", status: "running", completedSteps: 5, totalSteps: 6, projectId: "proj-6-1" },
+      { id: "plan-6-2", title: "Promotion Cycle — Spring", status: "awaiting", completedSteps: 0, totalSteps: 5, projectId: "proj-6-2" },
       { id: "plan-6-3", title: "401k Reconciliation", status: "paused", completedSteps: 2, totalSteps: 4 },
     ],
     teamMembers: [

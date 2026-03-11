@@ -1,7 +1,7 @@
 {
   "title": "Product Decision Journal",
   "project": "AI Services POC — BambooHR Consultant App",
-  "lastUpdated": "2026-03-09T21:00:00Z",
+  "lastUpdated": "2026-03-11T12:00:00Z",
   "schema": {
     "version": 1,
     "nodeTypes": ["outcome", "opportunity", "solution", "experiment", "decision"],
@@ -67,18 +67,50 @@
       "id": "OP8",
       "title": "HRCs context-switch to Salesforce for task/deadline visibility and simple updates",
       "status": "active",
-      "date": "2026-03-09",
+      "date": "2026-03-11",
       "parentId": "O2",
-      "reasoning": "HRCs use Salesforce for task tracking, deadline management, and basic project management. Throughout the day they switch between Pandopticon and Salesforce to check what's due, update task status, and log notes. This context-switching is pure 'work around the work' — the data exists in Salesforce but isn't surfaced where HRCs are already working. Two distinct pain buckets: (1) CRUD pain — too many clicks to log/update tasks in Salesforce's UI, and (2) intelligence pain — can't see what's urgent across clients, nothing connects tasks to meetings/action plans/deadlines. Discovery interviews starting 3/9 to validate which bucket dominates.",
-      "relatedIds": ["OP6", "Q10"]
+      "reasoning": "Discovery revealed Salesforce's role is narrower than assumed — it's a task template engine and billing trigger, not the day-to-day planning tool. The Customer Profile Doc (Google Docs) is the real source of truth. Three pain buckets: (1) CRUD pain — too many clicks, confusing views. (2) Intelligence pain — can't see what's urgent across clients. (3) Duplicate work pain — HRCs maintain real plans in spreadsheets/slides then update Salesforce separately; templates are outdated and require heavy editing. Salesforce does handle: deal-close billing triggers, client-to-HRC assignment (Katie), pre-loaded task templates per project type, hours spent/saved tracking. Katie wants but doesn't have: a dashboard tracking progress across projects and who's falling behind.",
+      "relatedIds": ["OP6", "Q10"],
+      "evidence": [
+        { "type": "research", "source": "HRC Workflow FigJam (discovery)", "quote": "Consultants maintain real plan in spreadsheets/slides, then update Salesforce separately. Feels like duplicate work." },
+        { "type": "research", "source": "HRC Workflow FigJam (discovery)", "quote": "Pre-loaded templates are old and outdated, requiring heavy manual editing every time." },
+        { "type": "research", "source": "HRC Workflow FigJam (discovery)", "quote": "Not a good way to present a project plan to customers — Thomas builds his in a slide deck." }
+      ]
+    },
+    {
+      "id": "OP9",
+      "title": "HRCs manually glue together 5 tools after every client call",
+      "status": "active",
+      "date": "2026-03-11",
+      "parentId": "O2",
+      "reasoning": "Discovery workflow mapping revealed the core 'work around the work': after every client call, HRCs manually copy Attention insights into the Customer Profile Doc (Google Docs), update the project plan spreadsheet (Google Sheets), sync changes to Salesforce, and prep for the next call by re-reading all three. This manual glue work repeats for every client every week. The Customer Profile Doc (Google Docs) is the real source of truth — not Salesforce. Five tools in the daily loop: Attention, Google Docs, Google Sheets, Salesforce, ChatGPT. Pandopticon's job is to eliminate the manual steps between them, not replace any single tool.",
+      "evidence": [
+        { "type": "research", "source": "HRC Workflow FigJam (discovery)", "quote": "Single Google Doc which tracks: Customer info, Discovery call, Each call with transcription highlights from Attention. This is the real source of truth." },
+        { "type": "research", "source": "HRC Workflow FigJam (discovery)", "quote": "Build Project Plan Spreadsheet ~1hr" }
+      ],
+      "relatedIds": ["OP7", "OP8", "OP5", "S17", "S18"]
+    },
+    {
+      "id": "OP10",
+      "title": "No good way to share a project plan with clients that's easy to edit, easy to share, and looks good",
+      "status": "active",
+      "date": "2026-03-11",
+      "parentId": "O2",
+      "reasoning": "HRCs need to share project plans with clients. The plan must be easy to edit, easy to share, and look professional. No current tool hits all three. Google Sheets: easy to edit and share, but not client-presentable. Google Slides: looks better, but hard to maintain — static snapshots that must be manually rebuilt after every change. Thomas builds plans in slide decks specifically because Sheets doesn't look good enough to show clients. Neither tool connects to the rest of the workflow — changes from meetings don't flow in automatically, and the HRC is the manual sync layer. The ideal: HRC edits conversationally via Pandopticon agent, Google Sheets is the backend (source of truth), and the client sees a beautiful always-current rendered view.",
+      "evidence": [
+        { "type": "research", "source": "HRC Workflow FigJam (discovery)", "quote": "Not a good way to present a project plan to customers — Thomas builds his in a slide deck." },
+        { "type": "research", "source": "HRC Workflow FigJam (discovery)", "quote": "Build Project Plan Spreadsheet ~1hr" }
+      ],
+      "relatedIds": ["OP5", "OP9", "S18", "S20", "S21", "S22", "S23", "S24", "S25"]
     },
     {
       "id": "OP5",
-      "title": "Project plan dates are buried in PDFs with no visibility in Pandopticon",
+      "title": "Project plan dates live in Google Sheets with no visibility or live link in Pandopticon",
       "status": "active",
-      "date": "2026-03-09",
+      "date": "2026-03-10",
       "parentId": "O2",
-      "reasoning": "HRCs manage multiple clients with overlapping project timelines (performance management rollouts, HRIS migrations, etc.). Currently, project plan dates are buried in PDFs and slide decks. No single view to see what's coming up across clients, which makes prioritization and meeting prep harder. This feature lets HRCs import project plans, extracts dates/phases via AI, and surfaces them in the client workspace."
+      "reasoning": "HRCs build project plans in Google Sheets and share them with clients. These are living documents — due dates shift constantly based on client conversations. A one-time import (S13) goes stale immediately. The AI agent can't prioritize work correctly with stale dates. HRCs won't re-import after every change. Pandopticon needs a live link to Google Sheets that stays current and can write back date changes captured from meetings (via Attention). The Google Sheets API supports full read/write, and OAuth is shared with Calendar/Gmail (BHR is a Google Workspace shop).",
+      "relatedIds": ["S13", "S18", "Q8"]
     },
     {
       "id": "OP1",
@@ -241,12 +273,99 @@
       "relatedIds": ["OP7", "D9"]
     },
     {
+      "id": "S17",
+      "title": "Attention.tech as meeting intelligence source (replaces/augments Google Meet/Zoom)",
+      "status": "exploring",
+      "date": "2026-03-10",
+      "parentId": "OP7",
+      "reasoning": "Attention (attention.tech, now attention.com) is an AI meeting recording and intelligence platform. It records calls on Zoom/Meet/Teams, transcribes, and produces structured extractedIntelligence — action items, next steps, decisions, competitor mentions — pre-labeled and CRM-mapped. This is significantly richer than relying on Google Meet/Zoom's basic structured summaries. Key context: BambooHR already runs Attention — no licensing or procurement needed, just API access. Two integration paths: (1) Direct REST API — Pandopticon's backend calls api.attention.tech/v2/ (API key auth, well-documented endpoints for conversations, calendar, transcripts, extracted intelligence). Same integration pattern as Salesforce/Calendar. (2) MCP server — an official open-source Attention MCP server exists (17 read-only tools), but requires Claude as the model powering Pandopticon's agents (currently GPT). Recommended approach: REST API for structured data pulls (dashboards, client home, scheduled syncs), agent-accessible tools for conversational queries ('what did we discuss about dental plans last Tuesday?'). No Attention→Salesforce auto-sync — Pandopticon reads from both sources directly, so auto-sync would create duplicates rather than add value. Testing: connect to BHR's production Attention instance (read-only access, no sandbox concept, low risk).",
+      "relatedIds": ["OP7", "S15", "D9", "Q9", "Q11"]
+    },
+    {
+      "id": "S19",
+      "title": "Google Docs integration — read/write Customer Profile Doc (the real source of truth)",
+      "status": "exploring",
+      "date": "2026-03-11",
+      "parentId": "OP9",
+      "reasoning": "Discovery revealed the Customer Profile Doc (Google Docs) is the real source of truth per client — not Salesforce. A single doc per client accumulates customer info, discovery notes, and Attention call highlights from every meeting. The Google Docs API supports full read/write (OAuth 2.0, shared with Sheets/Calendar/Gmail). Two high-value paths: (1) Write — auto-append Attention call summaries after every meeting, eliminating the most repetitive step in the weekly HRC workflow (~20 manual copy-paste sessions/week for a 20-client HRC). (2) Read — ingest the Profile Doc to dramatically enrich prep briefs and agent context with the HRC's own accumulated notes. Append-to-end is the safest write strategy (character-index-based API, but appending avoids position fragility). Transition path: Pandopticon starts by serving the doc → Client Home gradually becomes the better version of it → eventually HRCs stop opening the doc.",
+      "relatedIds": ["OP9", "S17", "S18", "S15", "D8"],
+      "evidence": [
+        { "type": "research", "source": "HRC Workflow FigJam (discovery)", "quote": "Single Google Doc which tracks: Customer info, Discovery call, Each call with transcription highlights from Attention. This is the real source of truth." }
+      ]
+    },
+    {
+      "id": "S18",
+      "title": "Live Google Sheets linking for project plans (dynamic sync + write-back)",
+      "status": "exploring",
+      "date": "2026-03-10",
+      "parentId": "OP5",
+      "reasoning": "Replace one-time plan import (S13) with a live link to Google Sheets. HRCs link a client's project plan spreadsheet; Pandopticon reads it via Google Sheets API, uses LLM to extract tasks/dates/milestones from varied spreadsheet formats, and keeps data current via hybrid freshness (post-meeting re-read + daily sync). Write-back enables the closed loop: Attention captures 'push open enrollment to April 15th' from a meeting → Pandopticon matches it to the plan → agent proposes update → HRC approves → API writes new date to the shared sheet → client sees it immediately. Auth is OAuth 2.0 shared with Calendar/Gmail. Key consideration: the sheet is client-facing, so write-back must be precise (correct cell, no formatting corruption) and the approval step is non-negotiable.",
+      "relatedIds": ["OP5", "S13", "S17", "S15", "D8"]
+    },
+    {
+      "id": "S20",
+      "title": "Approach A: Pandopticon-hosted rendered site for client-facing project plans",
+      "status": "exploring",
+      "date": "2026-03-11",
+      "parentId": "OP10",
+      "reasoning": "A read-only web page generated from the Google Sheet plan data. Client gets a bookmarked URL. Pandopticon reads the sheet, renders a polished timeline/milestone view with BambooHR branding, keeps it current. Full design control, always live, mobile-friendly. The HRC never opens the spreadsheet — they edit via agent conversation in Pandopticon chat, the agent writes to Sheets (source of truth), and the rendered site updates automatically. One sentence from the HRC → three surfaces update (Sheet, Pandopticon views, client site). Security via unguessable token URLs or simple auth. Seeds the path toward a full client portal (Approach D). This is the recommended approach — it solves all three requirements (easy to edit via chat, easy to share via URL, looks good via rendered design) without changing the HRC's workflow.",
+      "relatedIds": ["OP10", "S18", "S23"]
+    },
+    {
+      "id": "S21",
+      "title": "Approach B: Auto-generated Google Slides from Sheets data",
+      "status": "exploring",
+      "date": "2026-03-11",
+      "parentId": "OP10",
+      "reasoning": "Pandopticon reads the Sheets plan, generates a polished Slides deck via the Google Slides API. HRC edits in Sheets, client sees Slides. Stays in Google Workspace, clients already know Slides. But: Slides API is fiddly for layout, static snapshots that need re-generation after every change, not truly live, not great on mobile. Decent interim if the hosted site feels like too much infrastructure too soon.",
+      "relatedIds": ["OP10", "S18"]
+    },
+    {
+      "id": "S22",
+      "title": "Approach C: Branded PDF auto-generated after each plan update",
+      "status": "exploring",
+      "date": "2026-03-11",
+      "parentId": "OP10",
+      "reasoning": "Every plan change triggers a polished PDF dropped in a shared Drive folder or emailed to the client. PDFs look professional and are universally accessible. But static — stale immediately, clients accumulate versions, no on-demand status checking. Better as a complement to a live view than a standalone solution.",
+      "relatedIds": ["OP10"]
+    },
+    {
+      "id": "S23",
+      "title": "Approach D: Client portal within Pandopticon",
+      "status": "deferred",
+      "date": "2026-03-11",
+      "parentId": "OP10",
+      "reasoning": "A stripped-down authenticated view where clients log in and see their project plan, milestones, recent updates, meeting summaries, document links. The fullest vision — exactly what Katie said she wants ('clients could log in and see progress against project plan'). Too much scope for now (needs client auth, permissions, user management), but this is the long-term direction. Approach A (rendered site) naturally grows into this over time. Deferred, not rejected.",
+      "relatedIds": ["OP10", "S20"],
+      "evidence": [
+        { "type": "research", "source": "HRC Workflow FigJam (discovery)", "quote": "Future feature (not built): Clients could log in and see progress against Project Plan" }
+      ]
+    },
+    {
+      "id": "S24",
+      "title": "Approach E: Notion page (auto-synced from Sheets)",
+      "status": "exploring",
+      "date": "2026-03-11",
+      "parentId": "OP10",
+      "reasoning": "Pandopticon pushes plan data to a Notion page per client. Beautiful out of the box, shareable via URL, clients can comment. But adds Notion as a dependency, another tool in the stack, doesn't brand as BambooHR. BHR may not want to adopt Notion org-wide.",
+      "relatedIds": ["OP10"]
+    },
+    {
+      "id": "S25",
+      "title": "Approach F: Email digest after each milestone or plan change",
+      "status": "exploring",
+      "date": "2026-03-11",
+      "parentId": "OP10",
+      "reasoning": "Send the client a beautiful HTML email when the plan changes: 'Here's where your project stands.' Visual timeline, what's done, what's next. Meets clients in their inbox, no URL to remember, creates a communication touchpoint. But not interactive — client can't check on-demand. Works best as a complement to a live view (Approach A), not a replacement. Notify via email, link back to the live URL.",
+      "relatedIds": ["OP10", "S20"]
+    },
+    {
       "id": "S14",
       "title": "Integration Map — visual diagram of all system connections",
       "status": "active",
       "date": "2026-03-09",
       "parentId": "OP6",
-      "reasoning": "HTML diagram showing Pandopticon's relationship to 7 systems of record: BambooHR (Core, R+W), Google Calendar (Exploring, R), Google Meet/Zoom (Exploring, R), Salesforce (Exploring, R+W), Google Drive (Exploring, R), Gmail (Exploring, R+W), Slack (Exploring, R+W). Sandwich layout with 3 systems above Pandopticon, 4 below, with SVG-drawn read/write connection lines. Uses real brand logos. Living document — updates as integration status changes.",
+      "reasoning": "HTML diagram showing Pandopticon's relationship to 10 systems of record: BambooHR (Core, R+W), Google Calendar (Exploring, R), Google Meet/Zoom (Exploring, R), Attention.tech (Exploring, R), Google Docs (Exploring, R+W), Google Sheets (Exploring, R+W), Salesforce (Exploring, R+W), Google Drive (Exploring, R), Gmail (Exploring, R+W), Slack (Exploring, R+W). Sandwich layout with SVG-drawn read/write connection lines. Uses real brand logos. Living document — updates as integration status changes.",
       "artifact": "mockups/system-architecture.html",
       "relatedIds": ["OP6", "D8"]
     },
@@ -468,20 +587,26 @@
     {
       "id": "Q9",
       "title": "What does the post-meeting flow look like?",
-      "date": "2026-03-09",
-      "context": "Pre-meeting prep is built. The natural complement: after a meeting ends, AI processes the transcript/recording, extracts a structured summary (decisions, action items, open questions), and proposes updates — mark tasks complete, create new tasks, update project plan status. This closes the loop between meetings. Not yet designed."
+      "date": "2026-03-10",
+      "context": "Pre-meeting prep is built. The natural complement: after a meeting ends, AI processes the transcript/recording, extracts a structured summary (decisions, action items, open questions), and proposes updates — mark tasks complete, create new tasks, update project plan status. This closes the loop between meetings. Attention.tech changes the picture significantly — it already does the extraction (extractedIntelligence field with action items, decisions, next steps) and can auto-sync to Salesforce. Pandopticon's job becomes connection, not extraction: take Attention's structured output and link it to existing client state (action plans, open questions, project timelines). Not yet designed."
     },
     {
       "id": "Q10",
       "title": "Should Salesforce integration focus on read-only or read+write?",
-      "date": "2026-03-09",
-      "context": "Interviews starting 3/9. If CRUD pain dominates (too many clicks to log a task), HRCs will want write-back. If intelligence pain dominates (can't see what's urgent across clients), read-only into prep briefs and dashboards may be enough. The answer determines API scope and maintenance burden. Feasibility note: either path is technically manageable — the read→synthesize→surface pattern already exists. Write-back adds Salesforce OAuth + field mapping complexity but is scoped to simple updates (mark complete, log note), not building a full task CRUD. Key risk: if CRUD pain dominates, it means building a task manager — that's a different product."
+      "date": "2026-03-11",
+      "context": "Discovery revealed a third pain bucket: duplicate work. HRCs maintain real plans in spreadsheets then update Salesforce separately. Salesforce is more of a billing trigger and task template engine than a daily planning tool — the Customer Profile Doc (Google Docs) is the real source of truth. This shifts the answer: read+write is still valuable but scoped to syncing status back from Pandopticon (so HRCs stop manually updating Salesforce after updating their spreadsheet). Katie also wants a manager dashboard for cross-project progress — Pandopticon could serve this need by reading Salesforce task data and presenting it better than Salesforce does natively."
     },
     {
       "id": "Q8",
       "title": "What's the right integration priority order after BambooHR?",
-      "date": "2026-03-09",
-      "context": "Seven systems mapped but only BambooHR is core. Salesforce interviews starting 3/9 will inform whether it's next. Calendar/Meet are natural fits for meeting prep flow already prototyped. Gmail and Slack are passive monitoring plays. Google Drive is a context enrichment play. Need to sequence based on HRC pain intensity and API feasibility."
+      "date": "2026-03-11",
+      "context": "Ten systems now mapped (Google Docs elevated from Drive sub-item to its own integration). BambooHR is core. Discovery revealed the Customer Profile Doc (Google Docs) is the real source of truth — this makes Google Docs arguably the highest-priority integration after BambooHR. The Google Workspace cluster (Docs + Sheets + Calendar) shares one OAuth and covers the three most critical HRC workflows: client context (Docs), project plans (Sheets), and meeting scheduling (Calendar). Attention.tech feeds into both Docs (call summaries) and Sheets (date changes) — it's the input layer. Salesforce's role is narrower than assumed (task templates + billing, not daily planning). The most compelling integration story: Attention→Docs (auto-append call summaries) + Attention→Sheets (write back date changes) + everything→Client Home (unified prep view). Gmail and Slack remain passive monitoring. Google Drive is context enrichment for policies/SOWs."
+    },
+    {
+      "id": "Q11",
+      "title": "Should Pandopticon's agents use Claude instead of (or alongside) GPT?",
+      "date": "2026-03-10",
+      "context": "Currently agents use GPT (OpenAI). Switching to Claude (Anthropic) would unlock MCP — a protocol for giving AI models tool access to external systems. An official Attention MCP server exists (17 tools), and MCP servers exist for many other integrations (Notion, Salesforce, Slack, etc.). This is bigger than Attention — it's an architectural decision that affects how ALL integrations work with the AI agents. With Claude + MCP, agents could natively query Attention, Salesforce, Slack, etc. during conversation. With GPT, the same functionality requires wiring each integration as OpenAI function calls manually. Trade-offs: Claude MCP is more elegant and composable, but adds Anthropic as a dependency alongside OpenAI. Could also run both models for different agent types."
     },
     {
       "id": "Q6",
