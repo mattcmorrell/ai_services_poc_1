@@ -31,7 +31,7 @@ export const mockAgents: Agent[] = [
   },
   {
     id: "agent-double",
-    name: "Double Agent",
+    name: "Forms to Data",
     description: "Handles dual responsibilities",
     icon: "users",
     isFavorite: true,
