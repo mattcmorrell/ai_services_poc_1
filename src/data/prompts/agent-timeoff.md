@@ -198,3 +198,8 @@ When presenting policy specifications (typically in step 2), use a clear structu
 - Start vs end of accrual period
 - Hours-per-day conversion when source uses "days"
 - Waiting period interpretation ("PTO begins after 90 days" could mean no accrual until then, or grant at day 90)
+
+### Status Markers
+When performing multi-step work, emit status markers to show progress:
+[STATUS: description of what you're doing]
+Emit a marker BEFORE each logical step, then continue. Use 2-5 per response for substantive tasks.

@@ -18,6 +18,7 @@ import { ActionCardCompact } from "@/components/chat/action-card-compact";
 import { ClarifyingQuestionsCard } from "@/components/chat/clarifying-questions-card";
 import { GateApprovalCard } from "@/components/chat/gate-approval-card";
 import { ApprovalRequestCard } from "@/components/chat/approval-request-card";
+import { ActivityFeed } from "@/components/chat/activity-feed";
 
 export interface MessageListTheme {
   /** Message container spacing, e.g. "mb-6" or "mb-8" */
@@ -185,6 +186,9 @@ export function MessageList({
   const [expandedThinking, setExpandedThinking] = useState<
     Record<string, boolean>
   >({});
+  const [expandedContent, setExpandedContent] = useState<
+    Record<string, boolean>
+  >({});
 
   const toggleThinking = (messageId: string) => {
     setExpandedThinking((prev) => ({
@@ -234,33 +238,71 @@ export function MessageList({
             </div>
           )}
 
-          {/* Message content */}
-          <div
-            className={
-              theme.contentWrapperClass?.(message.role) ||
-              cn(
-                "prose prose-sm dark:prose-invert max-w-none",
-                message.role === "user" && "text-right"
-              )
-            }
-          >
-            <div
-              className={cn(
-                message.role === "user"
-                  ? theme.userBubbleClass ||
-                      "inline-block rounded-lg bg-muted px-4 py-2 text-foreground"
-                  : theme.assistantClass
-              )}
-              style={
-                message.role === "user"
-                  ? theme.userBubbleStyle
-                  : theme.assistantStyle
-              }
-              dangerouslySetInnerHTML={{
-                __html: transform(message.content, msgIdx),
-              }}
-            />
-          </div>
+          {/* Activity feed for messages with status updates */}
+          {message.role === "assistant" && message.statusUpdates && message.statusUpdates.length > 0 && (
+            <div className="mb-2">
+              <ActivityFeed updates={message.statusUpdates} />
+            </div>
+          )}
+
+          {/* Message content — collapsible when status updates exist */}
+          {(() => {
+            const hasActivity = message.role === "assistant" && message.statusUpdates && message.statusUpdates.length > 0;
+            const isExpanded = !hasActivity || expandedContent[message.id];
+            const hasContent = message.content.trim().length > 0;
+
+            return (
+              <>
+                {hasActivity && hasContent && (
+                  <button
+                    onClick={() =>
+                      setExpandedContent((prev) => ({
+                        ...prev,
+                        [message.id]: !prev[message.id],
+                      }))
+                    }
+                    className="mb-2 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {isExpanded ? (
+                      <ChevronDown className="h-3 w-3" />
+                    ) : (
+                      <ChevronRight className="h-3 w-3" />
+                    )}
+                    {isExpanded ? "Hide response" : "Show full response"}
+                  </button>
+                )}
+
+                {(!hasActivity || isExpanded) && hasContent && (
+                  <div
+                    className={
+                      theme.contentWrapperClass?.(message.role) ||
+                      cn(
+                        "prose prose-sm dark:prose-invert max-w-none",
+                        message.role === "user" && "text-right"
+                      )
+                    }
+                  >
+                    <div
+                      className={cn(
+                        message.role === "user"
+                          ? theme.userBubbleClass ||
+                              "inline-block rounded-lg bg-muted px-4 py-2 text-foreground"
+                          : theme.assistantClass
+                      )}
+                      style={
+                        message.role === "user"
+                          ? theme.userBubbleStyle
+                          : theme.assistantStyle
+                      }
+                      dangerouslySetInnerHTML={{
+                        __html: transform(message.content, msgIdx),
+                      }}
+                    />
+                  </div>
+                )}
+              </>
+            );
+          })()}
 
           {/* Action Plan Card */}
           {message.actionPlan && (

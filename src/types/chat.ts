@@ -48,6 +48,15 @@ export interface ClarifyingQuestions {
   answers?: Record<string, string | string[]>;
 }
 
+export interface StatusUpdate {
+  id: string;
+  label: string;
+  icon?: string;
+  status: "running" | "done" | "error";
+  detail?: string;
+  timestamp: Date;
+}
+
 export interface Message {
   id: string;
   role: "user" | "assistant";
@@ -73,6 +82,7 @@ export interface Message {
     title?: string;
     approved?: boolean;
   };
+  statusUpdates?: StatusUpdate[];
   hidden?: boolean;
   timestamp: Date;
 }

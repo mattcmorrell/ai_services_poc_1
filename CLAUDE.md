@@ -32,17 +32,30 @@ All state lives in the root `Home` component (~890 lines). Views are switched vi
 
 Chat-list-panel and dashboard-view variants are NOT yet consolidated — changes to those still need manual replication across all variants.
 
-### Chat Message Flow
+### Chat Message Flow (Streaming)
 
-1. User sends message → `handleSendMessage` in page.tsx
-2. POST to `/api/chat` with message history, clientName, and optional agentId
-3. API route loads agent-specific system prompt via `loadAgentPrompt()` if agentId provided
-4. Response parsed through three-stage pipeline:
-   - `parseArtifacts()` → extracts `<artifact>` tags, replaces with `[ARTIFACT:id]` placeholders
+Uses Vercel AI SDK v6 for streaming responses. Per-chat session architecture:
+
+1. User sends message → `useStreamingChatSession` hook calls `sendMessage`
+2. `DefaultChatTransport` POSTs to `/api/chat` with `UIMessage[]`, `clientName`, `agentId`
+3. API route uses `streamText()` + `toUIMessageStreamResponse()` (not raw OpenAI SDK)
+4. During streaming: live `[STATUS: ...]` markers extracted and shown as activity feed
+5. On `onFinish`, five-stage parsing pipeline runs on completed text:
+   - `parseStatusUpdates()` → extracts `[STATUS: ...]` markers
+   - `parseArtifacts()` → extracts `<artifact>` tags
    - `parseClarifyingQuestions()` → extracts `{"clarifyingQuestions":[...]}` JSON blocks
    - `parseActionPlan()` → extracts JSON `{"plan":{...}}` or XML `<action_plan>` blocks
-5. Each parser cleans its content before passing to the next
-6. Parsed items stored on the Message object; new action plans auto-open the plan panel
+   - `parseApprovalRequest()` → extracts gate approval patterns
+6. Parsed extras stored in a `Map<messageId, ParsedExtras>` ref, synced back to `chats` state
+7. `message-list.tsx` renders activity feed (collapsed text) + structured cards
+
+**Key files:**
+- `src/hooks/use-streaming-chat-session.ts` — per-chat streaming hook wrapping `useChat`
+- `src/lib/ai/provider.ts` — `getModel()` returning `openai("gpt-5.2")`
+- `src/lib/ai/message-adapter.ts` — `UIMessage` ↔ app `Message` conversion
+- `src/lib/status-parser.ts` — `[STATUS: ...]` marker extraction (live + final)
+
+**Gotcha:** After `onFinish` parses extras into a ref, the `useMemo` that converts messages won't re-run unless a `parseVersion` counter state is bumped. This forces React to re-derive messages with the parsed content.
 
 ### Action Plan Execution
 
@@ -67,6 +80,7 @@ Plans have a status lifecycle: pending → approved → executing → completed/
 | `chat/message-list.tsx` | Shared message renderer with `MessageListTheme` — all functional rendering lives here |
 | `chat/action-card.tsx` | Full action plan card with step timeline, approval buttons |
 | `chat/action-card-compact.tsx` | Compact plan card (used in OG + v5 variants with split plan panel) |
+| `chat/activity-feed.tsx` | Compact status lines with spinner/checkmark (Claude Code-style) |
 | `chat/clarifying-questions-card.tsx` | Tabbed multi-step question form with selectable options |
 | `artifacts/artifact-card.tsx` | Artifact list items with type-specific icons |
 | `artifacts/artifact-panel.tsx` | Side panel for viewing artifact content |
@@ -78,16 +92,28 @@ Plans have a status lifecycle: pending → approved → executing → completed/
 
 The app uses Radix `ScrollArea`. To programmatically scroll, query the viewport child element: `scrollRef.current?.querySelector('[data-radix-scroll-area-viewport]')` — do NOT use the root ref directly.
 
+### Activity Feed (Status Markers)
+
+Agent prompts include instructions to emit `[STATUS: description]` markers during multi-step work. These are parsed into compact activity lines (Claude Code-style) with spinner → checkmark transitions. Full text is collapsible behind "Show full response". This is a hybrid approach — markers are LLM-generated text now, structured to be replaceable with real Vercel AI SDK tool calls later.
+
 ## Tech Stack
 
 - **Next.js 16** with App Router, React Compiler enabled
 - **React 18**, TypeScript strict mode
 - **Tailwind CSS 4** (`@import "tailwindcss"` syntax, oklch colors)
 - **shadcn/ui** (New York style, CSS variables)
-- **OpenAI SDK** — model: `gpt-5.2`, 2000 max completion tokens
+- **Vercel AI SDK v6** (`ai`, `@ai-sdk/openai`, `@ai-sdk/react`) — streaming via `streamText`/`useChat`
+- **Model:** `gpt-5.2`, 2000 max output tokens
 - **@xyflow/react** for workflow diagrams
 - **@tremor/react** for dashboard charts
 - **lucide-react** for icons
+
+### Vercel AI SDK v6 Conventions
+- `convertToModelMessages()` is async — must `await`
+- `UIMessage` uses `.parts[]` (not `.content`) — use `getTextFromParts()` helper
+- `useChat` config: `DefaultChatTransport({ api, body })` — no `input`/`handleSubmit`/`append`
+- `onFinish` receives `({ message })` not `(msg)`
+- `maxOutputTokens` not `maxTokens` in `streamText()`
 
 ## Environment Variables
 

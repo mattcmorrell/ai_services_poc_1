@@ -56,12 +56,9 @@ import { mockAgents } from "@/data/agents-data";
 import { defaultPayrollWorkflow } from "@/data/workflow-data";
 import { Message, Chat, Client, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactPanel } from "@/components/artifacts/artifact-panel";
-import { parseArtifacts } from "@/lib/artifact-parser";
-import { parseActionPlan } from "@/lib/action-plan-parser";
-import { parseClarifyingQuestions } from "@/lib/clarifying-questions-parser";
-import { parseApprovalRequest } from "@/lib/approval-request-parser";
 import { Agent } from "@/types/agent";
 import { ClientsView } from "@/components/clients/clients-view";
+import { useStreamingChatSession } from "@/hooks/use-streaming-chat-session";
 
 const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14"] as const;
 type Variant = (typeof VARIANTS)[number];
@@ -92,7 +89,7 @@ export default function Home() {
   const [chatPanelMode, setChatPanelMode] = useState<"recent" | "clients">("recent");
   const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
   const [chats, setChats] = useState<Chat[]>(mockChats);
-  const [loadingChatId, setLoadingChatId] = useState<string | null>(null);
+  // Loading state is now derived from streamingSession.loadingChatId
   const [agents, setAgents] = useState<Agent[]>(mockAgents);
   const [clientSelectOpen, setClientSelectOpen] = useState(false);
   const [selectedAgentForClient, setSelectedAgentForClient] = useState<Agent | null>(null);
@@ -108,7 +105,45 @@ export default function Home() {
     () => mockClients.find((c) => c.id === selectedChat?.clientId),
     [selectedChat]
   );
-  const currentMessages = selectedChat?.messages || [];
+
+  // --- Streaming session for the active chat ---
+  const streamingSession = useStreamingChatSession({
+    chatId: selectedChatId || "__none__",
+    clientName: selectedClient?.name || "Unknown Client",
+    agentId: selectedChat?.agentId,
+    onFinishMessage: useCallback(({ message, artifacts: newArtifacts }: { message: Message; artifacts: Artifact[] }) => {
+      if (!selectedChatId) return;
+      // Sync the parsed assistant message + artifacts back into durable chats state
+      setChats((prev) =>
+        prev.map((c) => {
+          if (c.id !== selectedChatId) return c;
+
+          // If a new action plan arrived, decline any existing pending plans
+          let updatedMessages = c.messages;
+          if (message.actionPlan) {
+            updatedMessages = c.messages.map((msg) => {
+              if (msg.actionPlan && msg.actionPlan.status === "pending") {
+                return { ...msg, actionPlan: { ...msg.actionPlan, status: "declined" as const } };
+              }
+              return msg;
+            });
+          }
+
+          return {
+            ...c,
+            messages: [...updatedMessages, message],
+            artifacts: [...c.artifacts, ...newArtifacts],
+            updatedAt: new Date(),
+          };
+        })
+      );
+    }, [selectedChatId]),
+  });
+
+  // Use streaming messages when available, fall back to durable chats state
+  const currentMessages = streamingSession.messages.length > 0
+    ? streamingSession.messages
+    : selectedChat?.messages || [];
   const currentArtifacts = selectedChat?.artifacts || [];
   // Search all chats for the selected artifact (not just selectedChat)
   const selectedArtifact = useMemo(() => {
@@ -219,123 +254,24 @@ export default function Home() {
 
   // --- Chat-ID-explicit handlers ---
 
+  // For the active (selected) chat, use the streaming session
   const handleSendMessageForChat = useCallback(
-    async (content: string, chatId: string, options?: { hidden?: boolean }) => {
-      const chat = chats.find((c) => c.id === chatId);
-      if (!chat) return;
-
-      const chatClient = mockClients.find((c) => c.id === chat.clientId);
-
-      const userMessage: Message = {
-        id: `msg-${Date.now()}`,
-        role: "user",
-        content,
-        timestamp: new Date(),
-        ...(options?.hidden && { hidden: true }),
-      };
-
-      setChats((prev) =>
-        prev.map((c) =>
-          c.id === chatId
-            ? { ...c, messages: [...c.messages, userMessage], updatedAt: new Date() }
-            : c
-        )
-      );
-
-      setLoadingChatId(chatId);
-
-      try {
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: [...(chat.messages || []), userMessage].map(
-              (m) => ({ role: m.role, content: m.content })
-            ),
-            clientName: chatClient?.name || "Unknown Client",
-            agentId: chat.agentId,
-          }),
-        });
-
-        const data = await response.json();
-
-        const { content: artifactParsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
-
-        // Parse clarifying questions first, then action plans
-        const cqResult = parseClarifyingQuestions(artifactParsedContent);
-        const afterCqContent = cqResult?.cleanedContent || artifactParsedContent;
-
-        const actionPlanResult = parseActionPlan(afterCqContent);
-        const afterActionContent = actionPlanResult?.cleanedContent || afterCqContent;
-        let actionPlan = actionPlanResult?.plan;
-
-        // Parse approval requests (e.g. "### Gate: approve Step 4")
-        const approvalResult = parseApprovalRequest(afterActionContent);
-        const finalContent = approvalResult?.cleanedContent || afterActionContent;
-
-        // Safety net: for Time Off agent, ensure all steps are gated
-        if (actionPlan && chat.agentId === "agent-timeoff") {
-          actionPlan = {
-            ...actionPlan,
-            steps: actionPlan.steps.map(step => ({
-              ...step,
-              nonUndoable: true,
-            })),
-          };
-        }
-
-        const assistantMessage: Message = {
-          id: `msg-${Date.now() + 1}`,
-          role: "assistant",
-          content: finalContent,
-          artifactIds: newArtifacts.map((a) => a.id),
-          actionPlan,
-          clarifyingQuestions: cqResult?.questions,
-          approvalRequest: approvalResult?.approvalRequest,
-          timestamp: new Date(),
-        };
-
-        setChats((prev) =>
-          prev.map((c) => {
-            if (c.id !== chatId) return c;
-
-            let updatedMessages = c.messages;
-            if (actionPlan) {
-              updatedMessages = c.messages.map((msg) => {
-                if (msg.actionPlan && msg.actionPlan.status === "pending") {
-                  return {
-                    ...msg,
-                    actionPlan: { ...msg.actionPlan, status: "declined" as const },
-                  };
-                }
-                return msg;
-              });
-            }
-
-            return {
-              ...c,
-              messages: [...updatedMessages, assistantMessage],
-              artifacts: [...c.artifacts, ...newArtifacts],
-              updatedAt: new Date(),
-            };
-          })
-        );
-      } catch (error) {
-        console.error("Failed to send message:", error);
-      } finally {
-        setLoadingChatId(null);
+    (content: string, chatId: string, options?: { hidden?: boolean }) => {
+      // Only the selected chat uses the streaming session hook
+      if (chatId === selectedChatId) {
+        streamingSession.sendMessage(content, options);
       }
     },
-    [chats]
+    [selectedChatId, streamingSession]
   );
 
   // Wrapper for "recent" mode — uses selectedChatId
   const handleSendMessage = useCallback(
-    async (content: string, options?: { hidden?: boolean }) => {
+    (content: string, options?: { hidden?: boolean }) => {
       if (!selectedChatId) return;
-      await handleSendMessageForChat(content, selectedChatId, options);
+      streamingSession.sendMessage(content, options);
     },
-    [selectedChatId, handleSendMessageForChat]
+    [selectedChatId, streamingSession]
   );
 
   const handleApproveForChat = useCallback(
@@ -785,15 +721,20 @@ export default function Home() {
     setChatPanelMode("recent");
   };
 
+  // Pending message from dashboard — sent via streaming hook after chat becomes active
+  const pendingDashboardMessageRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (pendingDashboardMessageRef.current && selectedChatId) {
+      const msg = pendingDashboardMessageRef.current;
+      pendingDashboardMessageRef.current = null;
+      streamingSession.sendMessage(msg);
+    }
+  }, [selectedChatId, streamingSession]);
+
   const handleDashboardMessage = useCallback(
-    async (message: string, client: Client | null, chipPosition: number) => {
+    (message: string, client: Client | null, chipPosition: number) => {
       const newChatId = `chat-${Date.now()}`;
-      const userMessage: Message = {
-        id: `msg-${Date.now()}`,
-        role: "user",
-        content: message,
-        timestamp: new Date(),
-      };
 
       const newChat: Chat = {
         id: newChatId,
@@ -801,64 +742,15 @@ export default function Home() {
         title: "New Chat",
         hasUnread: false,
         updatedAt: new Date(),
-        messages: [userMessage],
+        messages: [],
         artifacts: [],
       };
 
       setChats((prev) => [newChat, ...prev]);
+      pendingDashboardMessageRef.current = message;
       setSelectedChatId(newChatId);
       setActiveView("chats");
       setChatPanelMode("recent");
-      setLoadingChatId(newChatId);
-
-      try {
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: [{ role: "user", content: message }],
-            clientName: client?.name || "Unknown Client",
-          }),
-        });
-
-        const data = await response.json();
-
-        const { content: artifactParsedContent, artifacts: newArtifacts } = parseArtifacts(data.content);
-
-        const cqResult = parseClarifyingQuestions(artifactParsedContent);
-        const afterCqContent = cqResult?.cleanedContent || artifactParsedContent;
-
-        const actionPlanResult = parseActionPlan(afterCqContent);
-        const finalContent = actionPlanResult?.cleanedContent || afterCqContent;
-        const actionPlan = actionPlanResult?.plan;
-
-        const assistantMessage: Message = {
-          id: `msg-${Date.now() + 1}`,
-          role: "assistant",
-          content: finalContent,
-          artifactIds: newArtifacts.map((a) => a.id),
-          actionPlan,
-          clarifyingQuestions: cqResult?.questions,
-          timestamp: new Date(),
-        };
-
-        setChats((prev) =>
-          prev.map((chat) =>
-            chat.id === newChatId
-              ? {
-                  ...chat,
-                  messages: [...chat.messages, assistantMessage],
-                  artifacts: [...chat.artifacts, ...newArtifacts],
-                  updatedAt: new Date(),
-                }
-              : chat
-          )
-        );
-      } catch (error) {
-        console.error("Failed to send message:", error);
-      } finally {
-        setLoadingChatId(null);
-      }
     },
     []
   );
@@ -979,7 +871,7 @@ export default function Home() {
                 onWorkflowClick={handleWorkflowClick}
                 onArtifactClick={setSelectedArtifactId}
                 onSubmitClarifyingAnswers={handleSubmitClarifyingAnswers}
-                isLoading={loadingChatId === selectedChatId}
+                isLoading={streamingSession.loadingChatId === selectedChatId}
                 activePlan={activePlan || undefined}
                 activePlanMessageId={activePlanMessage?.id}
                 planPanelOpen={planPanelOpen}
@@ -1033,7 +925,7 @@ export default function Home() {
               onNewChat={handleNewChat}
               onWorkflowClick={handleWorkflowClick}
               onArtifactClick={setSelectedArtifactId}
-              loadingChatId={loadingChatId}
+              loadingChatId={streamingSession.loadingChatId}
               chatPanelMode={chatPanelMode}
               onChatPanelModeChange={setChatPanelMode}
             />

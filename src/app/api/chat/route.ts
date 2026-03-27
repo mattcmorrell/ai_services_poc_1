@@ -1,10 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { streamText, convertToModelMessages, type UIMessage } from "ai";
+import { getModel } from "@/lib/ai/provider";
 import { loadAgentPrompt } from "@/lib/prompt-loader";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 const defaultSystemPrompt = `You are an AI assistant helping BambooHR consultants manage their clients' HR practices. You are knowledgeable about:
 - Payroll processing and tax compliance
@@ -71,11 +67,30 @@ Examples:
 - <artifact title="Tax Calculation Script" type="code" language="python">...</artifact>
 - <artifact title="Q4 Benefits Comparison" type="table">...</artifact>
 
-Keep artifact titles concise but descriptive. You can include text before/after artifacts to provide context.`;
+Keep artifact titles concise but descriptive. You can include text before/after artifacts to provide context.
 
-export async function POST(request: NextRequest) {
+STATUS MARKERS:
+When performing multi-step work or analysis, emit status markers to show your progress. Use this format:
+[STATUS: description of what you're doing]
+
+Emit a status marker BEFORE each logical step of your work, then continue your response.
+
+Examples:
+[STATUS: Reviewing current time off policies]
+[STATUS: Analyzing employee group assignments]
+[STATUS: Checking payroll configuration]
+[STATUS: Preparing policy recommendations]
+[STATUS: Generating summary report]
+
+Use 2-5 status markers per response for substantive tasks. For simple questions or short answers, you may skip status markers entirely.`;
+
+export async function POST(request: Request) {
   try {
-    const { messages, clientName, agentId } = await request.json();
+    const { messages, clientName, agentId } = (await request.json()) as {
+      messages: UIMessage[];
+      clientName: string;
+      agentId?: string;
+    };
 
     // Load agent-specific prompt if agentId is provided
     let systemPrompt = defaultSystemPrompt;
@@ -86,30 +101,22 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const formattedMessages = [
-      { role: "system" as const, content: systemPrompt + `\n\nYou are currently assisting with the client: ${clientName}` },
-      ...messages.map((msg: { role: string; content: string }) => ({
-        role: msg.role as "user" | "assistant",
-        content: msg.content,
-      })),
-    ];
+    const fullSystemPrompt =
+      systemPrompt + `\n\nYou are currently assisting with the client: ${clientName}`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-5.2",
-      messages: formattedMessages,
-      max_completion_tokens: 2000,
+    const result = streamText({
+      model: getModel(),
+      system: fullSystemPrompt,
+      messages: await convertToModelMessages(messages),
+      maxOutputTokens: 2000,
     });
 
-    const responseContent = completion.choices[0]?.message?.content || "I apologize, but I was unable to generate a response.";
-
-    return NextResponse.json({
-      content: responseContent,
-    });
+    return result.toUIMessageStreamResponse();
   } catch (error) {
-    console.error("OpenAI API error:", error);
-    return NextResponse.json(
-      { error: "Failed to generate response" },
-      { status: 500 }
-    );
+    console.error("Chat API error:", error);
+    return new Response(JSON.stringify({ error: "Failed to generate response" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

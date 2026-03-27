@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { DefaultChatTransport } from "ai";
+import { useChat } from "@ai-sdk/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Send, FileText, ClipboardCopy, Check, Loader2 } from "lucide-react";
+import { getTextFromParts } from "@/lib/ai/message-adapter";
 
-interface InterviewMessage {
+interface DisplayMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
@@ -13,13 +16,47 @@ interface InterviewMessage {
 }
 
 export function InterviewChat() {
-  const [messages, setMessages] = useState<InterviewMessage[]>([]);
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [greetingMsg, setGreetingMsg] = useState<DisplayMessage | null>(null);
+  const [summaryIds, setSummaryIds] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const greetingFetched = useRef(false);
+
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/chat",
+        body: { clientName: "Customer Interview", agentId: "agent-interviewer" },
+      }),
+    [],
+  );
+
+  const { messages: uiMessages, sendMessage, status } = useChat({
+    id: "interview",
+    transport,
+  });
+
+  const isLoading = status === "submitted" || status === "streaming";
+
+  // Convert UIMessages to display messages
+  const streamedMessages: DisplayMessage[] = useMemo(
+    () =>
+      uiMessages.map((m) => ({
+        id: m.id,
+        role: m.role as "user" | "assistant",
+        content: getTextFromParts(m),
+        isSummary: summaryIds.has(m.id),
+      })),
+    [uiMessages, summaryIds],
+  );
+
+  // Combine greeting + streamed messages
+  const messages: DisplayMessage[] = useMemo(() => {
+    if (greetingMsg) return [greetingMsg, ...streamedMessages];
+    return streamedMessages;
+  }, [greetingMsg, streamedMessages]);
 
   const scrollToBottom = useCallback(() => {
     const viewport = scrollRef.current?.querySelector(
@@ -42,23 +79,19 @@ export function InterviewChat() {
         const res = await fetch("/api/agent-greeting?agentId=agent-interviewer");
         const data = await res.json();
         if (data.greeting) {
-          setMessages([
-            {
-              id: "greeting",
-              role: "assistant",
-              content: data.greeting.trim(),
-            },
-          ]);
-        }
-      } catch {
-        setMessages([
-          {
+          setGreetingMsg({
             id: "greeting",
             role: "assistant",
-            content:
-              "Hi! I'm here to help gather your time off policy details. What types of time off do your employees get?",
-          },
-        ]);
+            content: data.greeting.trim(),
+          });
+        }
+      } catch {
+        setGreetingMsg({
+          id: "greeting",
+          role: "assistant",
+          content:
+            "Hi! I'm here to help gather your time off policy details. What types of time off do your employees get?",
+        });
       }
     }
     fetchGreeting();
@@ -68,67 +101,28 @@ export function InterviewChat() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  async function sendMessage(content: string, displayContent?: string) {
-    const userMsg: InterviewMessage = {
-      id: `user-${Date.now()}`,
-      role: "user",
-      content: displayContent || content,
-    };
-
-    const updatedMessages = [...messages, userMsg];
-    setMessages(updatedMessages);
-    setInput("");
-    setIsLoading(true);
-
-    try {
-      const apiMessages = updatedMessages.map((m) => ({
-        role: m.role,
-        content: m.role === "user" && m.content === displayContent ? content : m.content,
-      }));
-
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: apiMessages,
-          clientName: "Customer Interview",
-          agentId: "agent-interviewer",
-        }),
-      });
-
-      const data = await res.json();
-
-      const isSummary = content === "[GENERATE_SUMMARY]";
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `assistant-${Date.now()}`,
-          role: "assistant",
-          content: data.content || "Sorry, I wasn't able to respond.",
-          isSummary,
-        },
-      ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `error-${Date.now()}`,
-          role: "assistant",
-          content: "Something went wrong. Please try again.",
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-      inputRef.current?.focus();
+  // Track the next assistant message as a summary
+  const pendingSummaryRef = useRef(false);
+  useEffect(() => {
+    if (pendingSummaryRef.current && !isLoading && uiMessages.length > 0) {
+      const lastMsg = uiMessages[uiMessages.length - 1];
+      if (lastMsg.role === "assistant") {
+        setSummaryIds((prev) => new Set(prev).add(lastMsg.id));
+        pendingSummaryRef.current = false;
+      }
     }
+  }, [isLoading, uiMessages]);
+
+  function handleSend(content: string) {
+    sendMessage({ text: content });
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
-    sendMessage(trimmed);
+    handleSend(trimmed);
+    setInput("");
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -140,7 +134,8 @@ export function InterviewChat() {
 
   function generateSummary() {
     if (isLoading) return;
-    sendMessage("[GENERATE_SUMMARY]", "Please generate a summary of everything we've discussed.");
+    pendingSummaryRef.current = true;
+    handleSend("Please generate a summary of everything we've discussed.");
   }
 
   async function copySummary(content: string) {
