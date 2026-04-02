@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mono Pairings — Deep Dive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0e0e10;
+    color: #e0e0e0;
+    font-family: 'Inter', sans-serif;
+    padding: 40px 48px 80px;
+  }
+
+  a { color: #818cf8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .back { font-size: 13px; margin-bottom: 24px; display: inline-block; }
+
+  h1 { font-size: 28px; font-weight: 600; color: #fff; margin-bottom: 8px; }
+
+  .subtitle { font-size: 15px; color: #bbb; margin-bottom: 16px; max-width: 680px; line-height: 1.6; }
+
+  .nav-link {
+    display: inline-block; font-size: 14px; color: #818cf8; text-decoration: none;
+    margin-bottom: 48px; padding: 8px 16px;
+    border: 1px solid rgba(99,102,241,0.25); border-radius: 6px;
+  }
+  .nav-link:hover { background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.4); text-decoration: none; }
+
+  /* Rule banner */
+  .rule {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px 18px; background: rgba(99,102,241,0.06);
+    border: 1px solid rgba(99,102,241,0.15); border-radius: 8px;
+    margin-bottom: 48px; font-size: 13px; color: #bbb; line-height: 1.5;
+  }
+  .rule-icon { color: #818cf8; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .rule strong { color: #e0e0e0; }
+
+  /* Family sections */
+  .family-section { margin-bottom: 72px; }
+  .family-header {
+    display: flex; align-items: baseline; gap: 16px;
+    margin-bottom: 8px; padding-bottom: 12px; border-bottom: 1px solid #27272a;
+  }
+  .family-title { font-size: 18px; font-weight: 600; color: #fff; }
+  .family-sub { font-size: 13px; color: #999; }
+
+  /* Specimen grid */
+  .specimens { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; }
+  .specimen {
+    background: #18181b; border: 1px solid #27272a; border-radius: 10px; padding: 24px 28px;
+  }
+  .specimen:hover { border-color: #3f3f46; }
+  .specimen.full { grid-column: 1 / -1; }
+  .specimen-label {
+    font-size: 11px; font-weight: 500; color: #999;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px;
+  }
+
+  /* Type scale */
+  .type-scale { display: flex; flex-direction: column; gap: 12px; }
+  .type-scale-row { display: flex; align-items: baseline; gap: 16px; }
+  .type-scale-size { font-size: 11px; color: #999; min-width: 48px; text-align: right; font-variant-numeric: tabular-nums; }
+  .type-scale-sample { color: #ddd; line-height: 1.3; }
+
+  /* Activity feed */
+  .activity-feed { display: flex; flex-direction: column; gap: 0; }
+  .activity-line { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; }
+  .activity-icon { font-size: 14px; min-width: 18px; text-align: center; padding-top: 2px; }
+  .activity-icon.done { color: #4ade80; }
+  .activity-icon.running { color: #818cf8; }
+  .activity-icon.warn { color: #fbbf24; }
+  .activity-content { flex: 1; font-size: 13px; color: #bbb; line-height: 1.5; }
+  .activity-content .data-ref { color: #e0e0e0; font-weight: 500; }
+  .activity-elapsed { font-size: 12px; color: #999; white-space: nowrap; padding-top: 2px; }
+
+  /* Chat messages */
+  .chat-mock { display: flex; flex-direction: column; gap: 16px; }
+  .chat-msg { max-width: 90%; }
+  .chat-msg.assistant { align-self: flex-start; }
+  .chat-msg.user { align-self: flex-end; }
+  .chat-sender { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .chat-bubble { font-size: 14px; line-height: 1.6; color: #bbb; padding: 14px 18px; border-radius: 10px; }
+  .chat-bubble.a-bg { background: #1a1a1f; border: 1px solid #27272a; }
+  .chat-bubble.u-bg { background: #2a2a3a; border: 1px solid #3a3a4a; color: #ddd; }
+  .chat-bubble strong { color: #e0e0e0; font-weight: 600; }
+  .chat-bubble .agent-data {
+    font-size: 13px; color: #a5b4fc;
+    background: rgba(99,102,241,0.06); padding: 1px 6px; border-radius: 4px;
+  }
+  .chat-time { font-size: 11px; color: #999; margin-top: 4px; }
+
+  /* Thinking block */
+  .thinking-block { background: #111115; border: 1px solid #27272a; border-radius: 8px; overflow: hidden; }
+  .thinking-toggle {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px; font-size: 13px; color: #999; cursor: pointer; border-bottom: 1px solid #222;
+  }
+  .thinking-toggle .chevron { font-size: 11px; color: #999; }
+  .thinking-body { padding: 16px; font-size: 13px; color: #aaa; line-height: 1.7; }
+  .thinking-body .thought-step { margin-bottom: 12px; padding-left: 16px; border-left: 2px solid #27272a; }
+  .thinking-body .thought-step:last-child { margin-bottom: 0; }
+  .thinking-body .thought-label { color: #999; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .thinking-body .thought-data { color: #e0e0e0; }
+  .thinking-body .thought-flag { color: #fbbf24; }
+
+  /* Tool call output */
+  .tool-call { background: #111115; border: 1px solid #27272a; border-radius: 8px; overflow: hidden; }
+  .tool-call-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px; background: rgba(99,102,241,0.04); border-bottom: 1px solid #222;
+    font-size: 13px; color: #999;
+  }
+  .tool-call-name { color: #818cf8; font-weight: 500; }
+  .tool-call-body { padding: 16px; font-size: 13px; line-height: 1.6; color: #bbb; }
+  .tool-call-body .kv-row { display: flex; gap: 12px; padding: 4px 0; }
+  .tool-call-body .kv-key { color: #999; min-width: 120px; flex-shrink: 0; }
+  .tool-call-body .kv-val { color: #e0e0e0; }
+  .tool-call-body .kv-val.flag { color: #fbbf24; }
+  .tool-call-body .kv-val.error { color: #f87171; }
+
+  /* Anomaly card */
+  .anomaly-card { background: #18181b; border: 1px solid rgba(251,191,36,0.2); border-radius: 8px; padding: 20px 24px; }
+  .anomaly-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .anomaly-icon { color: #fbbf24; font-size: 16px; }
+  .anomaly-title { font-size: 14px; font-weight: 600; color: #e0e0e0; }
+  .anomaly-body { font-size: 14px; color: #bbb; line-height: 1.6; margin-bottom: 16px; }
+  .anomaly-evidence {
+    font-size: 13px; line-height: 1.6; color: #bbb;
+    background: #111115; border: 1px solid #222; border-radius: 6px; padding: 14px 16px;
+  }
+  .anomaly-evidence .ev-row { display: flex; gap: 12px; padding: 3px 0; }
+  .anomaly-evidence .ev-label { color: #999; min-width: 120px; }
+  .anomaly-evidence .ev-value { color: #e0e0e0; }
+  .anomaly-evidence .ev-value.hot { color: #fbbf24; font-weight: 500; }
+  .anomaly-actions { display: flex; gap: 10px; margin-top: 14px; }
+  .anomaly-btn { font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 6px; border: none; cursor: pointer; }
+  .anomaly-btn.primary { background: #4f46e5; color: #fff; }
+  .anomaly-btn.secondary { background: #27272a; color: #ccc; }
+
+  /* Action plan */
+  .plan-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .plan-title { font-size: 16px; font-weight: 600; color: #fff; }
+  .plan-status { font-size: 12px; padding: 3px 10px; border-radius: 4px; background: rgba(99,102,241,0.1); color: #818cf8; }
+  .plan-meta { display: flex; gap: 24px; margin-bottom: 16px; }
+  .plan-meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .plan-meta-value { font-size: 18px; font-weight: 600; color: #fff; }
+  .plan-meta-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.06em; }
+  .plan-steps { display: flex; flex-direction: column; gap: 0; }
+  .plan-step { display: flex; align-items: flex-start; gap: 14px; padding: 10px 0; border-bottom: 1px solid #1e1e22; font-size: 14px; color: #bbb; }
+  .plan-step:last-child { border-bottom: none; }
+  .plan-step-num { font-size: 14px; color: #999; min-width: 20px; }
+  .plan-step-text { flex: 1; }
+  .plan-step-status { font-size: 12px; padding: 2px 8px; border-radius: 3px; white-space: nowrap; }
+  .plan-step-status.done { background: rgba(74,222,128,0.08); color: #4ade80; }
+  .plan-step-status.active { background: rgba(99,102,241,0.08); color: #818cf8; }
+  .plan-step-status.gate { background: rgba(239,68,68,0.08); color: #f87171; }
+  .plan-step-status.pending { color: #999; }
+  .plan-actions { display: flex; gap: 10px; margin-top: 14px; }
+  .plan-btn { font-size: 13px; font-weight: 500; padding: 8px 20px; border-radius: 6px; border: none; cursor: pointer; }
+  .plan-btn.approve { background: #4f46e5; color: #fff; }
+  .plan-btn.decline { background: #27272a; color: #ccc; }
+
+  /* Progress bar */
+  .progress-bar { height: 6px; background: #27272a; border-radius: 3px; overflow: hidden; margin-bottom: 4px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #4f46e5, #818cf8); border-radius: 3px; }
+  .progress-label { font-size: 11px; color: #999; margin-bottom: 12px; }
+
+  /* Data table */
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th {
+    font-size: 11px; font-weight: 500; color: #999;
+    text-transform: uppercase; letter-spacing: 0.06em; text-align: left;
+    padding: 8px 12px; border-bottom: 1px solid #27272a;
+  }
+  .data-table td { font-size: 13px; color: #bbb; padding: 10px 12px; border-bottom: 1px solid #1e1e22; }
+  .data-table .num { font-variant-numeric: tabular-nums; text-align: right; }
+  .data-table .name { color: #e0e0e0; font-weight: 500; }
+
+  @media (max-width: 1000px) {
+    .specimens { grid-template-columns: 1fr; }
+    .specimen.full { grid-column: 1; }
+    body { padding: 24px 24px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<a href="font-comparison.html" class="back">&larr; Back to all fonts</a>
+
+<h1>Mono Pairings — Deep Dive</h1>
+<p class="subtitle">Three font families with matched monospace companions. Mono is used intentionally: it signals the agent's work — thinking, tool calls, extracted data, execution status. Everything else stays sans.</p>
+<a href="font-mono-intent.html" class="nav-link">Mono intent study &rarr; The design rationale</a>
+
+<div class="rule">
+  <span class="rule-icon">&#9670;</span>
+  <span><strong>The rule:</strong> If the agent computed it, extracted it, or is actively doing it — mono. If a human wrote it, would say it, or it's UI chrome — sans. Mono is the agent's voice showing through.</span>
+</div>
+
+<!-- ============================================ -->
+<!-- GEIST + GEIST MONO -->
+<!-- ============================================ -->
+<div class="family-section">
+  <div class="family-header">
+    <span class="family-title">Geist + Geist Mono</span>
+    <span class="family-sub">Vercel's typeface — clean, technical, purpose-built for dev tools</span>
+  </div>
+
+  <div class="specimens">
+
+    <!-- Type scales -->
+    <div class="specimen">
+      <div class="specimen-label">Type Scale — Sans (human layer)</div>
+      <div class="type-scale">
+        <div class="type-scale-row"><span class="type-scale-size">32px</span><span class="type-scale-sample" style="font-family:'Geist',sans-serif;font-size:32px;font-weight:600;">January Payroll</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">24px</span><span class="type-scale-sample" style="font-family:'Geist',sans-serif;font-size:24px;font-weight:600;">Benefits Enrollment Q1</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">18px</span><span class="type-scale-sample" style="font-family:'Geist',sans-serif;font-size:18px;font-weight:500;">Run payroll for 47 employees</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">14px</span><span class="type-scale-sample" style="font-family:'Geist',sans-serif;font-size:14px;">Dr. Vance has 58 overtime hours this period vs. a 3-period average.</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">13px</span><span class="type-scale-sample" style="font-family:'Geist',sans-serif;font-size:13px;color:#999;">Completed 10:34 AM &middot; 2 of 8 steps</span></div>
+      </div>
+    </div>
+
+    <div class="specimen">
+      <div class="specimen-label">Type Scale — Mono (agent layer)</div>
+      <div class="type-scale">
+        <div class="type-scale-row"><span class="type-scale-size">28px</span><span class="type-scale-sample" style="font-family:'Geist Mono',monospace;font-size:28px;font-weight:600;">$4,132.50</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">22px</span><span class="type-scale-sample" style="font-family:'Geist Mono',monospace;font-size:22px;font-weight:500;">82 hrs &nbsp; 47 ee</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">16px</span><span class="type-scale-sample" style="font-family:'Geist Mono',monospace;font-size:16px;">variance +383% &nbsp; threshold 150%</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">13px</span><span class="type-scale-sample" style="font-family:'Geist Mono',monospace;font-size:13px;color:#bbb;">Pulling employee roster &mdash; 47 active employees</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">12px</span><span class="type-scale-sample" style="font-family:'Geist Mono',monospace;font-size:12px;color:#999;">Completed &nbsp; Running &nbsp; Gate &nbsp; FAILED</span></div>
+      </div>
+    </div>
+
+    <!-- Activity feed (agent narrating) -->
+    <div class="specimen full">
+      <div class="specimen-label">Activity Feed — agent narrating its work (mono)</div>
+      <div class="activity-feed">
+        <div class="activity-line">
+          <span class="activity-icon done">&#10003;</span>
+          <span class="activity-content" style="font-family:'Geist Mono',monospace;">Pulling employee roster for Black Mesa &mdash; <span class="data-ref">47 active employees</span></span>
+          <span class="activity-elapsed" style="font-family:'Geist Mono',monospace;">1.2s</span>
+        </div>
+        <div class="activity-line">
+          <span class="activity-icon done">&#10003;</span>
+          <span class="activity-content" style="font-family:'Geist Mono',monospace;">Collecting hours from timesheet API &mdash; pay period <span class="data-ref">Jan 1&ndash;31</span></span>
+          <span class="activity-elapsed" style="font-family:'Geist Mono',monospace;">3.4s</span>
+        </div>
+        <div class="activity-line">
+          <span class="activity-icon warn">&#9888;</span>
+          <span class="activity-content" style="font-family:'Geist Mono',monospace;">Flagged <span class="data-ref">3 anomalies</span> &mdash; overtime variance, new HSA deduction, missing timesheet</span>
+          <span class="activity-elapsed" style="font-family:'Geist Mono',monospace;">0.8s</span>
+        </div>
+        <div class="activity-line">
+          <span class="activity-icon running">&#9679;</span>
+          <span class="activity-content" style="font-family:'Geist Mono',monospace;">Generating anomaly report for consultant review&hellip;</span>
+          <span class="activity-elapsed" style="font-family:'Geist Mono',monospace;">&mdash;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat with inline data -->
+    <div class="specimen">
+      <div class="specimen-label">Chat — sans prose, mono for extracted data</div>
+      <div class="chat-mock">
+        <div class="chat-msg assistant">
+          <div class="chat-sender" style="font-family:'Geist',sans-serif;">Assistant</div>
+          <div class="chat-bubble a-bg" style="font-family:'Geist',sans-serif;">I found <strong>3 anomalies</strong> in this payroll run. The biggest is Dr. Eli Vance — <span class="agent-data" style="font-family:'Geist Mono',monospace;">58 OT hrs</span> vs his <span class="agent-data" style="font-family:'Geist Mono',monospace;">12 hr avg</span>. That's a <span class="agent-data" style="font-family:'Geist Mono',monospace;">$4,132.50</span> difference in gross pay.</div>
+          <div class="chat-time" style="font-family:'Geist',sans-serif;">10:34 AM</div>
+        </div>
+        <div class="chat-msg user">
+          <div class="chat-sender" style="font-family:'Geist',sans-serif;">You</div>
+          <div class="chat-bubble u-bg" style="font-family:'Geist',sans-serif;">Is this a crunch period or should I flag it?</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent thinking -->
+    <div class="specimen">
+      <div class="specimen-label">Agent Thinking — mono reasoning block</div>
+      <div class="thinking-block">
+        <div class="thinking-toggle" style="font-family:'Geist',sans-serif;"><span class="chevron">&#9660;</span> Agent reasoning</div>
+        <div class="thinking-body" style="font-family:'Geist Mono',monospace;">
+          <div class="thought-step">
+            <div class="thought-label">Comparing</div>
+            current OT = <span class="thought-data">58.0 hrs</span>, 3-period avg = <span class="thought-data">12.0 hrs</span>
+          </div>
+          <div class="thought-step">
+            <div class="thought-label">Calculating</div>
+            variance: <span class="thought-data">+383%</span> &mdash; threshold is 150%. Base hours (<span class="thought-data">80.0</span>) normal. Anomaly isolated to overtime.
+          </div>
+          <div class="thought-step">
+            <div class="thought-label">Conclusion</div>
+            <span class="thought-flag">Flagging. Gross impact $4,132.50 &mdash; requires consultant review.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tool call output -->
+    <div class="specimen">
+      <div class="specimen-label">Tool Call Output — agent pulled this from BHR API</div>
+      <div class="tool-call">
+        <div class="tool-call-header" style="font-family:'Geist Mono',monospace;">
+          <span class="tool-call-name">bamboohr.getEmployee</span>
+          <span>&rarr; 200 OK</span>
+        </div>
+        <div class="tool-call-body" style="font-family:'Geist Mono',monospace;">
+          <div class="kv-row"><span class="kv-key">employee_id</span><span class="kv-val">4821</span></div>
+          <div class="kv-row"><span class="kv-key">name</span><span class="kv-val">Dr. Eli Vance</span></div>
+          <div class="kv-row"><span class="kv-key">hours_overtime</span><span class="kv-val flag">58.0</span></div>
+          <div class="kv-row"><span class="kv-key">gross_pay</span><span class="kv-val">$8,245.00</span></div>
+          <div class="kv-row"><span class="kv-key">prev_gross_pay</span><span class="kv-val">$4,112.50</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Anomaly card -->
+    <div class="specimen">
+      <div class="specimen-label">Anomaly — sans explanation, mono evidence</div>
+      <div class="anomaly-card">
+        <div class="anomaly-header">
+          <span class="anomaly-icon">&#9888;</span>
+          <span class="anomaly-title" style="font-family:'Geist',sans-serif;">Overtime anomaly — Dr. Eli Vance</span>
+        </div>
+        <div class="anomaly-body" style="font-family:'Geist',sans-serif;">58 overtime hours vs a 3-period average of 12. Could be a legitimate crunch period, but it's a $4,132.50 difference in gross pay.</div>
+        <div class="anomaly-evidence" style="font-family:'Geist Mono',monospace;">
+          <div class="ev-row"><span class="ev-label">current_ot</span><span class="ev-value hot">58.0 hrs</span></div>
+          <div class="ev-row"><span class="ev-label">3_period_avg</span><span class="ev-value">12.0 hrs</span></div>
+          <div class="ev-row"><span class="ev-label">variance</span><span class="ev-value hot">+383%</span></div>
+          <div class="ev-row"><span class="ev-label">gross_impact</span><span class="ev-value hot">+$4,132.50</span></div>
+        </div>
+        <div class="anomaly-actions">
+          <button class="anomaly-btn primary" style="font-family:'Geist',sans-serif;">Acknowledge</button>
+          <button class="anomaly-btn secondary" style="font-family:'Geist',sans-serif;">Investigate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action plan -->
+    <div class="specimen">
+      <div class="specimen-label">Action Plan — sans steps, mono status badges</div>
+      <div>
+        <div class="plan-header">
+          <span class="plan-title" style="font-family:'Geist',sans-serif;">Run January Payroll</span>
+          <span class="plan-status" style="font-family:'Geist Mono',monospace;">Running</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+        <div class="progress-label" style="font-family:'Geist',sans-serif;">Step 2 of 8</div>
+        <div class="plan-steps">
+          <div class="plan-step"><span class="plan-step-num" style="font-family:'Geist',sans-serif;">1</span><span class="plan-step-text" style="font-family:'Geist',sans-serif;">Create payroll run for Jan 1–31</span><span class="plan-step-status done" style="font-family:'Geist Mono',monospace;">Completed</span></div>
+          <div class="plan-step"><span class="plan-step-num" style="font-family:'Geist',sans-serif;">2</span><span class="plan-step-text" style="font-family:'Geist',sans-serif;">Collect and validate employee hours</span><span class="plan-step-status active" style="font-family:'Geist Mono',monospace;">Running</span></div>
+          <div class="plan-step"><span class="plan-step-num" style="font-family:'Geist',sans-serif;">3</span><span class="plan-step-text" style="font-family:'Geist',sans-serif;">Review against previous payroll</span><span class="plan-step-status pending">&mdash;</span></div>
+          <div class="plan-step"><span class="plan-step-num" style="font-family:'Geist',sans-serif;">5</span><span class="plan-step-text" style="font-family:'Geist',sans-serif;">Approve payroll run</span><span class="plan-step-status gate" style="font-family:'Geist Mono',monospace;">Gate</span></div>
+        </div>
+        <div class="plan-actions">
+          <button class="plan-btn approve" style="font-family:'Geist',sans-serif;">Approve Plan</button>
+          <button class="plan-btn decline" style="font-family:'Geist',sans-serif;">Decline</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data table -->
+    <div class="specimen">
+      <div class="specimen-label">Data Table — sans headers/names, mono for agent-pulled numbers</div>
+      <table class="data-table">
+        <thead>
+          <tr style="font-family:'Geist',sans-serif;">
+            <th>Employee</th><th>Dept</th><th class="num">Hours</th><th class="num">OT</th><th class="num">Gross</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name" style="font-family:'Geist',sans-serif;">Dr. Eli Vance</td>
+            <td style="font-family:'Geist',sans-serif;">Research</td>
+            <td class="num" style="font-family:'Geist Mono',monospace;">80.0</td>
+            <td class="num" style="font-family:'Geist Mono',monospace;color:#f87171;">58.0</td>
+            <td class="num" style="font-family:'Geist Mono',monospace;">$8,245.00</td>
+          </tr>
+          <tr>
+            <td class="name" style="font-family:'Geist',sans-serif;">Barney Calhoun</td>
+            <td style="font-family:'Geist',sans-serif;">Security</td>
+            <td class="num" style="font-family:'Geist Mono',monospace;">80.0</td>
+            <td class="num" style="font-family:'Geist Mono',monospace;">4.5</td>
+            <td class="num" style="font-family:'Geist Mono',monospace;">$4,112.50</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- DM SANS + DM MONO -->
+<!-- ============================================ -->
+<div class="family-section">
+  <div class="family-header">
+    <span class="family-title">DM Sans + DM Mono</span>
+    <span class="family-sub">Geometric, low-contrast — calm and clean for dashboard-heavy UIs</span>
+  </div>
+
+  <div class="specimens">
+
+    <div class="specimen">
+      <div class="specimen-label">Type Scale — Sans (human layer)</div>
+      <div class="type-scale">
+        <div class="type-scale-row"><span class="type-scale-size">32px</span><span class="type-scale-sample" style="font-family:'DM Sans',sans-serif;font-size:32px;font-weight:600;">January Payroll</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">24px</span><span class="type-scale-sample" style="font-family:'DM Sans',sans-serif;font-size:24px;font-weight:600;">Benefits Enrollment Q1</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">18px</span><span class="type-scale-sample" style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:500;">Run payroll for 47 employees</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">14px</span><span class="type-scale-sample" style="font-family:'DM Sans',sans-serif;font-size:14px;">Dr. Vance has 58 overtime hours this period vs. a 3-period average.</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">13px</span><span class="type-scale-sample" style="font-family:'DM Sans',sans-serif;font-size:13px;color:#999;">Completed 10:34 AM &middot; 2 of 8 steps</span></div>
+      </div>
+    </div>
+
+    <div class="specimen">
+      <div class="specimen-label">Type Scale — Mono (agent layer)</div>
+      <div class="type-scale">
+        <div class="type-scale-row"><span class="type-scale-size">28px</span><span class="type-scale-sample" style="font-family:'DM Mono',monospace;font-size:28px;font-weight:500;">$4,132.50</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">22px</span><span class="type-scale-sample" style="font-family:'DM Mono',monospace;font-size:22px;font-weight:500;">82 hrs &nbsp; 47 ee</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">16px</span><span class="type-scale-sample" style="font-family:'DM Mono',monospace;font-size:16px;">variance +383% &nbsp; threshold 150%</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">13px</span><span class="type-scale-sample" style="font-family:'DM Mono',monospace;font-size:13px;color:#bbb;">Pulling employee roster &mdash; 47 active employees</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">12px</span><span class="type-scale-sample" style="font-family:'DM Mono',monospace;font-size:12px;color:#999;">Completed &nbsp; Running &nbsp; Gate &nbsp; FAILED</span></div>
+      </div>
+    </div>
+
+    <!-- Activity feed -->
+    <div class="specimen full">
+      <div class="specimen-label">Activity Feed — agent narrating its work (mono)</div>
+      <div class="activity-feed">
+        <div class="activity-line">
+          <span class="activity-icon done">&#10003;</span>
+          <span class="activity-content" style="font-family:'DM Mono',monospace;">Pulling employee roster for Black Mesa &mdash; <span class="data-ref">47 active employees</span></span>
+          <span class="activity-elapsed" style="font-family:'DM Mono',monospace;">1.2s</span>
+        </div>
+        <div class="activity-line">
+          <span class="activity-icon warn">&#9888;</span>
+          <span class="activity-content" style="font-family:'DM Mono',monospace;">Flagged <span class="data-ref">3 anomalies</span> &mdash; overtime variance, new HSA deduction, missing timesheet</span>
+          <span class="activity-elapsed" style="font-family:'DM Mono',monospace;">0.8s</span>
+        </div>
+        <div class="activity-line">
+          <span class="activity-icon running">&#9679;</span>
+          <span class="activity-content" style="font-family:'DM Mono',monospace;">Generating anomaly report for consultant review&hellip;</span>
+          <span class="activity-elapsed" style="font-family:'DM Mono',monospace;">&mdash;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat -->
+    <div class="specimen">
+      <div class="specimen-label">Chat — sans prose, mono for extracted data</div>
+      <div class="chat-mock">
+        <div class="chat-msg assistant">
+          <div class="chat-sender" style="font-family:'DM Sans',sans-serif;">Assistant</div>
+          <div class="chat-bubble a-bg" style="font-family:'DM Sans',sans-serif;">I found <strong>3 anomalies</strong> in this payroll run. The biggest is Dr. Eli Vance — <span class="agent-data" style="font-family:'DM Mono',monospace;">58 OT hrs</span> vs his <span class="agent-data" style="font-family:'DM Mono',monospace;">12 hr avg</span>. That's a <span class="agent-data" style="font-family:'DM Mono',monospace;">$4,132.50</span> difference.</div>
+          <div class="chat-time" style="font-family:'DM Sans',sans-serif;">10:34 AM</div>
+        </div>
+        <div class="chat-msg user">
+          <div class="chat-sender" style="font-family:'DM Sans',sans-serif;">You</div>
+          <div class="chat-bubble u-bg" style="font-family:'DM Sans',sans-serif;">Is this a crunch period or should I flag it?</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent thinking -->
+    <div class="specimen">
+      <div class="specimen-label">Agent Thinking — mono reasoning block</div>
+      <div class="thinking-block">
+        <div class="thinking-toggle" style="font-family:'DM Sans',sans-serif;"><span class="chevron">&#9660;</span> Agent reasoning</div>
+        <div class="thinking-body" style="font-family:'DM Mono',monospace;">
+          <div class="thought-step">
+            <div class="thought-label">Comparing</div>
+            current OT = <span class="thought-data">58.0 hrs</span>, 3-period avg = <span class="thought-data">12.0 hrs</span>
+          </div>
+          <div class="thought-step">
+            <div class="thought-label">Calculating</div>
+            variance: <span class="thought-data">+383%</span> &mdash; threshold is 150%. Anomaly isolated to overtime.
+          </div>
+          <div class="thought-step">
+            <div class="thought-label">Conclusion</div>
+            <span class="thought-flag">Flagging. Gross impact $4,132.50 &mdash; requires consultant review.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tool call -->
+    <div class="specimen">
+      <div class="specimen-label">Tool Call Output — agent pulled this from BHR API</div>
+      <div class="tool-call">
+        <div class="tool-call-header" style="font-family:'DM Mono',monospace;">
+          <span class="tool-call-name">bamboohr.getEmployee</span>
+          <span>&rarr; 200 OK</span>
+        </div>
+        <div class="tool-call-body" style="font-family:'DM Mono',monospace;">
+          <div class="kv-row"><span class="kv-key">employee_id</span><span class="kv-val">4821</span></div>
+          <div class="kv-row"><span class="kv-key">name</span><span class="kv-val">Dr. Eli Vance</span></div>
+          <div class="kv-row"><span class="kv-key">hours_overtime</span><span class="kv-val flag">58.0</span></div>
+          <div class="kv-row"><span class="kv-key">gross_pay</span><span class="kv-val">$8,245.00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Anomaly -->
+    <div class="specimen">
+      <div class="specimen-label">Anomaly — sans explanation, mono evidence</div>
+      <div class="anomaly-card">
+        <div class="anomaly-header">
+          <span class="anomaly-icon">&#9888;</span>
+          <span class="anomaly-title" style="font-family:'DM Sans',sans-serif;">Overtime anomaly — Dr. Eli Vance</span>
+        </div>
+        <div class="anomaly-body" style="font-family:'DM Sans',sans-serif;">58 overtime hours vs a 3-period average of 12. Could be legitimate, but it's a $4,132.50 difference in gross pay.</div>
+        <div class="anomaly-evidence" style="font-family:'DM Mono',monospace;">
+          <div class="ev-row"><span class="ev-label">current_ot</span><span class="ev-value hot">58.0 hrs</span></div>
+          <div class="ev-row"><span class="ev-label">3_period_avg</span><span class="ev-value">12.0 hrs</span></div>
+          <div class="ev-row"><span class="ev-label">variance</span><span class="ev-value hot">+383%</span></div>
+          <div class="ev-row"><span class="ev-label">gross_impact</span><span class="ev-value hot">+$4,132.50</span></div>
+        </div>
+        <div class="anomaly-actions">
+          <button class="anomaly-btn primary" style="font-family:'DM Sans',sans-serif;">Acknowledge</button>
+          <button class="anomaly-btn secondary" style="font-family:'DM Sans',sans-serif;">Investigate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action plan -->
+    <div class="specimen">
+      <div class="specimen-label">Action Plan — sans steps, mono status badges</div>
+      <div>
+        <div class="plan-header">
+          <span class="plan-title" style="font-family:'DM Sans',sans-serif;">Run January Payroll</span>
+          <span class="plan-status" style="font-family:'DM Mono',monospace;">Running</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+        <div class="progress-label" style="font-family:'DM Sans',sans-serif;">Step 2 of 8</div>
+        <div class="plan-steps">
+          <div class="plan-step"><span class="plan-step-num" style="font-family:'DM Sans',sans-serif;">1</span><span class="plan-step-text" style="font-family:'DM Sans',sans-serif;">Create payroll run for Jan 1–31</span><span class="plan-step-status done" style="font-family:'DM Mono',monospace;">Completed</span></div>
+          <div class="plan-step"><span class="plan-step-num" style="font-family:'DM Sans',sans-serif;">2</span><span class="plan-step-text" style="font-family:'DM Sans',sans-serif;">Collect and validate employee hours</span><span class="plan-step-status active" style="font-family:'DM Mono',monospace;">Running</span></div>
+          <div class="plan-step"><span class="plan-step-num" style="font-family:'DM Sans',sans-serif;">3</span><span class="plan-step-text" style="font-family:'DM Sans',sans-serif;">Review against previous payroll</span><span class="plan-step-status pending">&mdash;</span></div>
+          <div class="plan-step"><span class="plan-step-num" style="font-family:'DM Sans',sans-serif;">5</span><span class="plan-step-text" style="font-family:'DM Sans',sans-serif;">Approve payroll run</span><span class="plan-step-status gate" style="font-family:'DM Mono',monospace;">Gate</span></div>
+        </div>
+        <div class="plan-actions">
+          <button class="plan-btn approve" style="font-family:'DM Sans',sans-serif;">Approve Plan</button>
+          <button class="plan-btn decline" style="font-family:'DM Sans',sans-serif;">Decline</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data table -->
+    <div class="specimen">
+      <div class="specimen-label">Data Table — sans headers/names, mono for agent-pulled numbers</div>
+      <table class="data-table">
+        <thead>
+          <tr style="font-family:'DM Sans',sans-serif;"><th>Employee</th><th>Dept</th><th class="num">Hours</th><th class="num">OT</th><th class="num">Gross</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name" style="font-family:'DM Sans',sans-serif;">Dr. Eli Vance</td>
+            <td style="font-family:'DM Sans',sans-serif;">Research</td>
+            <td class="num" style="font-family:'DM Mono',monospace;">80.0</td>
+            <td class="num" style="font-family:'DM Mono',monospace;color:#f87171;">58.0</td>
+            <td class="num" style="font-family:'DM Mono',monospace;">$8,245.00</td>
+          </tr>
+          <tr>
+            <td class="name" style="font-family:'DM Sans',sans-serif;">Barney Calhoun</td>
+            <td style="font-family:'DM Sans',sans-serif;">Security</td>
+            <td class="num" style="font-family:'DM Mono',monospace;">80.0</td>
+            <td class="num" style="font-family:'DM Mono',monospace;">4.5</td>
+            <td class="num" style="font-family:'DM Mono',monospace;">$4,112.50</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- IBM PLEX SANS + IBM PLEX MONO -->
+<!-- ============================================ -->
+<div class="family-section">
+  <div class="family-header">
+    <span class="family-title">IBM Plex Sans + IBM Plex Mono</span>
+    <span class="family-sub">Corporate-grade, neutral — the professional's choice</span>
+  </div>
+
+  <div class="specimens">
+
+    <div class="specimen">
+      <div class="specimen-label">Type Scale — Sans (human layer)</div>
+      <div class="type-scale">
+        <div class="type-scale-row"><span class="type-scale-size">32px</span><span class="type-scale-sample" style="font-family:'IBM Plex Sans',sans-serif;font-size:32px;font-weight:600;">January Payroll</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">24px</span><span class="type-scale-sample" style="font-family:'IBM Plex Sans',sans-serif;font-size:24px;font-weight:600;">Benefits Enrollment Q1</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">18px</span><span class="type-scale-sample" style="font-family:'IBM Plex Sans',sans-serif;font-size:18px;font-weight:500;">Run payroll for 47 employees</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">14px</span><span class="type-scale-sample" style="font-family:'IBM Plex Sans',sans-serif;font-size:14px;">Dr. Vance has 58 overtime hours this period vs. a 3-period average.</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">13px</span><span class="type-scale-sample" style="font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:#999;">Completed 10:34 AM &middot; 2 of 8 steps</span></div>
+      </div>
+    </div>
+
+    <div class="specimen">
+      <div class="specimen-label">Type Scale — Mono (agent layer)</div>
+      <div class="type-scale">
+        <div class="type-scale-row"><span class="type-scale-size">28px</span><span class="type-scale-sample" style="font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:600;">$4,132.50</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">22px</span><span class="type-scale-sample" style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:500;">82 hrs &nbsp; 47 ee</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">16px</span><span class="type-scale-sample" style="font-family:'IBM Plex Mono',monospace;font-size:16px;">variance +383% &nbsp; threshold 150%</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">13px</span><span class="type-scale-sample" style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#bbb;">Pulling employee roster &mdash; 47 active employees</span></div>
+        <div class="type-scale-row"><span class="type-scale-size">12px</span><span class="type-scale-sample" style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#999;">Completed &nbsp; Running &nbsp; Gate &nbsp; FAILED</span></div>
+      </div>
+    </div>
+
+    <!-- Activity feed -->
+    <div class="specimen full">
+      <div class="specimen-label">Activity Feed — agent narrating its work (mono)</div>
+      <div class="activity-feed">
+        <div class="activity-line">
+          <span class="activity-icon done">&#10003;</span>
+          <span class="activity-content" style="font-family:'IBM Plex Mono',monospace;">Pulling employee roster for Black Mesa &mdash; <span class="data-ref">47 active employees</span></span>
+          <span class="activity-elapsed" style="font-family:'IBM Plex Mono',monospace;">1.2s</span>
+        </div>
+        <div class="activity-line">
+          <span class="activity-icon warn">&#9888;</span>
+          <span class="activity-content" style="font-family:'IBM Plex Mono',monospace;">Flagged <span class="data-ref">3 anomalies</span> &mdash; overtime variance, new HSA deduction, missing timesheet</span>
+          <span class="activity-elapsed" style="font-family:'IBM Plex Mono',monospace;">0.8s</span>
+        </div>
+        <div class="activity-line">
+          <span class="activity-icon running">&#9679;</span>
+          <span class="activity-content" style="font-family:'IBM Plex Mono',monospace;">Generating anomaly report for consultant review&hellip;</span>
+          <span class="activity-elapsed" style="font-family:'IBM Plex Mono',monospace;">&mdash;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat -->
+    <div class="specimen">
+      <div class="specimen-label">Chat — sans prose, mono for extracted data</div>
+      <div class="chat-mock">
+        <div class="chat-msg assistant">
+          <div class="chat-sender" style="font-family:'IBM Plex Sans',sans-serif;">Assistant</div>
+          <div class="chat-bubble a-bg" style="font-family:'IBM Plex Sans',sans-serif;">I found <strong>3 anomalies</strong> in this payroll run. The biggest is Dr. Eli Vance — <span class="agent-data" style="font-family:'IBM Plex Mono',monospace;">58 OT hrs</span> vs his <span class="agent-data" style="font-family:'IBM Plex Mono',monospace;">12 hr avg</span>. That's a <span class="agent-data" style="font-family:'IBM Plex Mono',monospace;">$4,132.50</span> difference.</div>
+          <div class="chat-time" style="font-family:'IBM Plex Sans',sans-serif;">10:34 AM</div>
+        </div>
+        <div class="chat-msg user">
+          <div class="chat-sender" style="font-family:'IBM Plex Sans',sans-serif;">You</div>
+          <div class="chat-bubble u-bg" style="font-family:'IBM Plex Sans',sans-serif;">Is this a crunch period or should I flag it?</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent thinking -->
+    <div class="specimen">
+      <div class="specimen-label">Agent Thinking — mono reasoning block</div>
+      <div class="thinking-block">
+        <div class="thinking-toggle" style="font-family:'IBM Plex Sans',sans-serif;"><span class="chevron">&#9660;</span> Agent reasoning</div>
+        <div class="thinking-body" style="font-family:'IBM Plex Mono',monospace;">
+          <div class="thought-step">
+            <div class="thought-label">Comparing</div>
+            current OT = <span class="thought-data">58.0 hrs</span>, 3-period avg = <span class="thought-data">12.0 hrs</span>
+          </div>
+          <div class="thought-step">
+            <div class="thought-label">Calculating</div>
+            variance: <span class="thought-data">+383%</span> &mdash; threshold is 150%. Anomaly isolated to overtime.
+          </div>
+          <div class="thought-step">
+            <div class="thought-label">Conclusion</div>
+            <span class="thought-flag">Flagging. Gross impact $4,132.50 &mdash; requires consultant review.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tool call -->
+    <div class="specimen">
+      <div class="specimen-label">Tool Call Output — agent pulled this from BHR API</div>
+      <div class="tool-call">
+        <div class="tool-call-header" style="font-family:'IBM Plex Mono',monospace;">
+          <span class="tool-call-name">bamboohr.getEmployee</span>
+          <span>&rarr; 200 OK</span>
+        </div>
+        <div class="tool-call-body" style="font-family:'IBM Plex Mono',monospace;">
+          <div class="kv-row"><span class="kv-key">employee_id</span><span class="kv-val">4821</span></div>
+          <div class="kv-row"><span class="kv-key">name</span><span class="kv-val">Dr. Eli Vance</span></div>
+          <div class="kv-row"><span class="kv-key">hours_overtime</span><span class="kv-val flag">58.0</span></div>
+          <div class="kv-row"><span class="kv-key">gross_pay</span><span class="kv-val">$8,245.00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Anomaly -->
+    <div class="specimen">
+      <div class="specimen-label">Anomaly — sans explanation, mono evidence</div>
+      <div class="anomaly-card">
+        <div class="anomaly-header">
+          <span class="anomaly-icon">&#9888;</span>
+          <span class="anomaly-title" style="font-family:'IBM Plex Sans',sans-serif;">Overtime anomaly — Dr. Eli Vance</span>
+        </div>
+        <div class="anomaly-body" style="font-family:'IBM Plex Sans',sans-serif;">58 overtime hours vs a 3-period average of 12. Could be legitimate, but it's a $4,132.50 difference in gross pay.</div>
+        <div class="anomaly-evidence" style="font-family:'IBM Plex Mono',monospace;">
+          <div class="ev-row"><span class="ev-label">current_ot</span><span class="ev-value hot">58.0 hrs</span></div>
+          <div class="ev-row"><span class="ev-label">3_period_avg</span><span class="ev-value">12.0 hrs</span></div>
+          <div class="ev-row"><span class="ev-label">variance</span><span class="ev-value hot">+383%</span></div>
+          <div class="ev-row"><span class="ev-label">gross_impact</span><span class="ev-value hot">+$4,132.50</span></div>
+        </div>
+        <div class="anomaly-actions">
+          <button class="anomaly-btn primary" style="font-family:'IBM Plex Sans',sans-serif;">Acknowledge</button>
+          <button class="anomaly-btn secondary" style="font-family:'IBM Plex Sans',sans-serif;">Investigate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action plan -->
+    <div class="specimen">
+      <div class="specimen-label">Action Plan — sans steps, mono status badges</div>
+      <div>
+        <div class="plan-header">
+          <span class="plan-title" style="font-family:'IBM Plex Sans',sans-serif;">Run January Payroll</span>
+          <span class="plan-status" style="font-family:'IBM Plex Mono',monospace;">Running</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+        <div class="progress-label" style="font-family:'IBM Plex Sans',sans-serif;">Step 2 of 8</div>
+        <div class="plan-steps">
+          <div class="plan-step"><span class="plan-step-num" style="font-family:'IBM Plex Sans',sans-serif;">1</span><span class="plan-step-text" style="font-family:'IBM Plex Sans',sans-serif;">Create payroll run for Jan 1–31</span><span class="plan-step-status done" style="font-family:'IBM Plex Mono',monospace;">Completed</span></div>
+          <div class="plan-step"><span class="plan-step-num" style="font-family:'IBM Plex Sans',sans-serif;">2</span><span class="plan-step-text" style="font-family:'IBM Plex Sans',sans-serif;">Collect and validate employee hours</span><span class="plan-step-status active" style="font-family:'IBM Plex Mono',monospace;">Running</span></div>
+          <div class="plan-step"><span class="plan-step-num" style="font-family:'IBM Plex Sans',sans-serif;">3</span><span class="plan-step-text" style="font-family:'IBM Plex Sans',sans-serif;">Review against previous payroll</span><span class="plan-step-status pending">&mdash;</span></div>
+          <div class="plan-step"><span class="plan-step-num" style="font-family:'IBM Plex Sans',sans-serif;">5</span><span class="plan-step-text" style="font-family:'IBM Plex Sans',sans-serif;">Approve payroll run</span><span class="plan-step-status gate" style="font-family:'IBM Plex Mono',monospace;">Gate</span></div>
+        </div>
+        <div class="plan-actions">
+          <button class="plan-btn approve" style="font-family:'IBM Plex Sans',sans-serif;">Approve Plan</button>
+          <button class="plan-btn decline" style="font-family:'IBM Plex Sans',sans-serif;">Decline</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data table -->
+    <div class="specimen">
+      <div class="specimen-label">Data Table — sans headers/names, mono for agent-pulled numbers</div>
+      <table class="data-table">
+        <thead>
+          <tr style="font-family:'IBM Plex Sans',sans-serif;"><th>Employee</th><th>Dept</th><th class="num">Hours</th><th class="num">OT</th><th class="num">Gross</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name" style="font-family:'IBM Plex Sans',sans-serif;">Dr. Eli Vance</td>
+            <td style="font-family:'IBM Plex Sans',sans-serif;">Research</td>
+            <td class="num" style="font-family:'IBM Plex Mono',monospace;">80.0</td>
+            <td class="num" style="font-family:'IBM Plex Mono',monospace;color:#f87171;">58.0</td>
+            <td class="num" style="font-family:'IBM Plex Mono',monospace;">$8,245.00</td>
+          </tr>
+          <tr>
+            <td class="name" style="font-family:'IBM Plex Sans',sans-serif;">Barney Calhoun</td>
+            <td style="font-family:'IBM Plex Sans',sans-serif;">Security</td>
+            <td class="num" style="font-family:'IBM Plex Mono',monospace;">80.0</td>
+            <td class="num" style="font-family:'IBM Plex Mono',monospace;">4.5</td>
+            <td class="num" style="font-family:'IBM Plex Mono',monospace;">$4,112.50</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.48",
-    "@ai-sdk/react": "^3.0.141",
+    "@ai-sdk/react": "^3.0.145",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-scroll-area": "^1.2.10",

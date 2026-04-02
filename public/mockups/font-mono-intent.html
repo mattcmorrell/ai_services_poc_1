@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mono Intent — Where the Agent Shows Through</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0e0e10;
+    color: #e0e0e0;
+    font-family: 'Geist', sans-serif;
+    padding: 40px 48px 80px;
+  }
+
+  a { color: #818cf8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .back { font-size: 13px; margin-bottom: 24px; display: inline-block; }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: #bbb;
+    margin-bottom: 48px;
+    max-width: 680px;
+    line-height: 1.6;
+  }
+
+  /* Section dividers */
+  .section {
+    margin-bottom: 56px;
+  }
+
+  .section-header {
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .section-desc {
+    font-size: 14px;
+    color: #999;
+    line-height: 1.5;
+    max-width: 600px;
+  }
+
+  /* Rule callout */
+  .rule {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 18px;
+    background: rgba(99, 102, 241, 0.06);
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #bbb;
+    line-height: 1.5;
+  }
+
+  .rule-icon {
+    color: #818cf8;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .rule strong { color: #e0e0e0; }
+
+  /* Specimen cards */
+  .specimens {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .specimen {
+    background: #18181b;
+    border: 1px solid #27272a;
+    border-radius: 10px;
+    padding: 24px 28px;
+  }
+
+  .specimen:hover { border-color: #3f3f46; }
+
+  .specimen.full {
+    grid-column: 1 / -1;
+  }
+
+  .specimen-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+  }
+
+  /* Mono annotation tags */
+  .mono-tag {
+    display: inline-block;
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.08);
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+    letter-spacing: 0.02em;
+  }
+
+  .sans-tag {
+    display: inline-block;
+    font-size: 11px;
+    color: #999;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* ===================== */
+  /* ACTIVITY FEED         */
+  /* ===================== */
+  .activity-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .activity-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 0;
+  }
+
+  .activity-icon {
+    font-size: 14px;
+    min-width: 18px;
+    text-align: center;
+    padding-top: 2px;
+  }
+
+  .activity-icon.done { color: #4ade80; }
+  .activity-icon.running { color: #818cf8; }
+  .activity-icon.warn { color: #fbbf24; }
+
+  .activity-content {
+    flex: 1;
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: #bbb;
+    line-height: 1.5;
+  }
+
+  .activity-content .data-ref {
+    color: #e0e0e0;
+    font-weight: 500;
+  }
+
+  .activity-elapsed {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: #999;
+    white-space: nowrap;
+    padding-top: 2px;
+  }
+
+  /* ===================== */
+  /* THINKING BLOCK        */
+  /* ===================== */
+  .thinking-block {
+    background: #111115;
+    border: 1px solid #27272a;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .thinking-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #999;
+    cursor: pointer;
+    border-bottom: 1px solid #222;
+  }
+
+  .thinking-toggle .chevron {
+    font-size: 11px;
+    color: #999;
+  }
+
+  .thinking-body {
+    padding: 16px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.7;
+  }
+
+  .thinking-body .thought-step {
+    margin-bottom: 12px;
+    padding-left: 16px;
+    border-left: 2px solid #27272a;
+  }
+
+  .thinking-body .thought-step:last-child { margin-bottom: 0; }
+
+  .thinking-body .thought-label {
+    color: #999;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .thinking-body .thought-data {
+    color: #e0e0e0;
+  }
+
+  .thinking-body .thought-conclusion {
+    color: #fbbf24;
+  }
+
+  /* ===================== */
+  /* TOOL CALL OUTPUT      */
+  /* ===================== */
+  .tool-call {
+    background: #111115;
+    border: 1px solid #27272a;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .tool-call-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(99, 102, 241, 0.04);
+    border-bottom: 1px solid #222;
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: #999;
+  }
+
+  .tool-call-name {
+    color: #818cf8;
+    font-weight: 500;
+  }
+
+  .tool-call-body {
+    padding: 16px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #bbb;
+  }
+
+  .tool-call-body .kv-row {
+    display: flex;
+    gap: 12px;
+    padding: 4px 0;
+  }
+
+  .tool-call-body .kv-key {
+    color: #999;
+    min-width: 140px;
+    flex-shrink: 0;
+  }
+
+  .tool-call-body .kv-val {
+    color: #e0e0e0;
+  }
+
+  .tool-call-body .kv-val.flag {
+    color: #fbbf24;
+  }
+
+  .tool-call-body .kv-val.error {
+    color: #f87171;
+  }
+
+  /* ===================== */
+  /* ANOMALY CARD          */
+  /* ===================== */
+  .anomaly-card {
+    background: #18181b;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+
+  .anomaly-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .anomaly-icon {
+    color: #fbbf24;
+    font-size: 16px;
+  }
+
+  .anomaly-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e0e0e0;
+  }
+
+  .anomaly-body {
+    font-size: 14px;
+    color: #bbb;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .anomaly-evidence {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #bbb;
+    background: #111115;
+    border: 1px solid #222;
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+
+  .anomaly-evidence .ev-row {
+    display: flex;
+    gap: 12px;
+    padding: 3px 0;
+  }
+
+  .anomaly-evidence .ev-label {
+    color: #999;
+    min-width: 120px;
+  }
+
+  .anomaly-evidence .ev-value {
+    color: #e0e0e0;
+  }
+
+  .anomaly-evidence .ev-value.hot {
+    color: #fbbf24;
+    font-weight: 500;
+  }
+
+  .anomaly-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .anomaly-btn {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .anomaly-btn.primary {
+    background: #4f46e5;
+    color: #fff;
+  }
+
+  .anomaly-btn.secondary {
+    background: #27272a;
+    color: #ccc;
+  }
+
+  /* ===================== */
+  /* CHAT WITH INLINE DATA */
+  /* ===================== */
+  .chat-bubble {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #bbb;
+    padding: 16px 20px;
+    border-radius: 10px;
+    background: #1a1a1f;
+    border: 1px solid #27272a;
+  }
+
+  .chat-bubble strong { color: #e0e0e0; font-weight: 600; }
+
+  .chat-bubble .agent-data {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: #a5b4fc;
+    background: rgba(99, 102, 241, 0.06);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  /* ===================== */
+  /* ACTION PLAN STEP      */
+  /* ===================== */
+  .plan-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .plan-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #1e1e22;
+    font-size: 14px;
+    color: #bbb;
+  }
+
+  .plan-step:last-child { border-bottom: none; }
+
+  .plan-step-num {
+    font-size: 14px;
+    color: #999;
+    min-width: 24px;
+    padding-top: 1px;
+  }
+
+  .plan-step-text { flex: 1; }
+
+  .plan-step-status {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .plan-step-status.done {
+    font-family: 'Geist Mono', monospace;
+    background: rgba(74, 222, 128, 0.08);
+    color: #4ade80;
+  }
+
+  .plan-step-status.active {
+    font-family: 'Geist Mono', monospace;
+    background: rgba(99, 102, 241, 0.08);
+    color: #818cf8;
+  }
+
+  .plan-step-status.gate {
+    font-family: 'Geist Mono', monospace;
+    background: rgba(239, 68, 68, 0.08);
+    color: #f87171;
+  }
+
+  .plan-step-status.pending {
+    color: #999;
+  }
+
+  /* ===================== */
+  /* COMPARISON: WITH/WITHOUT */
+  /* ===================== */
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .comparison-card {
+    background: #18181b;
+    border: 1px solid #27272a;
+    border-radius: 10px;
+    padding: 24px 28px;
+  }
+
+  .comparison-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #27272a;
+  }
+
+  .comparison-label.with { color: #818cf8; }
+  .comparison-label.without { color: #999; }
+
+  @media (max-width: 1000px) {
+    .specimens { grid-template-columns: 1fr; }
+    .comparison-grid { grid-template-columns: 1fr; }
+    .specimen.full { grid-column: 1; }
+    body { padding: 24px 24px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<a href="font-mono-deep-dive.html" class="back">&larr; Back to deep dive</a>
+
+<h1>Mono Intent</h1>
+<p class="subtitle">Mono isn't for "small text" or "metadata." It's the visual signal that the agent is working, thinking, or produced this output. Everything else stays in the sans. Here's where it earns its place.</p>
+
+<!-- ======================================= -->
+<!-- THE RULE -->
+<!-- ======================================= -->
+<div class="section">
+  <div class="rule">
+    <span class="rule-icon">&#9670;</span>
+    <span><strong>The rule:</strong> If a human wrote it or would say it, it's sans. If the agent computed it, extracted it, or is actively doing it, it's mono. Mono is the agent's voice showing through the interface.</span>
+  </div>
+</div>
+
+<!-- ======================================= -->
+<!-- 1. ACTIVITY FEED — Agent narrating work -->
+<!-- ======================================= -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Activity Feed <span class="mono-tag">mono</span></div>
+    <div class="section-desc">The agent narrating what it's doing in real time. This is the strongest case for mono — these lines are literally the agent's running log. The consultant didn't write any of this; the agent is reporting its own work.</div>
+  </div>
+
+  <div class="specimens">
+    <div class="specimen full">
+      <div class="specimen-label">Agent executing a payroll run</div>
+      <div class="activity-feed">
+        <div class="activity-line">
+          <span class="activity-icon done">&#10003;</span>
+          <span class="activity-content">Pulling employee roster for Black Mesa &mdash; <span class="data-ref">47 active employees</span></span>
+          <span class="activity-elapsed">1.2s</span>
+        </div>
+        <div class="activity-line">
+          <span class="activity-icon done">&#10003;</span>
+          <span class="activity-content">Collecting hours from timesheet API &mdash; pay period <span class="data-ref">Jan 1&ndash;31</span></span>
+          <span class="activity-elapsed">3.4s</span>
+        </div>
+        <div class="activity-line">
+          <span class="activity-icon done">&#10003;</span>
+          <span class="activity-content">Cross-referencing against previous payroll run (<span class="data-ref">Dec 2025</span>)</span>
+          <span class="activity-elapsed">2.1s</span>
+        </div>
+        <div class="activity-line">
+          <span class="activity-icon warn">&#9888;</span>
+          <span class="activity-content">Flagged <span class="data-ref">3 anomalies</span> &mdash; overtime variance, new HSA deduction, missing timesheet</span>
+          <span class="activity-elapsed">0.8s</span>
+        </div>
+        <div class="activity-line">
+          <span class="activity-icon running">&#9679;</span>
+          <span class="activity-content">Generating anomaly report for consultant review&hellip;</span>
+          <span class="activity-elapsed">&mdash;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================= -->
+<!-- 2. AGENT THINKING — Internal reasoning  -->
+<!-- ======================================= -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Agent Thinking <span class="mono-tag">mono</span></div>
+    <div class="section-desc">The agent's internal reasoning, exposed. This is the machine showing its work — comparing values, making judgments, reaching conclusions. Collapsible by default, mono when expanded. This is where the "precision instrument" feel comes through strongest.</div>
+  </div>
+
+  <div class="specimens">
+    <div class="specimen full">
+      <div class="specimen-label">Thinking block — expanded</div>
+      <div class="thinking-block">
+        <div class="thinking-toggle">
+          <span class="chevron">&#9660;</span>
+          <span>Agent reasoning</span>
+        </div>
+        <div class="thinking-body">
+          <div class="thought-step">
+            <div class="thought-label">Comparing</div>
+            Dr. Eli Vance: current OT = <span class="thought-data">58.0 hrs</span>, 3-period avg = <span class="thought-data">12.0 hrs</span>
+          </div>
+          <div class="thought-step">
+            <div class="thought-label">Calculating</div>
+            Variance: <span class="thought-data">+383%</span> &mdash; threshold is 150%. Base hours (<span class="thought-data">80.0</span>) are within normal range. The anomaly is isolated to overtime.
+          </div>
+          <div class="thought-step">
+            <div class="thought-label">Checking</div>
+            No PTO, leave, or status change on file for this period. No department transfer. Role unchanged since <span class="thought-data">2024-06-15</span>.
+          </div>
+          <div class="thought-step">
+            <div class="thought-label">Conclusion</div>
+            <span class="thought-conclusion">Flagging as anomaly. Likely legitimate crunch period, but gross pay impact is $4,132.50 — requires consultant review before proceeding.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================= -->
+<!-- 3. TOOL CALL OUTPUT — API results       -->
+<!-- ======================================= -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Tool Call Output <span class="mono-tag">mono</span></div>
+    <div class="section-desc">When the agent calls the BambooHR API and gets structured data back. This is raw agent output — the machine reached into a system and pulled data. Mono signals "this came from a tool, not from prose."</div>
+  </div>
+
+  <div class="specimens">
+    <div class="specimen">
+      <div class="specimen-label">API response — employee lookup</div>
+      <div class="tool-call">
+        <div class="tool-call-header">
+          <span class="tool-call-name">bamboohr.getEmployee</span>
+          <span>&rarr; 200 OK</span>
+        </div>
+        <div class="tool-call-body">
+          <div class="kv-row"><span class="kv-key">employee_id</span><span class="kv-val">4821</span></div>
+          <div class="kv-row"><span class="kv-key">name</span><span class="kv-val">Dr. Eli Vance</span></div>
+          <div class="kv-row"><span class="kv-key">department</span><span class="kv-val">Research</span></div>
+          <div class="kv-row"><span class="kv-key">status</span><span class="kv-val">Active</span></div>
+          <div class="kv-row"><span class="kv-key">hours_regular</span><span class="kv-val">80.0</span></div>
+          <div class="kv-row"><span class="kv-key">hours_overtime</span><span class="kv-val flag">58.0</span></div>
+          <div class="kv-row"><span class="kv-key">gross_pay</span><span class="kv-val">$8,245.00</span></div>
+          <div class="kv-row"><span class="kv-key">prev_gross_pay</span><span class="kv-val">$4,112.50</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="specimen">
+      <div class="specimen-label">API response — validation failure</div>
+      <div class="tool-call">
+        <div class="tool-call-header">
+          <span class="tool-call-name">bamboohr.validateTimesheet</span>
+          <span>&rarr; 200 OK</span>
+        </div>
+        <div class="tool-call-body">
+          <div class="kv-row"><span class="kv-key">employee_id</span><span class="kv-val">2917</span></div>
+          <div class="kv-row"><span class="kv-key">name</span><span class="kv-val">Jeff Hardy</span></div>
+          <div class="kv-row"><span class="kv-key">hours_submitted</span><span class="kv-val error">0.0</span></div>
+          <div class="kv-row"><span class="kv-key">3_period_avg</span><span class="kv-val">82.0</span></div>
+          <div class="kv-row"><span class="kv-key">pto_on_file</span><span class="kv-val">None</span></div>
+          <div class="kv-row"><span class="kv-key">leave_status</span><span class="kv-val">None</span></div>
+          <div class="kv-row"><span class="kv-key">validation</span><span class="kv-val error">FAILED — missing timesheet</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================= -->
+<!-- 4. ANOMALY CARD — Agent flagging        -->
+<!-- ======================================= -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Anomaly Detection <span class="mono-tag">mono evidence</span> <span class="sans-tag">sans explanation</span></div>
+    <div class="section-desc">The agent flags something unusual. The explanation is in sans (the agent is talking to you). The evidence block is mono (the agent is showing you the data it found). This is the boundary — prose vs. proof.</div>
+  </div>
+
+  <div class="specimens">
+    <div class="specimen full">
+      <div class="specimen-label">Anomaly card in chat</div>
+      <div class="anomaly-card">
+        <div class="anomaly-header">
+          <span class="anomaly-icon">&#9888;</span>
+          <span class="anomaly-title">Overtime anomaly — Dr. Eli Vance</span>
+        </div>
+        <div class="anomaly-body">Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase. His base hours are normal — it's the OT that's unusual. Could be a legitimate crunch period, but it's a $4,132.50 difference in gross pay.</div>
+        <div class="anomaly-evidence">
+          <div class="ev-row"><span class="ev-label">current_ot</span><span class="ev-value hot">58.0 hrs</span></div>
+          <div class="ev-row"><span class="ev-label">3_period_avg</span><span class="ev-value">12.0 hrs</span></div>
+          <div class="ev-row"><span class="ev-label">variance</span><span class="ev-value hot">+383%</span></div>
+          <div class="ev-row"><span class="ev-label">base_hours</span><span class="ev-value">80.0 hrs</span></div>
+          <div class="ev-row"><span class="ev-label">gross_impact</span><span class="ev-value hot">+$4,132.50</span></div>
+          <div class="ev-row"><span class="ev-label">pto_leave</span><span class="ev-value">None on file</span></div>
+        </div>
+        <div class="anomaly-actions">
+          <button class="anomaly-btn primary">Acknowledge &amp; Continue</button>
+          <button class="anomaly-btn secondary">Investigate</button>
+          <button class="anomaly-btn secondary">Exclude from run</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================= -->
+<!-- 5. INLINE DATA IN CHAT — Agent surfaces values -->
+<!-- ======================================= -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Inline Data in Chat <span class="mono-tag">mono</span> <span class="sans-tag">sans</span></div>
+    <div class="section-desc">When the agent is explaining something in prose (sans), but surfaces a specific value it extracted or computed — that value gets a mono callout. The agent found this number; it's not part of the natural language.</div>
+  </div>
+
+  <div class="specimens">
+    <div class="specimen full">
+      <div class="specimen-label">Chat message with extracted data</div>
+      <div class="chat-bubble">I found <strong>3 anomalies</strong> in this payroll run. The biggest is Dr. Eli Vance — <span class="agent-data">58 OT hrs</span> vs. his <span class="agent-data">12 hr avg</span>. That's a <span class="agent-data">383%</span> increase, which puts the gross pay impact at <span class="agent-data">$4,132.50</span>. His base hours (<span class="agent-data">80.0</span>) are normal, so the anomaly is isolated to overtime. I'd recommend reviewing this before we proceed.</div>
+    </div>
+
+    <div class="specimen full" style="margin-top: 8px;">
+      <div class="specimen-label">Compare: same message without mono callouts</div>
+      <div class="chat-bubble" style="border-color: #222;">I found <strong>3 anomalies</strong> in this payroll run. The biggest is Dr. Eli Vance — 58 OT hrs vs. his 12 hr avg. That's a 383% increase, which puts the gross pay impact at $4,132.50. His base hours (80.0) are normal, so the anomaly is isolated to overtime. I'd recommend reviewing this before we proceed.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================= -->
+<!-- 6. ACTION PLAN — Mixed                  -->
+<!-- ======================================= -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Action Plan — Where Mono Earns It <span class="mono-tag">status only</span></div>
+    <div class="section-desc">Step descriptions are written for the consultant to understand — sans. Step status badges are the agent reporting execution state — mono. Step numbers are just UI chrome — sans. The line is: who is this text serving? The reader (sans) or the machine (mono)?</div>
+  </div>
+
+  <div class="specimens">
+    <div class="specimen full">
+      <div class="specimen-label">Plan steps — mono on status, sans on everything else</div>
+      <div class="plan-steps">
+        <div class="plan-step">
+          <span class="plan-step-num">1</span>
+          <span class="plan-step-text">Create payroll run for Jan 1–31, 2026</span>
+          <span class="plan-step-status done">Completed</span>
+        </div>
+        <div class="plan-step">
+          <span class="plan-step-num">2</span>
+          <span class="plan-step-text">Collect and validate employee hours and salary data</span>
+          <span class="plan-step-status done">Completed</span>
+        </div>
+        <div class="plan-step">
+          <span class="plan-step-num">3</span>
+          <span class="plan-step-text">Review individual employees against previous payroll</span>
+          <span class="plan-step-status active">Running</span>
+        </div>
+        <div class="plan-step">
+          <span class="plan-step-num">4</span>
+          <span class="plan-step-text">Review total payroll amounts against previous payrolls</span>
+          <span class="plan-step-status pending">&mdash;</span>
+        </div>
+        <div class="plan-step">
+          <span class="plan-step-num">5</span>
+          <span class="plan-step-text">Approve payroll run</span>
+          <span class="plan-step-status gate">Gate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================= -->
+<!-- 7. WHAT STAYS SANS                      -->
+<!-- ======================================= -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">What Stays Sans</div>
+    <div class="section-desc">Not everything systematic deserves mono. Timestamps, step numbers, labels, navigation, buttons — that's UI chrome. The consultant's own messages. The agent explaining something in prose. Headings. All sans. Mono is reserved for the moments the agent's machinery shows through.</div>
+  </div>
+
+  <div class="comparison-grid">
+    <div class="comparison-card">
+      <div class="comparison-label with">Mono — agent's work</div>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;">
+        <div style="color:#bbb;">Activity feed lines (agent narrating)</div>
+        <div style="color:#bbb;">Thinking/reasoning blocks (agent's logic)</div>
+        <div style="color:#bbb;">Tool call outputs (API responses)</div>
+        <div style="color:#bbb;">Anomaly evidence data (agent's proof)</div>
+        <div style="color:#bbb;">Inline data callouts (agent-extracted values)</div>
+        <div style="color:#bbb;">Execution status badges (Done, Running, Gate)</div>
+      </div>
+    </div>
+    <div class="comparison-card">
+      <div class="comparison-label without">Sans — everything else</div>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;">
+        <div style="color:#bbb;">Headings and titles</div>
+        <div style="color:#bbb;">Chat message body text (even from the agent)</div>
+        <div style="color:#bbb;">Step descriptions in action plans</div>
+        <div style="color:#bbb;">Anomaly explanation prose</div>
+        <div style="color:#bbb;">Buttons, navigation, labels</div>
+        <div style="color:#bbb;">Timestamps, step numbers, UI chrome</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
