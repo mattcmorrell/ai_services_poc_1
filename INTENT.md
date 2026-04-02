@@ -366,49 +366,54 @@ A separate Claude Code session was launched (via `/sidequest`) to evolve the dec
 
 ---
 
-# INTENT — Visual Design Exploration
+# INTENT — Visual Design Overhaul (Active)
 
 ## Goal
-Explore multiple visual design variants for the BambooHR consultant app. Each variant is a complete set of 3 files (dashboard-view, chat-list-panel, chat-view) that can be swapped via a floating toggle. The aim is to find the perfect aesthetic direction — warm, professional, and distinctive — before committing to a final design system.
+Build a portfolio-quality visual design for the BambooHR AI consultant app. This is a rare opportunity to show off visual design craft outside an established design system. The design should feel high-end, slightly futuristic, trustworthy, and technically impressive — "on trend but not super trendy."
 
-## Current Direction
-Building and comparing design variants side-by-side in the browser using a floating pill toggle (bottom-right corner). Each variant has a distinct aesthetic personality. Using the `/frontend-design` skill for high-quality, non-generic designs.
+## Design Direction: Mercury-Inspired
+Primary inspiration: **Mercury's marketing page** (not their product UI, which is vanilla in light mode). Full research and references in `UI-RESEARCH.md`.
+
+**Core aesthetic:**
+- Swiss grid discipline — structured layouts with visible grid logic
+- Abstract generative/mathematical art — wireframe spheres, orbital lines, concentric rings (not illustrations or stock photos)
+- Restrained palette — grayscale + one blue-purple/indigo accent. Restraint = high-end.
+- Soft blues and cool grays — a sophisticated alternative to boring business blue
+- Gradient-glow status states — cards warm from within to signal attention, not flat colored badges
+- Typographic confidence — large numbers, tight letter-spacing, generous whitespace
+- Surface depth on every card — subtle gradients, soft glow edges, material quality
+
+**Key differentiator:** Bring marketing-page-level craft into the working product UI. Close the gap that most SaaS products have between their marketing site and their actual app.
+
+## Mode Strategy
+- **Build dark mode first** — elevated dark range (#1a1c2e to #1e2030), not pure black. Handles glare from large windows.
+- **Light mode must be equally strong** — cool-tinted off-white base, cards with soft shadows (not just borders), stronger accent color to compensate for lost contrast. Solve what Mercury didn't.
+- Same palette DNA, two expressions — not just color inversion.
+
+## Previous Exploration (13 Variants)
+Explored 13 design variants (OG + V1-V11) with a floating toggle system. This provided a broad exploration of aesthetic directions. The Mercury-inspired direction supersedes this — drawing on the restraint of V5 (Liquid Glass) and the typography confidence of V4 (Swiss) while going beyond all of them.
+
+Prior variants are still in the codebase and can be referenced but are not the active direction.
 
 ## What's Done
-13 variants created and wired into the toggle system:
+- UI research completed — gold standard companies identified, design trends analyzed, galleries catalogued (`UI-RESEARCH.md`)
+- Design direction chosen (Mercury-inspired, dark-mode-first)
+- Mode strategy decided (elevated dark + solved light mode)
 
-| Variant | Name | Mode | Accent | Fonts | Vibe |
-|---------|------|------|--------|-------|------|
-| OG | Original | Dark | Blue | System | Default shadcn |
-| V1 | Bold & Classy | Dark | Gold/Amber | — | Luxury dark |
-| V2 | Brutalist Industrial | Dark | Red | Monospace | Terminal/raw |
-| V3 | Soft Editorial | Light | Warm tones | Serif | Magazine |
-| V4 | Swiss Typography | Light | Red/Black | Sans | Poster |
-| V5 | Liquid Glass | Dark | Glass | — | Frosted on black |
-| V6 | Cyberpunk Neon City | Dark | Cyan/Magenta | — | Neon noir |
-| V7 | Zen Garden | Light | Sage green | — | Calming (contrast fixed) |
-| V8 | Obsidian & Champagne | Dark | Champagne gold | Playfair Display + Plus Jakarta Sans | Warm luxury |
-| V9 | Soft Studio | Light | Dusty violet | Fraunces + Outfit | Pillowy lavender |
-| V10 | Paper & Ink | Light | Salmon coral | Spectral + Karla | Notebook/ruled |
-| V11 | Midnight Editorial | Dark | Burnt orange | Newsreader + Satoshi | Bloomberg meets Conde Nast |
-
-Toggle system in `page.tsx`: `VARIANTS` array, `variantMap` object, `designVariant` state, floating toggle UI.
-
-## Rejected Approaches
-- V7 initially had poor contrast on the chats page — fixed by darkening all text colors significantly.
+## Typography: Dual-Font Agent/Human Voice
+Monospace for agent actions, sans-serif for human space. The typeface itself signals who's acting. Pairing: **Geist Sans** (human) + **Geist Mono** (agent). See `UI-RESEARCH.md` for full mapping of which font goes where.
 
 ## Open Questions
-- Which variant(s) to move forward with as the final design?
-- Any more aesthetic directions to explore?
-- When to stop exploring and commit to a direction?
-
-## To-Do
-- [ ] **Finish visual design exploration** — continue trying new variants or refining existing ones until we're ready to pick a winner
+- ~~Typography choice~~ — Decided: Geist Sans + Geist Mono
+- Exact color tokens — need to define the palette in OKLCH/LCH
+- How do generative art motifs appear in-product? (agent avatars? empty states? loading? dashboard hero?)
+- How does the gradient-glow status pattern adapt for action plan states (pending, approved, executing, paused, stopped)?
 
 ## Next Steps
-- User to review all 13 variants in browser and identify favorites
-- Potentially create more variants or refine top picks
-- Eventually select a final design direction and remove the toggle system
+1. Build a dark-mode-first mockup of the chat view with the Mercury direction
+2. Define the color palette (dark + light mode tokens)
+3. Apply the direction to dashboard and chat-list-panel
+4. Test both modes side by side
 
 ---
 
