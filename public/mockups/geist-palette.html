@@ -27,7 +27,7 @@
   }
   /* INKWELL LIGHT */
   body.inkwell.light {
-    --bg: #EBE8E0; --card: #fff; --inner: #F5F3EF;
+    --bg: #EBE8E0; --card: #fff; --inner: #F7F5F1;
     --accent: #A27B5B; --accent-bright: #8A6A4E; --accent-dim: #8A6A4E;
     --accent-bg: rgba(162,123,91,0.1); --accent-border: rgba(162,123,91,0.15);
     --text-bright: #1C2426; --text-primary: #2E3B3D; --text-secondary: #6B7574;
@@ -49,7 +49,7 @@
   }
   /* MERCURY LIGHT */
   body.mercury.light {
-    --bg: #F3F4F6; --card: #fff; --inner: #ECEDF0;
+    --bg: #F3F4F6; --card: #fff; --inner: #F4F5F7;
     --accent: #506098; --accent-bright: #506098; --accent-dim: #405080;
     --accent-bg: rgba(80,96,152,0.07); --accent-border: rgba(80,96,152,0.12);
     --text-bright: #1C1E24; --text-primary: #3C3F48; --text-secondary: #6E7178;
@@ -57,6 +57,28 @@
     --border: rgba(30,35,50,0.07); --border-strong: rgba(30,35,50,0.11);
     --success: #4A7A52; --warning: #9A8050; --danger: #A05050;
     --inner-border: rgba(30,35,50,0.05);
+  }
+  /* ORBITAL DARK */
+  body.orbital.dark {
+    --bg: #161C22; --card: #1E2830; --inner: #2A3640;
+    --accent: #8AAEC4; --accent-bright: #B0D0E0; --accent-dim: #6890A8;
+    --accent-bg: rgba(138,174,196,0.08); --accent-border: rgba(138,174,196,0.15);
+    --text-bright: #E8EFF4; --text-primary: #E8EFF4; --text-secondary: #9AABB8;
+    --alert: #E08850; --alert-bright: #F0A468; --alert-bg: rgba(224,136,80,0.12); --alert-border: rgba(224,136,80,0.22);
+    --border: rgba(196,212,220,0.08); --border-strong: rgba(196,212,220,0.12);
+    --success: #7BAA82; --warning: #C4A060; --danger: #C07070;
+    --inner-border: rgba(196,212,220,0.06);
+  }
+  /* ORBITAL LIGHT */
+  body.orbital.light {
+    --bg: #E8EFF4; --card: #fff; --inner: #EEF4F8;
+    --accent: #4A7A98; --accent-bright: #4A7A98; --accent-dim: #3A6480;
+    --accent-bg: rgba(74,122,152,0.07); --accent-border: rgba(74,122,152,0.12);
+    --text-bright: #1A2830; --text-primary: #2A3A44; --text-secondary: #5A7080;
+    --alert: #C06828; --alert-bright: #C06828; --alert-bg: rgba(192,104,40,0.08); --alert-border: rgba(192,104,40,0.15);
+    --border: rgba(26,40,48,0.07); --border-strong: rgba(26,40,48,0.11);
+    --success: #4A8A52; --warning: #9A8050; --danger: #A05050;
+    --inner-border: rgba(26,40,48,0.05);
   }
 
   /* ============================================ */
@@ -233,6 +255,7 @@
   <div class="control-group">
     <button class="control-btn active" onclick="setColorway('inkwell')">Inkwell</button>
     <button class="control-btn" onclick="setColorway('mercury')">Mercury</button>
+    <button class="control-btn" onclick="setColorway('orbital')">Orbital</button>
   </div>
   <div class="control-sep"></div>
   <div class="control-group">
@@ -454,6 +477,24 @@ const palettes = {
       { color: '#1C2426', label: 'Inkwell' },
     ],
   },
+  orbital: {
+    dark: [
+      { color: '#161C22', label: 'Deep Space' },
+      { color: '#1E2830', label: 'Horizon' },
+      { color: '#2A3640', label: 'Dusk' },
+      { color: '#8AAEC4', label: 'Powder' },
+      { color: '#E08850', label: 'Alert' },
+      { color: '#E8EFF4', label: 'Frost' },
+    ],
+    light: [
+      { color: '#E8EFF4', label: 'Sky Wash' },
+      { color: '#EEF4F8', label: 'Mist' },
+      { color: '#FFFFFF', label: 'White' },
+      { color: '#4A7A98', label: 'Powder' },
+      { color: '#C06828', label: 'Alert' },
+      { color: '#1A2830', label: 'Deep Space' },
+    ],
+  },
   mercury: {
     dark: [
       { color: '#101214', label: 'Void' },
@@ -510,6 +551,7 @@ function apply() {
 document.addEventListener('keydown', e => {
   if (e.key === '1') setColorway('inkwell');
   if (e.key === '2') setColorway('mercury');
+  if (e.key === '3') setColorway('orbital');
   if (e.key === 'd') setMode('dark');
   if (e.key === 'l') setMode('light');
 });
