@@ -61,7 +61,7 @@ Their light mode dashboard is indistinguishable from dozens of other SaaS produc
   - Cards with depth (soft shadows, subtle surface gradients — not just borders)
   - Accent color running slightly stronger to compensate for lost contrast
   - Generative art motifs adapted as subtle textures
-- **Same palette DNA, two expressions** — not just color inversion
+- **Two distinct emotional temperatures, one system.** Dark mode = cool, restrained, focused, professional. Light mode = warm, spacious, luxurious, aspirational. They share the same components and grid but each has its own personality — not just an inverted color scheme. This is what makes Mercury's dark mode better than their light mode: they designed for it, not derived it.
 
 ---
 
@@ -182,6 +182,18 @@ Subtle noise overlay on surfaces for tactile quality. Canvas-generated 256x256 n
 - **Light surfaces (#f0+ range): 3% opacity**
 - Only noticeable when you compare side-by-side with a flat version — never distracting
 - SVG filter approach is unreliable in browsers — use canvas-generated PNG (see `public/mockups/color-swatches.html` for working implementation)
+
+### Prometheus / Weyland Industries Influence
+The fictional Weyland Industries corporate site (jeeto.com/prometheus) nails "serious institutional AI" — transferable ideas:
+- **Module numbering on section labels** — `MODULE 3 · PAYROLL EXECUTION`, `AGENT 04 · COMPLIANCE CHECK`. Small caps, tracked-out, numbered. Mission-control cadence without hazard stripes.
+- **Bold keyword in headlines** — "PLAN **EXECUTING**", "CLIENT **OVERVIEW**". One word carries the weight.
+- **Dot-grid background texture** — faint technical grid on surfaces as an alternative to noise/grain. Reads as "blueprint paper." Consider for agent-related panels.
+- **Cyan/teal accent for tech elements only** — surgical use on interactive/agent UI, not as general accent.
+- **Gold/amber as warm counterpoint on cool institutional base** — matches our dual-temperature concept.
+- **Numbered capability grid (01–08)** — plan steps, agent capabilities as a tight numbered grid.
+- **Light/dark section rhythm** — dashboard (light) / chat+agent area (dark) as distinct visual chapters.
+
+Screenshots in `screenshots/prometheus-*.png`.
 
 ### Tracked-Out Type (Superhuman Detail)
 Wide letter-spacing on brand wordmarks / section labels only. Not on body text, not on nav items. All caps + thin weight + tracking = elegant. Use sparingly — one or two moments per view (e.g., agent name in status bar, product wordmark). The "luxury e-commerce every-label-tracked" look from 2018-2020 is dead, but a single tracked-out wordmark is a timeless Swiss typography move.
