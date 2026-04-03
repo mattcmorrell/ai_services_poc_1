@@ -47,6 +47,12 @@ import { DashboardView as DashboardViewV13 } from "@/components/dashboard/dashbo
 import { ChatListPanel as ChatListPanelV14 } from "@/components/chat-list-panel-v13";
 import { ChatView as ChatViewV14 } from "@/components/chat-view-v13";
 import { DashboardView as DashboardViewV14 } from "@/components/dashboard/dashboard-view-v13";
+import { ChatListPanel as ChatListPanelV15 } from "@/components/chat-list-panel-v15";
+import { ChatView as ChatViewV15 } from "@/components/chat-view-v15";
+import { DashboardView as DashboardViewV15 } from "@/components/dashboard/dashboard-view-v15";
+import { ChatListPanel as ChatListPanelV16 } from "@/components/chat-list-panel-v16";
+import { ChatView as ChatViewV16 } from "@/components/chat-view-v16";
+import { DashboardView as DashboardViewV16 } from "@/components/dashboard/dashboard-view-v16";
 import { AgentsView } from "@/components/agents/agents-view";
 import { ClientSelectDialog } from "@/components/agents/client-select-dialog";
 import { WorkflowPanel } from "@/components/workflow/workflow-panel";
@@ -60,7 +66,7 @@ import { Agent } from "@/types/agent";
 import { ClientsView } from "@/components/clients/clients-view";
 import { useStreamingChatSession } from "@/hooks/use-streaming-chat-session";
 
-const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14"] as const;
+const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16"] as const;
 type Variant = (typeof VARIANTS)[number];
 
 const variantMap = {
@@ -79,6 +85,8 @@ const variantMap = {
   v12: { DashboardView: DashboardViewV12, ChatListPanel: ChatListPanelV12, ChatView: ChatViewV12 },
   v13: { DashboardView: DashboardViewV13, ChatListPanel: ChatListPanelV13, ChatView: ChatViewV13 },
   v14: { DashboardView: DashboardViewV14, ChatListPanel: ChatListPanelV14, ChatView: ChatViewV14 },
+  v15: { DashboardView: DashboardViewV15, ChatListPanel: ChatListPanelV15, ChatView: ChatViewV15 },
+  v16: { DashboardView: DashboardViewV16, ChatListPanel: ChatListPanelV16, ChatView: ChatViewV16 },
 };
 
 export default function Home() {
@@ -952,7 +960,69 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className={`flex h-screen overflow-hidden ${designVariant === "v15" ? "theme-mercury" : ""} ${designVariant === "v16" ? "theme-orbital" : ""}`}>
+      {designVariant === "v15" && (
+        <style>{`
+          .theme-mercury {
+            --background: #101214;
+            --foreground: #E8E9ED;
+            --card: #222428;
+            --card-foreground: #E8E9ED;
+            --popover: #191B1F;
+            --popover-foreground: #E8E9ED;
+            --primary: #6878B8;
+            --primary-foreground: #E8E9ED;
+            --secondary: #222428;
+            --secondary-foreground: #E8E9ED;
+            --muted: #222428;
+            --muted-foreground: #9DA0A8;
+            --accent: #222428;
+            --accent-foreground: #E8E9ED;
+            --destructive: #E08850;
+            --border: rgba(180, 185, 200, 0.07);
+            --input: rgba(180, 185, 200, 0.1);
+            --ring: #6878B8;
+            --sidebar: #101214;
+            --sidebar-foreground: #E8E9ED;
+            --sidebar-primary: #6878B8;
+            --sidebar-primary-foreground: #E8E9ED;
+            --sidebar-accent: #222428;
+            --sidebar-accent-foreground: #E8E9ED;
+            --sidebar-border: rgba(180, 185, 200, 0.07);
+          }
+        `}</style>
+      )}
+      {designVariant === "v16" && (
+        <style>{`
+          .theme-orbital {
+            --background: #161C22;
+            --foreground: #E8EFF4;
+            --card: #1E2830;
+            --card-foreground: #E8EFF4;
+            --popover: #1A2228;
+            --popover-foreground: #E8EFF4;
+            --primary: #8AAEC4;
+            --primary-foreground: #E8EFF4;
+            --secondary: #2A3640;
+            --secondary-foreground: #E8EFF4;
+            --muted: #2A3640;
+            --muted-foreground: #9AABB8;
+            --accent: #2A3640;
+            --accent-foreground: #E8EFF4;
+            --destructive: #E08850;
+            --border: rgba(196, 212, 220, 0.08);
+            --input: rgba(196, 212, 220, 0.1);
+            --ring: #8AAEC4;
+            --sidebar: #161C22;
+            --sidebar-foreground: #E8EFF4;
+            --sidebar-primary: #8AAEC4;
+            --sidebar-primary-foreground: #E8EFF4;
+            --sidebar-accent: #2A3640;
+            --sidebar-accent-foreground: #E8EFF4;
+            --sidebar-border: rgba(196, 212, 220, 0.08);
+          }
+        `}</style>
+      )}
       <Sidebar activeView={activeView} onViewChange={setActiveView} />
       {renderMainContent()}
       <ClientSelectDialog

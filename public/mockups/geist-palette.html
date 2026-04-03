@@ -242,10 +242,96 @@
   .data-table .name { color: var(--text-bright); font-weight: 500; }
   .data-table .num { font-variant-numeric: tabular-nums; text-align: right; }
 
+  /* ---- LUNAR EXPLORATION ---- */
+  .lunar-section {
+    margin: 32px 0 8px;
+    padding: 28px 32px 32px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+  }
+  .lunar-section .lunar-section-title { color: #e0e0e0; }
+  .lunar-section .lunar-section-sub { color: #888; }
+  .lunar-section .lunar-section-desc { color: #999; }
+  .lunar-section .lunar-label { color: #bbb; }
+  .lunar-section .lunar-hex { color: #888; }
+  .lunar-section .lunar-context-label { color: #888; }
+  .lunar-section-header {
+    display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px;
+  }
+  .lunar-section-title {
+    font-family: 'Geist', sans-serif;
+    font-size: 18px; font-weight: 600; color: var(--text-bright);
+  }
+  .lunar-section-sub {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px; color: var(--text-secondary); letter-spacing: 0.04em;
+  }
+  .lunar-section-desc {
+    font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;
+  }
+  .lunar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .lunar-card {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .lunar-pair {
+    display: flex; width: 100%; gap: 3px; border-radius: 10px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .lunar-swatch {
+    flex: 1; aspect-ratio: 1/1;
+    transition: box-shadow 0.2s;
+  }
+  .lunar-swatch:hover {
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.2);
+  }
+  .lunar-swatch-base {
+    opacity: 0.85;
+  }
+  .lunar-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px; color: var(--text-secondary);
+    text-align: center; letter-spacing: 0.02em;
+  }
+  .lunar-hex {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px; color: var(--text-secondary); opacity: 0.7;
+    text-align: center;
+  }
+  .lunar-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    padding: 3px 8px; border-radius: 4px;
+    margin-top: 2px; display: inline-block;
+  }
+  .lunar-context {
+    display: flex; gap: 12px; margin-top: 20px; padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .lunar-context-swatch {
+    width: 100%; aspect-ratio: 5/2; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500;
+  }
+  .lunar-context-card {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .lunar-context-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px; color: var(--text-secondary); text-align: center;
+  }
+
   @media (max-width: 1000px) {
     .specimens { grid-template-columns: 1fr; }
     .specimen.full { grid-column: 1; }
     body { padding: 24px 24px 60px; }
+    .lunar-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
@@ -270,6 +356,19 @@
 <p class="subtitle">Same specimens, two colorways. Toggle Inkwell (warm teal) vs Mercury (cool indigo) and dark/light to compare all four combinations.</p>
 
 <div class="swatches" id="swatches"></div>
+
+<!-- LUNAR EXPLORATION -->
+<div class="lunar-section" id="lunarSection">
+  <div class="lunar-section-header">
+    <span class="lunar-section-title">Lunar Variations</span>
+    <span class="lunar-section-sub">inner surface · #2E3B3D baseline</span>
+  </div>
+  <p class="lunar-section-desc">
+    Exploring the inner/card surface color that sits on top of the card background. Used for input fields, nested containers, hover states.
+  </p>
+  <div class="lunar-grid" id="lunarGrid"></div>
+  <div class="lunar-context" id="lunarContext"></div>
+</div>
 
 <div class="rule">
   <span class="rule-icon">&#9670;</span>
@@ -545,6 +644,7 @@ function apply() {
   container.innerHTML = sw.map(s =>
     `<div class="swatch"><div class="swatch-color" style="background:${s.color};"></div> ${s.label} ${s.color}</div>`
   ).join('');
+  renderLunar();
 }
 
 // Keyboard shortcuts: 1=inkwell, 2=mercury, d=dark, l=light
@@ -556,8 +656,121 @@ document.addEventListener('keydown', e => {
   if (e.key === 'l') setMode('light');
 });
 
+// ---- LUNAR EXPLORATION ----
+const lunarVariations = {
+  inkwell: {
+    dark: {
+      base: { hex: '#2E3B3D', label: 'Lunar (base)' },
+      variants: [
+        { hex: '#3A4440', label: 'Warmer', tag: '+warm', desc: 'Shift green channel up, red slightly' },
+        { hex: '#2A3840', label: 'Cooler', tag: '+cool', desc: 'Push toward blue-slate' },
+        { hex: '#384848', label: 'Lighter', tag: '+light', desc: 'Lift all channels evenly' },
+        { hex: '#2E4540', label: 'More saturated', tag: '+sat', desc: 'Push green/teal, pull red down' },
+      ],
+      card: '#1C2426',
+      textOnInner: '#C8C2B4',
+    },
+    light: {
+      base: { hex: '#F7F5F1', label: 'Inner (base)' },
+      variants: [
+        { hex: '#F8F4EA', label: 'Warmer', tag: '+warm', desc: 'More cream/yellow' },
+        { hex: '#F2F4F6', label: 'Cooler', tag: '+cool', desc: 'Blue-gray undertone' },
+        { hex: '#FDFCFA', label: 'Lighter', tag: '+light', desc: 'Closer to white' },
+        { hex: '#F0F0E8', label: 'More saturated', tag: '+sat', desc: 'Push the warm tint' },
+      ],
+      card: '#FFFFFF',
+      textOnInner: '#6B7574',
+    },
+  },
+  mercury: {
+    dark: {
+      base: { hex: '#222428', label: 'Steel (base)' },
+      variants: [
+        { hex: '#282830', label: 'Warmer', tag: '+warm', desc: 'Slight purple warmth' },
+        { hex: '#1E2228', label: 'Cooler', tag: '+cool', desc: 'Push toward navy' },
+        { hex: '#2A2C32', label: 'Lighter', tag: '+light', desc: 'Lift evenly' },
+        { hex: '#222838', label: 'More saturated', tag: '+sat', desc: 'Push blue channel' },
+      ],
+      card: '#191B1F',
+      textOnInner: '#9DA0A8',
+    },
+    light: {
+      base: { hex: '#F4F5F7', label: 'Inner (base)' },
+      variants: [
+        { hex: '#F6F5F2', label: 'Warmer', tag: '+warm', desc: 'Cream touch' },
+        { hex: '#F0F2F6', label: 'Cooler', tag: '+cool', desc: 'Blue-gray' },
+        { hex: '#F9FAFB', label: 'Lighter', tag: '+light', desc: 'Near white' },
+        { hex: '#ECEEF4', label: 'More saturated', tag: '+sat', desc: 'Push blue tint' },
+      ],
+      card: '#FFFFFF',
+      textOnInner: '#6E7178',
+    },
+  },
+  orbital: {
+    dark: {
+      base: { hex: '#2A3640', label: 'Dusk (base)' },
+      variants: [
+        { hex: '#303840', label: 'Warmer', tag: '+warm', desc: 'Slight green-brown shift' },
+        { hex: '#243848', label: 'Cooler', tag: '+cool', desc: 'Push blue deeper' },
+        { hex: '#34424C', label: 'Lighter', tag: '+light', desc: 'Lift evenly' },
+        { hex: '#264048', label: 'More saturated', tag: '+sat', desc: 'Push teal channel' },
+      ],
+      card: '#1E2830',
+      textOnInner: '#9AABB8',
+    },
+    light: {
+      base: { hex: '#EEF4F8', label: 'Mist (base)' },
+      variants: [
+        { hex: '#F2F4F2', label: 'Warmer', tag: '+warm', desc: 'Slight sage' },
+        { hex: '#E8F0F8', label: 'Cooler', tag: '+cool', desc: 'More sky blue' },
+        { hex: '#F4F8FC', label: 'Lighter', tag: '+light', desc: 'Near white' },
+        { hex: '#E4F0F4', label: 'More saturated', tag: '+sat', desc: 'Push blue tint' },
+      ],
+      card: '#FFFFFF',
+      textOnInner: '#5A7080',
+    },
+  },
+};
+
+function renderLunar() {
+  const data = lunarVariations[currentColorway]?.[currentMode];
+  const section = document.getElementById('lunarSection');
+  if (!data) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  const grid = document.getElementById('lunarGrid');
+  const baseHex = data.base.hex;
+  grid.innerHTML = data.variants.map(v => `
+    <div class="lunar-card">
+      <div class="lunar-pair">
+        <div class="lunar-swatch lunar-swatch-base" style="background:${baseHex};" title="Base: ${baseHex}"></div>
+        <div class="lunar-swatch" style="background:${v.hex};" title="${v.label}: ${v.hex}"></div>
+      </div>
+      <div class="lunar-label">${v.label}</div>
+      <div class="lunar-hex">${baseHex} → ${v.hex}</div>
+      <span class="lunar-tag">${v.tag}</span>
+    </div>
+  `).join('');
+
+  // Context row: show each variant as a surface with text
+  const ctx = document.getElementById('lunarContext');
+  ctx.innerHTML = data.variants.map(v => `
+    <div class="lunar-context-card">
+      <div class="lunar-context-swatch" style="background:${v.hex}; color:${data.textOnInner}; border: 1px solid rgba(255,255,255,0.06);">
+        ${v.label}
+      </div>
+      <div class="lunar-context-label">${v.hex}</div>
+    </div>
+  `).join('');
+}
+
+// URL params: ?colorway=mercury&mode=light
+const params = new URLSearchParams(window.location.search);
+if (params.get('colorway')) currentColorway = params.get('colorway');
+if (params.get('mode')) currentMode = params.get('mode');
+
 apply();
 </script>
-
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
 </body>
 </html>
