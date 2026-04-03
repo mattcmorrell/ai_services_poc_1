@@ -39,10 +39,10 @@
   /* MERCURY DARK */
   body.mercury.dark {
     --bg: #101214; --card: #191B1F; --inner: #222428;
-    --accent: #7080C0; --accent-bright: #9AA6D4; --accent-dim: #5A6AA0;
-    --accent-bg: rgba(112,128,192,0.08); --accent-border: rgba(112,128,192,0.14);
+    --accent: #6878B8; --accent-bright: #8E9AD0; --accent-dim: #506098;
+    --accent-bg: rgba(104,120,184,0.08); --accent-border: rgba(104,120,184,0.14);
     --text-bright: #E8E9ED; --text-primary: #E8E9ED; --text-secondary: #9DA0A8;
-    --alert: #D4875A; --alert-bright: #E8A070; --alert-bg: rgba(212,135,90,0.1); --alert-border: rgba(212,135,90,0.2);
+    --alert: #E08850; --alert-bright: #F0A468; --alert-bg: rgba(224,136,80,0.12); --alert-border: rgba(224,136,80,0.22);
     --border: rgba(180,185,200,0.07); --border-strong: rgba(180,185,200,0.11);
     --success: #7BAA82; --warning: #C4A060; --danger: #C07070;
     --inner-border: rgba(180,185,200,0.05);
@@ -50,10 +50,10 @@
   /* MERCURY LIGHT */
   body.mercury.light {
     --bg: #F3F4F6; --card: #fff; --inner: #ECEDF0;
-    --accent: #5A6AA0; --accent-bright: #5A6AA0; --accent-dim: #4A5888;
-    --accent-bg: rgba(90,106,160,0.07); --accent-border: rgba(90,106,160,0.12);
+    --accent: #506098; --accent-bright: #506098; --accent-dim: #405080;
+    --accent-bg: rgba(80,96,152,0.07); --accent-border: rgba(80,96,152,0.12);
     --text-bright: #1C1E24; --text-primary: #3C3F48; --text-secondary: #6E7178;
-    --alert: #B86E3A; --alert-bright: #B86E3A; --alert-bg: rgba(184,110,58,0.08); --alert-border: rgba(184,110,58,0.15);
+    --alert: #C06828; --alert-bright: #C06828; --alert-bg: rgba(192,104,40,0.08); --alert-border: rgba(192,104,40,0.15);
     --border: rgba(30,35,50,0.07); --border-strong: rgba(30,35,50,0.11);
     --success: #4A7A52; --warning: #9A8050; --danger: #A05050;
     --inner-border: rgba(30,35,50,0.05);
@@ -162,7 +162,7 @@
   .thinking-body .thought-step:last-child { margin-bottom: 0; }
   .thinking-body .thought-label { color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
   .thinking-body .thought-data { color: var(--text-bright); }
-  .thinking-body .thought-flag { color: var(--warning); }
+  .thinking-body .thought-flag { color: var(--alert-bright); }
 
   /* Tool call */
   .tool-call { background: var(--inner); border: 1px solid var(--inner-border); border-radius: 8px; overflow: hidden; }
@@ -176,7 +176,7 @@
   .kv-val.error { color: var(--danger) !important; }
 
   /* Anomaly card */
-  .anomaly-card { background: var(--card); border: 1px solid var(--alert-border); border-radius: 8px; padding: 20px 24px; }
+  .anomaly-card { background: var(--card); border: 2px solid var(--alert); border-radius: 8px; padding: 20px 24px; box-shadow: inset 0 0 20px var(--alert-bg), inset 0 0 40px var(--alert-bg), 0 0 16px var(--alert-bg); }
   .anomaly-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
   .anomaly-icon { color: var(--alert); font-size: 16px; }
   .anomaly-title { font-size: 14px; font-weight: 600; color: var(--text-bright); }
@@ -188,8 +188,7 @@
   .ev-value.hot { color: var(--alert) !important; font-weight: 500; }
   .anomaly-actions { display: flex; gap: 10px; margin-top: 14px; }
   .anomaly-btn { font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 6px; border: none; cursor: pointer; }
-  .anomaly-btn.primary { background: var(--accent); color: #fff; }
-  body.inkwell.light .anomaly-btn.primary { color: #fff; }
+  .anomaly-btn.primary { background: var(--alert); color: #fff; }
   .anomaly-btn.secondary { background: var(--inner); color: var(--text-secondary); border: 1px solid var(--border); }
 
   /* Action plan */
@@ -460,16 +459,16 @@ const palettes = {
       { color: '#101214', label: 'Void' },
       { color: '#191B1F', label: 'Slate' },
       { color: '#222428', label: 'Graphite' },
-      { color: '#7080C0', label: 'Steel Blue' },
-      { color: '#D4875A', label: 'Alert' },
+      { color: '#6878B8', label: 'Steel Blue' },
+      { color: '#E08850', label: 'Alert' },
       { color: '#E8E9ED', label: 'Ice' },
     ],
     light: [
       { color: '#F3F4F6', label: 'Frost' },
       { color: '#ECEDF0', label: 'Mist' },
       { color: '#FFFFFF', label: 'White' },
-      { color: '#5A6AA0', label: 'Steel Blue' },
-      { color: '#B86E3A', label: 'Alert' },
+      { color: '#506098', label: 'Steel Blue' },
+      { color: '#C06828', label: 'Alert' },
       { color: '#1C1E24', label: 'Slate' },
     ],
   }
