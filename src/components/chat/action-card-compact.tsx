@@ -33,12 +33,12 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
   const isStopped = plan.status === "stopped";
 
   const getStatusIcon = () => {
-    if (isCompleted) return <CheckCircle className="w-4 h-4 shrink-0" style={{ color: "rgba(74, 222, 128, 0.8)" }} />;
-    if (isDeclined || isStopped) return <XCircle className="w-4 h-4 shrink-0" style={{ color: "rgba(239, 68, 68, 0.6)" }} />;
-    if (isPaused) return <Pause className="w-4 h-4 shrink-0" style={{ color: "rgba(251, 191, 36, 0.8)" }} />;
-    if (isExecuting) return <Loader2 className="w-4 h-4 shrink-0 animate-spin" style={{ color: "rgba(96, 165, 250, 0.8)" }} />;
-    if (isApproved) return <Check className="w-4 h-4 shrink-0" style={{ color: "rgba(74, 222, 128, 0.8)" }} />;
-    return <ClipboardList className="w-4 h-4 shrink-0" style={{ color: "rgba(255,255,255,0.35)" }} />;
+    if (isCompleted) return <CheckCircle className="w-4 h-4 shrink-0" style={{ color: "var(--color-success)" }} />;
+    if (isDeclined || isStopped) return <XCircle className="w-4 h-4 shrink-0" style={{ color: "var(--color-danger)" }} />;
+    if (isPaused) return <Pause className="w-4 h-4 shrink-0" style={{ color: "var(--color-warning)" }} />;
+    if (isExecuting) return <Loader2 className="w-4 h-4 shrink-0 animate-spin" style={{ color: "var(--color-info)" }} />;
+    if (isApproved) return <Check className="w-4 h-4 shrink-0" style={{ color: "var(--color-success)" }} />;
+    return <ClipboardList className="w-4 h-4 shrink-0 text-muted-foreground" />;
   };
 
   const getStatusText = () => {
@@ -53,35 +53,21 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
   };
 
   return (
-    <div
-      className="rounded-xl max-w-lg"
-      style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.06)",
-      }}
-    >
+    <div className="rounded-xl max-w-lg bg-secondary border border-border">
       {/* Clickable card body */}
       <button
         onClick={onOpenPanel}
-        className="group flex items-center gap-3 px-4 py-3 w-full text-left transition-colors hover:bg-white/[0.02] rounded-xl"
+        className="group flex items-center gap-3 px-4 py-3 w-full text-left transition-colors hover:bg-accent rounded-xl"
       >
         {getStatusIcon()}
         <div className="flex-1 min-w-0">
-          <div
-            className="text-sm truncate"
-            style={{ color: "rgba(255,255,255,0.7)", fontWeight: 400 }}
-          >
-            {plan.title}
-          </div>
-          <div className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+          <div className="text-sm truncate text-foreground">{plan.title}</div>
+          <div className="text-xs font-mono text-muted-foreground">
             {plan.steps.length} steps · {getStatusText()}
             {(isExecuting || isCompleted) && ` · ${completedSteps}/${plan.steps.length} complete`}
           </div>
         </div>
-        <div
-          className="flex items-center gap-1 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-          style={{ color: "rgba(255,255,255,0.4)" }}
-        >
+        <div className="flex items-center gap-1 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity shrink-0 text-muted-foreground">
           Details
           <ArrowRight className="w-3 h-3" />
         </div>
@@ -89,10 +75,7 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
 
       {/* Approve/Decline for pending plans */}
       {isPending && (onApprove || onDecline) && (
-        <div
-          className="flex gap-2.5 px-3 py-3"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}
-        >
+        <div className="flex gap-2.5 px-3 py-3 border-t border-border">
           {onApprove && (
             <button
               onClick={(e) => { e.stopPropagation(); onApprove(); }}
@@ -105,12 +88,7 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
           {onDecline && (
             <button
               onClick={(e) => { e.stopPropagation(); onDecline(); }}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 cursor-pointer"
-              style={{
-                background: "rgba(255,255,255,0.04)",
-                color: "rgba(255,255,255,0.5)",
-                border: "1px solid rgba(255,255,255,0.06)",
-              }}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 cursor-pointer bg-secondary text-muted-foreground border border-border"
             >
               <X className="w-3.5 h-3.5" />
               Decline
@@ -121,13 +99,7 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
 
       {/* Completion summary */}
       {isCompleted && plan.completionSummary && (
-        <div
-          className="px-4 py-2 text-xs"
-          style={{
-            borderTop: "1px solid rgba(255,255,255,0.04)",
-            color: "rgba(74, 222, 128, 0.7)",
-          }}
-        >
+        <div className="px-4 py-2 text-xs border-t border-border" style={{ color: "var(--color-success)" }}>
           {plan.completionSummary}
         </div>
       )}

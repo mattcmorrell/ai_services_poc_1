@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import { Search, MessageSquare, ChevronLeft, ChevronRight, X, Bot, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getAvatarStyle } from "@/lib/avatar-colors";
 import type { Client, Chat } from "@/types/chat";
 
 interface ApproachProps {
@@ -13,28 +14,6 @@ interface ApproachProps {
   children: React.ReactNode;
   tabBar?: React.ReactNode;
   version: number;
-}
-
-// Deterministic color palette for client initials
-const AVATAR_COLORS = [
-  "bg-blue-600",
-  "bg-emerald-600",
-  "bg-violet-600",
-  "bg-amber-600",
-  "bg-rose-600",
-  "bg-cyan-600",
-  "bg-indigo-600",
-  "bg-teal-600",
-  "bg-orange-600",
-  "bg-pink-600",
-];
-
-function getAvatarColor(clientId: string): string {
-  let hash = 0;
-  for (let i = 0; i < clientId.length; i++) {
-    hash = clientId.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
 function getInitials(name: string): string {
@@ -187,10 +166,8 @@ export function SidebarListProto({
                     )}
                   >
                     <div
-                      className={cn(
-                        "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white",
-                        getAvatarColor(client.id)
-                      )}
+                      className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+                      style={getAvatarStyle(client.id)}
                     >
                       {getInitials(client.name)}
                     </div>
@@ -368,10 +345,8 @@ export function SidebarListProto({
                   )}
                   <div className="relative">
                     <div
-                      className={cn(
-                        "flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white",
-                        getAvatarColor(client.id)
-                      )}
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white"
+                      style={getAvatarStyle(client.id)}
                     >
                       {getInitials(client.name)}
                     </div>
@@ -410,10 +385,8 @@ export function SidebarListProto({
               >
                 {/* Colored initial circle */}
                 <div
-                  className={cn(
-                    "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white",
-                    getAvatarColor(client.id)
-                  )}
+                  className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+                  style={getAvatarStyle(client.id)}
                 >
                   {getInitials(client.name)}
                 </div>

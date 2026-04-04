@@ -2,57 +2,9 @@
 
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Sidebar } from "@/components/sidebar";
-import { ChatListPanel as ChatListPanelOriginal } from "@/components/chat-list-panel";
-import { ChatView as ChatViewOriginal } from "@/components/chat-view";
-import { DashboardView as DashboardViewOriginal } from "@/components/dashboard/dashboard-view";
-import { ChatListPanel as ChatListPanelV1 } from "@/components/chat-list-panel-v1";
-import { ChatView as ChatViewV1 } from "@/components/chat-view-v1";
-import { DashboardView as DashboardViewV1 } from "@/components/dashboard/dashboard-view-v1";
-import { ChatListPanel as ChatListPanelV2 } from "@/components/chat-list-panel-v2";
-import { ChatView as ChatViewV2 } from "@/components/chat-view-v2";
-import { DashboardView as DashboardViewV2 } from "@/components/dashboard/dashboard-view-v2";
-import { ChatListPanel as ChatListPanelV3 } from "@/components/chat-list-panel-v3";
-import { ChatView as ChatViewV3 } from "@/components/chat-view-v3";
-import { DashboardView as DashboardViewV3 } from "@/components/dashboard/dashboard-view-v3";
-import { ChatListPanel as ChatListPanelV4 } from "@/components/chat-list-panel-v4";
-import { ChatView as ChatViewV4 } from "@/components/chat-view-v4";
-import { DashboardView as DashboardViewV4 } from "@/components/dashboard/dashboard-view-v4";
-import { ChatListPanel as ChatListPanelV5 } from "@/components/chat-list-panel-v5";
-import { ChatView as ChatViewV5 } from "@/components/chat-view-v5";
-import { DashboardView as DashboardViewV5 } from "@/components/dashboard/dashboard-view-v5";
-import { ChatListPanel as ChatListPanelV6 } from "@/components/chat-list-panel-v6";
-import { ChatView as ChatViewV6 } from "@/components/chat-view-v6";
-import { DashboardView as DashboardViewV6 } from "@/components/dashboard/dashboard-view-v6";
-import { ChatListPanel as ChatListPanelV7 } from "@/components/chat-list-panel-v7";
-import { ChatView as ChatViewV7 } from "@/components/chat-view-v7";
-import { DashboardView as DashboardViewV7 } from "@/components/dashboard/dashboard-view-v7";
-import { ChatListPanel as ChatListPanelV8 } from "@/components/chat-list-panel-v8";
-import { ChatView as ChatViewV8 } from "@/components/chat-view-v8";
-import { DashboardView as DashboardViewV8 } from "@/components/dashboard/dashboard-view-v8";
-import { ChatListPanel as ChatListPanelV9 } from "@/components/chat-list-panel-v9";
-import { ChatView as ChatViewV9 } from "@/components/chat-view-v9";
-import { DashboardView as DashboardViewV9 } from "@/components/dashboard/dashboard-view-v9";
-import { ChatListPanel as ChatListPanelV10 } from "@/components/chat-list-panel-v10";
-import { ChatView as ChatViewV10 } from "@/components/chat-view-v10";
-import { DashboardView as DashboardViewV10 } from "@/components/dashboard/dashboard-view-v10";
-import { ChatListPanel as ChatListPanelV11 } from "@/components/chat-list-panel-v11";
-import { ChatView as ChatViewV11 } from "@/components/chat-view-v11";
-import { DashboardView as DashboardViewV11 } from "@/components/dashboard/dashboard-view-v11";
-import { ChatListPanel as ChatListPanelV12 } from "@/components/chat-list-panel-v12";
-import { ChatView as ChatViewV12 } from "@/components/chat-view-v12";
-import { DashboardView as DashboardViewV12 } from "@/components/dashboard/dashboard-view-v12";
-import { ChatListPanel as ChatListPanelV13 } from "@/components/chat-list-panel-v13";
-import { ChatView as ChatViewV13 } from "@/components/chat-view-v13";
-import { DashboardView as DashboardViewV13 } from "@/components/dashboard/dashboard-view-v13";
-import { ChatListPanel as ChatListPanelV14 } from "@/components/chat-list-panel-v13";
-import { ChatView as ChatViewV14 } from "@/components/chat-view-v13";
-import { DashboardView as DashboardViewV14 } from "@/components/dashboard/dashboard-view-v13";
-import { ChatListPanel as ChatListPanelV15 } from "@/components/chat-list-panel-v15";
-import { ChatView as ChatViewV15 } from "@/components/chat-view-v15";
-import { DashboardView as DashboardViewV15 } from "@/components/dashboard/dashboard-view-v15";
-import { ChatListPanel as ChatListPanelV16 } from "@/components/chat-list-panel-v16";
-import { ChatView as ChatViewV16 } from "@/components/chat-view-v16";
-import { DashboardView as DashboardViewV16 } from "@/components/dashboard/dashboard-view-v16";
+import { ChatListPanel } from "@/components/chat-list-panel";
+import { ChatView } from "@/components/chat-view";
+import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { AgentsView } from "@/components/agents/agents-view";
 import { ClientSelectDialog } from "@/components/agents/client-select-dialog";
 import { WorkflowPanel } from "@/components/workflow/workflow-panel";
@@ -66,33 +18,7 @@ import { Agent } from "@/types/agent";
 import { ClientsView } from "@/components/clients/clients-view";
 import { useStreamingChatSession } from "@/hooks/use-streaming-chat-session";
 
-const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16"] as const;
-type Variant = (typeof VARIANTS)[number];
-
-const variantMap = {
-  original: { DashboardView: DashboardViewOriginal, ChatListPanel: ChatListPanelOriginal, ChatView: ChatViewOriginal },
-  v1: { DashboardView: DashboardViewV1, ChatListPanel: ChatListPanelV1, ChatView: ChatViewV1 },
-  v2: { DashboardView: DashboardViewV2, ChatListPanel: ChatListPanelV2, ChatView: ChatViewV2 },
-  v3: { DashboardView: DashboardViewV3, ChatListPanel: ChatListPanelV3, ChatView: ChatViewV3 },
-  v4: { DashboardView: DashboardViewV4, ChatListPanel: ChatListPanelV4, ChatView: ChatViewV4 },
-  v5: { DashboardView: DashboardViewV5, ChatListPanel: ChatListPanelV5, ChatView: ChatViewV5 },
-  v6: { DashboardView: DashboardViewV6, ChatListPanel: ChatListPanelV6, ChatView: ChatViewV6 },
-  v7: { DashboardView: DashboardViewV7, ChatListPanel: ChatListPanelV7, ChatView: ChatViewV7 },
-  v8: { DashboardView: DashboardViewV8, ChatListPanel: ChatListPanelV8, ChatView: ChatViewV8 },
-  v9: { DashboardView: DashboardViewV9, ChatListPanel: ChatListPanelV9, ChatView: ChatViewV9 },
-  v10: { DashboardView: DashboardViewV10, ChatListPanel: ChatListPanelV10, ChatView: ChatViewV10 },
-  v11: { DashboardView: DashboardViewV11, ChatListPanel: ChatListPanelV11, ChatView: ChatViewV11 },
-  v12: { DashboardView: DashboardViewV12, ChatListPanel: ChatListPanelV12, ChatView: ChatViewV12 },
-  v13: { DashboardView: DashboardViewV13, ChatListPanel: ChatListPanelV13, ChatView: ChatViewV13 },
-  v14: { DashboardView: DashboardViewV14, ChatListPanel: ChatListPanelV14, ChatView: ChatViewV14 },
-  v15: { DashboardView: DashboardViewV15, ChatListPanel: ChatListPanelV15, ChatView: ChatViewV15 },
-  v16: { DashboardView: DashboardViewV16, ChatListPanel: ChatListPanelV16, ChatView: ChatViewV16 },
-};
-
 export default function Home() {
-  const [designVariant, setDesignVariant] = useState<Variant>("original");
-  const { DashboardView, ChatListPanel, ChatView } = variantMap[designVariant];
-
   const [activeView, setActiveView] = useState("dashboard");
   const [chatPanelMode, setChatPanelMode] = useState<"recent" | "clients">("recent");
   const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
@@ -960,69 +886,7 @@ export default function Home() {
   };
 
   return (
-    <div className={`flex h-screen overflow-hidden ${designVariant === "v15" ? "theme-mercury" : ""} ${designVariant === "v16" ? "theme-orbital" : ""}`}>
-      {designVariant === "v15" && (
-        <style>{`
-          .theme-mercury {
-            --background: #101214;
-            --foreground: #E8E9ED;
-            --card: #222428;
-            --card-foreground: #E8E9ED;
-            --popover: #191B1F;
-            --popover-foreground: #E8E9ED;
-            --primary: #6878B8;
-            --primary-foreground: #E8E9ED;
-            --secondary: #222428;
-            --secondary-foreground: #E8E9ED;
-            --muted: #222428;
-            --muted-foreground: #9DA0A8;
-            --accent: #222428;
-            --accent-foreground: #E8E9ED;
-            --destructive: #E08850;
-            --border: rgba(180, 185, 200, 0.07);
-            --input: rgba(180, 185, 200, 0.1);
-            --ring: #6878B8;
-            --sidebar: #101214;
-            --sidebar-foreground: #E8E9ED;
-            --sidebar-primary: #6878B8;
-            --sidebar-primary-foreground: #E8E9ED;
-            --sidebar-accent: #222428;
-            --sidebar-accent-foreground: #E8E9ED;
-            --sidebar-border: rgba(180, 185, 200, 0.07);
-          }
-        `}</style>
-      )}
-      {designVariant === "v16" && (
-        <style>{`
-          .theme-orbital {
-            --background: #161C22;
-            --foreground: #E8EFF4;
-            --card: #1E2830;
-            --card-foreground: #E8EFF4;
-            --popover: #1A2228;
-            --popover-foreground: #E8EFF4;
-            --primary: #8AAEC4;
-            --primary-foreground: #E8EFF4;
-            --secondary: #2A3640;
-            --secondary-foreground: #E8EFF4;
-            --muted: #2A3640;
-            --muted-foreground: #9AABB8;
-            --accent: #2A3640;
-            --accent-foreground: #E8EFF4;
-            --destructive: #E08850;
-            --border: rgba(196, 212, 220, 0.08);
-            --input: rgba(196, 212, 220, 0.1);
-            --ring: #8AAEC4;
-            --sidebar: #161C22;
-            --sidebar-foreground: #E8EFF4;
-            --sidebar-primary: #8AAEC4;
-            --sidebar-primary-foreground: #E8EFF4;
-            --sidebar-accent: #2A3640;
-            --sidebar-accent-foreground: #E8EFF4;
-            --sidebar-border: rgba(196, 212, 220, 0.08);
-          }
-        `}</style>
-      )}
+    <div className="flex h-screen overflow-hidden">
       <Sidebar activeView={activeView} onViewChange={setActiveView} />
       {renderMainContent()}
       <ClientSelectDialog
@@ -1032,25 +896,6 @@ export default function Home() {
         clients={mockClients}
         onSelectClient={handleClientSelectedForAgent}
       />
-
-      {/* Design variant toggle */}
-      <div className="fixed bottom-4 right-4 z-[100] flex flex-col items-end gap-2">
-        <div className="flex items-center gap-1 rounded-full border border-[oklch(1_0_0_/_0.1)] bg-[oklch(0.15_0_0_/_0.9)] px-1.5 py-1 shadow-2xl backdrop-blur-md">
-          {VARIANTS.map((v) => (
-            <button
-              key={v}
-              onClick={() => setDesignVariant(v)}
-              className={`rounded-full px-3 py-1 text-[11px] font-medium tracking-wide transition-all ${
-                designVariant === v
-                  ? "bg-[oklch(0.7_0.15_65)] text-[oklch(0.1_0_0)] shadow-sm"
-                  : "text-[oklch(0.55_0_0)] hover:text-[oklch(0.8_0_0)]"
-              }`}
-            >
-              {v === "original" ? "OG" : v.toUpperCase()}
-            </button>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

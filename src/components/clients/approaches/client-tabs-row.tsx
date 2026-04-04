@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { getAvatarStyle } from "@/lib/avatar-colors";
 import type { Client, Chat } from "@/types/chat";
 
 interface ApproachProps {
@@ -12,28 +13,6 @@ interface ApproachProps {
   children: React.ReactNode;
   tabBar?: React.ReactNode;
   version: number;
-}
-
-// Deterministic color palette for client initials
-const AVATAR_COLORS = [
-  "bg-blue-600",
-  "bg-emerald-600",
-  "bg-violet-600",
-  "bg-amber-600",
-  "bg-rose-600",
-  "bg-cyan-600",
-  "bg-indigo-600",
-  "bg-teal-600",
-  "bg-orange-600",
-  "bg-pink-600",
-];
-
-function getAvatarColor(clientId: string): string {
-  let hash = 0;
-  for (let i = 0; i < clientId.length; i++) {
-    hash = clientId.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
 function getInitials(name: string): string {
@@ -94,7 +73,6 @@ export function ClientTabsRow({
               className={cn(
                 "flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-semibold text-white",
                 "ring-2 ring-offset-1 ring-offset-card transition-all",
-                getAvatarColor(client.id),
                 isActive
                   ? "ring-primary"
                   : client.unreadCount > 0
@@ -102,6 +80,7 @@ export function ClientTabsRow({
                     : "ring-transparent",
                 !isActive && "opacity-70 hover:opacity-100"
               )}
+              style={getAvatarStyle(client.id)}
             >
               {getInitials(client.name)}
             </div>

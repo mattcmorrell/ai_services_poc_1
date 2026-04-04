@@ -55,7 +55,7 @@ export function GateApprovalCard({
   if (isApproved) {
     return (
       <div className="mt-4 rounded-lg border border-emerald-500/20 bg-card/50 px-4 py-3 max-w-[520px]">
-        <div className="flex items-center gap-2 text-[12px] tracking-wide uppercase text-emerald-500/70">
+        <div className="flex items-center gap-2 font-mono text-[12px] tracking-wide uppercase text-emerald-500/70">
           <Check size={12} />
           <span>
             Step {gateApproval.stepIndex + 1} approved
@@ -72,7 +72,7 @@ export function GateApprovalCard({
   if (isDeclined) {
     return (
       <div className="mt-4 rounded-lg border border-red-500/20 bg-card/50 px-4 py-3 max-w-[520px]">
-        <div className="flex items-center gap-2 text-[12px] tracking-wide uppercase text-red-400/70">
+        <div className="flex items-center gap-2 font-mono text-[12px] tracking-wide uppercase text-red-400/70">
           <X size={12} />
           <span>
             Step {gateApproval.stepIndex + 1} — plan modified

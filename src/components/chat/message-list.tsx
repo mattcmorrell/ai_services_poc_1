@@ -114,10 +114,10 @@ const defaultTransform = (content: string) => {
     if (tableRows.length > 0) {
       const headerRow = tableRows[0];
       const dataRows = tableRows.slice(2); // skip separator row
-      const headerCells = headerRow.split("|").filter(c => c.trim()).map(c => `<th style="padding:4px 8px;text-align:left;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.1)">${inlineMd(c.trim())}</th>`);
+      const headerCells = headerRow.split("|").filter(c => c.trim()).map(c => `<th style="padding:4px 8px;text-align:left;font-weight:600;border-bottom:1px solid var(--border)">${inlineMd(c.trim())}</th>`);
       let html = `<table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:12px"><thead><tr>${headerCells.join("")}</tr></thead><tbody>`;
       for (const row of dataRows) {
-        const cells = row.split("|").filter(c => c.trim()).map(c => `<td style="padding:4px 8px;border-bottom:1px solid rgba(255,255,255,0.04)">${inlineMd(c.trim())}</td>`);
+        const cells = row.split("|").filter(c => c.trim()).map(c => `<td style="padding:4px 8px;border-bottom:1px solid var(--border-subtle)">${inlineMd(c.trim())}</td>`);
         html += `<tr>${cells.join("")}</tr>`;
       }
       html += "</tbody></table>";
@@ -146,7 +146,7 @@ const defaultTransform = (content: string) => {
     } else if (trimmed.startsWith("## ")) {
       result.push(`<div style="font-size:15px;font-weight:600;margin:20px 0 8px">${inlineMd(trimmed.slice(3))}</div>`);
     } else if (trimmed === "---" || trimmed === "***") {
-      result.push('<hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:12px 0" />');
+      result.push('<hr style="border:none;border-top:1px solid var(--border);margin:12px 0" />');
     } else if (trimmed.startsWith("- ")) {
       result.push(`<div style="padding-left:16px;text-indent:-12px;margin:2px 0">• ${inlineMd(trimmed.slice(2))}</div>`);
     } else if (trimmed === "") {

@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from "react";
 import { MessageSquare, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getAvatarStyle } from "@/lib/avatar-colors";
 import type { Client, Chat } from "@/types/chat";
 import { ChatClientToggle } from "@/components/chat-client-toggle";
 import { useResizable, ResizeHandle } from "@/components/ui/resize-handle";
@@ -16,28 +17,6 @@ interface SidebarListProps {
   tabBar?: React.ReactNode;
   chatPanelMode: "recent" | "clients";
   onChatPanelModeChange: (mode: "recent" | "clients") => void;
-}
-
-// Deterministic color palette for client initials
-const AVATAR_COLORS = [
-  "bg-blue-600",
-  "bg-emerald-600",
-  "bg-violet-600",
-  "bg-amber-600",
-  "bg-rose-600",
-  "bg-cyan-600",
-  "bg-indigo-600",
-  "bg-teal-600",
-  "bg-orange-600",
-  "bg-pink-600",
-];
-
-function getAvatarColor(clientId: string): string {
-  let hash = 0;
-  for (let i = 0; i < clientId.length; i++) {
-    hash = clientId.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
 function getInitials(name: string): string {
@@ -135,10 +114,8 @@ export function SidebarList({
                 )}
               >
                 <div
-                  className={cn(
-                    "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white",
-                    getAvatarColor(client.id)
-                  )}
+                  className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+                  style={getAvatarStyle(client.id)}
                 >
                   {getInitials(client.name)}
                 </div>

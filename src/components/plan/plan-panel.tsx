@@ -31,31 +31,17 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
     <>
       <ResizeHandle onMouseDown={onDragStart} />
       <div
-        className="flex flex-col h-full shrink-0"
-        style={{
-          width: `${width}px`,
-          background: "#060608",
-          borderLeft: "1px solid rgba(255,255,255,0.06)",
-          fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        }}
+        className="flex flex-col h-full shrink-0 bg-background border-l border-border"
+        style={{ width: `${width}px` }}
       >
         {/* Header */}
-        <div
-          className="flex items-center justify-between px-5 py-4 shrink-0"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-        >
+        <div className="flex items-center justify-between px-5 py-4 shrink-0 border-b border-border">
           <div className="flex items-center gap-3 min-w-0">
-            <div
-              className="flex h-8 w-8 items-center justify-center rounded-lg shrink-0"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
-            >
-              <ClipboardList className="w-4 h-4" style={{ color: "rgba(255,255,255,0.4)" }} />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg shrink-0 bg-secondary border border-border">
+              <ClipboardList className="w-4 h-4 text-muted-foreground" />
             </div>
             <div className="min-w-0">
-              <h2
-                className="text-sm font-medium truncate"
-                style={{ color: "rgba(255,255,255,0.85)" }}
-              >
+              <h2 className="text-sm font-medium truncate text-foreground">
                 {plan.title}
               </h2>
               <PlanStatusBadge status={plan.status} />
@@ -63,8 +49,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
           </div>
           <button
             onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-white/[0.06]"
-            style={{ color: "rgba(255,255,255,0.35)" }}
+            className="flex h-7 w-7 items-center justify-center rounded-full transition-colors text-muted-foreground hover:bg-accent"
           >
             <X className="w-4 h-4" />
           </button>
@@ -75,47 +60,29 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
           {!showHistory ? (
             <div>
               {/* Plan description */}
-              <p
-                className="text-sm mb-5"
-                style={{ color: "rgba(255,255,255,0.4)", fontWeight: 300 }}
-              >
+              <p className="text-sm mb-5 text-muted-foreground font-light">
                 {plan.description}
               </p>
 
               {/* Metadata */}
               {plan.metadata && (
-                <div
-                  className="flex gap-4 mb-5 pb-4"
-                  style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}
-                >
+                <div className="flex gap-4 mb-5 pb-4 border-b" style={{ borderColor: "var(--border-subtle)" }}>
                   {plan.metadata.affectedCount && (
                     <div className="text-center">
-                      <div
-                        className="text-lg font-semibold"
-                        style={{ color: "rgba(255,255,255,0.75)" }}
-                      >
+                      <div className="text-lg font-semibold text-foreground">
                         {plan.metadata.affectedCount}
                       </div>
-                      <div
-                        className="text-[10px] uppercase tracking-wide"
-                        style={{ color: "rgba(255,255,255,0.25)" }}
-                      >
+                      <div className="text-[11px] uppercase tracking-wide" style={{ color: "var(--text-quaternary-alpha)" }}>
                         {plan.metadata.affectedLabel || "items"}
                       </div>
                     </div>
                   )}
                   {plan.metadata.estimatedTime && (
                     <div className="text-center">
-                      <div
-                        className="text-lg font-semibold"
-                        style={{ color: "rgba(255,255,255,0.75)" }}
-                      >
+                      <div className="text-lg font-semibold text-foreground">
                         {plan.metadata.estimatedTime}
                       </div>
-                      <div
-                        className="text-[10px] uppercase tracking-wide"
-                        style={{ color: "rgba(255,255,255,0.25)" }}
-                      >
+                      <div className="text-[11px] uppercase tracking-wide" style={{ color: "var(--text-quaternary-alpha)" }}>
                         estimated
                       </div>
                     </div>
@@ -131,9 +98,9 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
                 <div
                   className="mt-5 flex items-center gap-2.5 p-3 rounded-lg text-sm"
                   style={{
-                    background: "rgba(74, 222, 128, 0.06)",
-                    border: "1px solid rgba(74, 222, 128, 0.1)",
-                    color: "rgba(74, 222, 128, 0.8)",
+                    background: "var(--color-success-muted)",
+                    border: "1px solid var(--color-success-muted)",
+                    color: "var(--color-success)",
                   }}
                 >
                   {plan.completionSummary}
@@ -146,10 +113,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
         </ScrollArea>
 
         {/* Footer */}
-        <div
-          className="flex items-center justify-between px-5 py-3 shrink-0"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
-        >
+        <div className="flex items-center justify-between px-5 py-3 shrink-0 border-t border-border">
           <PlanControls
             plan={plan}
             onPause={onPause}
@@ -158,8 +122,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
           />
           <button
             onClick={() => setShowHistory(!showHistory)}
-            className="flex items-center gap-1.5 text-[11px] transition-colors"
-            style={{ color: "rgba(255,255,255,0.3)" }}
+            className="flex items-center gap-1.5 text-[11px] transition-colors text-muted-foreground hover:text-foreground"
           >
             <History className="w-3.5 h-3.5" />
             {showHistory ? "Current plan" : "Past plans"}
@@ -181,7 +144,6 @@ export function PlanPanelPill({
   const completedSteps = plan.steps.filter((s) => s.status === "completed").length;
   const totalSteps = plan.steps.length;
   const progress = totalSteps > 0 ? completedSteps / totalSteps : 0;
-  const isExecuting = plan.status === "executing";
   const isPaused = plan.status === "paused";
 
   const circumference = 2 * Math.PI * 10;
@@ -190,64 +152,34 @@ export function PlanPanelPill({
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-2.5 pl-2.5 pr-3.5 py-2 rounded-full transition-all duration-300 hover:scale-105 group"
-      style={{
-        background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)",
-        border: "1px solid rgba(255,255,255,0.1)",
-        backdropFilter: "blur(20px)",
-      }}
+      className="flex items-center gap-2.5 pl-2.5 pr-3.5 py-2 rounded-full transition-all duration-300 hover:scale-105 group backdrop-blur-xl bg-card/80 border border-border"
     >
       {/* Progress ring */}
       <svg width="28" height="28" viewBox="0 0 24 24" className="shrink-0">
+        <circle cx="12" cy="12" r="10" fill="none" stroke="var(--border)" strokeWidth="2" />
         <circle
-          cx="12"
-          cy="12"
-          r="10"
-          fill="none"
-          stroke="rgba(255,255,255,0.06)"
-          strokeWidth="2"
+          cx="12" cy="12" r="10" fill="none"
+          stroke={isPaused ? "var(--color-warning)" : "var(--color-success)"}
+          strokeWidth="2" strokeLinecap="round"
+          strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
+          transform="rotate(-90 12 12)" className="transition-all duration-500"
         />
-        <circle
-          cx="12"
-          cy="12"
-          r="10"
-          fill="none"
-          stroke={isPaused ? "rgba(251, 191, 36, 0.7)" : "rgba(74, 222, 128, 0.7)"}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          transform="rotate(-90 12 12)"
-          className="transition-all duration-500"
-        />
-        <text
-          x="12"
-          y="12"
-          textAnchor="middle"
-          dominantBaseline="central"
-          fill="rgba(255,255,255,0.7)"
-          fontSize="8"
-          fontWeight="600"
-        >
+        <text x="12" y="12" textAnchor="middle" dominantBaseline="central"
+          fill="var(--text-primary-alpha)" fontSize="8" fontWeight="600">
           {completedSteps}
         </text>
       </svg>
 
       <div className="text-left">
-        <div className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
-          Plan
-        </div>
-        <div className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+        <div className="text-xs font-medium" style={{ color: "var(--text-primary-alpha)" }}>Plan</div>
+        <div className="text-xs font-mono" style={{ color: "var(--text-tertiary-alpha)" }}>
           {completedSteps}/{totalSteps}
-          {isExecuting && " running"}
+          {plan.status === "executing" && " running"}
           {isPaused && " paused"}
         </div>
       </div>
 
-      <ChevronRight
-        className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ color: "rgba(255,255,255,0.4)" }}
-      />
+      <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
     </button>
   );
 }

@@ -2,6 +2,7 @@
 
 import { LayoutDashboard, MessageSquare, Bot, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 interface SidebarProps {
   activeView: string;
@@ -37,9 +38,12 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           </button>
         ))}
       </nav>
-      <button className="flex h-12 w-full items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
-        <Settings className="h-5 w-5" />
-      </button>
+      <div className="flex flex-col items-center gap-1 w-full">
+        <ThemeSwitcher />
+        <button className="flex h-10 w-full items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
+          <Settings className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 }

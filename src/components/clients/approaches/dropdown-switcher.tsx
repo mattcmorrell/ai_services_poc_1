@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { ChevronDown, Check, Search, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getAvatarStyle } from "@/lib/avatar-colors";
 import type { Client, Chat } from "@/types/chat";
 
 interface ApproachProps {
@@ -13,27 +14,6 @@ interface ApproachProps {
   children: React.ReactNode;
   tabBar?: React.ReactNode;
   version: number;
-}
-
-const AVATAR_COLORS = [
-  "bg-blue-600",
-  "bg-emerald-600",
-  "bg-violet-600",
-  "bg-amber-600",
-  "bg-rose-600",
-  "bg-cyan-600",
-  "bg-indigo-600",
-  "bg-teal-600",
-  "bg-orange-600",
-  "bg-pink-600",
-];
-
-function getAvatarColor(clientId: string): string {
-  let hash = 0;
-  for (let i = 0; i < clientId.length; i++) {
-    hash = clientId.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
 function getInitials(name: string): string {
@@ -191,10 +171,8 @@ export function DropdownSwitcher({
           {selectedClient ? (
             <>
               <span
-                className={cn(
-                  "flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold leading-none text-white",
-                  getAvatarColor(selectedClient.id)
-                )}
+                className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold leading-none text-white"
+                style={getAvatarStyle(selectedClient.id)}
               >
                 {getInitials(selectedClient.name)}
               </span>
@@ -283,10 +261,8 @@ export function DropdownSwitcher({
                       >
                         {/* Initial circle */}
                         <span
-                          className={cn(
-                            "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-semibold leading-none text-white",
-                            getAvatarColor(client.id)
-                          )}
+                          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-semibold leading-none text-white"
+                          style={getAvatarStyle(client.id)}
                         >
                           {getInitials(client.name)}
                         </span>
