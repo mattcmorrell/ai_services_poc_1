@@ -34,6 +34,26 @@ Orbital/relationship diagrams are fair game if they're the right visualization f
 ### The Vibe
 Marketing-page-level craft meets mission control — restrained, high-end, and every space reference pulls its weight.
 
+### 3 Colorway Themes (Decided April 2026)
+
+| Theme | Vibe | Dark BG | Light BG | Accent (dark) | Accent (light) |
+|-------|------|---------|----------|---------------|----------------|
+| **Inkwell** | Warm earthy, craft | `#111617` Abyss | `#EBE8E0` Linen | Sage `#7A9A78` | `#5A7A58` |
+| **Mercury** | Cool indigo, institutional | `#101214` | `#F3F4F6` | `#6878B8` | `#506098` |
+| **Orbital** | Blue-steel, technical | `#161C22` Deep Space | `#E8EFF4` Sky Wash | Powder `#8AAEC4` | `#4A7A98` |
+
+**All themes share:** Orange alert (`#D4875A` dark / ~`#C06828` light), semantic status colors (success green, warning yellow, danger red), and 10 themed client avatar colors.
+
+**Inkwell accent history:** Originally Brulee (`#A27B5B`, warm brown) — changed to Sage because Brulee was too close to the alert orange. Evaluated 4 candidates (Sage, Patina, Brass, Mauve) via side-by-side mockup. Sage won for its earthy green clarity.
+
+**Implementation:** CSS custom properties on `<html>` element. Classes like `.inkwell.dark`, `.mercury.light` switch all shadcn variables at once. The OG components already use Tailwind theme classes (`bg-background`, `text-foreground`) so theming is CSS-only. A theme switcher in the sidebar lets users pick colorway + light/dark mode.
+
+**Design reference mockups:**
+- `public/mockups/geist-palette.html` — interactive palette explorer (all 3 colorways × dark/light)
+- `public/mockups/accent-compare.html` — Sage vs Patina side-by-side
+- `public/mockups/prometheus-references.html` — Weyland Industries design reference board
+- `public/mockups/figma-thumbnail.html` — PNDA\CMD branded thumbnail
+
 ---
 
 ## Typography & Agent Voice System
@@ -60,11 +80,8 @@ If the agent computed it, extracted it, or is actively doing it — mono. If a h
 - Timestamps, labels, UI chrome — these serve the reader, not the machine
 - **Numbers in UI chrome** — stat cards, dashboard values, table columns, step counts. A dollar amount in a stat card is UI presenting data (sans). The same dollar amount inside a tool call output is the agent showing what it found (mono). Context determines the font, not the data type.
 
-### Font Family Candidates (Under Evaluation)
-Three families with matched mono companions:
-1. **Geist + Geist Mono** — Vercel's typeface, clean/technical, currently in use
-2. **DM Sans + DM Mono** — geometric, low-contrast, calm
-3. **IBM Plex Sans + IBM Plex Mono** — corporate-grade, neutral, professional
+### Font Family: Geist (Decided)
+**Geist Sans + Geist Mono** — Vercel's typeface. Clean, technical, free. Geist Mono is unusually readable at body sizes. Loaded via `next/font/google` in `layout.tsx` as `--font-geist-sans` and `--font-geist-mono`.
 
 Mockups: `public/mockups/font-mono-intent.html`, `public/mockups/font-mono-deep-dive.html`, `public/mockups/font-comparison.html`
 

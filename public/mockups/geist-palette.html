@@ -17,8 +17,8 @@
   /* INKWELL DARK */
   body.inkwell.dark {
     --bg: #111617; --card: #1C2426; --inner: #2E3B3D;
-    --accent: #A27B5B; --accent-bright: #D4B48E; --accent-dim: #8A6A4E;
-    --accent-bg: rgba(162,123,91,0.12); --accent-border: rgba(162,123,91,0.2);
+    --accent: #7A9A78; --accent-bright: #A0C09E; --accent-dim: #5E7A5C;
+    --accent-bg: rgba(122,154,120,0.12); --accent-border: rgba(122,154,120,0.2);
     --text-bright: #F2F0EB; --text-primary: #F2F0EB; --text-secondary: #C8C2B4;
     --alert: #D4875A; --alert-bright: #E8A070; --alert-bg: rgba(212,135,90,0.1); --alert-border: rgba(212,135,90,0.2);
     --border: rgba(220,215,201,0.08); --border-strong: rgba(220,215,201,0.12);
@@ -28,8 +28,8 @@
   /* INKWELL LIGHT */
   body.inkwell.light {
     --bg: #EBE8E0; --card: #fff; --inner: #F7F5F1;
-    --accent: #A27B5B; --accent-bright: #8A6A4E; --accent-dim: #8A6A4E;
-    --accent-bg: rgba(162,123,91,0.1); --accent-border: rgba(162,123,91,0.15);
+    --accent: #5A7A58; --accent-bright: #4A6848; --accent-dim: #4A6848;
+    --accent-bg: rgba(90,122,88,0.1); --accent-border: rgba(90,122,88,0.15);
     --text-bright: #1C2426; --text-primary: #2E3B3D; --text-secondary: #6B7574;
     --alert: #B86E3A; --alert-bright: #B86E3A; --alert-bg: rgba(184,110,58,0.08); --alert-border: rgba(184,110,58,0.15);
     --border: rgba(44,54,57,0.08); --border-strong: rgba(44,54,57,0.12);
@@ -242,6 +242,49 @@
   .data-table .name { color: var(--text-bright); font-weight: 500; }
   .data-table .num { font-variant-numeric: tabular-nums; text-align: right; }
 
+  /* ---- ACCENT EXPLORATION ---- */
+  .accent-section {
+    margin: 24px 0 8px;
+    padding: 28px 32px 32px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+  }
+  .accent-section .accent-title { font-family: 'Geist', sans-serif; font-size: 18px; font-weight: 600; color: #e0e0e0; margin-bottom: 4px; }
+  .accent-section .accent-sub { font-family: 'Geist Mono', monospace; font-size: 12px; color: #888; letter-spacing: 0.04em; }
+  .accent-section .accent-desc { font-size: 14px; color: #999; margin: 8px 0 24px; line-height: 1.5; }
+  .accent-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px;
+  }
+  .accent-card { display: flex; flex-direction: column; gap: 8px; }
+  .accent-swatch-row {
+    display: flex; gap: 3px; border-radius: 10px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .accent-swatch-half { flex: 1; aspect-ratio: 3/2; }
+  .accent-demo {
+    border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .accent-demo-btn {
+    padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer;
+    font-family: 'Geist', sans-serif; font-size: 13px; font-weight: 500;
+    color: #111; text-align: center;
+  }
+  .accent-demo-alert-btn {
+    padding: 8px 16px; border-radius: 6px; border: none;
+    font-family: 'Geist', sans-serif; font-size: 13px; font-weight: 500;
+    text-align: center;
+  }
+  .accent-demo-bar { height: 6px; border-radius: 3px; }
+  .accent-demo-bar-track { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.06); overflow: hidden; }
+  .accent-label { font-family: 'Geist Mono', monospace; font-size: 12px; color: #bbb; text-align: center; }
+  .accent-hex { font-family: 'Geist Mono', monospace; font-size: 11px; color: #888; text-align: center; }
+  .accent-tag {
+    font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: #888; text-align: center;
+  }
+
   /* ---- LUNAR EXPLORATION ---- */
   .lunar-section {
     margin: 32px 0 8px;
@@ -350,7 +393,7 @@
   </div>
 </div>
 
-<a href="font-mono-deep-dive.html" class="back">&larr; Back to deep dive</a>
+<a href="font-mono-deep-dive.html" class="back">&larr; Back to deep dive</a> &nbsp;&middot;&nbsp; <a href="accent-compare.html" class="back">Sage vs Patina comparison &rarr;</a>
 
 <h1>Geist + Geist Mono</h1>
 <p class="subtitle">Same specimens, two colorways. Toggle Inkwell (warm teal) vs Mercury (cool indigo) and dark/light to compare all four combinations.</p>
@@ -368,6 +411,14 @@
   </p>
   <div class="lunar-grid" id="lunarGrid"></div>
   <div class="lunar-context" id="lunarContext"></div>
+</div>
+
+<!-- ACCENT EXPLORATION -->
+<div class="accent-section" id="accentSection">
+  <div class="accent-title">Accent vs Alert — Separation Test</div>
+  <div class="accent-sub">Current Inkwell accent is too close to the alert orange</div>
+  <p class="accent-desc">Each column shows an accent candidate next to the alert color, then a mini UI demo: accent button, alert button, and progress bar on the card background. <a href="accent-compare.html" style="color:#A0C09E;">Full side-by-side comparison &rarr;</a></p>
+  <div class="accent-grid" id="accentGrid"></div>
 </div>
 
 <div class="rule">
@@ -563,15 +614,15 @@ const palettes = {
       { color: '#111617', label: 'Abyss' },
       { color: '#1C2426', label: 'Inkwell' },
       { color: '#2E3B3D', label: 'Lunar' },
-      { color: '#A27B5B', label: 'Brulee' },
+      { color: '#7A9A78', label: 'Sage' },
       { color: '#D4875A', label: 'Alert' },
       { color: '#F2F0EB', label: 'Cream' },
     ],
     light: [
       { color: '#EBE8E0', label: 'Linen' },
-      { color: '#F5F3EF', label: 'Cream' },
+      { color: '#F7F5F1', label: 'Cream' },
       { color: '#FFFFFF', label: 'White' },
-      { color: '#A27B5B', label: 'Brulee' },
+      { color: '#5A7A58', label: 'Sage' },
       { color: '#B86E3A', label: 'Alert' },
       { color: '#1C2426', label: 'Inkwell' },
     ],
@@ -645,6 +696,7 @@ function apply() {
     `<div class="swatch"><div class="swatch-color" style="background:${s.color};"></div> ${s.label} ${s.color}</div>`
   ).join('');
   renderLunar();
+  renderAccentExploration();
 }
 
 // Keyboard shortcuts: 1=inkwell, 2=mercury, d=dark, l=light
@@ -655,6 +707,63 @@ document.addEventListener('keydown', e => {
   if (e.key === 'd') setMode('dark');
   if (e.key === 'l') setMode('light');
 });
+
+// ---- ACCENT EXPLORATION ----
+const accentCandidates = {
+  inkwell: {
+    dark: {
+      alert: '#D4875A',
+      card: '#1C2426',
+      current: { hex: '#A27B5B', label: 'Brulee (current)', tag: 'too close to alert' },
+      candidates: [
+        { hex: '#7A9A78', label: 'Sage', tag: 'earthy green' },
+        { hex: '#6B9E9A', label: 'Patina', tag: 'dusty teal' },
+        { hex: '#C4A55A', label: 'Brass', tag: 'warm gold' },
+        { hex: '#9A7A8E', label: 'Mauve', tag: 'warm rose' },
+      ],
+    },
+    light: {
+      alert: '#B86E3A',
+      card: '#FFFFFF',
+      current: { hex: '#A27B5B', label: 'Brulee (current)', tag: 'too close to alert' },
+      candidates: [
+        { hex: '#5A7A58', label: 'Sage', tag: 'earthy green' },
+        { hex: '#4A7A78', label: 'Patina', tag: 'dusty teal' },
+        { hex: '#9A8038', label: 'Brass', tag: 'warm gold' },
+        { hex: '#7A5A6E', label: 'Mauve', tag: 'warm rose' },
+      ],
+    },
+  },
+};
+
+function renderAccentExploration() {
+  const section = document.getElementById('accentSection');
+  const data = accentCandidates[currentColorway]?.[currentMode];
+  if (!data) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  const grid = document.getElementById('accentGrid');
+  const all = [data.current, ...data.candidates];
+
+  grid.innerHTML = all.map((c, i) => `
+    <div class="accent-card">
+      <div class="accent-swatch-row">
+        <div class="accent-swatch-half" style="background:${c.hex};" title="Accent: ${c.hex}"></div>
+        <div class="accent-swatch-half" style="background:${data.alert};" title="Alert: ${data.alert}"></div>
+      </div>
+      <div class="accent-label">${c.label}</div>
+      <div class="accent-hex">${c.hex}</div>
+      <div class="accent-tag">${c.tag}</div>
+      <div class="accent-demo" style="background:${data.card};">
+        <div class="accent-demo-btn" style="background:${c.hex};">Approve Plan</div>
+        <div class="accent-demo-alert-btn" style="background:rgba(0,0,0,0.15); color:${data.alert}; border: 1px solid ${data.alert}40;">⚠ Urgent</div>
+        <div class="accent-demo-bar-track">
+          <div class="accent-demo-bar" style="background:${c.hex}; width:35%;"></div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
 
 // ---- LUNAR EXPLORATION ----
 const lunarVariations = {
