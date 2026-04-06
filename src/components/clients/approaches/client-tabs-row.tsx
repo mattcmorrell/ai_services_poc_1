@@ -89,8 +89,8 @@ export function ClientTabsRow({
             {client.unreadCount > 0 && (
               <span
                 className={cn(
-                  "absolute -right-1 -top-1 flex h-3.5 min-w-3.5 items-center justify-center",
-                  "rounded-full bg-primary px-0.5 text-[8px] font-semibold leading-none text-primary-foreground"
+                  "absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center",
+                  "rounded-full bg-primary px-0.5 text-[11px] font-medium leading-none text-primary-foreground"
                 )}
               >
                 {client.unreadCount}

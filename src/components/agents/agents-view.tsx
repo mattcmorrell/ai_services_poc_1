@@ -76,7 +76,7 @@ export function AgentsView({ agents, onAgentClick, onToggleFavorite }: AgentsVie
     <div className="flex h-full flex-1 flex-col bg-background">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border px-6 py-4">
-        <h1 className="text-2xl font-semibold">Agents</h1>
+        <h1 className="text-[24px] font-semibold">Agents</h1>
         <div className="flex items-center gap-3">
           <div className="relative">
             <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -97,7 +97,7 @@ export function AgentsView({ agents, onAgentClick, onToggleFavorite }: AgentsVie
         {/* Favorites Section */}
         {favoriteAgents.length > 0 && (
           <div className="mb-8">
-            <h2 className="mb-4 text-lg font-semibold">Favorites</h2>
+            <h2 className="mb-4 text-[18px] font-medium">Favorites</h2>
             <div className="flex flex-wrap gap-4">
               {favoriteAgents.map((agent) => {
                 const IconComponent = iconMap[agent.icon] || Robot;
@@ -134,7 +134,7 @@ export function AgentsView({ agents, onAgentClick, onToggleFavorite }: AgentsVie
         {/* All Agents Section */}
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">All Agents</h2>
+            <h2 className="text-[18px] font-medium">All Agents</h2>
             <Button variant="outline" size="sm" className="gap-1">
               <Plus className="h-4 w-4" />
               New Agent

@@ -70,7 +70,7 @@ export function ActionCard({ plan, workflow, onApprove, onDecline, onWorkflowCli
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-lg font-semibold">{plan.title}</h3>
+        <h3 className="text-[18px] font-medium">{plan.title}</h3>
         {getStatusIcon()}
       </div>
 

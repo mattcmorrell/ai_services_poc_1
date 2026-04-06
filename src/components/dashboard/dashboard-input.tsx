@@ -367,7 +367,7 @@ export function DashboardInput({ clients, agents, onSend, onAgentSelected }: Das
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-border px-6 py-4">
-              <h2 className="text-lg font-semibold">Select an Agent</h2>
+              <h2 className="text-[18px] font-medium">Select an Agent</h2>
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

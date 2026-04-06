@@ -167,7 +167,7 @@ export function PrototypeSwitcher({
           </span>
           {isArchived && current?.status && STATUS_LABELS[current.status] && (
             <span className={cn(
-              "rounded px-1 py-0.5 text-[8px] font-semibold uppercase leading-none",
+              "rounded px-1.5 py-0.5 text-[11px] font-medium uppercase leading-none",
               STATUS_LABELS[current.status].color
             )}>
               {STATUS_LABELS[current.status].label}

@@ -169,7 +169,7 @@ export function CardGrid({
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-2">
             <Users className="h-6 w-6 text-muted-foreground" />
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            <h1 className="text-[24px] font-semibold tracking-tight text-foreground">
               Your Clients
             </h1>
           </div>
@@ -294,7 +294,7 @@ export function CardGrid({
         {clients.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Users className="mb-4 h-12 w-12 text-muted-foreground/40" />
-            <h2 className="text-lg font-medium text-foreground">
+            <h2 className="text-[18px] font-medium text-foreground">
               No clients yet
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">

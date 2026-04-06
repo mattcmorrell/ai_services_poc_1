@@ -77,7 +77,7 @@ function WorkflowStepNode({ data }: WorkflowStepNodeProps) {
             }}
             className="flex items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100"
           >
-            <span className="w-3 h-3 rounded-full bg-green-600 flex items-center justify-center text-white text-[8px] font-bold">B</span>
+            <span className="w-4 h-4 rounded-full bg-green-600 flex items-center justify-center text-white text-[11px] font-bold">B</span>
             <span className="underline">Open in BambooHR</span>
           </button>
         </div>

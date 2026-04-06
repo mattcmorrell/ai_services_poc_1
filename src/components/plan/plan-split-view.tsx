@@ -110,7 +110,7 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
             {onApprove && (
               <button
                 onClick={onApprove}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold transition-all bg-primary text-primary-foreground"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-medium transition-all bg-primary text-primary-foreground"
               >
                 <Check className="w-3.5 h-3.5" />
                 Approve
@@ -119,7 +119,7 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
             {onDecline && (
               <button
                 onClick={onDecline}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold transition-all bg-muted text-muted-foreground border border-border"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-medium transition-all bg-muted text-muted-foreground border border-border"
               >
                 <X className="w-3.5 h-3.5" />
                 Decline

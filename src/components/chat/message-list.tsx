@@ -142,9 +142,9 @@ const defaultTransform = (content: string) => {
 
     // Headings
     if (trimmed.startsWith("### ")) {
-      result.push(`<div style="font-size:13px;font-weight:600;margin:16px 0 6px">${inlineMd(trimmed.slice(4))}</div>`);
+      result.push(`<div style="font-size:14px;font-weight:500;margin:16px 0 6px">${inlineMd(trimmed.slice(4))}</div>`);
     } else if (trimmed.startsWith("## ")) {
-      result.push(`<div style="font-size:15px;font-weight:600;margin:20px 0 8px">${inlineMd(trimmed.slice(3))}</div>`);
+      result.push(`<div style="font-size:18px;font-weight:500;margin:20px 0 8px">${inlineMd(trimmed.slice(3))}</div>`);
     } else if (trimmed === "---" || trimmed === "***") {
       result.push('<hr style="border:none;border-top:1px solid var(--border);margin:12px 0" />');
     } else if (trimmed.startsWith("- ")) {

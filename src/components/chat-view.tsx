@@ -217,7 +217,7 @@ export function ChatView({
       {/* Header — full width, above split */}
       <div className="flex items-center justify-between border-b border-border px-6 py-4 shrink-0">
         <div>
-          <h1 className="text-2xl font-semibold">{chatTitle}</h1>
+          <h1 className="text-[24px] font-semibold">{chatTitle}</h1>
           {client && (
             <p className="text-sm text-muted-foreground">{client.name}</p>
           )}

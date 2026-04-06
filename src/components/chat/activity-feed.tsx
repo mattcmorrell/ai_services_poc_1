@@ -15,7 +15,7 @@ export function ActivityFeed({ updates }: ActivityFeedProps) {
       {updates.map((update) => (
         <div
           key={update.id}
-          className="flex items-center gap-2 font-mono text-[13px] leading-relaxed"
+          className="flex items-center gap-2 font-mono text-[14px] leading-relaxed"
         >
           {/* Status icon */}
           <span className="flex h-4 w-4 shrink-0 items-center justify-center">
