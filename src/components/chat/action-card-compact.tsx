@@ -12,6 +12,7 @@ import {
   Stop,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { ActionPlan } from "@/types/chat";
 
 interface ActionCardCompactProps {
@@ -77,24 +78,24 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
       {isPending && (onApprove || onDecline) && (
         <div className="flex gap-2.5 px-3 py-3 border-t border-border">
           {onApprove && (
-            <button
+            <Button
               onClick={(e) => { e.stopPropagation(); onApprove(); }}
-              className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
+              className="flex-1"
               style={{ padding: "8px 20px" }}
             >
               <Check className="w-4 h-4" />
               Approve plan
-            </button>
+            </Button>
           )}
           {onDecline && (
-            <button
+            <Button
+              variant="secondary"
               onClick={(e) => { e.stopPropagation(); onDecline(); }}
-              className="inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer bg-muted text-muted-foreground border border-border"
               style={{ padding: "8px 20px" }}
             >
               <X className="w-4 h-4" />
               Decline
-            </button>
+            </Button>
           )}
         </div>
       )}

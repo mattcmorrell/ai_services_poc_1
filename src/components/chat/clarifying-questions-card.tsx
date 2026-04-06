@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback, useState } from "react";
 import { Check } from "@phosphor-icons/react";
+import { StatusLabel } from "@/components/ui/status-label";
 import { ClarifyingQuestions } from "@/types/chat";
 
 interface ClarifyingQuestionsCardProps {
@@ -116,10 +117,10 @@ export function ClarifyingQuestionsCard({
   if (isAnswered && savedAnswers) {
     return (
       <div className="rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-success) 20%, transparent)" }}>
-        <div className="flex items-center gap-2 mb-2.5 text-[12px] tracking-wide uppercase" style={{ color: "var(--color-success)", opacity: 0.7 }}>
+        <StatusLabel variant="success" className="mb-2.5">
           <Check size={12} />
           <span>Questions answered</span>
-        </div>
+        </StatusLabel>
         <div className="flex flex-col gap-1.5">
           {questions.map((q) => {
             const answer = savedAnswers[q.id];

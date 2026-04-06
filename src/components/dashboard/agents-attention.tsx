@@ -8,6 +8,7 @@ import {
   Warning,
 } from "@phosphor-icons/react";
 import { AgentAttention } from "@/types/dashboard";
+import { AlertPill } from "@/components/ui/alert-pill";
 import { cn } from "@/lib/utils";
 
 interface AgentsAttentionProps {
@@ -64,10 +65,10 @@ export function AgentsAttention({ agents, onAgentClick }: AgentsAttentionProps) 
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{agent.agentName}</span>
                   {agent.isUrgent && (
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold" style={{ padding: "3px 10px", borderRadius: 4, background: "color-mix(in srgb, var(--destructive) 12%, transparent)", color: "var(--destructive)" }}>
+                    <AlertPill variant="urgent">
                       <Warning className="h-3 w-3" />
                       Urgent
-                    </span>
+                    </AlertPill>
                   )}
                   <span className="ml-auto text-xs text-muted-foreground">
                     {formatTimestamp(agent.timestamp)}

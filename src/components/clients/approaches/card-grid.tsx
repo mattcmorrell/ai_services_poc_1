@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { ArrowLeft, ChatDots, Clock, Users, MagnifyingGlass } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { AlertPill } from "@/components/ui/alert-pill";
 import type { Client, Chat } from "@/types/chat";
 
 interface ApproachProps {
@@ -268,12 +269,10 @@ export function CardGrid({
 
                 {/* V2: Status indicator */}
                 {version >= 2 && unread >= 4 && (
-                  <span className="inline-flex items-center text-xs font-semibold" style={{ padding: "3px 10px", borderRadius: 4, background: "color-mix(in srgb, var(--destructive) 12%, transparent)", color: "var(--destructive)" }}>Urgent</span>
+                  <AlertPill variant="urgent">Urgent</AlertPill>
                 )}
                 {version >= 2 && unread >= 1 && unread < 4 && (
-                  <span className="inline-flex items-center text-xs font-semibold" style={{ padding: "3px 10px", borderRadius: 4, background: "var(--color-warning-muted)", color: "var(--color-warning)" }}>
-                    Needs attention
-                  </span>
+                  <AlertPill variant="attention">Needs attention</AlertPill>
                 )}
               </button>
             );

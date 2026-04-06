@@ -2,6 +2,8 @@
 
 import { useEffect, useCallback } from "react";
 import { Check, ShieldWarning, PencilSimple, X } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
+import { StatusLabel } from "@/components/ui/status-label";
 import { ActionPlan } from "@/types/chat";
 
 interface GateApprovalCardProps {
@@ -55,12 +57,10 @@ export function GateApprovalCard({
   if (isApproved) {
     return (
       <div className="mt-4 rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-success) 20%, transparent)" }}>
-        <div className="flex items-center gap-2 text-[12px] font-semibold tracking-wide uppercase" style={{ color: "var(--color-success)", opacity: 0.7 }}>
+        <StatusLabel variant="success">
           <Check size={12} />
-          <span>
-            Step {gateApproval.stepIndex + 1} approved
-          </span>
-        </div>
+          <span>Step {gateApproval.stepIndex + 1} approved</span>
+        </StatusLabel>
         <p className="text-[13px] text-foreground/50 mt-1">
           {gateApproval.stepDescription}
         </p>
@@ -72,12 +72,10 @@ export function GateApprovalCard({
   if (isDeclined) {
     return (
       <div className="mt-4 rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-danger) 20%, transparent)" }}>
-        <div className="flex items-center gap-2 text-[12px] font-semibold tracking-wide uppercase" style={{ color: "var(--color-danger)", opacity: 0.7 }}>
+        <StatusLabel variant="danger">
           <X size={12} />
-          <span>
-            Step {gateApproval.stepIndex + 1} — plan modified
-          </span>
-        </div>
+          <span>Step {gateApproval.stepIndex + 1} — plan modified</span>
+        </StatusLabel>
         <p className="text-[13px] text-foreground/50 mt-1">
           Describe your changes below.
         </p>
@@ -93,11 +91,9 @@ export function GateApprovalCard({
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted/60">
           <ShieldWarning className="w-4 h-4 text-foreground/40" />
         </div>
-        <div>
-          <div className="text-[12px] font-semibold tracking-wide uppercase text-muted-foreground/80">
-            Step {gateApproval.stepIndex + 1} — Approval required
-          </div>
-        </div>
+        <StatusLabel variant="muted">
+          Step {gateApproval.stepIndex + 1} — Approval required
+        </StatusLabel>
       </div>
 
       {/* Body */}
@@ -112,22 +108,18 @@ export function GateApprovalCard({
 
       {/* Action buttons */}
       <div className="p-3 px-5 border-t border-border flex gap-2.5">
-        <button
-          onClick={onApprove}
-          className="flex-1 flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 text-primary-foreground cursor-pointer"
-          style={{ background: "var(--primary)", padding: "8px 20px" }}
-        >
+        <Button onClick={onApprove} className="flex-1" style={{ padding: "8px 20px" }}>
           <Check className="w-4 h-4" />
           Approve & continue
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
           onClick={onModify}
-          className="flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 bg-transparent cursor-pointer"
           style={{ color: "var(--color-danger)", border: "1px solid color-mix(in srgb, var(--color-danger) 30%, transparent)", padding: "8px 20px" }}
         >
-          <PencilSimple className="w-3.5 h-3.5" />
+          <PencilSimple className="w-4 h-4" />
           Modify
-        </button>
+        </Button>
       </div>
     </div>
   );

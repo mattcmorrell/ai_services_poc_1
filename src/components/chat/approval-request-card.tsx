@@ -2,6 +2,8 @@
 
 import { useEffect, useCallback } from "react";
 import { Check, ShieldCheck, X } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
+import { StatusLabel } from "@/components/ui/status-label";
 
 interface ApprovalRequestCardProps {
   question: string;
@@ -48,10 +50,10 @@ export function ApprovalRequestCard({
   if (isApproved) {
     return (
       <div className="mt-4 rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-success) 20%, transparent)" }}>
-        <div className="flex items-center gap-2 text-[12px] font-semibold tracking-wide uppercase" style={{ color: "var(--color-success)", opacity: 0.7 }}>
+        <StatusLabel variant="success">
           <Check size={12} />
           <span>Approved</span>
-        </div>
+        </StatusLabel>
         {title && (
           <p className="text-[13px] text-foreground/50 mt-1">{title}</p>
         )}
@@ -63,10 +65,10 @@ export function ApprovalRequestCard({
   if (isDeclined) {
     return (
       <div className="mt-4 rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-danger) 20%, transparent)" }}>
-        <div className="flex items-center gap-2 text-[12px] font-semibold tracking-wide uppercase" style={{ color: "var(--color-danger)", opacity: 0.7 }}>
+        <StatusLabel variant="danger">
           <X size={12} />
           <span>Declined</span>
-        </div>
+        </StatusLabel>
         {title && (
           <p className="text-[13px] text-foreground/50 mt-1">{title}</p>
         )}
@@ -82,9 +84,9 @@ export function ApprovalRequestCard({
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted/60">
           <ShieldCheck className="w-4 h-4 text-foreground/40" />
         </div>
-        <div className="text-[12px] font-semibold tracking-wide uppercase text-muted-foreground/80">
+        <StatusLabel variant="muted">
           {title || "Approval required"}
-        </div>
+        </StatusLabel>
       </div>
 
       {/* Body */}
@@ -96,22 +98,18 @@ export function ApprovalRequestCard({
 
       {/* Action buttons */}
       <div className="p-3 px-5 border-t border-border flex gap-2.5">
-        <button
-          onClick={onApprove}
-          className="flex-1 flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 text-primary-foreground cursor-pointer"
-          style={{ background: "var(--primary)", padding: "8px 20px" }}
-        >
+        <Button onClick={onApprove} className="flex-1" style={{ padding: "8px 20px" }}>
           <Check className="w-4 h-4" />
           Approve
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
           onClick={onDecline}
-          className="flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 bg-transparent cursor-pointer"
           style={{ color: "var(--color-danger)", border: "1px solid color-mix(in srgb, var(--color-danger) 30%, transparent)", padding: "8px 20px" }}
         >
           <X className="w-4 h-4" />
           Decline
-        </button>
+        </Button>
       </div>
     </div>
   );
