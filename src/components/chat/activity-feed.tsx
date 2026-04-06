@@ -20,11 +20,11 @@ export function ActivityFeed({ updates }: ActivityFeedProps) {
           {/* Status icon */}
           <span className="flex h-4 w-4 shrink-0 items-center justify-center">
             {update.status === "running" ? (
-              <CircleNotch weight="regular" className="h-3.5 w-3.5 animate-spin text-blue-400" />
+              <CircleNotch weight="regular" className="h-3.5 w-3.5 animate-spin" style={{ color: "var(--color-info)" }} />
             ) : update.status === "error" ? (
-              <WarningCircle className="h-3.5 w-3.5 text-red-400" />
+              <WarningCircle className="h-3.5 w-3.5" style={{ color: "var(--color-danger)" }} />
             ) : (
-              <Check className="h-3.5 w-3.5 text-emerald-400" />
+              <Check className="h-3.5 w-3.5" style={{ color: "var(--color-success)" }} />
             )}
           </span>
 

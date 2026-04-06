@@ -54,8 +54,8 @@ export function GateApprovalCard({
   // Approved state: compact summary
   if (isApproved) {
     return (
-      <div className="mt-4 rounded-lg border border-emerald-500/20 bg-card/50 px-4 py-3 max-w-[520px]">
-        <div className="flex items-center gap-2 text-[12px] font-medium tracking-wide uppercase text-emerald-500/70">
+      <div className="mt-4 rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-success) 20%, transparent)" }}>
+        <div className="flex items-center gap-2 text-[12px] font-medium tracking-wide uppercase" style={{ color: "var(--color-success)", opacity: 0.7 }}>
           <Check size={12} />
           <span>
             Step {gateApproval.stepIndex + 1} approved
@@ -71,8 +71,8 @@ export function GateApprovalCard({
   // Declined state: compact summary
   if (isDeclined) {
     return (
-      <div className="mt-4 rounded-lg border border-red-500/20 bg-card/50 px-4 py-3 max-w-[520px]">
-        <div className="flex items-center gap-2 text-[12px] font-medium tracking-wide uppercase text-red-400/70">
+      <div className="mt-4 rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-danger) 20%, transparent)" }}>
+        <div className="flex items-center gap-2 text-[12px] font-medium tracking-wide uppercase" style={{ color: "var(--color-danger)", opacity: 0.7 }}>
           <X size={12} />
           <span>
             Step {gateApproval.stepIndex + 1} — plan modified
@@ -87,7 +87,7 @@ export function GateApprovalCard({
 
   // Pending state: big approval card
   return (
-    <div className="mt-4 rounded-lg border border-border bg-card/50 overflow-hidden max-w-[520px]">
+    <div className="mt-4 rounded-xl border border-border bg-card/50 overflow-hidden max-w-[520px]">
       {/* Header */}
       <div className="flex items-center gap-2.5 px-5 py-3 border-b border-border bg-muted/30">
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted/60">
@@ -114,14 +114,16 @@ export function GateApprovalCard({
       <div className="p-3 px-5 border-t border-border flex gap-2.5">
         <button
           onClick={onApprove}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md text-[12px] font-medium tracking-wide transition-all duration-200 bg-emerald-600 text-white cursor-pointer hover:bg-emerald-500"
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md text-[12px] font-medium tracking-wide transition-all duration-200 text-primary-foreground cursor-pointer"
+          style={{ background: "var(--primary)" }}
         >
           <Check className="w-3.5 h-3.5" />
           Approve & continue
         </button>
         <button
           onClick={onModify}
-          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-[12px] font-medium tracking-wide transition-all duration-200 bg-transparent text-red-400 cursor-pointer hover:bg-red-500/10 border border-red-500/30"
+          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-[12px] font-medium tracking-wide transition-all duration-200 bg-transparent cursor-pointer"
+          style={{ color: "var(--color-danger)", border: "1px solid color-mix(in srgb, var(--color-danger) 30%, transparent)" }}
         >
           <PencilSimple className="w-3.5 h-3.5" />
           Modify

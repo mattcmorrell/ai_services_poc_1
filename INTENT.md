@@ -65,8 +65,68 @@ Working on branch `visual-design-overhaul`. V15 (Mercury) and V16 (Orbital) vari
 - Header height mismatch on recent chats — needs investigation
 - Getting screenshots + variables into Figma (may need new file or variable updates)
 
+## Active: Design System Alignment
+
+Audit of codebase against `public/mockups/design-system.html` (2026-04-06). Reference spec is the single source of truth for tokens, typography, component styling.
+
+### High — Systematic Drift
+
+- [x] **Hardcoded Tailwind colors instead of design tokens** (~20 instances) *(fixed 2026-04-06)*
+  - activity-feed.tsx — icon colors now use `--color-info`, `--color-danger`, `--color-success`
+  - action-card.tsx — status icons, approved button, completion banner, step indicators all tokenized
+  - gate-approval-card.tsx — approved/declined borders, approve/modify buttons tokenized
+  - approval-request-card.tsx — same pattern as gate-approval
+  - clarifying-questions-card.tsx — answered state border, check icon tokenized
+  - message-list.tsx — approved button tokenized
+  - Note: workflow/ (BambooHR brand green) and clients/ (prototypes) left as-is — not in design system scope
+
+- [ ] **Stopped/Declined badges use full danger instead of desaturated**
+  - `plan-controls.tsx:134-136` — uses `--color-danger-muted` bg + `--color-danger` text
+  - Spec: `color-mix(in srgb, var(--color-danger) 8%, transparent)` bg, `color-mix(in srgb, var(--color-danger) 50%, var(--muted-foreground))` text
+  - Hierarchy: danger = "act now", stopped/declined = "ended negatively but resolved"
+
+- [x] **Card border-radius 8px → 12px** *(fixed 2026-04-06)*
+  - gate-approval-card, approval-request-card, clarifying-questions-card, artifact-card
+
+- [ ] **Chat user bubble padding and asymmetric radius**
+  - `message-list.tsx:289` — `px-4 py-2` (16px 8px) → spec: 14px 18px
+  - `message-list.tsx:289` — `rounded-lg` (8px uniform) → spec: 12px with bottom-right 4px
+
+### Medium — Component-Level Fixes
+
+- [ ] **Badge padding** — `plan-controls.tsx:143` uses `px-2 py-0.5` (8px 2px), spec: 3px 10px
+- [ ] **Badge dot size** — `plan-controls.tsx:148` uses `w-1.5 h-1.5` (6px) — correct per spec
+- [ ] **Status label font weight** — `font-medium` (500) throughout, spec says 600
+  - `gate-approval-card.tsx:58,75,97`
+  - `approval-request-card.tsx:51,66,85`
+  - `action-card.tsx:123`
+- [ ] **Button font size** — approve/decline buttons use `text-[12px]`, spec says 14px (or 13px small)
+  - `action-card-compact.tsx:82,91`
+  - `approval-request-card.tsx:101,108`
+  - `gate-approval-card.tsx:117,124`
+- [ ] **Button border-radius** — `rounded-md` (6px), spec says 8px (`rounded-lg`)
+  - Same files as above + `clarifying-questions-card.tsx:288,300`
+- [ ] **Button padding** — `py-2.5` only, spec says 8px 20px
+- [ ] **Inline data chip** — `globals.css:427-440`
+  - Padding: 2px 8px → spec: 1px 6px
+  - Border-radius: 6px → spec: 3px
+  - Extra border not in spec
+- [ ] **Chat input padding** — `chat-view.tsx:161` uses `p-3` (12px), spec: 14px 16px
+- [ ] **Label letter-spacing** — `action-card.tsx:123` uses `tracking-wide` (0.025em), spec: 0.06em
+
+### Low — Missing Implementations
+
+- [ ] **Anomaly card** — fully spec'd in design system, no component exists yet
+- [ ] **Alert pills** — spec defines urgent/attention variants (4px radius, sans), not formally built
+- [ ] **Activity feed font size** — code uses 14px, spec has internal inconsistency (type scale says 14px for `.type-feed`, component specimen CSS says 13px for `.feed-line`)
+
+### Notes
+- Design system spec: `public/mockups/design-system.html#patterns`
+- Design system badge hierarchy: danger (act now) > warning (paused) > stopped/declined (desaturated red, resolved) > muted (pending, neutral)
+- Voice rule: mono = agent produced, sans = human space. The font signals *who produced this*.
+
 ## Next Steps (Monday 2026-04-07)
-1. Run Claude's reskin plan against V15/V16
+1. Work through design system alignment checklist above
 2. Get screenshots + design tokens into Figma
 3. Resolve dashboard layout
 4. Resolve client nav question

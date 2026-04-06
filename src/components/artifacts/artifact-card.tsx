@@ -42,7 +42,7 @@ export function ArtifactCard({ artifact, isSelected, onClick, onEdit, onCopy, on
   return (
     <div
       className={cn(
-        "w-full max-w-xs text-left p-3 rounded-lg border transition-colors",
+        "w-full max-w-xs text-left p-3 rounded-xl border transition-colors",
         "hover:bg-accent/50",
         isSelected
           ? "border-primary bg-accent"

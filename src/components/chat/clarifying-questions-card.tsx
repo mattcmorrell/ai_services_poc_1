@@ -115,8 +115,8 @@ export function ClarifyingQuestionsCard({
   // Answered state: compact read-only summary
   if (isAnswered && savedAnswers) {
     return (
-      <div className="rounded-lg border border-emerald-500/20 bg-card/50 px-4 py-3 max-w-[520px]">
-        <div className="flex items-center gap-2 mb-2.5 text-[12px] tracking-wide uppercase text-emerald-500/70">
+      <div className="rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-success) 20%, transparent)" }}>
+        <div className="flex items-center gap-2 mb-2.5 text-[12px] tracking-wide uppercase" style={{ color: "var(--color-success)", opacity: 0.7 }}>
           <Check size={12} />
           <span>Questions answered</span>
         </div>
@@ -145,7 +145,7 @@ export function ClarifyingQuestionsCard({
 
   // Active state: tabbed question UI
   return (
-    <div className="rounded-lg border border-border bg-card/50 overflow-hidden max-w-[520px]">
+    <div className="rounded-xl border border-border bg-card/50 overflow-hidden max-w-[520px]">
       {/* Tab bar */}
       <div className="flex border-b border-border bg-muted/30 overflow-x-auto">
         {questions.map((q, idx) => {
@@ -162,7 +162,7 @@ export function ClarifyingQuestionsCard({
               }`}
             >
               {tabAnswered && (
-                <Check size={10} className="text-emerald-500" />
+                <Check size={10} style={{ color: "var(--color-success)" }} />
               )}
               {q.header}
             </button>

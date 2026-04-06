@@ -432,11 +432,8 @@ export function MessageList({
                 <Button
                   onClick={() => onApprove(message.id)}
                   disabled={message.approved}
-                  className={cn(
-                    "gap-2",
-                    message.approved &&
-                      "bg-green-600 hover:bg-green-600 text-white"
-                  )}
+                  className="gap-2"
+                  style={message.approved ? { background: "var(--color-success)", color: "white" } : undefined}
                 >
                   {message.approved ? (
                     <>
