@@ -57,7 +57,7 @@
   --accent: #2E3B3D; --accent-foreground: #F2F0EB;
   --destructive: #D4875A;
   --border: rgba(220,215,201,0.08); --input: rgba(220,215,201,0.12); --ring: #7A9A78;
-  --color-success: #6ABA7A; --color-success-muted: rgba(106,186,122,0.12);
+  --color-success: #34D058; --color-success-muted: rgba(52,208,88,0.14);
   --color-warning: #D4A456; --color-warning-muted: rgba(212,164,86,0.12);
   --color-danger: #C96B6B; --color-danger-muted: rgba(201,107,107,0.12);
   --color-info: #A0C09E; --color-info-muted: rgba(160,192,158,0.12);
@@ -93,7 +93,7 @@
   --accent: #2A3640; --accent-foreground: #E8EFF4;
   --destructive: #E08850;
   --border: rgba(196,212,220,0.08); --input: rgba(196,212,220,0.12); --ring: #8AAEC4;
-  --color-success: #7BAA82; --color-success-muted: rgba(123,170,130,0.12);
+  --color-success: #5BC870; --color-success-muted: rgba(91,200,112,0.13);
   --color-warning: #C4A060; --color-warning-muted: rgba(196,160,96,0.12);
   --color-danger: #C07070; --color-danger-muted: rgba(192,112,112,0.12);
   --color-info: #B0D0E0; --color-info-muted: rgba(176,208,224,0.12);
@@ -255,6 +255,11 @@ body {
   font-family: 'Geist Mono', monospace; font-size: 11px;
   color: var(--muted-foreground); width: 32px; flex-shrink: 0;
 }
+.type-token {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: var(--primary); width: 108px; flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
 .type-sample { color: var(--foreground); flex: 1; }
 
 /* ============================================ */
@@ -289,7 +294,7 @@ body {
 
 /* Badges */
 .badge {
-  font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500;
+  font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 600;
   display: inline-flex; align-items: center; gap: 6px;
   padding: 3px 10px; border-radius: 20px;
 }
@@ -302,8 +307,23 @@ body {
 .badge-warning .badge-dot { background: var(--color-warning); }
 .badge-danger { background: var(--color-danger-muted); color: var(--color-danger); }
 .badge-danger .badge-dot { background: var(--color-danger); }
-.badge-muted { background: var(--secondary); color: var(--muted-foreground); }
+.badge-stopped { background: color-mix(in srgb, var(--color-danger) 8%, transparent); color: color-mix(in srgb, var(--color-danger) 50%, var(--muted-foreground)); }
+.badge-stopped .badge-dot { background: color-mix(in srgb, var(--color-danger) 40%, var(--muted-foreground)); }
+.badge-muted { background: var(--muted); color: var(--muted-foreground); }
 .badge-muted .badge-dot { background: var(--muted-foreground); }
+
+/* Alert pills */
+.alert-pill {
+  font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 4px;
+}
+.alert-pill-urgent {
+  background: var(--color-danger-muted); color: var(--destructive);
+}
+.alert-pill-attention {
+  background: var(--color-warning-muted); color: var(--color-warning);
+}
 
 /* Activity feed */
 .feed-line {
@@ -321,7 +341,7 @@ body {
   height: 6px; border-radius: 3px; background: var(--secondary);
   overflow: hidden; margin-bottom: 6px;
 }
-.plan-progress-fill { height: 100%; border-radius: 3px; background: var(--color-success); transition: width 0.5s; }
+.plan-progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 70%, var(--background)), var(--primary)); transition: width 0.5s; }
 .plan-progress-label {
   font-family: 'Geist Mono', monospace; font-size: 12px;
   color: var(--muted-foreground); margin-bottom: 16px;
@@ -347,18 +367,24 @@ body {
 
 /* Anomaly card */
 .anomaly-card {
-  background: var(--card); border-radius: 12px; padding: 20px;
-  border: 1px solid var(--destructive); border-left-width: 3px;
-  box-shadow: inset 0 0 40px -20px rgba(224,136,80,0.06);
+  background: var(--card); border-radius: 12px; padding: 20px 24px;
+  border: 2px solid var(--destructive);
+  box-shadow:
+    inset 0 0 20px var(--color-danger-muted),
+    inset 0 0 40px var(--color-danger-muted),
+    0 0 16px var(--color-danger-muted);
 }
-.anomaly-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.anomaly-icon { font-size: 16px; }
-.anomaly-title { font-size: 15px; font-weight: 600; color: var(--foreground); }
-.anomaly-body { font-size: 14px; color: var(--card-foreground); line-height: 1.6; margin-bottom: 12px; }
+.anomaly-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.anomaly-icon { font-size: 16px; color: var(--destructive); }
+.anomaly-title { font-size: 14px; font-weight: 600; color: var(--foreground); }
+.anomaly-body { font-size: 14px; color: var(--card-foreground); line-height: 1.6; margin-bottom: 16px; }
 .anomaly-evidence {
-  font-family: 'Geist Mono', monospace; font-size: 13px;
-  background: var(--secondary); border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;
+  font-family: 'Geist Mono', monospace; font-size: 13px; line-height: 1.6;
+  background: var(--muted); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px;
+  border: 1px solid var(--border);
 }
+.btn-destructive-fill { background: var(--destructive); color: #fff; }
+.btn-muted-outline { background: var(--muted); color: var(--muted-foreground); border: 1px solid var(--border); }
 .ev-row { display: flex; justify-content: space-between; padding: 3px 0; }
 .ev-label { color: var(--muted-foreground); }
 .ev-value { color: var(--foreground); }
@@ -607,27 +633,27 @@ body {
 
   <div class="swatch-row-label">Geist Sans — Human Layer</div>
   <div style="margin-bottom:28px">
-    <div class="type-row"><span class="type-size">32px</span><span class="type-weight">700</span><span class="type-sample" style="font-size:32px;font-weight:700">January Payroll</span></div>
-    <div class="type-row"><span class="type-size">24px</span><span class="type-weight">600</span><span class="type-sample" style="font-size:24px;font-weight:600">Benefits Enrollment Q1</span></div>
-    <div class="type-row"><span class="type-size">18px</span><span class="type-weight">500</span><span class="type-sample" style="font-size:18px;font-weight:500">Run payroll for 47 employees</span></div>
-    <div class="type-row"><span class="type-size">14px</span><span class="type-weight">400</span><span class="type-sample" style="font-size:14px">Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12.</span></div>
-    <div class="type-row"><span class="type-size">13px</span><span class="type-weight">400</span><span class="type-sample" style="font-size:13px;color:var(--muted-foreground)">Completed 10:34 AM &middot; 2 of 8 steps</span></div>
-    <div class="type-row"><span class="type-size">12px</span><span class="type-weight">500</span><span class="type-sample" style="font-size:12px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted-foreground)">Section Label</span></div>
+    <div class="type-row"><span class="type-size">32px</span><span class="type-weight">700</span><span class="type-token">.type-page-title</span><span class="type-sample" style="font-size:32px;font-weight:700">January Payroll</span></div>
+    <div class="type-row"><span class="type-size">24px</span><span class="type-weight">600</span><span class="type-token">.type-section-title</span><span class="type-sample" style="font-size:24px;font-weight:600">Benefits Enrollment Q1</span></div>
+    <div class="type-row"><span class="type-size">18px</span><span class="type-weight">500</span><span class="type-token">.type-subhead</span><span class="type-sample" style="font-size:18px;font-weight:500">Run payroll for 47 employees</span></div>
+    <div class="type-row"><span class="type-size">14px</span><span class="type-weight">400</span><span class="type-token">.type-body</span><span class="type-sample" style="font-size:14px">Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12.</span></div>
+    <div class="type-row"><span class="type-size">13px</span><span class="type-weight">400</span><span class="type-token">.type-meta</span><span class="type-sample" style="font-size:13px;color:var(--muted-foreground)">Completed 10:34 AM &middot; 2 of 8 steps</span></div>
+    <div class="type-row"><span class="type-size">12px</span><span class="type-weight">500</span><span class="type-token">.type-label</span><span class="type-sample" style="font-size:12px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted-foreground)">Section Label</span></div>
   </div>
 
   <div class="swatch-row-label">Geist Mono — Agent Layer</div>
   <div style="margin-bottom:28px">
-    <div class="type-row"><span class="type-size">14px</span><span class="type-weight">400</span><span class="type-sample" style="font-family:'Geist Mono',monospace;font-size:14px">Pulling payroll data from BambooHR...</span></div>
-    <div class="type-row"><span class="type-size">13px</span><span class="type-weight">400</span><span class="type-sample" style="font-family:'Geist Mono',monospace;font-size:13px">current_ot: 58.0 hrs &middot; variance: +383%</span></div>
-    <div class="type-row"><span class="type-size">12px</span><span class="type-weight">500</span><span class="type-sample" style="font-family:'Geist Mono',monospace;font-size:12px;font-weight:500">Running &middot; Done &middot; Gate &middot; Paused</span></div>
-    <div class="type-row"><span class="type-size">11px</span><span class="type-weight">500</span><span class="type-sample" style="font-family:'Geist Mono',monospace;font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary)">Module 01 &middot; Agent Status</span></div>
+    <div class="type-row"><span class="type-size">14px</span><span class="type-weight">400</span><span class="type-token">.type-feed</span><span class="type-sample" style="font-family:'Geist Mono',monospace;font-size:14px">Pulling payroll data from BambooHR...</span></div>
+    <div class="type-row"><span class="type-size">13px</span><span class="type-weight">400</span><span class="type-token">.type-data</span><span class="type-sample" style="font-family:'Geist Mono',monospace;font-size:13px">current_ot: 58.0 hrs &middot; variance: +383%</span></div>
+    <div class="type-row"><span class="type-size">12px</span><span class="type-weight">500</span><span class="type-token">.type-status</span><span class="type-sample" style="font-family:'Geist Mono',monospace;font-size:12px;font-weight:500">Running &middot; Done &middot; Gate &middot; Paused</span></div>
+    <div class="type-row"><span class="type-size">11px</span><span class="type-weight">500</span><span class="type-token">.type-module</span><span class="type-sample" style="font-family:'Geist Mono',monospace;font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary)">Module 01 &middot; Agent Status</span></div>
   </div>
 
   <div class="swatch-row-label">Numbers — Sans in UI Chrome</div>
   <div>
-    <div class="type-row"><span class="type-size">28px</span><span class="type-weight">600</span><span class="type-sample" style="font-size:28px;font-weight:600">$4,132.50</span></div>
-    <div class="type-row"><span class="type-size">22px</span><span class="type-weight">500</span><span class="type-sample" style="font-size:22px;font-weight:500">82 hrs &nbsp; 47 ee</span></div>
-    <div class="type-row"><span class="type-size">14px</span><span class="type-weight">400</span><span class="type-sample" style="font-size:14px">variance +383% &nbsp; threshold 150%</span></div>
+    <div class="type-row"><span class="type-size">28px</span><span class="type-weight">600</span><span class="type-token">.type-stat-lg</span><span class="type-sample" style="font-size:28px;font-weight:600">$4,132.50</span></div>
+    <div class="type-row"><span class="type-size">22px</span><span class="type-weight">500</span><span class="type-token">.type-stat-md</span><span class="type-sample" style="font-size:22px;font-weight:500">82 hrs &nbsp; 47 ee</span></div>
+    <div class="type-row"><span class="type-size">14px</span><span class="type-weight">400</span><span class="type-token">.type-stat-sm</span><span class="type-sample" style="font-size:14px">variance +383% &nbsp; threshold 150%</span></div>
   </div>
 </div>
 
@@ -660,12 +686,65 @@ body {
     <!-- Status Badges -->
     <div class="specimen">
       <div class="specimen-label">Status Badges (mono)</div>
-      <div class="btn-row" style="gap:8px">
+      <div class="btn-row" style="gap:8px;margin-bottom:16px">
         <span class="badge badge-success"><span class="badge-dot"></span>Done</span>
         <span class="badge badge-info"><span class="badge-dot"></span>Running</span>
         <span class="badge badge-warning"><span class="badge-dot"></span>Paused</span>
         <span class="badge badge-danger"><span class="badge-dot"></span>Stopped</span>
         <span class="badge badge-muted"><span class="badge-dot"></span>Pending</span>
+      </div>
+      <div class="specimen-label">Alert Pills (sans)</div>
+      <div class="btn-row" style="gap:8px">
+        <span class="alert-pill alert-pill-urgent">&#9888; Urgent</span>
+        <span class="alert-pill alert-pill-attention">&#9679; Needs attention</span>
+      </div>
+
+      <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--border)">
+        <div class="specimen-label">Proposed: Danger reserved for "act now"</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:12px">
+          <!-- Current -->
+          <div>
+            <div style="font-family:'Geist Mono',monospace;font-size:11px;color:var(--muted-foreground);margin-bottom:10px;letter-spacing:0.06em;text-transform:uppercase">Current</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
+                <span style="font-size:13px;color:var(--foreground)">Stopped</span>
+                <span class="badge badge-danger"><span class="badge-dot"></span>Stopped</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
+                <span style="font-size:13px;color:var(--foreground)">Declined</span>
+                <span class="badge badge-danger"><span class="badge-dot"></span>Declined</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
+                <span style="font-size:13px;color:var(--foreground)">Urgent item</span>
+                <span class="alert-pill alert-pill-urgent">&#9888; Urgent</span>
+              </div>
+            </div>
+            <div style="font-size:12px;color:var(--muted-foreground);margin-top:8px">Stopped, Declined, and Urgent all use danger — no hierarchy</div>
+          </div>
+          <!-- Proposed -->
+          <div>
+            <div style="font-family:'Geist Mono',monospace;font-size:11px;color:var(--primary);margin-bottom:10px;letter-spacing:0.06em;text-transform:uppercase">Proposed</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
+                <span style="font-size:13px;color:var(--foreground)">Pending</span>
+                <span class="badge badge-muted"><span class="badge-dot"></span>Pending</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
+                <span style="font-size:13px;color:var(--foreground)">Stopped</span>
+                <span class="badge badge-stopped"><span class="badge-dot"></span>Stopped</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
+                <span style="font-size:13px;color:var(--foreground)">Declined</span>
+                <span class="badge badge-stopped"><span class="badge-dot"></span>Declined</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
+                <span style="font-size:13px;color:var(--foreground)">Urgent item</span>
+                <span class="alert-pill alert-pill-urgent">&#9888; Urgent</span>
+              </div>
+            </div>
+            <div style="font-size:12px;color:var(--muted-foreground);margin-top:8px">Pending = neutral waiting. Stopped/Declined = faint red (ended badly). Urgent = full danger (act now).</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -749,8 +828,8 @@ body {
           <div class="ev-row"><span class="ev-label">gross_impact</span><span class="ev-value ev-hot">+$4,132.50</span></div>
         </div>
         <div class="btn-row">
-          <button class="btn btn-primary">Acknowledge</button>
-          <button class="btn btn-secondary">Investigate</button>
+          <button class="btn btn-destructive-fill">Acknowledge</button>
+          <button class="btn btn-muted-outline">Investigate</button>
         </div>
       </div>
     </div>

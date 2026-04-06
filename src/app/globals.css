@@ -197,8 +197,8 @@
   --sidebar-border: rgba(220, 215, 201, 0.08);
   --sidebar-ring: #7A9A78;
   /* Semantic */
-  --color-success: #6ABA7A;
-  --color-success-muted: rgba(106, 186, 122, 0.12);
+  --color-success: #34D058;
+  --color-success-muted: rgba(52, 208, 88, 0.14);
   --color-warning: #D4A456;
   --color-warning-muted: rgba(212, 164, 86, 0.12);
   --color-danger: #C96B6B;
@@ -309,8 +309,8 @@
   --sidebar-border: rgba(196, 212, 220, 0.08);
   --sidebar-ring: #8AAEC4;
   /* Semantic */
-  --color-success: #7BAA82;
-  --color-success-muted: rgba(123, 170, 130, 0.12);
+  --color-success: #5BC870;
+  --color-success-muted: rgba(91, 200, 112, 0.13);
   --color-warning: #C4A060;
   --color-warning-muted: rgba(196, 160, 96, 0.12);
   --color-danger: #C07070;
