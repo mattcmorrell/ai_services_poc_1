@@ -112,7 +112,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
               const sev = severityPill[item.severity];
               return (
                 <div key={item.id} className="flex items-start gap-3 px-5 py-4">
-                  <AlertPill variant={sev.variant} className="mt-px shrink-0 uppercase">
+                  <AlertPill variant={sev.variant} className="mt-px w-[100px] shrink-0 justify-center uppercase">
                     {sev.variant === "urgent" && <Warning size={12} />}
                     {sev.variant === "attention" && <span className="h-1.5 w-1.5 rounded-full" style={{ background: "currentColor" }} />}
                     {sev.label}
