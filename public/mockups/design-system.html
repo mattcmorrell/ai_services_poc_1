@@ -14,7 +14,7 @@
 .mercury.dark {
   --background: #101214; --foreground: #E8E9ED;
   --card: #191B1F; --card-foreground: #E8E9ED;
-  --popover: #191B1F; --popover-foreground: #E8E9ED;
+  --popover: var(--card); --popover-foreground: var(--card-foreground);
   --primary: #6878B8; --primary-foreground: #E8E9ED;
   --secondary: #222428; --secondary-foreground: #E8E9ED;
   --muted: #222428; --muted-foreground: #9DA0A8;
@@ -32,7 +32,7 @@
 .mercury.light {
   --background: #F3F4F6; --foreground: #1C1E24;
   --card: #FFFFFF; --card-foreground: #3C3F48;
-  --popover: #FFFFFF; --popover-foreground: #3C3F48;
+  --popover: var(--card); --popover-foreground: var(--card-foreground);
   --primary: #506098; --primary-foreground: #FFFFFF;
   --secondary: #F4F5F7; --secondary-foreground: #3C3F48;
   --muted: #F4F5F7; --muted-foreground: #6E7178;
@@ -50,7 +50,7 @@
 .inkwell.dark {
   --background: #111617; --foreground: #F2F0EB;
   --card: #1C2426; --card-foreground: #F2F0EB;
-  --popover: #1C2426; --popover-foreground: #F2F0EB;
+  --popover: var(--card); --popover-foreground: var(--card-foreground);
   --primary: #7A9A78; --primary-foreground: #F2F0EB;
   --secondary: #2E3B3D; --secondary-foreground: #F2F0EB;
   --muted: #2E3B3D; --muted-foreground: #C8C2B4;
@@ -68,7 +68,7 @@
 .inkwell.light {
   --background: #EBE8E0; --foreground: #1C2426;
   --card: #FFFFFF; --card-foreground: #2E3B3D;
-  --popover: #FFFFFF; --popover-foreground: #2E3B3D;
+  --popover: var(--card); --popover-foreground: var(--card-foreground);
   --primary: #5A7A58; --primary-foreground: #FFFFFF;
   --secondary: #F7F5F1; --secondary-foreground: #2E3B3D;
   --muted: #F7F5F1; --muted-foreground: #6B7574;
@@ -86,7 +86,7 @@
 .orbital.dark {
   --background: #161C22; --foreground: #E8EFF4;
   --card: #1E2830; --card-foreground: #E8EFF4;
-  --popover: #1E2830; --popover-foreground: #E8EFF4;
+  --popover: var(--card); --popover-foreground: var(--card-foreground);
   --primary: #8AAEC4; --primary-foreground: #E8EFF4;
   --secondary: #2A3640; --secondary-foreground: #E8EFF4;
   --muted: #2A3640; --muted-foreground: #9AABB8;
@@ -104,7 +104,7 @@
 .orbital.light {
   --background: #E8EFF4; --foreground: #1A2830;
   --card: #FFFFFF; --card-foreground: #2A3A44;
-  --popover: #FFFFFF; --popover-foreground: #2A3A44;
+  --popover: var(--card); --popover-foreground: var(--card-foreground);
   --primary: #4A7A98; --primary-foreground: #FFFFFF;
   --secondary: #EEF4F8; --secondary-foreground: #2A3A44;
   --muted: #EEF4F8; --muted-foreground: #5A7080;
@@ -542,10 +542,8 @@ body {
   <div class="swatch-grid" style="margin-bottom:28px">
     <div class="swatch-card"><div class="swatch-color" style="background:var(--background)"></div><div class="swatch-name">Background</div><div class="swatch-var">--background</div></div>
     <div class="swatch-card"><div class="swatch-color" style="background:var(--card)"></div><div class="swatch-name">Card</div><div class="swatch-var">--card</div></div>
-    <div class="swatch-card"><div class="swatch-color" style="background:var(--secondary)"></div><div class="swatch-name">Secondary</div><div class="swatch-var">--secondary</div></div>
-    <div class="swatch-card"><div class="swatch-color" style="background:var(--muted)"></div><div class="swatch-name">Muted</div><div class="swatch-var">--muted</div></div>
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--muted)"></div><div class="swatch-name">Muted / Inner</div><div class="swatch-var">--muted (= --secondary)</div></div>
     <div class="swatch-card"><div class="swatch-color" style="background:var(--sidebar)"></div><div class="swatch-name">Sidebar</div><div class="swatch-var">--sidebar</div></div>
-    <div class="swatch-card"><div class="swatch-color" style="background:var(--popover)"></div><div class="swatch-name">Popover</div><div class="swatch-var">--popover</div></div>
   </div>
 
   <div class="swatch-row-label">Interactive</div>
@@ -683,9 +681,9 @@ body {
           <span class="surface-label" style="color:var(--card-foreground)">Card</span>
           <span class="surface-label" style="color:var(--muted-foreground)">--card</span>
         </div>
-        <div class="surface-demo" style="background:var(--secondary);border:1px solid var(--border)">
-          <span class="surface-label" style="color:var(--secondary-foreground)">Secondary</span>
-          <span class="surface-label" style="color:var(--muted-foreground)">--secondary</span>
+        <div class="surface-demo" style="background:var(--muted);border:1px solid var(--border)">
+          <span class="surface-label" style="color:var(--foreground)">Muted / Inner</span>
+          <span class="surface-label" style="color:var(--muted-foreground)">--muted</span>
         </div>
       </div>
     </div>

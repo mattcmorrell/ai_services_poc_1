@@ -82,7 +82,7 @@ export function WorkflowPanel({ workflow, onClose }: WorkflowPanelProps) {
               {tab.type === "workflow" ? (
                 <ArrowsDownUp className="h-4 w-4" />
               ) : (
-                <span className="flex h-4 w-4 items-center justify-center rounded bg-green-600 text-[10px] font-bold text-white">
+                <span className="flex h-5 w-5 items-center justify-center rounded bg-green-600 text-[11px] font-bold text-white">
                   B
                 </span>
               )}

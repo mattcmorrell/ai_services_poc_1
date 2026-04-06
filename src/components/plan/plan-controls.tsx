@@ -52,7 +52,7 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
           </button>
           <button
             onClick={() => setConfirmingStop(false)}
-            className={cn(buttonBase, "font-medium bg-secondary text-muted-foreground border border-border")}
+            className={cn(buttonBase, "font-medium bg-muted text-muted-foreground border border-border")}
           >
             {!compact ? "Cancel" : "Back"}
           </button>

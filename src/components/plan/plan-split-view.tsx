@@ -22,7 +22,7 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
   const gatedStep = isPausedByGate ? plan.steps.find((s) => s.status === "in_progress") : null;
 
   return (
-    <div className="flex flex-col h-full bg-secondary/50">
+    <div className="flex flex-col h-full bg-muted/50">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 shrink-0 border-b" style={{ borderColor: "var(--border)" }}>
         <div className="flex items-center gap-2.5 min-w-0">
@@ -119,7 +119,7 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
             {onDecline && (
               <button
                 onClick={onDecline}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold transition-all bg-secondary text-muted-foreground border border-border"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-semibold transition-all bg-muted text-muted-foreground border border-border"
               >
                 <X className="w-3.5 h-3.5" />
                 Decline

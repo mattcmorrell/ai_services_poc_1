@@ -68,7 +68,7 @@ export function PlanDock({ plan, onPause, onStop, onResume }: PlanDockProps) {
         {/* Mini progress bar */}
         <div className="flex items-center gap-3 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-20 h-1.5 rounded-full overflow-hidden bg-secondary">
+            <div className="w-20 h-1.5 rounded-full overflow-hidden bg-muted">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{ width: `${progress}%`, background: "var(--color-success)" }}
@@ -109,7 +109,7 @@ export function PlanDock({ plan, onPause, onStop, onResume }: PlanDockProps) {
             {/* Agent log flyout */}
             {showAgentLog && (
               <div
-                className="mt-2 p-3 rounded-lg space-y-2 max-h-40 overflow-y-auto font-mono bg-secondary border border-border"
+                className="mt-2 p-3 rounded-lg space-y-2 max-h-40 overflow-y-auto font-mono bg-muted border border-border"
               >
                 {plan.steps
                   .filter((s) => s.thinkingLog && s.thinkingLog.length > 0)

@@ -53,8 +53,8 @@
   --foreground: #1C1E24;
   --card: #FFFFFF;
   --card-foreground: #3C3F48;
-  --popover: #FFFFFF;
-  --popover-foreground: #3C3F48;
+  --popover: var(--card);
+  --popover-foreground: var(--card-foreground);
   --primary: #506098;
   --primary-foreground: #FFFFFF;
   --secondary: #F4F5F7;
@@ -111,8 +111,8 @@
   --foreground: #E8E9ED;
   --card: #191B1F;
   --card-foreground: #E8E9ED;
-  --popover: #191B1F;
-  --popover-foreground: #E8E9ED;
+  --popover: var(--card);
+  --popover-foreground: var(--card-foreground);
   --primary: #6878B8;
   --primary-foreground: #E8E9ED;
   --secondary: #222428;
@@ -169,8 +169,8 @@
   --foreground: #F2F0EB;
   --card: #1C2426;
   --card-foreground: #F2F0EB;
-  --popover: #1C2426;
-  --popover-foreground: #F2F0EB;
+  --popover: var(--card);
+  --popover-foreground: var(--card-foreground);
   --primary: #7A9A78;
   --primary-foreground: #F2F0EB;
   --secondary: #2E3B3D;
@@ -223,8 +223,8 @@
   --foreground: #1C2426;
   --card: #FFFFFF;
   --card-foreground: #2E3B3D;
-  --popover: #FFFFFF;
-  --popover-foreground: #2E3B3D;
+  --popover: var(--card);
+  --popover-foreground: var(--card-foreground);
   --primary: #5A7A58;
   --primary-foreground: #FFFFFF;
   --secondary: #F7F5F1;
@@ -281,8 +281,8 @@
   --foreground: #E8EFF4;
   --card: #1E2830;
   --card-foreground: #E8EFF4;
-  --popover: #1E2830;
-  --popover-foreground: #E8EFF4;
+  --popover: var(--card);
+  --popover-foreground: var(--card-foreground);
   --primary: #8AAEC4;
   --primary-foreground: #E8EFF4;
   --secondary: #2A3640;
@@ -335,8 +335,8 @@
   --foreground: #1A2830;
   --card: #FFFFFF;
   --card-foreground: #2A3A44;
-  --popover: #FFFFFF;
-  --popover-foreground: #2A3A44;
+  --popover: var(--card);
+  --popover-foreground: var(--card-foreground);
   --primary: #4A7A98;
   --primary-foreground: #FFFFFF;
   --secondary: #EEF4F8;

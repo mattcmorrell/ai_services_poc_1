@@ -37,7 +37,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 shrink-0 border-b border-border">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg shrink-0 bg-secondary border border-border">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg shrink-0 bg-muted border border-border">
               <ClipboardText className="w-4 h-4 text-muted-foreground" />
             </div>
             <div className="min-w-0">

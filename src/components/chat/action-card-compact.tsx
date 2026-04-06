@@ -53,7 +53,7 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
   };
 
   return (
-    <div className="rounded-xl max-w-lg bg-secondary border border-border">
+    <div className="rounded-xl max-w-lg bg-muted border border-border">
       {/* Clickable card body */}
       <button
         onClick={onOpenPanel}
@@ -88,7 +88,7 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
           {onDecline && (
             <button
               onClick={(e) => { e.stopPropagation(); onDecline(); }}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 cursor-pointer bg-secondary text-muted-foreground border border-border"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 cursor-pointer bg-muted text-muted-foreground border border-border"
             >
               <X className="w-3.5 h-3.5" />
               Decline
