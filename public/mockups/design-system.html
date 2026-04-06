@@ -411,6 +411,102 @@ body {
   font-family: 'Geist Mono', monospace; font-size: 12px;
 }
 
+/* Dashboard card */
+.dash-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+}
+.dash-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px; border-bottom: 1px solid var(--border);
+}
+.dash-card-header-left {
+  display: flex; align-items: center; gap: 8px;
+}
+.dash-card-header-icon { color: var(--muted-foreground); }
+.dash-card-header-title {
+  font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--foreground);
+}
+.dash-card-header-meta {
+  font-family: 'Geist Mono', monospace; font-size: 12px;
+  color: var(--muted-foreground);
+}
+.dash-card-header-link {
+  font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--primary); text-decoration: none;
+  display: flex; align-items: center; gap: 4px;
+}
+.dash-card-header-link:hover { opacity: 0.8; }
+.dash-card-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 20px; border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.dash-card-row:last-child { border-bottom: none; }
+.dash-card-row-primary { color: var(--foreground); font-weight: 500; }
+.dash-card-row-secondary { color: var(--muted-foreground); font-size: 12px; }
+.dash-card-empty {
+  padding: 24px 20px; text-align: center;
+  font-size: 13px; color: var(--muted-foreground);
+}
+
+/* Attention item */
+.attention-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+}
+.attention-item:last-child { border-bottom: none; }
+.attention-sev {
+  font-family: 'Geist', sans-serif; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; text-align: center;
+  padding: 2px 8px; border-radius: 4px;
+  flex-shrink: 0; margin-top: 2px;
+}
+.attention-sev-blocking {
+  background: color-mix(in srgb, var(--destructive) 15%, transparent);
+  color: var(--destructive);
+}
+.attention-sev-error {
+  background: var(--color-danger-muted); color: var(--color-danger);
+}
+.attention-sev-review {
+  background: var(--color-info-muted); color: var(--color-info);
+}
+.attention-body { flex: 1; min-width: 0; }
+.attention-title { font-size: 14px; font-weight: 500; color: var(--foreground); }
+.attention-desc { font-size: 13px; color: var(--muted-foreground); margin-top: 2px; }
+.attention-actions {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+
+/* Mini plan row */
+.mini-plan { padding: 12px 20px; border-bottom: 1px solid var(--border); }
+.mini-plan:last-child { border-bottom: none; }
+.mini-plan-top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-bottom: 6px;
+}
+.mini-plan-title { font-size: 14px; font-weight: 500; color: var(--foreground); }
+.mini-plan-bottom { display: flex; align-items: center; gap: 8px; }
+.mini-plan-steps {
+  font-family: 'Geist Mono', monospace; font-size: 12px;
+  color: var(--muted-foreground); flex-shrink: 0;
+}
+.mini-plan-bar {
+  flex: 1; height: 6px; border-radius: 3px;
+  background: var(--secondary); overflow: hidden;
+}
+.mini-plan-bar-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 70%, var(--background)), var(--primary));
+  transition: width 0.5s;
+}
+.mini-plan-bar-paused .mini-plan-bar-fill {
+  background: var(--muted-foreground); opacity: 0.4;
+}
+
 /* Chat bubble */
 .chat-bubble {
   padding: 14px 18px; border-radius: 12px;
@@ -792,6 +888,120 @@ body {
         <div class="btn-row">
           <button class="btn btn-destructive-fill">Acknowledge</button>
           <button class="btn btn-muted-outline">Investigate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="specimen full">
+      <div class="specimen-label">Dashboard Card — header with label + optional link/meta, list rows</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
+
+        <!-- List card with link -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-header-left">
+              <svg class="dash-card-header-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span class="dash-card-header-title">Recent Chats</span>
+            </div>
+            <a class="dash-card-header-link" href="#">All chats &rarr;</a>
+          </div>
+          <div class="dash-card-row">
+            <span class="dash-card-row-primary" style="display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:var(--primary)"></span>Portal Gun Safety Training</span>
+            <span class="dash-card-row-secondary">35m ago</span>
+          </div>
+          <div class="dash-card-row">
+            <span class="dash-card-row-primary" style="padding-left:14px">GLaDOS Maintenance</span>
+            <span class="dash-card-row-secondary">3h ago</span>
+          </div>
+        </div>
+
+        <!-- Plan card with meta count -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-header-left">
+              <svg class="dash-card-header-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+              <span class="dash-card-header-title">Active Plans</span>
+            </div>
+            <span class="dash-card-header-meta">3 plans</span>
+          </div>
+          <div class="mini-plan">
+            <div class="mini-plan-top">
+              <span class="mini-plan-title">Q1 Payroll Processing</span>
+              <span class="badge badge-info"><span class="badge-dot" style="animation:pulse 1.5s infinite"></span>Running</span>
+            </div>
+            <div class="mini-plan-bottom">
+              <span class="mini-plan-steps">4 / 6 steps</span>
+              <div class="mini-plan-bar"><div class="mini-plan-bar-fill" style="width:67%"></div></div>
+            </div>
+          </div>
+          <div class="mini-plan">
+            <div class="mini-plan-top">
+              <span class="mini-plan-title">New Hire Onboarding</span>
+              <span class="badge badge-info"><span class="badge-dot" style="animation:pulse 1.5s infinite"></span>Running</span>
+            </div>
+            <div class="mini-plan-bottom">
+              <span class="mini-plan-steps">2 / 5 steps</span>
+              <div class="mini-plan-bar"><div class="mini-plan-bar-fill" style="width:40%"></div></div>
+            </div>
+          </div>
+          <div class="mini-plan">
+            <div class="mini-plan-top">
+              <span class="mini-plan-title">Benefits Enrollment Setup</span>
+              <span class="badge badge-muted"><span class="badge-dot"></span>Pending</span>
+            </div>
+            <div class="mini-plan-bottom">
+              <span class="mini-plan-steps">1 / 4 steps</span>
+              <div class="mini-plan-bar mini-plan-bar-paused"><div class="mini-plan-bar-fill" style="width:25%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attention Card -->
+    <div class="specimen full">
+      <div class="specimen-label">Attention Card — severity pills (sans), action buttons, viewer attribution</div>
+      <div class="dash-card" style="max-width:720px">
+        <div class="dash-card-header">
+          <div class="dash-card-header-left">
+            <span style="color:var(--color-warning)">&#9888;</span>
+            <span class="dash-card-header-title">Needs Attention</span>
+            <span class="badge badge-muted" style="font-size:11px;padding:2px 8px"><span class="badge-dot"></span>3</span>
+          </div>
+        </div>
+        <div class="attention-item">
+          <span class="attention-sev attention-sev-blocking">Blocking</span>
+          <div class="attention-body">
+            <div class="attention-title">Payroll Runner needs approval</div>
+            <div class="attention-desc">Q1 payroll calculation for 312 employees is ready and waiting for your sign-off.</div>
+          </div>
+          <div class="attention-actions">
+            <button class="btn btn-secondary" style="font-size:13px;padding:6px 14px;border-radius:6px">Approve</button>
+            <button class="btn btn-ghost" style="font-size:13px">View Details</button>
+          </div>
+        </div>
+        <div class="attention-item">
+          <span class="attention-sev attention-sev-error">Error</span>
+          <div class="attention-body">
+            <div class="attention-title">Benefits Enrollment failed</div>
+            <div class="attention-desc">Dental plan sync encountered an error during enrollment processing.</div>
+          </div>
+          <div class="attention-actions">
+            <button class="btn btn-secondary" style="font-size:13px;padding:6px 14px;border-radius:6px">Investigate</button>
+            <button class="btn btn-ghost" style="font-size:13px">Dismiss</button>
+          </div>
+        </div>
+        <div class="attention-item">
+          <span class="attention-sev attention-sev-review">Review</span>
+          <div class="attention-body">
+            <div class="attention-title">Compliance Check complete</div>
+            <div class="attention-desc">Annual compliance audit finished. 2 policy items flagged for your review.</div>
+          </div>
+          <div class="attention-actions">
+            <button class="btn btn-secondary" style="font-size:13px;padding:6px 14px;border-radius:6px">Review</button>
+            <button class="btn btn-ghost" style="font-size:13px">Snooze</button>
+          </div>
         </div>
       </div>
     </div>
