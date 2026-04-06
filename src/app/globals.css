@@ -423,6 +423,20 @@
   scrollbar-color: var(--muted-foreground) transparent;
 }
 
+/* Inset dividers — row separators that don't touch card edges */
+.divide-inset > * + * {
+  position: relative;
+}
+.divide-inset > * + *::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: var(--border);
+}
+
 /* Inline client chip styles */
 .inline-client-chip {
   display: inline-flex;

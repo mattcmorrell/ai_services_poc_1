@@ -98,7 +98,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
 
       {/* --- Needs Attention --- */}
       {homeData.attentionItems.length > 0 && (
-        <div className="mb-6 rounded-xl border border-border bg-card">
+        <div className="mb-6 rounded-[14px] border border-border bg-card overflow-hidden">
           <div className="flex items-center gap-2 border-b border-border px-5 py-3">
             <Warning className="h-4 w-4" style={{ color: "var(--color-warning)" }} />
             <span className="text-xs font-semibold uppercase tracking-[0.06em]">Needs Attention</span>
@@ -106,17 +106,17 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
               {homeData.attentionItems.length}
             </span>
           </div>
-          <div className="divide-y divide-border">
+          <div className="divide-inset">
             {homeData.attentionItems.map((item) => {
               const sev = severityConfig[item.severity];
               return (
-                <div key={item.id} className="flex items-start gap-4 px-5 py-4">
-                  <span className="mt-0.5 w-[72px] shrink-0 rounded px-2 py-0.5 text-center text-[11px] font-semibold uppercase" style={{ background: sev.bg, color: sev.color }}>
+                <div key={item.id} className="flex items-start gap-3 px-5 py-4">
+                  <span className="mt-0.5 shrink-0 rounded px-2 py-0.5 text-center text-[11px] font-semibold uppercase" style={{ background: sev.bg, color: sev.color }}>
                     {sev.label}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium">{item.title}</p>
-                    <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>
+                    <p className="text-sm font-medium">{item.title}</p>
+                    <p className="mt-0.5 text-[13px] text-muted-foreground">{item.description}</p>
                     {item.lastSeen ? (
                       <div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                         <span className="flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-medium text-white" style={getAvatarStyle(item.lastSeen.name)}>
@@ -146,7 +146,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
       {/* --- Recent Chats + Active Plans --- */}
       <div className="mb-6 grid grid-cols-5 gap-6">
         {/* Recent Chats — 3 cols */}
-        <div className="col-span-3 rounded-xl border border-border bg-card">
+        <div className="col-span-3 rounded-[14px] border border-border bg-card overflow-hidden">
           <div className="flex items-center justify-between border-b border-border px-5 py-3">
             <div className="flex items-center gap-2">
               <ChatDots className="h-4 w-4 text-muted-foreground" />
@@ -156,7 +156,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
               All chats <ArrowRight className="h-3 w-3" />
             </button>
           </div>
-          <div className="divide-y divide-border">
+          <div className="divide-inset">
             {chats
               .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
               .slice(0, 5)
@@ -183,34 +183,41 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
         </div>
 
         {/* Active Plans — 2 cols */}
-        <div className="col-span-2 rounded-xl border border-border bg-card">
+        <div className="col-span-2 rounded-[14px] border border-border bg-card overflow-hidden">
           <div className="flex items-center justify-between border-b border-border px-5 py-3">
             <div className="flex items-center gap-2">
               <ClipboardText className="h-4 w-4 text-muted-foreground" />
               <span className="text-xs font-semibold uppercase tracking-[0.06em]">Active Plans</span>
             </div>
-            <span className="text-xs text-muted-foreground">{homeData.activePlans.length} plans</span>
+            <span className="font-mono text-xs text-muted-foreground">{homeData.activePlans.length} plans</span>
           </div>
-          <div className="divide-y divide-border">
+          <div className="divide-inset">
             {homeData.activePlans.map((plan) => {
               const pct = plan.totalSteps > 0 ? (plan.completedSteps / plan.totalSteps) * 100 : 0;
               const statusCfg = planStatusConfig[plan.status];
+              const isPaused = plan.status === "paused";
               return (
                 <div key={plan.id} className="px-5 py-3">
-                  <div className="mb-1 flex items-center justify-between gap-2">
+                  <div className="mb-1.5 flex items-center justify-between gap-2">
                     <span className="truncate text-sm font-medium">{plan.title}</span>
                     <span className="shrink-0 rounded-full font-mono text-xs font-semibold" style={{ background: statusCfg.bg, color: statusCfg.color, padding: "3px 10px" }}>
                       {statusCfg.label}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="shrink-0 text-xs text-muted-foreground">
+                    <span className="shrink-0 font-mono text-xs text-muted-foreground">
                       {plan.completedSteps} / {plan.totalSteps} steps
                     </span>
-                    <div className="h-1.5 flex-1 rounded-full bg-secondary">
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-[3px] bg-secondary">
                       <div
-                        className="h-1.5 rounded-full transition-all"
-                        style={{ width: `${pct}%`, background: plan.status === "paused" ? "var(--muted-foreground)" : "var(--primary)", opacity: plan.status === "paused" ? 0.4 : 1 }}
+                        className="h-full rounded-[3px] transition-all"
+                        style={{
+                          width: `${pct}%`,
+                          background: isPaused
+                            ? "var(--muted-foreground)"
+                            : "linear-gradient(90deg, color-mix(in srgb, var(--primary) 70%, var(--background)), var(--primary))",
+                          opacity: isPaused ? 0.4 : 1,
+                        }}
                       />
                     </div>
                   </div>
@@ -235,7 +242,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
             </button>
           )}
         </div>
-        <div className="rounded-xl border border-border bg-card">
+        <div className="rounded-[14px] border border-border bg-card overflow-hidden">
           <div className="grid grid-cols-2 divide-x divide-border">
             {/* Team column */}
             <div>
@@ -243,7 +250,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
                 <Users className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Team</span>
               </div>
-              <div className="divide-y divide-border">
+              <div className="divide-inset">
                 {visibleTeam.map((item) => (
                   <div key={item.id} className="flex items-center gap-3 px-5 py-2.5">
                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-medium text-white" style={getAvatarStyle(item.name)}>
@@ -264,7 +271,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
                 <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 <span className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Agents</span>
               </div>
-              <div className="divide-y divide-border">
+              <div className="divide-inset">
                 {visibleAgents.map((item) => (
                   <div key={item.id} className="flex items-center gap-3 px-5 py-2.5">
                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-medium text-white" style={getAvatarStyle(item.name)}>
