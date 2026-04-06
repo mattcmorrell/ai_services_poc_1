@@ -48,76 +48,7 @@
 
 :root {
   --radius: 0.625rem;
-}
-
-/* ============================================ */
-/* MERCURY — cool desaturated steel blue        */
-/* ============================================ */
-
-.mercury.dark {
-  --background: #101214;
-  --foreground: #E8E9ED;
-  --card: #191B1F;
-  --card-foreground: #E8E9ED;
-  --popover: #191B1F;
-  --popover-foreground: #E8E9ED;
-  --primary: #6878B8;
-  --primary-foreground: #E8E9ED;
-  --secondary: #222428;
-  --secondary-foreground: #E8E9ED;
-  --muted: #222428;
-  --muted-foreground: #9DA0A8;
-  --accent: #222428;
-  --accent-foreground: #E8E9ED;
-  --destructive: #E08850;
-  --border: rgba(180, 185, 200, 0.07);
-  --input: rgba(180, 185, 200, 0.11);
-  --ring: #6878B8;
-  --chart-1: #6878B8;
-  --chart-2: #7BAA82;
-  --chart-3: #C4A060;
-  --chart-4: #8E9AD0;
-  --chart-5: #C07070;
-  --sidebar: #101214;
-  --sidebar-foreground: #E8E9ED;
-  --sidebar-primary: #6878B8;
-  --sidebar-primary-foreground: #E8E9ED;
-  --sidebar-accent: #222428;
-  --sidebar-accent-foreground: #E8E9ED;
-  --sidebar-border: rgba(180, 185, 200, 0.07);
-  --sidebar-ring: #6878B8;
-  /* Semantic */
-  --color-success: #7BAA82;
-  --color-success-muted: rgba(123, 170, 130, 0.12);
-  --color-warning: #C4A060;
-  --color-warning-muted: rgba(196, 160, 96, 0.12);
-  --color-danger: #C07070;
-  --color-danger-muted: rgba(192, 112, 112, 0.12);
-  --color-info: #8E9AD0;
-  --color-info-muted: rgba(142, 154, 208, 0.12);
-  /* Text alpha */
-  --text-primary-alpha: rgba(232, 233, 237, 0.9);
-  --text-secondary-alpha: rgba(232, 233, 237, 0.55);
-  --text-tertiary-alpha: rgba(232, 233, 237, 0.35);
-  --text-quaternary-alpha: rgba(232, 233, 237, 0.2);
-  /* Surface */
-  --surface-hover: rgba(232, 233, 237, 0.04);
-  --surface-subtle: rgba(232, 233, 237, 0.03);
-  --border-subtle: rgba(180, 185, 200, 0.04);
-  /* Avatar palette */
-  --avatar-1: #5B78B8;
-  --avatar-2: #7BAA82;
-  --avatar-3: #9B7AB8;
-  --avatar-4: #C4A060;
-  --avatar-5: #B87A7A;
-  --avatar-6: #5BAAAA;
-  --avatar-7: #8E9AD0;
-  --avatar-8: #6B9A7A;
-  --avatar-9: #D08860;
-  --avatar-10: #B87AA0;
-}
-
-.mercury.light {
+  /* Mercury light — default light mode */
   --background: #F3F4F6;
   --foreground: #1C1E24;
   --card: #FFFFFF;
@@ -178,6 +109,73 @@
   --avatar-8: #4B7A5A;
   --avatar-9: #A06828;
   --avatar-10: #985A80;
+}
+
+/* ============================================ */
+/* MERCURY DARK — cool desaturated steel blue   */
+/* ============================================ */
+
+.dark {
+  --background: #101214;
+  --foreground: #E8E9ED;
+  --card: #191B1F;
+  --card-foreground: #E8E9ED;
+  --popover: #191B1F;
+  --popover-foreground: #E8E9ED;
+  --primary: #6878B8;
+  --primary-foreground: #E8E9ED;
+  --secondary: #222428;
+  --secondary-foreground: #E8E9ED;
+  --muted: #222428;
+  --muted-foreground: #9DA0A8;
+  --accent: #222428;
+  --accent-foreground: #E8E9ED;
+  --destructive: #E08850;
+  --border: rgba(180, 185, 200, 0.07);
+  --input: rgba(180, 185, 200, 0.11);
+  --ring: #6878B8;
+  --chart-1: #6878B8;
+  --chart-2: #7BAA82;
+  --chart-3: #C4A060;
+  --chart-4: #8E9AD0;
+  --chart-5: #C07070;
+  --sidebar: #101214;
+  --sidebar-foreground: #E8E9ED;
+  --sidebar-primary: #6878B8;
+  --sidebar-primary-foreground: #E8E9ED;
+  --sidebar-accent: #222428;
+  --sidebar-accent-foreground: #E8E9ED;
+  --sidebar-border: rgba(180, 185, 200, 0.07);
+  --sidebar-ring: #6878B8;
+  /* Semantic */
+  --color-success: #7BAA82;
+  --color-success-muted: rgba(123, 170, 130, 0.12);
+  --color-warning: #C4A060;
+  --color-warning-muted: rgba(196, 160, 96, 0.12);
+  --color-danger: #C07070;
+  --color-danger-muted: rgba(192, 112, 112, 0.12);
+  --color-info: #8E9AD0;
+  --color-info-muted: rgba(142, 154, 208, 0.12);
+  /* Text alpha */
+  --text-primary-alpha: rgba(232, 233, 237, 0.9);
+  --text-secondary-alpha: rgba(232, 233, 237, 0.55);
+  --text-tertiary-alpha: rgba(232, 233, 237, 0.35);
+  --text-quaternary-alpha: rgba(232, 233, 237, 0.2);
+  /* Surface */
+  --surface-hover: rgba(232, 233, 237, 0.04);
+  --surface-subtle: rgba(232, 233, 237, 0.03);
+  --border-subtle: rgba(180, 185, 200, 0.04);
+  /* Avatar palette */
+  --avatar-1: #5B78B8;
+  --avatar-2: #7BAA82;
+  --avatar-3: #9B7AB8;
+  --avatar-4: #C4A060;
+  --avatar-5: #B87A7A;
+  --avatar-6: #5BAAAA;
+  --avatar-7: #8E9AD0;
+  --avatar-8: #6B9A7A;
+  --avatar-9: #D08860;
+  --avatar-10: #B87AA0;
 }
 
 /* ============================================ */
