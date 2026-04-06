@@ -114,7 +114,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
                 <div key={item.id} className="flex items-start gap-3 px-5 py-4">
                   <AlertPill variant={sev.variant} className="mt-px w-[100px] shrink-0 justify-center uppercase">
                     {sev.variant === "urgent" && <Warning size={12} />}
-                    {sev.variant === "attention" && <span className="h-1.5 w-1.5 rounded-full" style={{ background: "currentColor" }} />}
+                    {sev.variant === "attention" && item.severity !== "blocking" && <span className="h-1.5 w-1.5 rounded-full" style={{ background: "currentColor" }} />}
                     {sev.label}
                   </AlertPill>
                   <div className="min-w-0 flex-1">
