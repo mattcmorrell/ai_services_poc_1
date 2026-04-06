@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Light Mode Color Pass — Proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Geist', sans-serif;
+  padding: 48px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+.sub { font-size: 14px; margin-bottom: 32px; line-height: 1.6; max-width: 640px; }
+
+.theme-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+  margin-bottom: 48px;
+}
+.theme-col { border-radius: 16px; padding: 28px; }
+.theme-label {
+  font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px;
+}
+
+.badge {
+  font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 20px;
+}
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+.alert-pill {
+  font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 12px; border-radius: 4px;
+}
+
+.feed {
+  font-family: 'Geist Mono', monospace; font-size: 13px;
+  display: flex; align-items: center; gap: 8px; padding: 4px 0;
+}
+.feed-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.card {
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 12px;
+  border: 1px solid;
+}
+.section-label {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  letter-spacing: 0.06em; text-transform: uppercase; margin: 16px 0 8px;
+}
+
+/* ======================================= */
+/* MERCURY LIGHT                           */
+/* ======================================= */
+.mercury-current {
+  background: #F3F4F6; color: #1C1E24;
+  --card: #fff; --border: rgba(30,35,50,0.08); --muted-fg: #6E7178; --muted-bg: rgba(30,35,50,0.05);
+  --success: #4A7A52; --success-m: rgba(74,122,82,0.1);
+  --warning: #9A8050; --warning-m: rgba(154,128,80,0.1);
+  --danger: #A05050; --danger-m: rgba(160,80,80,0.1);
+  --info: #506098; --info-m: rgba(80,96,152,0.1);
+  --destructive: #C06828;
+  --stopped: color-mix(in srgb, #A05050 50%, #6E7178); --stopped-m: rgba(160,80,80,0.06);
+}
+.mercury-proposed {
+  background: #F3F4F6; color: #1C1E24;
+  --card: #fff; --border: rgba(30,35,50,0.08); --muted-fg: #6E7178; --muted-bg: rgba(30,35,50,0.05);
+  --success: #1A7A2E; --success-m: rgba(26,122,46,0.12);
+  --warning: #8A6A18; --warning-m: rgba(138,106,24,0.1);
+  --danger: #B83030; --danger-m: rgba(184,48,48,0.08);
+  --info: #3050A0; --info-m: rgba(48,80,160,0.1);
+  --destructive: #C04020;
+  --stopped: color-mix(in srgb, #B83030 50%, #6E7178); --stopped-m: rgba(184,48,48,0.06);
+}
+
+/* ======================================= */
+/* INKWELL LIGHT                           */
+/* ======================================= */
+.inkwell-current {
+  background: #EBE8E0; color: #1C2426;
+  --card: #fff; --border: rgba(44,54,57,0.1); --muted-fg: #6B7574; --muted-bg: rgba(44,54,57,0.05);
+  --success: #3D8A4D; --success-m: rgba(61,138,77,0.1);
+  --warning: #A27B5B; --warning-m: rgba(162,123,91,0.1);
+  --danger: #A84444; --danger-m: rgba(168,68,68,0.1);
+  --info: #5A7A58; --info-m: rgba(90,122,88,0.1);
+  --destructive: #B86E3A;
+  --stopped: color-mix(in srgb, #A84444 50%, #6B7574); --stopped-m: rgba(168,68,68,0.06);
+}
+.inkwell-proposed {
+  background: #EBE8E0; color: #1C2426;
+  --card: #fff; --border: rgba(44,54,57,0.1); --muted-fg: #6B7574; --muted-bg: rgba(44,54,57,0.05);
+  --success: #1E7A30; --success-m: rgba(30,122,48,0.12);
+  --warning: #886020; --warning-m: rgba(136,96,32,0.1);
+  --danger: #B03030; --danger-m: rgba(176,48,48,0.08);
+  --info: #3A6A48; --info-m: rgba(58,106,72,0.1);
+  --destructive: #B84A20;
+  --stopped: color-mix(in srgb, #B03030 50%, #6B7574); --stopped-m: rgba(176,48,48,0.06);
+}
+
+/* ======================================= */
+/* ORBITAL LIGHT                           */
+/* ======================================= */
+.orbital-current {
+  background: #E8EFF4; color: #1A2830;
+  --card: #fff; --border: rgba(26,40,48,0.08); --muted-fg: #5A7080; --muted-bg: rgba(26,40,48,0.05);
+  --success: #4A8A52; --success-m: rgba(74,138,82,0.1);
+  --warning: #9A8050; --warning-m: rgba(154,128,80,0.1);
+  --danger: #A05050; --danger-m: rgba(160,80,80,0.1);
+  --info: #4A7A98; --info-m: rgba(74,122,152,0.1);
+  --destructive: #C06828;
+  --stopped: color-mix(in srgb, #A05050 50%, #5A7080); --stopped-m: rgba(160,80,80,0.06);
+}
+.orbital-proposed {
+  background: #E8EFF4; color: #1A2830;
+  --card: #fff; --border: rgba(26,40,48,0.08); --muted-fg: #5A7080; --muted-bg: rgba(26,40,48,0.05);
+  --success: #1A7A30; --success-m: rgba(26,122,48,0.12);
+  --warning: #886020; --warning-m: rgba(136,96,32,0.1);
+  --danger: #B03030; --danger-m: rgba(176,48,48,0.08);
+  --info: #2A6088; --info-m: rgba(42,96,136,0.1);
+  --destructive: #B84020;
+  --stopped: color-mix(in srgb, #B03030 50%, #5A7080); --stopped-m: rgba(176,48,48,0.06);
+}
+</style>
+</head>
+<body style="background:#1a1a1a; color:#e0e0e0">
+
+<h1>Light Mode Semantic Colors — Current vs Proposed</h1>
+<p class="sub">
+  Current light mode colors are desaturated and low-contrast — badges, dots, and pills all wash out.
+  Proposed: push saturation, darken text colors, and apply the new badge hierarchy (danger reserved for "act now").
+</p>
+
+<!-- MERCURY -->
+<h2 style="font-size:18px; font-weight:600; margin-bottom:16px; color:#6878B8">Mercury Light</h2>
+<div class="theme-row">
+  <div class="theme-col mercury-current">
+    <div class="theme-label" style="color:var(--muted-fg)">Current</div>
+    <div class="section-label" style="color:var(--muted-fg)">Status badges</div>
+    <div class="badge-row">
+      <span class="badge" style="background:var(--success-m);color:var(--success)"><span class="badge-dot" style="background:var(--success)"></span>Done</span>
+      <span class="badge" style="background:var(--info-m);color:var(--info)"><span class="badge-dot" style="background:var(--info)"></span>Running</span>
+      <span class="badge" style="background:var(--warning-m);color:var(--warning)"><span class="badge-dot" style="background:var(--warning)"></span>Paused</span>
+      <span class="badge" style="background:var(--muted-bg);color:var(--muted-fg)"><span class="badge-dot" style="background:var(--muted-fg)"></span>Pending</span>
+      <span class="badge" style="background:var(--danger-m);color:var(--danger)"><span class="badge-dot" style="background:var(--danger)"></span>Stopped</span>
+      <span class="badge" style="background:var(--danger-m);color:var(--danger)"><span class="badge-dot" style="background:var(--danger)"></span>Declined</span>
+    </div>
+    <div class="section-label" style="color:var(--muted-fg)">Alert pills</div>
+    <div class="badge-row">
+      <span class="alert-pill" style="background:var(--danger-m);color:var(--destructive)">&#9888; Urgent</span>
+      <span class="alert-pill" style="background:var(--warning-m);color:var(--warning)">&#9679; Needs attention</span>
+    </div>
+    <div class="card" style="background:var(--card);border-color:var(--border)">
+      <div class="feed" style="color:#1C1E24"><span class="feed-dot" style="background:var(--success)"></span>Pulled payroll data</div>
+      <div class="feed" style="color:#1C1E24"><span class="feed-dot" style="background:var(--success)"></span>Validated 47 records</div>
+      <div class="feed" style="color:#1C1E24"><span class="feed-dot" style="background:var(--info)"></span>Checking thresholds...</div>
+      <div class="feed" style="color:var(--muted-fg)"><span class="feed-dot" style="background:var(--muted-fg);opacity:0.4"></span>Review against previous</div>
+    </div>
+  </div>
+  <div class="theme-col mercury-proposed">
+    <div class="theme-label" style="color:var(--info)">Proposed</div>
+    <div class="section-label" style="color:var(--muted-fg)">Status badges</div>
+    <div class="badge-row">
+      <span class="badge" style="background:var(--success-m);color:var(--success)"><span class="badge-dot" style="background:var(--success)"></span>Done</span>
+      <span class="badge" style="background:var(--info-m);color:var(--info)"><span class="badge-dot" style="background:var(--info)"></span>Running</span>
+      <span class="badge" style="background:var(--warning-m);color:var(--warning)"><span class="badge-dot" style="background:var(--warning)"></span>Paused</span>
+      <span class="badge" style="background:var(--muted-bg);color:var(--muted-fg)"><span class="badge-dot" style="background:var(--muted-fg)"></span>Pending</span>
+      <span class="badge" style="background:var(--stopped-m);color:var(--stopped)"><span class="badge-dot" style="background:var(--stopped)"></span>Stopped</span>
+      <span class="badge" style="background:var(--stopped-m);color:var(--stopped)"><span class="badge-dot" style="background:var(--stopped)"></span>Declined</span>
+    </div>
+    <div class="section-label" style="color:var(--muted-fg)">Alert pills</div>
+    <div class="badge-row">
+      <span class="alert-pill" style="background:var(--danger-m);color:var(--destructive)">&#9888; Urgent</span>
+      <span class="alert-pill" style="background:var(--warning-m);color:var(--warning)">&#9679; Needs attention</span>
+    </div>
+    <div class="card" style="background:var(--card);border-color:var(--border)">
+      <div class="feed" style="color:#1C1E24"><span class="feed-dot" style="background:var(--success)"></span>Pulled payroll data</div>
+      <div class="feed" style="color:#1C1E24"><span class="feed-dot" style="background:var(--success)"></span>Validated 47 records</div>
+      <div class="feed" style="color:#1C1E24"><span class="feed-dot" style="background:var(--info)"></span>Checking thresholds...</div>
+      <div class="feed" style="color:var(--muted-fg)"><span class="feed-dot" style="background:var(--muted-fg);opacity:0.4"></span>Review against previous</div>
+    </div>
+  </div>
+</div>
+
+<!-- INKWELL -->
+<h2 style="font-size:18px; font-weight:600; margin-bottom:16px; color:#7A9A78">Inkwell Light</h2>
+<div class="theme-row">
+  <div class="theme-col inkwell-current">
+    <div class="theme-label" style="color:var(--muted-fg)">Current</div>
+    <div class="section-label" style="color:var(--muted-fg)">Status badges</div>
+    <div class="badge-row">
+      <span class="badge" style="background:var(--success-m);color:var(--success)"><span class="badge-dot" style="background:var(--success)"></span>Done</span>
+      <span class="badge" style="background:var(--info-m);color:var(--info)"><span class="badge-dot" style="background:var(--info)"></span>Running</span>
+      <span class="badge" style="background:var(--warning-m);color:var(--warning)"><span class="badge-dot" style="background:var(--warning)"></span>Paused</span>
+      <span class="badge" style="background:var(--muted-bg);color:var(--muted-fg)"><span class="badge-dot" style="background:var(--muted-fg)"></span>Pending</span>
+      <span class="badge" style="background:var(--danger-m);color:var(--danger)"><span class="badge-dot" style="background:var(--danger)"></span>Stopped</span>
+      <span class="badge" style="background:var(--danger-m);color:var(--danger)"><span class="badge-dot" style="background:var(--danger)"></span>Declined</span>
+    </div>
+    <div class="section-label" style="color:var(--muted-fg)">Alert pills</div>
+    <div class="badge-row">
+      <span class="alert-pill" style="background:var(--danger-m);color:var(--destructive)">&#9888; Urgent</span>
+      <span class="alert-pill" style="background:var(--warning-m);color:var(--warning)">&#9679; Needs attention</span>
+    </div>
+    <div class="card" style="background:var(--card);border-color:var(--border)">
+      <div class="feed" style="color:#1C2426"><span class="feed-dot" style="background:var(--success)"></span>Pulled payroll data</div>
+      <div class="feed" style="color:#1C2426"><span class="feed-dot" style="background:var(--success)"></span>Validated 47 records</div>
+      <div class="feed" style="color:#1C2426"><span class="feed-dot" style="background:var(--info)"></span>Checking thresholds...</div>
+      <div class="feed" style="color:var(--muted-fg)"><span class="feed-dot" style="background:var(--muted-fg);opacity:0.4"></span>Review against previous</div>
+    </div>
+  </div>
+  <div class="theme-col inkwell-proposed">
+    <div class="theme-label" style="color:var(--info)">Proposed</div>
+    <div class="section-label" style="color:var(--muted-fg)">Status badges</div>
+    <div class="badge-row">
+      <span class="badge" style="background:var(--success-m);color:var(--success)"><span class="badge-dot" style="background:var(--success)"></span>Done</span>
+      <span class="badge" style="background:var(--info-m);color:var(--info)"><span class="badge-dot" style="background:var(--info)"></span>Running</span>
+      <span class="badge" style="background:var(--warning-m);color:var(--warning)"><span class="badge-dot" style="background:var(--warning)"></span>Paused</span>
+      <span class="badge" style="background:var(--muted-bg);color:var(--muted-fg)"><span class="badge-dot" style="background:var(--muted-fg)"></span>Pending</span>
+      <span class="badge" style="background:var(--stopped-m);color:var(--stopped)"><span class="badge-dot" style="background:var(--stopped)"></span>Stopped</span>
+      <span class="badge" style="background:var(--stopped-m);color:var(--stopped)"><span class="badge-dot" style="background:var(--stopped)"></span>Declined</span>
+    </div>
+    <div class="section-label" style="color:var(--muted-fg)">Alert pills</div>
+    <div class="badge-row">
+      <span class="alert-pill" style="background:var(--danger-m);color:var(--destructive)">&#9888; Urgent</span>
+      <span class="alert-pill" style="background:var(--warning-m);color:var(--warning)">&#9679; Needs attention</span>
+    </div>
+    <div class="card" style="background:var(--card);border-color:var(--border)">
+      <div class="feed" style="color:#1C2426"><span class="feed-dot" style="background:var(--success)"></span>Pulled payroll data</div>
+      <div class="feed" style="color:#1C2426"><span class="feed-dot" style="background:var(--success)"></span>Validated 47 records</div>
+      <div class="feed" style="color:#1C2426"><span class="feed-dot" style="background:var(--info)"></span>Checking thresholds...</div>
+      <div class="feed" style="color:var(--muted-fg)"><span class="feed-dot" style="background:var(--muted-fg);opacity:0.4"></span>Review against previous</div>
+    </div>
+  </div>
+</div>
+
+<!-- ORBITAL -->
+<h2 style="font-size:18px; font-weight:600; margin-bottom:16px; color:#8AAEC4">Orbital Light</h2>
+<div class="theme-row">
+  <div class="theme-col orbital-current">
+    <div class="theme-label" style="color:var(--muted-fg)">Current</div>
+    <div class="section-label" style="color:var(--muted-fg)">Status badges</div>
+    <div class="badge-row">
+      <span class="badge" style="background:var(--success-m);color:var(--success)"><span class="badge-dot" style="background:var(--success)"></span>Done</span>
+      <span class="badge" style="background:var(--info-m);color:var(--info)"><span class="badge-dot" style="background:var(--info)"></span>Running</span>
+      <span class="badge" style="background:var(--warning-m);color:var(--warning)"><span class="badge-dot" style="background:var(--warning)"></span>Paused</span>
+      <span class="badge" style="background:var(--muted-bg);color:var(--muted-fg)"><span class="badge-dot" style="background:var(--muted-fg)"></span>Pending</span>
+      <span class="badge" style="background:var(--danger-m);color:var(--danger)"><span class="badge-dot" style="background:var(--danger)"></span>Stopped</span>
+      <span class="badge" style="background:var(--danger-m);color:var(--danger)"><span class="badge-dot" style="background:var(--danger)"></span>Declined</span>
+    </div>
+    <div class="section-label" style="color:var(--muted-fg)">Alert pills</div>
+    <div class="badge-row">
+      <span class="alert-pill" style="background:var(--danger-m);color:var(--destructive)">&#9888; Urgent</span>
+      <span class="alert-pill" style="background:var(--warning-m);color:var(--warning)">&#9679; Needs attention</span>
+    </div>
+    <div class="card" style="background:var(--card);border-color:var(--border)">
+      <div class="feed" style="color:#1A2830"><span class="feed-dot" style="background:var(--success)"></span>Pulled payroll data</div>
+      <div class="feed" style="color:#1A2830"><span class="feed-dot" style="background:var(--success)"></span>Validated 47 records</div>
+      <div class="feed" style="color:#1A2830"><span class="feed-dot" style="background:var(--info)"></span>Checking thresholds...</div>
+      <div class="feed" style="color:var(--muted-fg)"><span class="feed-dot" style="background:var(--muted-fg);opacity:0.4"></span>Review against previous</div>
+    </div>
+  </div>
+  <div class="theme-col orbital-proposed">
+    <div class="theme-label" style="color:var(--info)">Proposed</div>
+    <div class="section-label" style="color:var(--muted-fg)">Status badges</div>
+    <div class="badge-row">
+      <span class="badge" style="background:var(--success-m);color:var(--success)"><span class="badge-dot" style="background:var(--success)"></span>Done</span>
+      <span class="badge" style="background:var(--info-m);color:var(--info)"><span class="badge-dot" style="background:var(--info)"></span>Running</span>
+      <span class="badge" style="background:var(--warning-m);color:var(--warning)"><span class="badge-dot" style="background:var(--warning)"></span>Paused</span>
+      <span class="badge" style="background:var(--muted-bg);color:var(--muted-fg)"><span class="badge-dot" style="background:var(--muted-fg)"></span>Pending</span>
+      <span class="badge" style="background:var(--stopped-m);color:var(--stopped)"><span class="badge-dot" style="background:var(--stopped)"></span>Stopped</span>
+      <span class="badge" style="background:var(--stopped-m);color:var(--stopped)"><span class="badge-dot" style="background:var(--stopped)"></span>Declined</span>
+    </div>
+    <div class="section-label" style="color:var(--muted-fg)">Alert pills</div>
+    <div class="badge-row">
+      <span class="alert-pill" style="background:var(--danger-m);color:var(--destructive)">&#9888; Urgent</span>
+      <span class="alert-pill" style="background:var(--warning-m);color:var(--warning)">&#9679; Needs attention</span>
+    </div>
+    <div class="card" style="background:var(--card);border-color:var(--border)">
+      <div class="feed" style="color:#1A2830"><span class="feed-dot" style="background:var(--success)"></span>Pulled payroll data</div>
+      <div class="feed" style="color:#1A2830"><span class="feed-dot" style="background:var(--success)"></span>Validated 47 records</div>
+      <div class="feed" style="color:#1A2830"><span class="feed-dot" style="background:var(--info)"></span>Checking thresholds...</div>
+      <div class="feed" style="color:var(--muted-fg)"><span class="feed-dot" style="background:var(--muted-fg);opacity:0.4"></span>Review against previous</div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:32px; padding:20px; background:#222; border-radius:12px">
+  <div style="font-family:'Geist Mono',monospace; font-size:12px; color:#9DA0A8; margin-bottom:12px">WHAT CHANGED</div>
+  <div style="font-size:14px; color:#ccc; line-height:1.8">
+    <strong style="color:#fff">Badge hierarchy:</strong> Stopped/Declined → desaturated red (resolved negative). Pending → muted neutral. Urgent owns full danger.<br>
+    <strong style="color:#fff">Success:</strong> Pushed darker green. Reads as "green" not "gray-green."<br>
+    <strong style="color:#fff">Info/Running:</strong> Pushed deeper blue. Distinct from muted text.<br>
+    <strong style="color:#fff">Warning:</strong> Pushed to true amber. No longer reads as "brown."<br>
+    <strong style="color:#fff">Danger:</strong> Pushed to true red. Clearly danger, not dusty rose.<br>
+    <strong style="color:#fff">Muted backgrounds:</strong> Bumped alpha to 10-12%. Tints the card without being heavy.
+  </div>
+</div>
+
+</body>
+</html>

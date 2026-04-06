@@ -319,7 +319,7 @@ body {
   padding: 3px 10px; border-radius: 4px;
 }
 .alert-pill-urgent {
-  background: var(--color-danger-muted); color: var(--destructive);
+  background: color-mix(in srgb, var(--destructive) 12%, transparent); color: var(--destructive);
 }
 .alert-pill-attention {
   background: var(--color-warning-muted); color: var(--color-warning);
@@ -683,68 +683,28 @@ body {
       </div>
     </div>
 
-    <!-- Status Badges -->
+    <!-- Badges & Pills -->
     <div class="specimen">
-      <div class="specimen-label">Status Badges (mono)</div>
-      <div class="btn-row" style="gap:8px;margin-bottom:16px">
+      <div class="specimen-label">Status Badges (mono) — agent-produced states</div>
+      <div class="btn-row" style="gap:8px;margin-bottom:8px">
         <span class="badge badge-success"><span class="badge-dot"></span>Done</span>
         <span class="badge badge-info"><span class="badge-dot"></span>Running</span>
         <span class="badge badge-warning"><span class="badge-dot"></span>Paused</span>
-        <span class="badge badge-danger"><span class="badge-dot"></span>Stopped</span>
         <span class="badge badge-muted"><span class="badge-dot"></span>Pending</span>
+        <span class="badge badge-stopped"><span class="badge-dot"></span>Stopped</span>
+        <span class="badge badge-stopped"><span class="badge-dot"></span>Declined</span>
       </div>
-      <div class="specimen-label">Alert Pills (sans)</div>
-      <div class="btn-row" style="gap:8px">
+      <div style="font-size:12px;color:var(--muted-foreground);margin-bottom:20px;line-height:1.6">
+        Danger reserved for "act now." Stopped/Declined use desaturated red — ended negatively but resolved. Pending is neutral.
+      </div>
+
+      <div class="specimen-label">Alert Pills (sans) — human-facing urgency</div>
+      <div class="btn-row" style="gap:8px;margin-bottom:8px">
         <span class="alert-pill alert-pill-urgent">&#9888; Urgent</span>
         <span class="alert-pill alert-pill-attention">&#9679; Needs attention</span>
       </div>
-
-      <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--border)">
-        <div class="specimen-label">Proposed: Danger reserved for "act now"</div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:12px">
-          <!-- Current -->
-          <div>
-            <div style="font-family:'Geist Mono',monospace;font-size:11px;color:var(--muted-foreground);margin-bottom:10px;letter-spacing:0.06em;text-transform:uppercase">Current</div>
-            <div style="display:flex;flex-direction:column;gap:6px">
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
-                <span style="font-size:13px;color:var(--foreground)">Stopped</span>
-                <span class="badge badge-danger"><span class="badge-dot"></span>Stopped</span>
-              </div>
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
-                <span style="font-size:13px;color:var(--foreground)">Declined</span>
-                <span class="badge badge-danger"><span class="badge-dot"></span>Declined</span>
-              </div>
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
-                <span style="font-size:13px;color:var(--foreground)">Urgent item</span>
-                <span class="alert-pill alert-pill-urgent">&#9888; Urgent</span>
-              </div>
-            </div>
-            <div style="font-size:12px;color:var(--muted-foreground);margin-top:8px">Stopped, Declined, and Urgent all use danger — no hierarchy</div>
-          </div>
-          <!-- Proposed -->
-          <div>
-            <div style="font-family:'Geist Mono',monospace;font-size:11px;color:var(--primary);margin-bottom:10px;letter-spacing:0.06em;text-transform:uppercase">Proposed</div>
-            <div style="display:flex;flex-direction:column;gap:6px">
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
-                <span style="font-size:13px;color:var(--foreground)">Pending</span>
-                <span class="badge badge-muted"><span class="badge-dot"></span>Pending</span>
-              </div>
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
-                <span style="font-size:13px;color:var(--foreground)">Stopped</span>
-                <span class="badge badge-stopped"><span class="badge-dot"></span>Stopped</span>
-              </div>
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
-                <span style="font-size:13px;color:var(--foreground)">Declined</span>
-                <span class="badge badge-stopped"><span class="badge-dot"></span>Declined</span>
-              </div>
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px">
-                <span style="font-size:13px;color:var(--foreground)">Urgent item</span>
-                <span class="alert-pill alert-pill-urgent">&#9888; Urgent</span>
-              </div>
-            </div>
-            <div style="font-size:12px;color:var(--muted-foreground);margin-top:8px">Pending = neutral waiting. Stopped/Declined = faint red (ended badly). Urgent = full danger (act now).</div>
-          </div>
-        </div>
+      <div style="font-size:12px;color:var(--muted-foreground);line-height:1.6">
+        Urgent owns the full danger/destructive color. Needs attention uses warning. These are UI labels (sans), not agent states (mono).
       </div>
     </div>
 
