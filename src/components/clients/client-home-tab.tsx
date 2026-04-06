@@ -15,6 +15,7 @@ import {
 import { Client, Chat } from "@/types/chat";
 import { getClientHomeData, type Severity } from "@/data/client-home-data";
 import { getAvatarStyle } from "@/lib/avatar-colors";
+import { Button } from "@/components/ui/button";
 
 interface ClientHomeTabProps {
   client: Client;
@@ -31,22 +32,16 @@ function timeAgo(date: Date): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-const severityConfig: Record<Severity, { label: string; className: string }> = {
-  blocking: { label: "BLOCKING", className: "bg-red-500/15 text-red-400" },
-  error: { label: "ERROR", className: "bg-amber-500/15 text-amber-400" },
-  review: { label: "REVIEW", className: "bg-blue-500/15 text-blue-400" },
+const severityConfig: Record<Severity, { label: string; bg: string; color: string }> = {
+  blocking: { label: "BLOCKING", bg: "color-mix(in srgb, var(--destructive) 15%, transparent)", color: "var(--destructive)" },
+  error: { label: "ERROR", bg: "var(--color-danger-muted)", color: "var(--color-danger)" },
+  review: { label: "REVIEW", bg: "var(--color-info-muted)", color: "var(--color-info)" },
 };
 
-const planStatusConfig: Record<string, { label: string; className: string }> = {
-  awaiting: { label: "Awaiting", className: "bg-amber-500/15 text-amber-400" },
-  running: { label: "Running", className: "bg-emerald-500/15 text-emerald-400" },
-  paused: { label: "Paused", className: "bg-zinc-500/15 text-zinc-400" },
-};
-
-const planBarColor: Record<string, string> = {
-  awaiting: "bg-blue-500",
-  running: "bg-blue-500",
-  paused: "bg-blue-500/40",
+const planStatusConfig: Record<string, { label: string; bg: string; color: string }> = {
+  awaiting: { label: "Awaiting", bg: "var(--color-warning-muted)", color: "var(--color-warning)" },
+  running: { label: "Running", bg: "var(--color-info-muted)", color: "var(--color-info)" },
+  paused: { label: "Paused", bg: "var(--muted)", color: "var(--muted-foreground)" },
 };
 
 // Mock enrichment data per client — in production this comes from the API
@@ -103,9 +98,9 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
 
       {/* --- Needs Attention --- */}
       {homeData.attentionItems.length > 0 && (
-        <div className="mb-6 rounded-lg border border-border bg-card">
+        <div className="mb-6 rounded-xl border border-border bg-card">
           <div className="flex items-center gap-2 border-b border-border px-5 py-3">
-            <Warning className="h-4 w-4 text-amber-400" />
+            <Warning className="h-4 w-4" style={{ color: "var(--color-warning)" }} />
             <span className="text-xs font-semibold uppercase tracking-[0.06em]">Needs Attention</span>
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1.5 text-[11px] font-medium text-foreground/70">
               {homeData.attentionItems.length}
@@ -116,7 +111,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
               const sev = severityConfig[item.severity];
               return (
                 <div key={item.id} className="flex items-start gap-4 px-5 py-4">
-                  <span className={`mt-0.5 w-[72px] shrink-0 rounded px-2 py-0.5 text-center text-[11px] font-medium uppercase ${sev.className}`}>
+                  <span className="mt-0.5 w-[72px] shrink-0 rounded px-2 py-0.5 text-center text-[11px] font-semibold uppercase" style={{ background: sev.bg, color: sev.color }}>
                     {sev.label}
                   </span>
                   <div className="min-w-0 flex-1">
@@ -134,12 +129,12 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
                     )}
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
-                    <button className="rounded-md border border-primary/50 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10">
+                    <Button variant="outline" size="sm">
                       {item.primaryAction}
-                    </button>
-                    <button className="text-xs text-muted-foreground transition-colors hover:text-foreground">
+                    </Button>
+                    <Button variant="ghost" size="sm" className="text-muted-foreground">
                       {item.secondaryAction}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               );
@@ -151,7 +146,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
       {/* --- Recent Chats + Active Plans --- */}
       <div className="mb-6 grid grid-cols-5 gap-6">
         {/* Recent Chats — 3 cols */}
-        <div className="col-span-3 rounded-lg border border-border bg-card">
+        <div className="col-span-3 rounded-xl border border-border bg-card">
           <div className="flex items-center justify-between border-b border-border px-5 py-3">
             <div className="flex items-center gap-2">
               <ChatDots className="h-4 w-4 text-muted-foreground" />
@@ -188,7 +183,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
         </div>
 
         {/* Active Plans — 2 cols */}
-        <div className="col-span-2 rounded-lg border border-border bg-card">
+        <div className="col-span-2 rounded-xl border border-border bg-card">
           <div className="flex items-center justify-between border-b border-border px-5 py-3">
             <div className="flex items-center gap-2">
               <ClipboardText className="h-4 w-4 text-muted-foreground" />
@@ -200,12 +195,11 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
             {homeData.activePlans.map((plan) => {
               const pct = plan.totalSteps > 0 ? (plan.completedSteps / plan.totalSteps) * 100 : 0;
               const statusCfg = planStatusConfig[plan.status];
-              const barColor = planBarColor[plan.status];
               return (
                 <div key={plan.id} className="px-5 py-3">
                   <div className="mb-1 flex items-center justify-between gap-2">
                     <span className="truncate text-sm font-medium">{plan.title}</span>
-                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ${statusCfg.className}`}>
+                    <span className="shrink-0 rounded-full font-mono text-xs font-semibold" style={{ background: statusCfg.bg, color: statusCfg.color, padding: "3px 10px" }}>
                       {statusCfg.label}
                     </span>
                   </div>
@@ -213,10 +207,10 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
                     <span className="shrink-0 text-xs text-muted-foreground">
                       {plan.completedSteps} / {plan.totalSteps} steps
                     </span>
-                    <div className="h-1.5 flex-1 rounded-full bg-border">
+                    <div className="h-1.5 flex-1 rounded-full bg-secondary">
                       <div
-                        className={`h-1.5 rounded-full transition-all ${barColor}`}
-                        style={{ width: `${pct}%` }}
+                        className="h-1.5 rounded-full transition-all"
+                        style={{ width: `${pct}%`, background: plan.status === "paused" ? "var(--muted-foreground)" : "var(--primary)", opacity: plan.status === "paused" ? 0.4 : 1 }}
                       />
                     </div>
                   </div>
@@ -241,7 +235,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
             </button>
           )}
         </div>
-        <div className="rounded-lg border border-border bg-card">
+        <div className="rounded-xl border border-border bg-card">
           <div className="grid grid-cols-2 divide-x divide-border">
             {/* Team column */}
             <div>
@@ -267,7 +261,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
             {/* Agents column */}
             <div>
               <div className="flex items-center gap-2 border-b border-border px-5 py-2.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 <span className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Agents</span>
               </div>
               <div className="divide-y divide-border">
