@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-type AlertPillVariant = "urgent" | "attention";
+type AlertPillVariant = "urgent" | "attention" | "info";
 
 const variantStyles: Record<AlertPillVariant, React.CSSProperties> = {
   urgent: {
@@ -10,6 +10,10 @@ const variantStyles: Record<AlertPillVariant, React.CSSProperties> = {
   attention: {
     background: "var(--color-warning-muted)",
     color: "var(--color-warning)",
+  },
+  info: {
+    background: "var(--color-info-muted)",
+    color: "var(--color-info)",
   },
 };
 

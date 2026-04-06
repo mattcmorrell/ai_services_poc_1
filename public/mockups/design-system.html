@@ -465,17 +465,17 @@ body {
   height: 1px; background: var(--border);
 }
 .attention-sev {
-  font-family: 'Geist', sans-serif; font-size: 11px; font-weight: 600;
-  text-transform: uppercase; text-align: center;
-  padding: 2px 8px; border-radius: 4px;
+  font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 4px;
   flex-shrink: 0; margin-top: 2px;
 }
 .attention-sev-blocking {
-  background: color-mix(in srgb, var(--destructive) 15%, transparent);
-  color: var(--destructive);
+  background: var(--color-warning-muted); color: var(--color-warning);
 }
 .attention-sev-error {
-  background: var(--color-danger-muted); color: var(--color-danger);
+  background: color-mix(in srgb, var(--destructive) 12%, transparent);
+  color: var(--destructive);
 }
 .attention-sev-review {
   background: var(--color-info-muted); color: var(--color-info);
@@ -980,7 +980,7 @@ body {
           </div>
         </div>
         <div class="attention-item">
-          <span class="attention-sev attention-sev-blocking">Blocking</span>
+          <span class="attention-sev attention-sev-blocking"><span style="width:6px;height:6px;border-radius:50%;background:currentColor"></span>Blocking</span>
           <div class="attention-body">
             <div class="attention-title">Payroll Runner needs approval</div>
             <div class="attention-desc">Q1 payroll calculation for 312 employees is ready and waiting for your sign-off.</div>
@@ -991,7 +991,7 @@ body {
           </div>
         </div>
         <div class="attention-item">
-          <span class="attention-sev attention-sev-error">Error</span>
+          <span class="attention-sev attention-sev-error">&#9888; Error</span>
           <div class="attention-body">
             <div class="attention-title">Benefits Enrollment failed</div>
             <div class="attention-desc">Dental plan sync encountered an error during enrollment processing.</div>

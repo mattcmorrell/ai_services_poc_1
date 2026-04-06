@@ -16,6 +16,7 @@ import { Client, Chat } from "@/types/chat";
 import { getClientHomeData, type Severity } from "@/data/client-home-data";
 import { getAvatarStyle } from "@/lib/avatar-colors";
 import { Button } from "@/components/ui/button";
+import { AlertPill } from "@/components/ui/alert-pill";
 
 interface ClientHomeTabProps {
   client: Client;
@@ -32,10 +33,10 @@ function timeAgo(date: Date): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-const severityConfig: Record<Severity, { label: string; bg: string; color: string }> = {
-  blocking: { label: "BLOCKING", bg: "color-mix(in srgb, var(--destructive) 15%, transparent)", color: "var(--destructive)" },
-  error: { label: "ERROR", bg: "var(--color-danger-muted)", color: "var(--color-danger)" },
-  review: { label: "REVIEW", bg: "var(--color-info-muted)", color: "var(--color-info)" },
+const severityPill: Record<Severity, { label: string; variant: "urgent" | "attention" | "info" }> = {
+  blocking: { label: "Blocking", variant: "attention" },
+  error: { label: "Error", variant: "urgent" },
+  review: { label: "Review", variant: "info" },
 };
 
 const planStatusConfig: Record<string, { label: string; bg: string; color: string }> = {
@@ -108,12 +109,14 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
           </div>
           <div className="divide-inset">
             {homeData.attentionItems.map((item) => {
-              const sev = severityConfig[item.severity];
+              const sev = severityPill[item.severity];
               return (
                 <div key={item.id} className="flex items-start gap-3 px-5 py-4">
-                  <span className="mt-0.5 shrink-0 rounded px-2 py-0.5 text-center text-[11px] font-semibold uppercase" style={{ background: sev.bg, color: sev.color }}>
+                  <AlertPill variant={sev.variant} className="mt-0.5 shrink-0 uppercase">
+                    {sev.variant === "urgent" && <Warning size={12} />}
+                    {sev.variant === "attention" && <span className="h-1.5 w-1.5 rounded-full" style={{ background: "currentColor" }} />}
                     {sev.label}
-                  </span>
+                  </AlertPill>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium">{item.title}</p>
                     <p className="mt-0.5 text-[13px] text-muted-foreground">{item.description}</p>
