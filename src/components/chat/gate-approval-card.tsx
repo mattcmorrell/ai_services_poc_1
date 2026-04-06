@@ -108,15 +108,11 @@ export function GateApprovalCard({
 
       {/* Action buttons */}
       <div className="p-3 px-5 border-t border-border flex gap-2.5">
-        <Button onClick={onApprove} className="flex-1" style={{ padding: "8px 20px" }}>
+        <Button onClick={onApprove} className="flex-1">
           <Check className="w-4 h-4" />
           Approve & continue
         </Button>
-        <Button
-          variant="ghost"
-          onClick={onModify}
-          style={{ color: "var(--color-danger)", border: "1px solid color-mix(in srgb, var(--color-danger) 30%, transparent)", padding: "8px 20px" }}
-        >
+        <Button variant="danger-outline" onClick={onModify}>
           <PencilSimple className="w-4 h-4" />
           Modify
         </Button>

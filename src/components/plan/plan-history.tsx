@@ -29,7 +29,7 @@ export function PlanHistory({ plans, onSelect }: PlanHistoryProps) {
 
   return (
     <div className="space-y-1">
-      <div className="flex items-center gap-1.5 px-2 py-1.5 text-[11px] font-mono font-medium uppercase tracking-wide text-muted-foreground">
+      <div className="flex items-center gap-1.5 px-2 py-1.5 text-[11px] font-mono font-medium uppercase tracking-[0.1em] text-muted-foreground">
         <Archive className="w-3 h-3" />
         Past Plans
       </div>

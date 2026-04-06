@@ -72,7 +72,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
                       <div className="text-[18px] font-medium text-foreground">
                         {plan.metadata.affectedCount}
                       </div>
-                      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                      <div className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
                         {plan.metadata.affectedLabel || "items"}
                       </div>
                     </div>
@@ -82,7 +82,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
                       <div className="text-[18px] font-medium text-foreground">
                         {plan.metadata.estimatedTime}
                       </div>
-                      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                      <div className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
                         estimated
                       </div>
                     </div>

@@ -98,15 +98,11 @@ export function ApprovalRequestCard({
 
       {/* Action buttons */}
       <div className="p-3 px-5 border-t border-border flex gap-2.5">
-        <Button onClick={onApprove} className="flex-1" style={{ padding: "8px 20px" }}>
+        <Button onClick={onApprove} className="flex-1">
           <Check className="w-4 h-4" />
           Approve
         </Button>
-        <Button
-          variant="ghost"
-          onClick={onDecline}
-          style={{ color: "var(--color-danger)", border: "1px solid color-mix(in srgb, var(--color-danger) 30%, transparent)", padding: "8px 20px" }}
-        >
+        <Button variant="danger-outline" onClick={onDecline}>
           <X className="w-4 h-4" />
           Decline
         </Button>

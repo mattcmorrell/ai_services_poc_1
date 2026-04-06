@@ -127,7 +127,7 @@ export function PlanStepTimeline({ steps, compact = false }: PlanStepTimelinePro
             {/* Thinking log */}
             {hasThinking && isExpanded && (
               <div className="ml-9 mb-2 p-3 rounded-lg text-xs font-mono space-y-1.5 bg-muted border border-border">
-                <div className="flex items-center gap-1.5 mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <div className="flex items-center gap-1.5 mb-2 text-xs font-medium uppercase tracking-[0.06em] text-muted-foreground">
                   <Brain className="w-3 h-3" />
                   Agent thinking
                 </div>

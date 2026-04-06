@@ -81,7 +81,6 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
             <Button
               onClick={(e) => { e.stopPropagation(); onApprove(); }}
               className="flex-1"
-              style={{ padding: "8px 20px" }}
             >
               <Check className="w-4 h-4" />
               Approve plan
@@ -91,7 +90,6 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
             <Button
               variant="secondary"
               onClick={(e) => { e.stopPropagation(); onDecline(); }}
-              style={{ padding: "8px 20px" }}
             >
               <X className="w-4 h-4" />
               Decline

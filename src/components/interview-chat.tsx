@@ -199,7 +199,7 @@ export function InterviewChat() {
                 >
                   {msg.isSummary && (
                     <div className="mb-3 flex items-center justify-between">
-                      <span className="text-xs font-medium uppercase tracking-wide text-primary">
+                      <span className="text-xs font-medium uppercase tracking-[0.06em] text-primary">
                         Policy Summary
                       </span>
                       <Button

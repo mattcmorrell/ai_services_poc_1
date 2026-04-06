@@ -106,7 +106,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
         <div className="mb-6 rounded-lg border border-border bg-card">
           <div className="flex items-center gap-2 border-b border-border px-5 py-3">
             <Warning className="h-4 w-4 text-amber-400" />
-            <span className="text-xs font-semibold uppercase tracking-wide">Needs Attention</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.06em]">Needs Attention</span>
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1.5 text-[11px] font-medium text-foreground/70">
               {homeData.attentionItems.length}
             </span>
@@ -155,7 +155,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
           <div className="flex items-center justify-between border-b border-border px-5 py-3">
             <div className="flex items-center gap-2">
               <ChatDots className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs font-semibold uppercase tracking-wide">Recent Chats</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.06em]">Recent Chats</span>
             </div>
             <button className="flex items-center gap-1 text-xs font-medium text-primary transition-colors hover:text-primary/80">
               All chats <ArrowRight className="h-3 w-3" />
@@ -192,7 +192,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
           <div className="flex items-center justify-between border-b border-border px-5 py-3">
             <div className="flex items-center gap-2">
               <ClipboardText className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs font-semibold uppercase tracking-wide">Active Plans</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.06em]">Active Plans</span>
             </div>
             <span className="text-xs text-muted-foreground">{homeData.activePlans.length} plans</span>
           </div>
@@ -231,7 +231,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
       <div className="mb-2">
         <div className="mb-3 flex items-center gap-2">
           <Sparkle className="h-4 w-4 text-muted-foreground" />
-          <span className="text-xs font-semibold uppercase tracking-wide">Recent Activity</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.06em]">Recent Activity</span>
           {homeData.recentActivity.team.length > 3 && (
             <button
               onClick={() => setShowMoreActivity((v) => !v)}
@@ -247,7 +247,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
             <div>
               <div className="flex items-center gap-2 border-b border-border px-5 py-2.5">
                 <Users className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Team</span>
+                <span className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Team</span>
               </div>
               <div className="divide-y divide-border">
                 {visibleTeam.map((item) => (
@@ -268,7 +268,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
             <div>
               <div className="flex items-center gap-2 border-b border-border px-5 py-2.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Agents</span>
+                <span className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Agents</span>
               </div>
               <div className="divide-y divide-border">
                 {visibleAgents.map((item) => (
