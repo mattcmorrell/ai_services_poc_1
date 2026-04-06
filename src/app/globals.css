@@ -109,17 +109,17 @@
 .dark {
   --background: #101214;
   --foreground: #E8E9ED;
-  --card: #191B1F;
+  --card: #1D2024;
   --card-foreground: #E8E9ED;
   --popover: var(--card);
   --popover-foreground: var(--card-foreground);
   --primary: #6878B8;
   --primary-foreground: #E8E9ED;
-  --secondary: #222428;
+  --secondary: #282A30;
   --secondary-foreground: #E8E9ED;
-  --muted: #222428;
+  --muted: #282A30;
   --muted-foreground: #9DA0A8;
-  --accent: #222428;
+  --accent: #282A30;
   --accent-foreground: #E8E9ED;
   --destructive: #E08850;
   --border: rgba(180, 185, 200, 0.07);
