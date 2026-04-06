@@ -215,14 +215,14 @@ export function TabGroups({
 
                   {/* Collapsed: tab count in a subtle circle */}
                   {!isExpanded && tabCount > 0 && (
-                    <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground/10 px-1 text-[9px] font-medium leading-none text-muted-foreground">
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground/10 px-1 text-[11px] font-medium leading-none text-muted-foreground">
                       {tabCount}
                     </span>
                   )}
 
                   {/* Unread badge */}
                   {group.unreadCount > 0 && (
-                    <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-semibold leading-none text-primary-foreground">
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-semibold leading-none text-primary-foreground">
                       {group.unreadCount}
                     </span>
                   )}

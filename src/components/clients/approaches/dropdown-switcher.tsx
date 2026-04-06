@@ -171,7 +171,7 @@ export function DropdownSwitcher({
           {selectedClient ? (
             <>
               <span
-                className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold leading-none text-white"
+                className="flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold leading-none text-white"
                 style={getAvatarStyle(selectedClient.id)}
               >
                 {getInitials(selectedClient.name)}
@@ -292,7 +292,7 @@ export function DropdownSwitcher({
                           <span
                             className={cn(
                               "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
-                              "rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground"
+                              "rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
                             )}
                           >
                             {client.unreadCount}
@@ -312,11 +312,11 @@ export function DropdownSwitcher({
               {/* V2+: keyboard hint footer */}
               {version >= 2 && (
                 <div className="border-t border-border px-3 py-1.5 flex items-center justify-between">
-                  <span className="text-[10px] text-muted-foreground">
+                  <span className="text-[11px] text-muted-foreground">
                     ⌘K to quick search
                   </span>
                   {version >= 3 && clientsNeedingAttention > 0 && (
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-[11px] text-muted-foreground">
                       {filteredClients.length} clients
                     </span>
                   )}

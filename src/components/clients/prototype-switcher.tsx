@@ -60,7 +60,7 @@ export function PrototypeSwitcher({
     >
       <div className="flex items-center gap-2">
         <span className={cn(
-          "flex h-5 w-5 items-center justify-center rounded text-[10px] font-bold",
+          "flex h-6 w-6 items-center justify-center rounded text-[11px] font-bold",
           dimmed ? "bg-muted/50" : "bg-muted"
         )}>
           {approach.id}
@@ -70,7 +70,7 @@ export function PrototypeSwitcher({
         </span>
         {approach.status && STATUS_LABELS[approach.status] && (
           <span className={cn(
-            "rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-none",
+            "rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase leading-none",
             STATUS_LABELS[approach.status].color
           )}>
             {STATUS_LABELS[approach.status].label}
@@ -133,7 +133,7 @@ export function PrototypeSwitcher({
           {/* Version selector */}
           {maxVersion > 1 && (
             <div className="border-t border-border px-4 py-2.5">
-              <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Version
               </span>
               <div className="flex gap-1">

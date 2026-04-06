@@ -189,7 +189,7 @@ export function SidebarListProto({
                           <span
                             className={cn(
                               "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
-                              "rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground"
+                              "rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
                             )}
                           >
                             {client.unreadCount}
@@ -355,8 +355,8 @@ export function SidebarListProto({
                     {client.unreadCount > 0 && (
                       <span
                         className={cn(
-                          "absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center",
-                          "rounded-full bg-primary px-1 text-[9px] font-semibold leading-none text-primary-foreground"
+                          "absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center",
+                          "rounded-full bg-primary px-1 text-[11px] font-semibold leading-none text-primary-foreground"
                         )}
                       >
                         {client.unreadCount}
@@ -420,13 +420,13 @@ export function SidebarListProto({
                     {isV4 ? (
                       <div className="flex items-center gap-1">
                         {unreadChats > 0 && (
-                          <span className="flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-primary">
+                          <span className="flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[11px] font-medium leading-none text-primary">
                             <ChatDots className="h-2.5 w-2.5" />
                             {unreadChats}
                           </span>
                         )}
                         {agentUpdates > 0 && (
-                          <span className="flex items-center gap-0.5 rounded-full bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-violet-400">
+                          <span className="flex items-center gap-0.5 rounded-full bg-violet-500/15 px-1.5 py-0.5 text-[11px] font-medium leading-none text-violet-400">
                             <Robot className="h-2.5 w-2.5" />
                             {agentUpdates}
                           </span>
@@ -437,7 +437,7 @@ export function SidebarListProto({
                         <span
                           className={cn(
                             "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
-                            "rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground"
+                            "rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
                           )}
                         >
                           {client.unreadCount}

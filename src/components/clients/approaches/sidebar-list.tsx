@@ -134,7 +134,7 @@ export function SidebarList({
                     </span>
 
                     {unreadChats > 0 && (
-                      <span className="flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-primary">
+                      <span className="flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[11px] font-medium leading-none text-primary">
                         <ChatDots className="h-2.5 w-2.5" />
                         {unreadChats}
                       </span>

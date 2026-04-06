@@ -262,7 +262,7 @@ export function BreadcrumbNav({
                           )}
                         >
                           <div
-                            className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white"
+                            className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-white"
                             style={getAvatarStyle(client.id)}
                           >
                             {getInitials(client.name)}
@@ -274,7 +274,7 @@ export function BreadcrumbNav({
                             <span
                               className={cn(
                                 "inline-flex h-4 min-w-4 items-center justify-center",
-                                "rounded-full bg-primary px-1 text-[9px] font-semibold leading-none text-primary-foreground"
+                                "rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
                               )}
                             >
                               {client.unreadCount}
@@ -333,7 +333,7 @@ export function BreadcrumbNav({
           {/* V2: Recently Viewed quick-access bar */}
           {version >= 2 && recentClients.length > 0 && (
             <div className="flex items-center gap-3 border-b border-border/50 bg-muted/20 px-4 py-2">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
                 Recent
               </span>
               <div className="flex items-center gap-2">
@@ -457,7 +457,7 @@ export function BreadcrumbNav({
                       <span
                         className={cn(
                           "inline-flex h-5 min-w-5 items-center justify-center",
-                          "rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground"
+                          "rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
                         )}
                       >
                         {row.unreadCount}

@@ -124,7 +124,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
                     <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>
                     {item.lastSeen ? (
                       <div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <span className="flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold text-white" style={getAvatarStyle(item.lastSeen.name)}>
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold text-white" style={getAvatarStyle(item.lastSeen.name)}>
                           {item.lastSeen.initials.charAt(0)}
                         </span>
                         {item.lastSeen.name} viewed {item.lastSeen.timeAgo}
@@ -252,7 +252,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
               <div className="divide-y divide-border">
                 {visibleTeam.map((item) => (
                   <div key={item.id} className="flex items-center gap-3 px-5 py-2.5">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white" style={getAvatarStyle(item.name)}>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white" style={getAvatarStyle(item.name)}>
                       {item.initials}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-sm">
@@ -273,7 +273,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
               <div className="divide-y divide-border">
                 {visibleAgents.map((item) => (
                   <div key={item.id} className="flex items-center gap-3 px-5 py-2.5">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white" style={getAvatarStyle(item.name)}>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white" style={getAvatarStyle(item.name)}>
                       {item.initials}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-sm">
