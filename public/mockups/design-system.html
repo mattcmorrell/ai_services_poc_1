@@ -417,12 +417,14 @@ body {
   font-size: 14px; line-height: 1.6; max-width: 480px;
 }
 .chat-user {
-  background: var(--primary); color: var(--primary-foreground);
+  background: var(--muted); color: var(--foreground);
   border-bottom-right-radius: 4px; margin-left: auto;
+  display: inline-block;
 }
 .chat-agent {
-  background: var(--card); color: var(--card-foreground);
-  border: 1px solid var(--border); border-bottom-left-radius: 4px;
+  color: var(--card-foreground);
+  border: none; background: none;
+  padding: 0;
 }
 .chat-meta {
   font-family: 'Geist Mono', monospace; font-size: 12px;
@@ -796,7 +798,7 @@ body {
 
     <!-- Chat Bubbles -->
     <div class="specimen full">
-      <div class="specimen-label">Chat — user bubble (primary), agent bubble (card), inline data (mono)</div>
+      <div class="specimen-label">Chat — user bubble (muted), agent response (plain prose), inline data (sans bold)</div>
       <div style="display:flex;flex-direction:column;gap:16px;max-width:560px">
         <div>
           <div class="chat-meta" style="text-align:right">You &middot; 1:30 PM</div>
