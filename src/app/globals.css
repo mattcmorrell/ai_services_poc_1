@@ -66,7 +66,7 @@
   --destructive: #C06828;
   --border: rgba(30, 35, 50, 0.08);
   --input: rgba(30, 35, 50, 0.12);
-  --ring: #506098;
+  --ring: var(--primary);
   --chart-1: #506098;
   --chart-2: #4A7A52;
   --chart-3: #9A8050;
@@ -133,7 +133,7 @@
   --destructive: #E08850;
   --border: rgba(180, 185, 200, 0.07);
   --input: rgba(180, 185, 200, 0.11);
-  --ring: #6878B8;
+  --ring: var(--primary);
   --chart-1: #6878B8;
   --chart-2: #7BAA82;
   --chart-3: #C4A060;
@@ -200,7 +200,7 @@
   --destructive: #D4875A;
   --border: rgba(220, 215, 201, 0.08);
   --input: rgba(220, 215, 201, 0.12);
-  --ring: #7A9A78;
+  --ring: var(--primary);
   --chart-1: #7A9A78;
   --chart-2: #D4A456;
   --chart-3: #6ABA7A;
@@ -263,7 +263,7 @@
   --destructive: #B86E3A;
   --border: rgba(44, 54, 57, 0.1);
   --input: rgba(44, 54, 57, 0.14);
-  --ring: #5A7A58;
+  --ring: var(--primary);
   --chart-1: #5A7A58;
   --chart-2: #A27B5B;
   --chart-3: #3D8A4D;
@@ -330,7 +330,7 @@
   --destructive: #E08850;
   --border: rgba(196, 212, 220, 0.08);
   --input: rgba(196, 212, 220, 0.12);
-  --ring: #8AAEC4;
+  --ring: var(--primary);
   --chart-1: #8AAEC4;
   --chart-2: #7BAA82;
   --chart-3: #C4A060;
@@ -393,7 +393,7 @@
   --destructive: #C06828;
   --border: rgba(26, 40, 48, 0.08);
   --input: rgba(26, 40, 48, 0.12);
-  --ring: #4A7A98;
+  --ring: var(--primary);
   --chart-1: #4A7A98;
   --chart-2: #4A8A52;
   --chart-3: #9A8050;

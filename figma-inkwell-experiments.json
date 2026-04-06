@@ -1,0 +1,66 @@
+{
+  "exported": "2026-04-06",
+  "note": "Inkwell Warm and Inkwell Cool experimental colorways. These were explored as warmer/cooler variations of the base Inkwell theme. Parked — not in the app code. Preserved here for potential future use.",
+  "variables": {
+    "bg": {
+      "Inkwell Warm Dark": "#151210",
+      "Inkwell Warm Light": "#F0EAE0",
+      "Inkwell Cool Dark": "#131618",
+      "Inkwell Cool Light": "#E6E8EA"
+    },
+    "card": {
+      "Inkwell Warm Dark": "#231E1A",
+      "Inkwell Warm Light": "#FFFDF8",
+      "Inkwell Cool Dark": "#1C2028",
+      "Inkwell Cool Light": "#FFFFFF"
+    },
+    "inner": {
+      "Inkwell Warm Dark": "#352E28",
+      "Inkwell Warm Light": "#F8F4EC",
+      "Inkwell Cool Dark": "#2A3038",
+      "Inkwell Cool Light": "#F0F1F3"
+    },
+    "accent": {
+      "Inkwell Warm Dark": "#B8845A",
+      "Inkwell Warm Light": "#B8845A",
+      "Inkwell Cool Dark": "#8A7A6A",
+      "Inkwell Cool Light": "#7A6E62"
+    },
+    "accent-bright": {
+      "Inkwell Warm Dark": "#E0C090",
+      "Inkwell Warm Light": "#956840",
+      "Inkwell Cool Dark": "#B0A090",
+      "Inkwell Cool Light": "#7A6E62"
+    },
+    "text-bright": {
+      "Inkwell Warm Dark": "#F5F0E5",
+      "Inkwell Warm Light": "#1A1510",
+      "Inkwell Cool Dark": "#EAECF0",
+      "Inkwell Cool Light": "#181C20"
+    },
+    "text-primary": {
+      "Inkwell Warm Dark": "#F5F0E5",
+      "Inkwell Warm Light": "#2E2820",
+      "Inkwell Cool Dark": "#EAECF0",
+      "Inkwell Cool Light": "#2A3038"
+    },
+    "text-secondary": {
+      "Inkwell Warm Dark": "#C8BEA8",
+      "Inkwell Warm Light": "#7A7060",
+      "Inkwell Cool Dark": "#A0A4AA",
+      "Inkwell Cool Light": "#686E74"
+    },
+    "alert": {
+      "Inkwell Warm Dark": "#D47848",
+      "Inkwell Warm Light": "#C06030",
+      "Inkwell Cool Dark": "#C88058",
+      "Inkwell Cool Light": "#A86840"
+    },
+    "warning": {
+      "Inkwell Warm Dark": "#D4A456",
+      "Inkwell Warm Light": "#A27B5B",
+      "Inkwell Cool Dark": "#C0A060",
+      "Inkwell Cool Light": "#8A7858"
+    }
+  }
+}
