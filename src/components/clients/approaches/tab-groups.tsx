@@ -207,7 +207,7 @@ export function TabGroups({
 
                   {/* Name — truncated to keep chips compact */}
                   <span className={cn(
-                    "max-w-[72px] truncate text-[11px] font-semibold leading-none",
+                    "max-w-[72px] truncate text-[11px] font-medium leading-none",
                     isActive ? "text-foreground" : "text-muted-foreground",
                   )}>
                     {group.client.name.split(/[\s-]+/)[0]}
@@ -222,7 +222,7 @@ export function TabGroups({
 
                   {/* Unread badge */}
                   {group.unreadCount > 0 && (
-                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-semibold leading-none text-primary-foreground">
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-medium leading-none text-primary-foreground">
                       {group.unreadCount}
                     </span>
                   )}

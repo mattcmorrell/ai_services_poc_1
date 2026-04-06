@@ -262,7 +262,7 @@ export function BreadcrumbNav({
                           )}
                         >
                           <div
-                            className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-white"
+                            className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-medium text-white"
                             style={getAvatarStyle(client.id)}
                           >
                             {getInitials(client.name)}
@@ -274,7 +274,7 @@ export function BreadcrumbNav({
                             <span
                               className={cn(
                                 "inline-flex h-4 min-w-4 items-center justify-center",
-                                "rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
+                                "rounded-full bg-primary px-1.5 text-[11px] font-medium leading-none text-primary-foreground"
                               )}
                             >
                               {client.unreadCount}
@@ -457,7 +457,7 @@ export function BreadcrumbNav({
                       <span
                         className={cn(
                           "inline-flex h-5 min-w-5 items-center justify-center",
-                          "rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
+                          "rounded-full bg-primary px-1.5 text-[11px] font-medium leading-none text-primary-foreground"
                         )}
                       >
                         {row.unreadCount}

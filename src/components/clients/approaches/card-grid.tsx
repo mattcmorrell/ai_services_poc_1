@@ -228,7 +228,7 @@ export function CardGrid({
                   <span
                     className={cn(
                       "absolute right-4 top-4 flex h-5 min-w-5 items-center justify-center",
-                      "rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
+                      "rounded-full bg-primary px-1.5 text-[11px] font-medium leading-none text-primary-foreground"
                     )}
                   >
                     {unread}

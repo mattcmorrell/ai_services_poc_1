@@ -107,7 +107,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
           <div className="flex items-center gap-2 border-b border-border px-5 py-3">
             <Warning className="h-4 w-4 text-amber-400" />
             <span className="text-xs font-semibold uppercase tracking-wide">Needs Attention</span>
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1.5 text-[11px] font-semibold text-foreground/70">
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1.5 text-[11px] font-medium text-foreground/70">
               {homeData.attentionItems.length}
             </span>
           </div>
@@ -116,7 +116,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
               const sev = severityConfig[item.severity];
               return (
                 <div key={item.id} className="flex items-start gap-4 px-5 py-4">
-                  <span className={`mt-0.5 w-[72px] shrink-0 rounded px-2 py-0.5 text-center text-[11px] font-bold uppercase ${sev.className}`}>
+                  <span className={`mt-0.5 w-[72px] shrink-0 rounded px-2 py-0.5 text-center text-[11px] font-medium uppercase ${sev.className}`}>
                     {sev.label}
                   </span>
                   <div className="min-w-0 flex-1">
@@ -124,7 +124,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
                     <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>
                     {item.lastSeen ? (
                       <div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold text-white" style={getAvatarStyle(item.lastSeen.name)}>
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-medium text-white" style={getAvatarStyle(item.lastSeen.name)}>
                           {item.lastSeen.initials.charAt(0)}
                         </span>
                         {item.lastSeen.name} viewed {item.lastSeen.timeAgo}
@@ -247,12 +247,12 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
             <div>
               <div className="flex items-center gap-2 border-b border-border px-5 py-2.5">
                 <Users className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Team</span>
+                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Team</span>
               </div>
               <div className="divide-y divide-border">
                 {visibleTeam.map((item) => (
                   <div key={item.id} className="flex items-center gap-3 px-5 py-2.5">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white" style={getAvatarStyle(item.name)}>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-medium text-white" style={getAvatarStyle(item.name)}>
                       {item.initials}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-sm">
@@ -268,12 +268,12 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
             <div>
               <div className="flex items-center gap-2 border-b border-border px-5 py-2.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-                <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Agents</span>
+                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Agents</span>
               </div>
               <div className="divide-y divide-border">
                 {visibleAgents.map((item) => (
                   <div key={item.id} className="flex items-center gap-3 px-5 py-2.5">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white" style={getAvatarStyle(item.name)}>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-medium text-white" style={getAvatarStyle(item.name)}>
                       {item.initials}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-sm">

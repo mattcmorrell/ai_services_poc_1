@@ -189,7 +189,7 @@ export function SidebarListProto({
                           <span
                             className={cn(
                               "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
-                              "rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
+                              "rounded-full bg-primary px-1.5 text-[11px] font-medium leading-none text-primary-foreground"
                             )}
                           >
                             {client.unreadCount}
@@ -356,7 +356,7 @@ export function SidebarListProto({
                       <span
                         className={cn(
                           "absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center",
-                          "rounded-full bg-primary px-1 text-[11px] font-semibold leading-none text-primary-foreground"
+                          "rounded-full bg-primary px-1 text-[11px] font-medium leading-none text-primary-foreground"
                         )}
                       >
                         {client.unreadCount}
@@ -437,7 +437,7 @@ export function SidebarListProto({
                         <span
                           className={cn(
                             "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
-                            "rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
+                            "rounded-full bg-primary px-1.5 text-[11px] font-medium leading-none text-primary-foreground"
                           )}
                         >
                           {client.unreadCount}

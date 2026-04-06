@@ -52,7 +52,7 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
             <div className="flex gap-4 mb-4 pb-3 border-b" style={{ borderColor: "var(--border)" }}>
               {plan.metadata.affectedCount && (
                 <div>
-                  <span className="text-base font-semibold text-foreground">{plan.metadata.affectedCount}</span>
+                  <span className="text-[14px] font-medium text-foreground">{plan.metadata.affectedCount}</span>
                   <span className="text-xs ml-1 text-muted-foreground">
                     {plan.metadata.affectedLabel || "items"}
                   </span>
@@ -60,7 +60,7 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
               )}
               {plan.metadata.estimatedTime && (
                 <div>
-                  <span className="text-base font-semibold text-foreground">{plan.metadata.estimatedTime}</span>
+                  <span className="text-[14px] font-medium text-foreground">{plan.metadata.estimatedTime}</span>
                 </div>
               )}
             </div>

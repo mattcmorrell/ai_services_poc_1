@@ -171,7 +171,7 @@ export function DropdownSwitcher({
           {selectedClient ? (
             <>
               <span
-                className="flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold leading-none text-white"
+                className="flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-medium leading-none text-white"
                 style={getAvatarStyle(selectedClient.id)}
               >
                 {getInitials(selectedClient.name)}
@@ -261,7 +261,7 @@ export function DropdownSwitcher({
                       >
                         {/* Initial circle */}
                         <span
-                          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-semibold leading-none text-white"
+                          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-medium leading-none text-white"
                           style={getAvatarStyle(client.id)}
                         >
                           {getInitials(client.name)}
@@ -292,7 +292,7 @@ export function DropdownSwitcher({
                           <span
                             className={cn(
                               "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
-                              "rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
+                              "rounded-full bg-primary px-1.5 text-[11px] font-medium leading-none text-primary-foreground"
                             )}
                           >
                             {client.unreadCount}

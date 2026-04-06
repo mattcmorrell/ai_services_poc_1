@@ -56,7 +56,7 @@ export function ClientTabsRow({
     <div className="flex h-full flex-1 flex-col overflow-hidden">
       {/* Horizontal client avatar bar */}
       <div className="flex flex-shrink-0 items-center gap-2 border-b border-border bg-card px-3 py-1">
-        <span className="mr-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <span className="mr-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           Clients
         </span>
         {clientsWithUnread.map(({ client, isActive }) => (
@@ -71,7 +71,7 @@ export function ClientTabsRow({
           >
             <div
               className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-semibold text-white",
+                "flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-medium text-white",
                 "ring-2 ring-offset-1 ring-offset-card transition-all",
                 isActive
                   ? "ring-primary"
