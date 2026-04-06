@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useRef, useEffect } from "react";
-import { Plus, Search, X } from "lucide-react";
+import { Plus, MagnifyingGlass, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Client, Chat } from "@/types/chat";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -161,7 +161,7 @@ export function ChatListPanel({
           )}
           aria-label={searchOpen ? "Close search" : "Search chats"}
         >
-          {searchOpen ? <X className="h-3.5 w-3.5" /> : <Search className="h-3.5 w-3.5" />}
+          {searchOpen ? <X className="h-3.5 w-3.5" /> : <MagnifyingGlass className="h-3.5 w-3.5" />}
         </button>
       </div>
 
@@ -173,7 +173,7 @@ export function ChatListPanel({
         )}
       >
         <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-          <Search className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
+          <MagnifyingGlass className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
           <input
             ref={searchInputRef}
             type="text"

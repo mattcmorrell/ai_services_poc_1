@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useCallback } from "react";
-import { Check, ShieldCheck, X } from "lucide-react";
+import { Check, ShieldCheck, X } from "@phosphor-icons/react";
 
 interface ApprovalRequestCardProps {
   question: string;

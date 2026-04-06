@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, ClipboardList, ChevronRight, History } from "lucide-react";
+import { X, ClipboardText, CaretRight, ClockCounterClockwise } from "@phosphor-icons/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useResizable, ResizeHandle } from "@/components/ui/resize-handle";
 import { ActionPlan } from "@/types/chat";
@@ -25,7 +25,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
     storageKey: "plan-panel-width",
     side: "right",
   });
-  const [showHistory, setShowHistory] = useState(false);
+  const [showClockCounterClockwise, setShowClockCounterClockwise] = useState(false);
 
   return (
     <>
@@ -38,7 +38,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
         <div className="flex items-center justify-between px-5 py-4 shrink-0 border-b border-border">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg shrink-0 bg-secondary border border-border">
-              <ClipboardList className="w-4 h-4 text-muted-foreground" />
+              <ClipboardText className="w-4 h-4 text-muted-foreground" />
             </div>
             <div className="min-w-0">
               <h2 className="text-sm font-medium truncate text-foreground">
@@ -57,7 +57,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
 
         {/* Content */}
         <ScrollArea className="flex-1 px-5 py-4">
-          {!showHistory ? (
+          {!showClockCounterClockwise ? (
             <div>
               {/* Plan description */}
               <p className="text-sm mb-5 text-muted-foreground font-light">
@@ -66,13 +66,13 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
 
               {/* Metadata */}
               {plan.metadata && (
-                <div className="flex gap-4 mb-5 pb-4 border-b" style={{ borderColor: "var(--border-subtle)" }}>
+                <div className="flex gap-4 mb-5 pb-4 border-b border-border">
                   {plan.metadata.affectedCount && (
                     <div className="text-center">
                       <div className="text-lg font-semibold text-foreground">
                         {plan.metadata.affectedCount}
                       </div>
-                      <div className="text-[11px] uppercase tracking-wide" style={{ color: "var(--text-quaternary-alpha)" }}>
+                      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
                         {plan.metadata.affectedLabel || "items"}
                       </div>
                     </div>
@@ -82,7 +82,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
                       <div className="text-lg font-semibold text-foreground">
                         {plan.metadata.estimatedTime}
                       </div>
-                      <div className="text-[11px] uppercase tracking-wide" style={{ color: "var(--text-quaternary-alpha)" }}>
+                      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
                         estimated
                       </div>
                     </div>
@@ -121,11 +121,11 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
             onResume={onResume}
           />
           <button
-            onClick={() => setShowHistory(!showHistory)}
+            onClick={() => setShowClockCounterClockwise(!showClockCounterClockwise)}
             className="flex items-center gap-1.5 text-[11px] transition-colors text-muted-foreground hover:text-foreground"
           >
-            <History className="w-3.5 h-3.5" />
-            {showHistory ? "Current plan" : "Past plans"}
+            <ClockCounterClockwise className="w-3.5 h-3.5" />
+            {showClockCounterClockwise ? "Current plan" : "Past plans"}
           </button>
         </div>
       </div>
@@ -165,21 +165,21 @@ export function PlanPanelPill({
           transform="rotate(-90 12 12)" className="transition-all duration-500"
         />
         <text x="12" y="12" textAnchor="middle" dominantBaseline="central"
-          fill="var(--text-primary-alpha)" fontSize="8" fontWeight="600">
+          fill="currentColor" fontSize="8" fontWeight="600">
           {completedSteps}
         </text>
       </svg>
 
       <div className="text-left">
-        <div className="text-xs font-medium" style={{ color: "var(--text-primary-alpha)" }}>Plan</div>
-        <div className="text-xs font-mono" style={{ color: "var(--text-tertiary-alpha)" }}>
+        <div className="text-xs font-medium text-foreground">Plan</div>
+        <div className="text-xs font-mono text-muted-foreground">
           {completedSteps}/{totalSteps}
           {plan.status === "executing" && " running"}
           {isPaused && " paused"}
         </div>
       </div>
 
-      <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
+      <CaretRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
     </button>
   );
 }

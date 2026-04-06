@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, FileText, Code, Table, List, MoreHorizontal, Copy, Download, Pencil, Trash2 } from "lucide-react";
+import { X, FileText, Code, Table, ListBullets, DotsThree, Copy, DownloadSimple, PencilSimple, Trash } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,7 +23,7 @@ const typeIcons = {
   document: FileText,
   code: Code,
   table: Table,
-  list: List,
+  list: ListBullets,
 };
 
 export function ArtifactPanel({ artifact, onClose, onUpdate }: ArtifactPanelProps) {
@@ -106,12 +106,12 @@ export function ArtifactPanel({ artifact, onClose, onUpdate }: ArtifactPanelProp
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreHorizontal className="h-4 w-4" />
+                <DotsThree className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                <Pencil className="w-4 h-4 mr-2" />
+                <PencilSimple className="w-4 h-4 mr-2" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem>
@@ -119,11 +119,11 @@ export function ArtifactPanel({ artifact, onClose, onUpdate }: ArtifactPanelProp
                 Copy
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Download className="w-4 h-4 mr-2" />
-                Download
+                <DownloadSimple className="w-4 h-4 mr-2" />
+                DownloadSimple
               </DropdownMenuItem>
               <DropdownMenuItem className="text-destructive">
-                <Trash2 className="w-4 h-4 mr-2" />
+                <Trash className="w-4 h-4 mr-2" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>

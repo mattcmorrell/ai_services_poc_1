@@ -4,17 +4,17 @@ import { useState, useEffect } from "react";
 import {
   Check,
   X,
-  ClipboardList,
+  ClipboardText,
   Users,
   Clock,
   CheckCircle,
   XCircle,
-  ArrowUpDown,
-  ChevronRight,
-  MoreHorizontal,
+  ArrowsDownUp,
+  CaretRight,
+  DotsThree,
   Pause,
-  Square,
-} from "lucide-react";
+  Stop,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ActionPlan, ActionPlanStep } from "@/types/chat";
@@ -50,7 +50,7 @@ export function ActionCard({ plan, workflow, onApprove, onDecline, onWorkflowCli
     if (isPaused) {
       return <Pause className="w-5 h-5 text-yellow-500" />;
     }
-    return <ClipboardList className="w-5 h-5 text-muted-foreground" />;
+    return <ClipboardText className="w-5 h-5 text-muted-foreground" />;
   };
 
   const getTimeDisplay = () => {
@@ -108,13 +108,13 @@ export function ActionCard({ plan, workflow, onApprove, onDecline, onWorkflowCli
           className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/30 mb-4 cursor-pointer hover:bg-muted/50 transition-colors"
         >
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-            <ArrowUpDown className="h-4 w-4" />
+            <ArrowsDownUp className="h-4 w-4" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-medium text-sm">{workflow.name}</div>
             <div className="text-xs text-muted-foreground">{workflow.description}</div>
           </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          <CaretRight className="w-4 h-4 text-muted-foreground" />
         </div>
       )}
 
@@ -209,7 +209,7 @@ function StepItem({ step, index, isDeclined }: StepItemProps) {
         )}
       >
         {isCompleted ? (
-          <Check className="w-3 h-3" strokeWidth={3} />
+          <Check className="w-3 h-3" />
         ) : (
           index
         )}

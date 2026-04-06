@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { IconContext } from "@phosphor-icons/react";
 
 export type Colorway = "mercury" | "inkwell" | "orbital";
 export type Mode = "light" | "dark";
@@ -61,7 +62,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeContext.Provider value={{ colorway, mode, setColorway, setMode, toggleMode }}>
-      {children}
+      <IconContext.Provider value={{ weight: "light" }}>
+        {children}
+      </IconContext.Provider>
     </ThemeContext.Provider>
   );
 }

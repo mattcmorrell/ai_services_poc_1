@@ -2,11 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import {
-  MoreHorizontal,
-  ChevronDown,
+  DotsThree,
+  CaretDown,
   Plus,
-  Mic,
-} from "lucide-react";
+  Microphone,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -186,7 +186,7 @@ export function ChatView({
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
                         {selectedModel}
-                        <ChevronDown className="h-3 w-3" />
+                        <CaretDown className="h-3 w-3" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -201,7 +201,7 @@ export function ChatView({
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
-                    <Mic className="h-4 w-4" />
+                    <Microphone className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -227,7 +227,7 @@ export function ChatView({
             <PlanPanelPill plan={activePlan} onClick={onOpenPlanPanel} />
           )}
           <Button variant="ghost" size="icon">
-            <MoreHorizontal className="h-5 w-5" />
+            <DotsThree className="h-5 w-5" />
           </Button>
         </div>
       </div>

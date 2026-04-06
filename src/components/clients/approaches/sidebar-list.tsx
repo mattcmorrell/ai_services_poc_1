@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { MessageSquare, Clock } from "lucide-react";
+import { ChatDots, Clock } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { getAvatarStyle } from "@/lib/avatar-colors";
 import type { Client, Chat } from "@/types/chat";
@@ -135,7 +135,7 @@ export function SidebarList({
 
                     {unreadChats > 0 && (
                       <span className="flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-primary">
-                        <MessageSquare className="h-2.5 w-2.5" />
+                        <ChatDots className="h-2.5 w-2.5" />
                         {unreadChats}
                       </span>
                     )}

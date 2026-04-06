@@ -1,16 +1,16 @@
 "use client";
 
 import {
-  ClipboardList,
+  ClipboardText,
   ArrowRight,
   CheckCircle,
   XCircle,
-  Loader2,
+  CircleNotch,
   Pause,
   Check,
   X,
-  Square,
-} from "lucide-react";
+  Stop,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { ActionPlan } from "@/types/chat";
 
@@ -36,9 +36,9 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
     if (isCompleted) return <CheckCircle className="w-4 h-4 shrink-0" style={{ color: "var(--color-success)" }} />;
     if (isDeclined || isStopped) return <XCircle className="w-4 h-4 shrink-0" style={{ color: "var(--color-danger)" }} />;
     if (isPaused) return <Pause className="w-4 h-4 shrink-0" style={{ color: "var(--color-warning)" }} />;
-    if (isExecuting) return <Loader2 className="w-4 h-4 shrink-0 animate-spin" style={{ color: "var(--color-info)" }} />;
+    if (isExecuting) return <CircleNotch weight="regular" className="w-4 h-4 shrink-0 animate-spin" style={{ color: "var(--color-info)" }} />;
     if (isApproved) return <Check className="w-4 h-4 shrink-0" style={{ color: "var(--color-success)" }} />;
-    return <ClipboardList className="w-4 h-4 shrink-0 text-muted-foreground" />;
+    return <ClipboardText className="w-4 h-4 shrink-0 text-muted-foreground" />;
   };
 
   const getStatusText = () => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
-import { Search, MessageSquare, ChevronLeft, ChevronRight, X, Bot, Clock } from "lucide-react";
+import { MagnifyingGlass, ChatDots, CaretLeft, CaretRight, X, Robot, Clock } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { getAvatarStyle } from "@/lib/avatar-colors";
 import type { Client, Chat } from "@/types/chat";
@@ -143,7 +143,7 @@ export function SidebarListProto({
                 )}
                 aria-label="Search clients"
               >
-                <Search className="h-3.5 w-3.5" />
+                <MagnifyingGlass className="h-3.5 w-3.5" />
               </button>
             </div>
 
@@ -198,7 +198,7 @@ export function SidebarListProto({
                       </div>
 
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <MessageSquare className="h-3 w-3" />
+                        <ChatDots className="h-3 w-3" />
                         {chatCount} {chatCount === 1 ? "chat" : "chats"}
                       </span>
                     </div>
@@ -258,7 +258,7 @@ export function SidebarListProto({
                 {searchOpen ? (
                   <X className="h-3.5 w-3.5" />
                 ) : (
-                  <Search className="h-3.5 w-3.5" />
+                  <MagnifyingGlass className="h-3.5 w-3.5" />
                 )}
               </button>
             )}
@@ -274,9 +274,9 @@ export function SidebarListProto({
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {collapsed ? (
-                <ChevronRight className="h-3.5 w-3.5" />
+                <CaretRight className="h-3.5 w-3.5" />
               ) : (
-                <ChevronLeft className="h-3.5 w-3.5" />
+                <CaretLeft className="h-3.5 w-3.5" />
               )}
             </button>
           </div>
@@ -291,7 +291,7 @@ export function SidebarListProto({
             )}
           >
             <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-              <Search className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
+              <MagnifyingGlass className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -421,13 +421,13 @@ export function SidebarListProto({
                       <div className="flex items-center gap-1">
                         {unreadChats > 0 && (
                           <span className="flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-primary">
-                            <MessageSquare className="h-2.5 w-2.5" />
+                            <ChatDots className="h-2.5 w-2.5" />
                             {unreadChats}
                           </span>
                         )}
                         {agentUpdates > 0 && (
                           <span className="flex items-center gap-0.5 rounded-full bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-violet-400">
-                            <Bot className="h-2.5 w-2.5" />
+                            <Robot className="h-2.5 w-2.5" />
                             {agentUpdates}
                           </span>
                         )}
@@ -453,7 +453,7 @@ export function SidebarListProto({
                     </span>
                   ) : (
                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <MessageSquare className="h-3 w-3" />
+                      <ChatDots className="h-3 w-3" />
                       {chatCount} {chatCount === 1 ? "chat" : "chats"}
                     </span>
                   )}

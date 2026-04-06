@@ -1,6 +1,6 @@
 "use client";
 
-import { X, ClipboardList, Check, AlertTriangle } from "lucide-react";
+import { X, ClipboardText, Check, Warning } from "@phosphor-icons/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ActionPlan } from "@/types/chat";
 import { PlanStepTimeline } from "./plan-step-timeline";
@@ -22,11 +22,11 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
   const gatedStep = isPausedByGate ? plan.steps.find((s) => s.status === "in_progress") : null;
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "var(--surface-subtle)" }}>
+    <div className="flex flex-col h-full bg-secondary/50">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 shrink-0 border-b" style={{ borderColor: "var(--border-subtle)" }}>
+      <div className="flex items-center justify-between px-4 py-3 shrink-0 border-b" style={{ borderColor: "var(--border)" }}>
         <div className="flex items-center gap-2.5 min-w-0">
-          <ClipboardList className="w-4 h-4 shrink-0 text-muted-foreground" />
+          <ClipboardText className="w-4 h-4 shrink-0 text-muted-foreground" />
           <div className="min-w-0">
             <h3 className="text-sm font-medium truncate text-foreground">{plan.title}</h3>
             <PlanStatusBadge status={plan.status} />
@@ -49,11 +49,11 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
 
           {/* Metadata row */}
           {plan.metadata && (
-            <div className="flex gap-4 mb-4 pb-3 border-b" style={{ borderColor: "var(--border-subtle)" }}>
+            <div className="flex gap-4 mb-4 pb-3 border-b" style={{ borderColor: "var(--border)" }}>
               {plan.metadata.affectedCount && (
                 <div>
                   <span className="text-base font-semibold text-foreground">{plan.metadata.affectedCount}</span>
-                  <span className="text-xs ml-1" style={{ color: "var(--text-quaternary-alpha)" }}>
+                  <span className="text-xs ml-1 text-muted-foreground">
                     {plan.metadata.affectedLabel || "items"}
                   </span>
                 </div>
@@ -76,7 +76,7 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
                 color: "var(--color-warning)",
               }}
             >
-              <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+              <Warning className="w-3.5 h-3.5 shrink-0 mt-0.5" />
               <div>
                 <span className="font-medium">This step cannot be undone.</span>
                 <span className="block mt-0.5" style={{ opacity: 0.75 }}>
@@ -104,7 +104,7 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
       </ScrollArea>
 
       {/* Footer */}
-      <div className="px-4 py-2.5 shrink-0 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+      <div className="px-4 py-2.5 shrink-0 border-t" style={{ borderColor: "var(--border)" }}>
         {plan.status === "pending" ? (
           <div className="flex items-center gap-2">
             {onApprove && (

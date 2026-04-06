@@ -1,6 +1,6 @@
 "use client";
 
-import { Sun, Moon, Palette } from "lucide-react";
+import { Sun, Moon, Palette } from "@phosphor-icons/react";
 import { useTheme, type Colorway } from "@/components/theme-provider";
 import { useState, useRef, useEffect } from "react";
 

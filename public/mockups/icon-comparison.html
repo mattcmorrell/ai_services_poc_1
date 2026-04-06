@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Icon Library Comparison — Panda Command</title>
+
+  <!-- Geist Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide (current) -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/thin/style.css" onload="" onerror=""></script>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/thin/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css">
+
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+
+  <!-- Material Symbols -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,200..300,0,0&display=swap">
+
+  <!-- Heroicons loaded inline via SVG -->
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #101214;
+      --card: #191B1F;
+      --fg: #E8E9ED;
+      --primary: #6878B8;
+      --muted: #222428;
+      --muted-fg: #9DA0A8;
+      --destructive: #E08850;
+      --border: rgba(255,255,255,0.06);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Geist', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ---- Tab Switcher ---- */
+    .switcher {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      gap: 2px;
+      padding: 12px 32px;
+      background: #0C0D0F;
+      border-bottom: 1px solid var(--border);
+    }
+    .switcher button {
+      padding: 8px 20px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted-fg);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .switcher button:hover {
+      color: var(--fg);
+      background: rgba(255,255,255,0.04);
+    }
+    .switcher button.active {
+      color: var(--fg);
+      background: var(--card);
+      border-color: var(--border);
+    }
+    .switcher button .key-hint {
+      display: inline-block;
+      margin-left: 6px;
+      font-size: 11px;
+      color: #999;
+      font-weight: 400;
+      background: rgba(255,255,255,0.05);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* ---- Content ---- */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    .design-panel { display: none; }
+    .design-panel.active { display: block; }
+
+    .library-header {
+      margin-bottom: 32px;
+    }
+    .library-header h2 {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 4px;
+    }
+    .library-header .style-note {
+      font-size: 14px;
+      color: var(--muted-fg);
+    }
+    .library-header .cdn-link {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+      font-family: 'Geist Mono', monospace;
+    }
+    .library-header .cdn-link a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .library-header .cdn-link a:hover { text-decoration: underline; }
+
+    /* ---- Sections ---- */
+    .icon-section {
+      margin-bottom: 36px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted-fg);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-label .size-tag {
+      font-size: 11px;
+      font-weight: 400;
+      color: #999;
+      text-transform: none;
+      letter-spacing: 0;
+      background: rgba(255,255,255,0.04);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .icon-row {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .icon-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-item .icon-label {
+      font-size: 11px;
+      color: #999;
+    }
+
+    /* Agent circle */
+    .agent-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Icon display */
+    .icon-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+    }
+    .icon-display svg {
+      display: block;
+    }
+
+    /* Status icon row */
+    .status-row .icon-display { color: var(--muted-fg); }
+    .status-row .icon-display.check { color: #4CAF87; }
+    .status-row .icon-display.close { color: #E05050; }
+    .status-row .icon-display.warning { color: var(--destructive); }
+
+    /* Dual size row */
+    .dual-size-row {
+      display: flex;
+      gap: 48px;
+      align-items: flex-start;
+    }
+    .size-group {
+      flex: 1;
+    }
+    .size-group-label {
+      font-size: 11px;
+      color: #999;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    /* Zoomed section */
+    .zoomed-row .icon-display {
+      color: var(--muted-fg);
+    }
+
+    /* Material Symbols specific */
+    .material-symbols-outlined {
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 250,
+        'GRAD' 0,
+        'opsz' 24;
+      color: inherit;
+      vertical-align: middle;
+    }
+
+    /* Phosphor specific */
+    .ph-thin, .ph-light {
+      color: inherit;
+      vertical-align: middle;
+    }
+
+    /* Tabler specific */
+    .ti {
+      color: inherit;
+      vertical-align: middle;
+    }
+
+    /* Comparison grid */
+    .comparison-note {
+      margin-top: 12px;
+      padding: 12px 16px;
+      background: rgba(104, 120, 184, 0.06);
+      border: 1px solid rgba(104, 120, 184, 0.12);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--muted-fg);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Tab Switcher -->
+<div class="switcher">
+  <button class="active" data-tab="lucide" title="Current icon library">Lucide<span class="key-hint">1</span></button>
+  <button data-tab="phosphor" title="Geometric, versatile, multiple weights">Phosphor<span class="key-hint">2</span></button>
+  <button data-tab="tabler" title="Sharp, consistent 1.5px stroke">Tabler<span class="key-hint">3</span></button>
+  <button data-tab="heroicons" title="Clean, Apple-esque outlines">Heroicons<span class="key-hint">4</span></button>
+  <button data-tab="material" title="Google's sharp outlined variant">Material Symbols<span class="key-hint">5</span></button>
+</div>
+
+<div class="container">
+
+<!-- ============================================================ -->
+<!-- 1. LUCIDE (Current) -->
+<!-- ============================================================ -->
+<div class="design-panel active" id="panel-lucide">
+  <div class="library-header">
+    <h2>Lucide Icons</h2>
+    <div class="style-note">Rounded, 2px stroke, friendly/organic feel — current icons in Panda Command</div>
+  </div>
+
+  <!-- Nav Sidebar -->
+  <div class="icon-section">
+    <div class="section-label">Nav Sidebar <span class="size-tag">20px &amp; 24px</span></div>
+    <div class="dual-size-row">
+      <div class="size-group">
+        <div class="size-group-label">20px</div>
+        <div class="icon-row">
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></div>
+            <span class="icon-label">Dashboard</span>
+          </div>
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></div>
+            <span class="icon-label">Chat</span>
+          </div>
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div>
+            <span class="icon-label">Agent</span>
+          </div>
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div>
+            <span class="icon-label">Settings</span>
+          </div>
+        </div>
+      </div>
+      <div class="size-group">
+        <div class="size-group-label">24px</div>
+        <div class="icon-row">
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></div>
+            <span class="icon-label">Dashboard</span>
+          </div>
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></div>
+            <span class="icon-label">Chat</span>
+          </div>
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div>
+            <span class="icon-label">Agent</span>
+          </div>
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div>
+            <span class="icon-label">Settings</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Icons -->
+  <div class="icon-section">
+    <div class="section-label">Agent Icons <span class="size-tag">20px in 40px circle</span></div>
+    <div class="icon-row">
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg></div></div>
+        <span class="icon-label">Payroll</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div></div>
+        <span class="icon-label">Presentation</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/><path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/><path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11c-.11.7-.72 1.22-1.43 1.22H17"/><path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7"/><path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/></svg></div></div>
+        <span class="icon-label">Celebration</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg></div></div>
+        <span class="icon-label">AI/Sparkle</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div></div>
+        <span class="icon-label">Star</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div>
+        <span class="icon-label">Clock</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div>
+        <span class="icon-label">Users</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg></div></div>
+        <span class="icon-label">Calculator</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Indicators -->
+  <div class="icon-section">
+    <div class="section-label">Status Indicators <span class="size-tag">16px</span></div>
+    <div class="icon-row status-row">
+      <div class="icon-item">
+        <div class="icon-display check"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <span class="icon-label">Check</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display close"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+        <span class="icon-label">Close</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display warning"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
+        <span class="icon-label">Warning</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>
+        <span class="icon-label">Loader</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></svg></div>
+        <span class="icon-label">Pause</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg></div>
+        <span class="icon-label">Play</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="icon-section">
+    <div class="section-label">Actions <span class="size-tag">20px</span></div>
+    <div class="icon-row">
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></div>
+        <span class="icon-label">Plus</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+        <span class="icon-label">Search</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></div>
+        <span class="icon-label">Microphone</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div>
+        <span class="icon-label">Filter</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+        <span class="icon-label">Arrow</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zoomed -->
+  <div class="icon-section">
+    <div class="section-label">Zoomed Detail <span class="size-tag">48px</span></div>
+    <div class="icon-row zoomed-row">
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></div>
+        <span class="icon-label">Dashboard</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></div>
+        <span class="icon-label">Chat</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <span class="icon-label">Settings</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <span class="icon-label">Star</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+        <span class="icon-label">Search</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg></div>
+        <span class="icon-label">Sparkle</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="comparison-note">
+    <strong>Baseline:</strong> Lucide uses rounded endcaps, 2px stroke, and generous corner radii. At 16-20px the rounded strokes can appear "lumpy" — details merge together and the icons read as soft/friendly rather than precise/technical.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 2. PHOSPHOR (Thin + Light) -->
+<!-- ============================================================ -->
+<div class="design-panel" id="panel-phosphor">
+  <div class="library-header">
+    <h2>Phosphor Icons</h2>
+    <div class="style-note">Geometric, 6 weights (using thin + light here), clean mathematical forms, square/sharp endcaps</div>
+  </div>
+
+  <!-- Nav Sidebar -->
+  <div class="icon-section">
+    <div class="section-label">Nav Sidebar <span class="size-tag">20px &amp; 24px — thin weight</span></div>
+    <div class="dual-size-row">
+      <div class="size-group">
+        <div class="size-group-label">20px (thin)</div>
+        <div class="icon-row">
+          <div class="icon-item"><div class="icon-display"><i class="ph-thin ph-squares-four" style="font-size:20px"></i></div><span class="icon-label">Dashboard</span></div>
+          <div class="icon-item"><div class="icon-display"><i class="ph-thin ph-chat-circle" style="font-size:20px"></i></div><span class="icon-label">Chat</span></div>
+          <div class="icon-item"><div class="icon-display"><i class="ph-thin ph-robot" style="font-size:20px"></i></div><span class="icon-label">Agent</span></div>
+          <div class="icon-item"><div class="icon-display"><i class="ph-thin ph-gear" style="font-size:20px"></i></div><span class="icon-label">Settings</span></div>
+        </div>
+      </div>
+      <div class="size-group">
+        <div class="size-group-label">24px (light)</div>
+        <div class="icon-row">
+          <div class="icon-item"><div class="icon-display"><i class="ph-light ph-squares-four" style="font-size:24px"></i></div><span class="icon-label">Dashboard</span></div>
+          <div class="icon-item"><div class="icon-display"><i class="ph-light ph-chat-circle" style="font-size:24px"></i></div><span class="icon-label">Chat</span></div>
+          <div class="icon-item"><div class="icon-display"><i class="ph-light ph-robot" style="font-size:24px"></i></div><span class="icon-label">Agent</span></div>
+          <div class="icon-item"><div class="icon-display"><i class="ph-light ph-gear" style="font-size:24px"></i></div><span class="icon-label">Settings</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Icons -->
+  <div class="icon-section">
+    <div class="section-label">Agent Icons <span class="size-tag">20px in 40px circle — light weight</span></div>
+    <div class="icon-row">
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ph-light ph-currency-dollar" style="font-size:20px"></i></div></div><span class="icon-label">Payroll</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ph-light ph-presentation-chart" style="font-size:20px"></i></div></div><span class="icon-label">Presentation</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ph-light ph-confetti" style="font-size:20px"></i></div></div><span class="icon-label">Celebration</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ph-light ph-sparkle" style="font-size:20px"></i></div></div><span class="icon-label">AI/Sparkle</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ph-light ph-star" style="font-size:20px"></i></div></div><span class="icon-label">Star</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ph-light ph-clock" style="font-size:20px"></i></div></div><span class="icon-label">Clock</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ph-light ph-users-three" style="font-size:20px"></i></div></div><span class="icon-label">Users</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ph-light ph-calculator" style="font-size:20px"></i></div></div><span class="icon-label">Calculator</span></div>
+    </div>
+  </div>
+
+  <!-- Status Indicators -->
+  <div class="icon-section">
+    <div class="section-label">Status Indicators <span class="size-tag">16px — light weight</span></div>
+    <div class="icon-row status-row">
+      <div class="icon-item"><div class="icon-display check"><i class="ph-light ph-check" style="font-size:16px"></i></div><span class="icon-label">Check</span></div>
+      <div class="icon-item"><div class="icon-display close"><i class="ph-light ph-x" style="font-size:16px"></i></div><span class="icon-label">Close</span></div>
+      <div class="icon-item"><div class="icon-display warning"><i class="ph-light ph-warning" style="font-size:16px"></i></div><span class="icon-label">Warning</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ph-light ph-spinner" style="font-size:16px"></i></div><span class="icon-label">Loader</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ph-light ph-pause" style="font-size:16px"></i></div><span class="icon-label">Pause</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ph-light ph-play" style="font-size:16px"></i></div><span class="icon-label">Play</span></div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="icon-section">
+    <div class="section-label">Actions <span class="size-tag">20px — light weight</span></div>
+    <div class="icon-row">
+      <div class="icon-item"><div class="icon-display"><i class="ph-light ph-plus" style="font-size:20px"></i></div><span class="icon-label">Plus</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ph-light ph-magnifying-glass" style="font-size:20px"></i></div><span class="icon-label">Search</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ph-light ph-microphone" style="font-size:20px"></i></div><span class="icon-label">Microphone</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ph-light ph-funnel" style="font-size:20px"></i></div><span class="icon-label">Filter</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ph-light ph-arrow-right" style="font-size:20px"></i></div><span class="icon-label">Arrow</span></div>
+    </div>
+  </div>
+
+  <!-- Zoomed -->
+  <div class="icon-section">
+    <div class="section-label">Zoomed Detail <span class="size-tag">48px — thin weight</span></div>
+    <div class="icon-row zoomed-row">
+      <div class="icon-item"><div class="icon-display"><i class="ph-thin ph-squares-four" style="font-size:48px"></i></div><span class="icon-label">Dashboard</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ph-thin ph-chat-circle" style="font-size:48px"></i></div><span class="icon-label">Chat</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ph-thin ph-gear" style="font-size:48px"></i></div><span class="icon-label">Settings</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ph-thin ph-star" style="font-size:48px"></i></div><span class="icon-label">Star</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ph-thin ph-magnifying-glass" style="font-size:48px"></i></div><span class="icon-label">Search</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ph-thin ph-sparkle" style="font-size:48px"></i></div><span class="icon-label">Sparkle</span></div>
+    </div>
+  </div>
+
+  <div class="comparison-note">
+    <strong>Key difference:</strong> Phosphor's thin/light weights use 1-1.5px strokes with geometric construction. The icons feel precise and scientific. Six weight options (thin/light/regular/bold/fill/duotone) allow fine-tuning density per context. React package: <code>@phosphor-icons/react</code>.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 3. TABLER -->
+<!-- ============================================================ -->
+<div class="design-panel" id="panel-tabler">
+  <div class="library-header">
+    <h2>Tabler Icons</h2>
+    <div class="style-note">Sharp, consistent 1.5px stroke, squared terminals, 5800+ icons — technical and utilitarian</div>
+  </div>
+
+  <!-- Nav Sidebar -->
+  <div class="icon-section">
+    <div class="section-label">Nav Sidebar <span class="size-tag">20px &amp; 24px</span></div>
+    <div class="dual-size-row">
+      <div class="size-group">
+        <div class="size-group-label">20px</div>
+        <div class="icon-row">
+          <div class="icon-item"><div class="icon-display"><i class="ti ti-layout-dashboard" style="font-size:20px"></i></div><span class="icon-label">Dashboard</span></div>
+          <div class="icon-item"><div class="icon-display"><i class="ti ti-message" style="font-size:20px"></i></div><span class="icon-label">Chat</span></div>
+          <div class="icon-item"><div class="icon-display"><i class="ti ti-robot" style="font-size:20px"></i></div><span class="icon-label">Agent</span></div>
+          <div class="icon-item"><div class="icon-display"><i class="ti ti-settings" style="font-size:20px"></i></div><span class="icon-label">Settings</span></div>
+        </div>
+      </div>
+      <div class="size-group">
+        <div class="size-group-label">24px</div>
+        <div class="icon-row">
+          <div class="icon-item"><div class="icon-display"><i class="ti ti-layout-dashboard" style="font-size:24px"></i></div><span class="icon-label">Dashboard</span></div>
+          <div class="icon-item"><div class="icon-display"><i class="ti ti-message" style="font-size:24px"></i></div><span class="icon-label">Chat</span></div>
+          <div class="icon-item"><div class="icon-display"><i class="ti ti-robot" style="font-size:24px"></i></div><span class="icon-label">Agent</span></div>
+          <div class="icon-item"><div class="icon-display"><i class="ti ti-settings" style="font-size:24px"></i></div><span class="icon-label">Settings</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Icons -->
+  <div class="icon-section">
+    <div class="section-label">Agent Icons <span class="size-tag">20px in 40px circle</span></div>
+    <div class="icon-row">
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ti ti-cash" style="font-size:20px"></i></div></div><span class="icon-label">Payroll</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ti ti-presentation" style="font-size:20px"></i></div></div><span class="icon-label">Presentation</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ti ti-confetti" style="font-size:20px"></i></div></div><span class="icon-label">Celebration</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ti ti-sparkles" style="font-size:20px"></i></div></div><span class="icon-label">AI/Sparkle</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ti ti-star" style="font-size:20px"></i></div></div><span class="icon-label">Star</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ti ti-clock" style="font-size:20px"></i></div></div><span class="icon-label">Clock</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ti ti-users" style="font-size:20px"></i></div></div><span class="icon-label">Users</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><i class="ti ti-calculator" style="font-size:20px"></i></div></div><span class="icon-label">Calculator</span></div>
+    </div>
+  </div>
+
+  <!-- Status Indicators -->
+  <div class="icon-section">
+    <div class="section-label">Status Indicators <span class="size-tag">16px</span></div>
+    <div class="icon-row status-row">
+      <div class="icon-item"><div class="icon-display check"><i class="ti ti-check" style="font-size:16px"></i></div><span class="icon-label">Check</span></div>
+      <div class="icon-item"><div class="icon-display close"><i class="ti ti-x" style="font-size:16px"></i></div><span class="icon-label">Close</span></div>
+      <div class="icon-item"><div class="icon-display warning"><i class="ti ti-alert-triangle" style="font-size:16px"></i></div><span class="icon-label">Warning</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-loader" style="font-size:16px"></i></div><span class="icon-label">Loader</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-player-pause" style="font-size:16px"></i></div><span class="icon-label">Pause</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-player-play" style="font-size:16px"></i></div><span class="icon-label">Play</span></div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="icon-section">
+    <div class="section-label">Actions <span class="size-tag">20px</span></div>
+    <div class="icon-row">
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-plus" style="font-size:20px"></i></div><span class="icon-label">Plus</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-search" style="font-size:20px"></i></div><span class="icon-label">Search</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-microphone" style="font-size:20px"></i></div><span class="icon-label">Microphone</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-filter" style="font-size:20px"></i></div><span class="icon-label">Filter</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-arrow-right" style="font-size:20px"></i></div><span class="icon-label">Arrow</span></div>
+    </div>
+  </div>
+
+  <!-- Zoomed -->
+  <div class="icon-section">
+    <div class="section-label">Zoomed Detail <span class="size-tag">48px</span></div>
+    <div class="icon-row zoomed-row">
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-layout-dashboard" style="font-size:48px"></i></div><span class="icon-label">Dashboard</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-message" style="font-size:48px"></i></div><span class="icon-label">Chat</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-settings" style="font-size:48px"></i></div><span class="icon-label">Settings</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-star" style="font-size:48px"></i></div><span class="icon-label">Star</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-search" style="font-size:48px"></i></div><span class="icon-label">Search</span></div>
+      <div class="icon-item"><div class="icon-display"><i class="ti ti-sparkles" style="font-size:48px"></i></div><span class="icon-label">Sparkle</span></div>
+    </div>
+  </div>
+
+  <div class="comparison-note">
+    <strong>Key difference:</strong> Tabler icons use a consistent 1.5px stroke with squared-off terminals instead of rounded caps. This creates a crisper, more utilitarian look — especially visible at small sizes where Lucide's rounded caps blur together. React package: <code>@tabler/icons-react</code>.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 4. HEROICONS -->
+<!-- ============================================================ -->
+<div class="design-panel" id="panel-heroicons">
+  <div class="library-header">
+    <h2>Heroicons</h2>
+    <div class="style-note">Clean, Apple-esque outlines, 1.5px stroke, elegant geometry by the Tailwind team</div>
+  </div>
+
+  <!-- Nav Sidebar -->
+  <div class="icon-section">
+    <div class="section-label">Nav Sidebar <span class="size-tag">20px &amp; 24px</span></div>
+    <div class="dual-size-row">
+      <div class="size-group">
+        <div class="size-group-label">20px (mini outline)</div>
+        <div class="icon-row">
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+            <span class="icon-label">Dashboard</span>
+          </div>
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"/></svg></div>
+            <span class="icon-label">Chat</span>
+          </div>
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg></div>
+            <span class="icon-label">Agent</span>
+          </div>
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.431.992a6.759 6.759 0 0 1 0 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281Z"/><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg></div>
+            <span class="icon-label">Settings</span>
+          </div>
+        </div>
+      </div>
+      <div class="size-group">
+        <div class="size-group-label">24px (outline)</div>
+        <div class="icon-row">
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+            <span class="icon-label">Dashboard</span>
+          </div>
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"/></svg></div>
+            <span class="icon-label">Chat</span>
+          </div>
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg></div>
+            <span class="icon-label">Agent</span>
+          </div>
+          <div class="icon-item">
+            <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.431.992a6.759 6.759 0 0 1 0 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281Z"/><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg></div>
+            <span class="icon-label">Settings</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Icons -->
+  <div class="icon-section">
+    <div class="section-label">Agent Icons <span class="size-tag">20px in 40px circle</span></div>
+    <div class="icon-row">
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg></div></div>
+        <span class="icon-label">Payroll</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605"/></svg></div></div>
+        <span class="icon-label">Presentation</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg></div></div>
+        <span class="icon-label">Celebration</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg></div></div>
+        <span class="icon-label">AI/Sparkle</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"/></svg></div></div>
+        <span class="icon-label">Star</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg></div></div>
+        <span class="icon-label">Clock</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg></div></div>
+        <span class="icon-label">Users</span>
+      </div>
+      <div class="icon-item">
+        <div class="agent-circle"><div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25v-.008Zm2.25-4.5h.008v.008H10.5v-.008Zm0 2.25h.008v.008H10.5v-.008Zm0 2.25h.008v.008H10.5v-.008Zm2.25-4.5h.008v.008H12.75v-.008Zm0 2.25h.008v.008H12.75v-.008Zm2.25-2.25h.008v.008H15v-.008Zm0 2.25h.008v.008H15v-.008ZM6 18.75V15a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 15v3.75m-12 0a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 18.75m-12 0v-1.5A2.25 2.25 0 0 1 8.25 15h7.5A2.25 2.25 0 0 1 18 17.25v1.5m-9-10.5h6m-6 0v-3a1.5 1.5 0 0 1 1.5-1.5h3a1.5 1.5 0 0 1 1.5 1.5v3m-6 0h6"/></svg></div></div>
+        <span class="icon-label">Calculator</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Indicators -->
+  <div class="icon-section">
+    <div class="section-label">Status Indicators <span class="size-tag">16px</span></div>
+    <div class="icon-row status-row">
+      <div class="icon-item">
+        <div class="icon-display check"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m4.5 12.75 6 6 9-13.5"/></svg></div>
+        <span class="icon-label">Check</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display close"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 18 18 6M6 6l12 12"/></svg></div>
+        <span class="icon-label">Close</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display warning"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg></div>
+        <span class="icon-label">Warning</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182"/></svg></div>
+        <span class="icon-label">Loader</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15.75 5.25v13.5m-7.5-13.5v13.5"/></svg></div>
+        <span class="icon-label">Pause</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"/></svg></div>
+        <span class="icon-label">Play</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="icon-section">
+    <div class="section-label">Actions <span class="size-tag">20px</span></div>
+    <div class="icon-row">
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4.5v15m7.5-7.5h-15"/></svg></div>
+        <span class="icon-label">Plus</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg></div>
+        <span class="icon-label">Search</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"/></svg></div>
+        <span class="icon-label">Microphone</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/></svg></div>
+        <span class="icon-label">Filter</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg></div>
+        <span class="icon-label">Arrow</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zoomed -->
+  <div class="icon-section">
+    <div class="section-label">Zoomed Detail <span class="size-tag">48px</span></div>
+    <div class="icon-row zoomed-row">
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+        <span class="icon-label">Dashboard</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"/></svg></div>
+        <span class="icon-label">Chat</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.431.992a6.759 6.759 0 0 1 0 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281Z"/><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg></div>
+        <span class="icon-label">Settings</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"/></svg></div>
+        <span class="icon-label">Star</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg></div>
+        <span class="icon-label">Search</span>
+      </div>
+      <div class="icon-item">
+        <div class="icon-display"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg></div>
+        <span class="icon-label">Sparkle</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="comparison-note">
+    <strong>Key difference:</strong> Heroicons use 1.5px stroke with rounded joins but slightly tighter geometry than Lucide. The icons feel polished and modern (Tailwind/Apple aesthetic) but may still be too rounded for a hardcore mission control feel. React package: <code>@heroicons/react</code>. Only ~300 icons total — smallest library here.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 5. MATERIAL SYMBOLS -->
+<!-- ============================================================ -->
+<div class="design-panel" id="panel-material">
+  <div class="library-header">
+    <h2>Material Symbols (Outlined)</h2>
+    <div class="style-note">Google's variable-font icon system, weight 250, optical-size aware, sharp geometric construction</div>
+  </div>
+
+  <!-- Nav Sidebar -->
+  <div class="icon-section">
+    <div class="section-label">Nav Sidebar <span class="size-tag">20px &amp; 24px — weight 250</span></div>
+    <div class="dual-size-row">
+      <div class="size-group">
+        <div class="size-group-label">20px</div>
+        <div class="icon-row">
+          <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">dashboard</span></div><span class="icon-label">Dashboard</span></div>
+          <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">chat</span></div><span class="icon-label">Chat</span></div>
+          <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">smart_toy</span></div><span class="icon-label">Agent</span></div>
+          <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">settings</span></div><span class="icon-label">Settings</span></div>
+        </div>
+      </div>
+      <div class="size-group">
+        <div class="size-group-label">24px</div>
+        <div class="icon-row">
+          <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:24px;font-variation-settings:'opsz' 24,'wght' 250">dashboard</span></div><span class="icon-label">Dashboard</span></div>
+          <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:24px;font-variation-settings:'opsz' 24,'wght' 250">chat</span></div><span class="icon-label">Chat</span></div>
+          <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:24px;font-variation-settings:'opsz' 24,'wght' 250">smart_toy</span></div><span class="icon-label">Agent</span></div>
+          <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:24px;font-variation-settings:'opsz' 24,'wght' 250">settings</span></div><span class="icon-label">Settings</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Icons -->
+  <div class="icon-section">
+    <div class="section-label">Agent Icons <span class="size-tag">20px in 40px circle</span></div>
+    <div class="icon-row">
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">payments</span></div></div><span class="icon-label">Payroll</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">co_present</span></div></div><span class="icon-label">Presentation</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">celebration</span></div></div><span class="icon-label">Celebration</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">auto_awesome</span></div></div><span class="icon-label">AI/Sparkle</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">star</span></div></div><span class="icon-label">Star</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">schedule</span></div></div><span class="icon-label">Clock</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">group</span></div></div><span class="icon-label">Users</span></div>
+      <div class="icon-item"><div class="agent-circle"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">calculate</span></div></div><span class="icon-label">Calculator</span></div>
+    </div>
+  </div>
+
+  <!-- Status Indicators -->
+  <div class="icon-section">
+    <div class="section-label">Status Indicators <span class="size-tag">16px — weight 250</span></div>
+    <div class="icon-row status-row">
+      <div class="icon-item"><div class="icon-display check"><span class="material-symbols-outlined" style="font-size:16px;font-variation-settings:'opsz' 20,'wght' 250">check</span></div><span class="icon-label">Check</span></div>
+      <div class="icon-item"><div class="icon-display close"><span class="material-symbols-outlined" style="font-size:16px;font-variation-settings:'opsz' 20,'wght' 250">close</span></div><span class="icon-label">Close</span></div>
+      <div class="icon-item"><div class="icon-display warning"><span class="material-symbols-outlined" style="font-size:16px;font-variation-settings:'opsz' 20,'wght' 250">warning</span></div><span class="icon-label">Warning</span></div>
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:16px;font-variation-settings:'opsz' 20,'wght' 250">progress_activity</span></div><span class="icon-label">Loader</span></div>
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:16px;font-variation-settings:'opsz' 20,'wght' 250">pause</span></div><span class="icon-label">Pause</span></div>
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:16px;font-variation-settings:'opsz' 20,'wght' 250">play_arrow</span></div><span class="icon-label">Play</span></div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="icon-section">
+    <div class="section-label">Actions <span class="size-tag">20px</span></div>
+    <div class="icon-row">
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">add</span></div><span class="icon-label">Plus</span></div>
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">search</span></div><span class="icon-label">Search</span></div>
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">mic</span></div><span class="icon-label">Microphone</span></div>
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">filter_alt</span></div><span class="icon-label">Filter</span></div>
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'opsz' 20,'wght' 250">arrow_forward</span></div><span class="icon-label">Arrow</span></div>
+    </div>
+  </div>
+
+  <!-- Zoomed -->
+  <div class="icon-section">
+    <div class="section-label">Zoomed Detail <span class="size-tag">48px — weight 200</span></div>
+    <div class="icon-row zoomed-row">
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:48px;font-variation-settings:'opsz' 48,'wght' 200">dashboard</span></div><span class="icon-label">Dashboard</span></div>
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:48px;font-variation-settings:'opsz' 48,'wght' 200">chat</span></div><span class="icon-label">Chat</span></div>
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:48px;font-variation-settings:'opsz' 48,'wght' 200">settings</span></div><span class="icon-label">Settings</span></div>
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:48px;font-variation-settings:'opsz' 48,'wght' 200">star</span></div><span class="icon-label">Star</span></div>
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:48px;font-variation-settings:'opsz' 48,'wght' 200">search</span></div><span class="icon-label">Search</span></div>
+      <div class="icon-item"><div class="icon-display"><span class="material-symbols-outlined" style="font-size:48px;font-variation-settings:'opsz' 48,'wght' 200">auto_awesome</span></div><span class="icon-label">Sparkle</span></div>
+    </div>
+  </div>
+
+  <div class="comparison-note">
+    <strong>Key difference:</strong> Material Symbols use a variable font with adjustable weight (200-700), optical size, fill, and grade. At weight 200-250 with outlined style, they feel sharp and technical. The optical-size axis means icons auto-optimize for their display size. Downsides: distinctly "Google" aesthetic, font file is large (~2MB for full set). React integration requires <code>@material-symbols/react-400</code> or similar.
+  </div>
+</div>
+
+</div><!-- .container -->
+
+<!-- Tab switching logic -->
+<script>
+(function() {
+  var tabs = ['lucide', 'phosphor', 'tabler', 'heroicons', 'material'];
+  var buttons = document.querySelectorAll('.switcher button');
+  var panels = tabs.map(function(t) { return document.getElementById('panel-' + t); });
+
+  function switchTo(idx) {
+    buttons.forEach(function(b, i) {
+      b.classList.toggle('active', i === idx);
+    });
+    panels.forEach(function(p, i) {
+      if (p) p.classList.toggle('active', i === idx);
+    });
+  }
+
+  buttons.forEach(function(btn, idx) {
+    btn.addEventListener('click', function() { switchTo(idx); });
+  });
+
+  // Keyboard shortcuts 1-5
+  document.addEventListener('keydown', function(e) {
+    // Don't trigger if user is typing in an input/textarea
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+    var num = parseInt(e.key);
+    if (num >= 1 && num <= 5) {
+      switchTo(num - 1);
+    }
+  });
+})();
+</script>
+
+<script src="feedback-panel.js"></script>
+</body>
+</html>

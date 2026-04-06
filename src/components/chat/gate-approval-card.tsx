@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useCallback } from "react";
-import { Check, ShieldAlert, Pencil, X } from "lucide-react";
+import { Check, ShieldWarning, PencilSimple, X } from "@phosphor-icons/react";
 import { ActionPlan } from "@/types/chat";
 
 interface GateApprovalCardProps {
@@ -91,7 +91,7 @@ export function GateApprovalCard({
       {/* Header */}
       <div className="flex items-center gap-2.5 px-5 py-3 border-b border-border bg-muted/30">
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted/60">
-          <ShieldAlert className="w-4 h-4 text-foreground/40" />
+          <ShieldWarning className="w-4 h-4 text-foreground/40" />
         </div>
         <div>
           <div className="text-[12px] font-medium tracking-wide uppercase text-muted-foreground">
@@ -123,7 +123,7 @@ export function GateApprovalCard({
           onClick={onModify}
           className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 bg-transparent text-red-400 cursor-pointer hover:bg-red-500/10 border border-red-500/30"
         >
-          <Pencil className="w-3.5 h-3.5" />
+          <PencilSimple className="w-3.5 h-3.5" />
           Modify
         </button>
       </div>

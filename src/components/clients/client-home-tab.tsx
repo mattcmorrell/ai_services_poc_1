@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import {
-  MessageSquare,
-  Building2,
+  ChatDots,
+  Buildings,
   MapPin,
   Phone,
-  AlertTriangle,
-  ClipboardList,
+  Warning,
+  ClipboardText,
   ArrowRight,
-  Sparkles,
+  Sparkle,
   Users,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { Client, Chat } from "@/types/chat";
 import { getClientHomeData, type Severity } from "@/data/client-home-data";
 import { getAvatarStyle } from "@/lib/avatar-colors";
@@ -81,7 +81,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
               {meta && (
                 <>
                   <span className="flex items-center gap-1">
-                    <Building2 className="h-3 w-3" />
+                    <Buildings className="h-3 w-3" />
                     {meta.industry}
                   </span>
                   <span className="flex items-center gap-1">
@@ -105,7 +105,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
       {homeData.attentionItems.length > 0 && (
         <div className="mb-6 rounded-lg border border-border bg-card">
           <div className="flex items-center gap-2 border-b border-border px-5 py-3">
-            <AlertTriangle className="h-4 w-4 text-amber-400" />
+            <Warning className="h-4 w-4 text-amber-400" />
             <span className="text-xs font-semibold uppercase tracking-wide">Needs Attention</span>
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1.5 text-[11px] font-semibold text-foreground/70">
               {homeData.attentionItems.length}
@@ -154,7 +154,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
         <div className="col-span-3 rounded-lg border border-border bg-card">
           <div className="flex items-center justify-between border-b border-border px-5 py-3">
             <div className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
+              <ChatDots className="h-4 w-4 text-muted-foreground" />
               <span className="text-xs font-semibold uppercase tracking-wide">Recent Chats</span>
             </div>
             <button className="flex items-center gap-1 text-xs font-medium text-primary transition-colors hover:text-primary/80">
@@ -191,7 +191,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
         <div className="col-span-2 rounded-lg border border-border bg-card">
           <div className="flex items-center justify-between border-b border-border px-5 py-3">
             <div className="flex items-center gap-2">
-              <ClipboardList className="h-4 w-4 text-muted-foreground" />
+              <ClipboardText className="h-4 w-4 text-muted-foreground" />
               <span className="text-xs font-semibold uppercase tracking-wide">Active Plans</span>
             </div>
             <span className="text-xs text-muted-foreground">{homeData.activePlans.length} plans</span>
@@ -230,7 +230,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
       {/* --- Recent Activity --- */}
       <div className="mb-2">
         <div className="mb-3 flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-muted-foreground" />
+          <Sparkle className="h-4 w-4 text-muted-foreground" />
           <span className="text-xs font-semibold uppercase tracking-wide">Recent Activity</span>
           {homeData.recentActivity.team.length > 3 && (
             <button

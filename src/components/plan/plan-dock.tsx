@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import {
-  ChevronDown,
-  ChevronUp,
-  ClipboardList,
+  CaretDown,
+  CaretUp,
+  ClipboardText,
   Brain,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { ActionPlan } from "@/types/chat";
 import { PlanStepTimeline } from "./plan-step-timeline";
 import { PlanControls, PlanStatusBadge } from "./plan-controls";
@@ -31,7 +31,7 @@ export function PlanDock({ plan, onPause, onStop, onResume }: PlanDockProps) {
     plan.status === "executing" ? "var(--color-info)"
     : plan.status === "paused" ? "var(--color-warning)"
     : plan.status === "completed" ? "var(--color-success)"
-    : "var(--text-quaternary-alpha)";
+    : "var(--muted-foreground)";
 
   return (
     <div className="relative z-20 shrink-0 border-b border-border">
@@ -40,7 +40,7 @@ export function PlanDock({ plan, onPause, onStop, onResume }: PlanDockProps) {
         className="flex items-center gap-3 px-6 py-3 cursor-pointer select-none transition-colors"
         style={{ ["--tw-bg-opacity" as string]: 1 }}
         onClick={() => setExpanded(!expanded)}
-        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface-hover)")}
+        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent)")}
         onMouseLeave={(e) => (e.currentTarget.style.background = "")}
       >
         {/* Status dot */}
@@ -68,13 +68,13 @@ export function PlanDock({ plan, onPause, onStop, onResume }: PlanDockProps) {
         {/* Mini progress bar */}
         <div className="flex items-center gap-3 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-20 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--surface-subtle)" }}>
+            <div className="w-20 h-1.5 rounded-full overflow-hidden bg-secondary">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{ width: `${progress}%`, background: "var(--color-success)" }}
               />
             </div>
-            <span className="text-[11px] font-mono tabular-nums font-medium" style={{ color: "var(--text-tertiary-alpha)" }}>
+            <span className="text-[11px] font-mono tabular-nums font-medium text-muted-foreground">
               {completedSteps}/{totalSteps}
             </span>
           </div>
@@ -86,14 +86,14 @@ export function PlanDock({ plan, onPause, onStop, onResume }: PlanDockProps) {
 
           {/* Expand/collapse chevron */}
           <div className="text-muted-foreground">
-            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {expanded ? <CaretUp className="w-4 h-4" /> : <CaretDown className="w-4 h-4" />}
           </div>
         </div>
       </div>
 
       {/* Expanded section */}
       {expanded && (
-        <div className="px-6 pb-4 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+        <div className="px-6 pb-4 border-t border-border">
           <div className="pt-3 max-w-2xl">
             <PlanStepTimeline steps={plan.steps} compact />
 
@@ -109,25 +109,24 @@ export function PlanDock({ plan, onPause, onStop, onResume }: PlanDockProps) {
             {/* Agent log flyout */}
             {showAgentLog && (
               <div
-                className="mt-2 p-3 rounded-lg space-y-2 max-h-40 overflow-y-auto font-mono"
-                style={{ background: "var(--surface-subtle)", border: "1px solid var(--border-subtle)" }}
+                className="mt-2 p-3 rounded-lg space-y-2 max-h-40 overflow-y-auto font-mono bg-secondary border border-border"
               >
                 {plan.steps
                   .filter((s) => s.thinkingLog && s.thinkingLog.length > 0)
                   .flatMap((step) =>
                     step.thinkingLog!.map((log, i) => (
                       <div key={`${step.id}-${i}`} className="flex gap-2">
-                        <span className="text-[11px] shrink-0" style={{ color: "var(--text-quaternary-alpha)" }}>
+                        <span className="text-[11px] shrink-0 text-muted-foreground opacity-60">
                           [{step.description.slice(0, 20)}...]
                         </span>
-                        <span className="text-[11px]" style={{ color: "var(--text-tertiary-alpha)" }}>
+                        <span className="text-[11px] text-muted-foreground">
                           {log}
                         </span>
                       </div>
                     ))
                   )}
                 {plan.steps.every((s) => !s.thinkingLog || s.thinkingLog.length === 0) && (
-                  <p className="text-[11px]" style={{ color: "var(--text-quaternary-alpha)" }}>
+                  <p className="text-[11px] text-muted-foreground opacity-60">
                     No agent logs yet.
                   </p>
                 )}

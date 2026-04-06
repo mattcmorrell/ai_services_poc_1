@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { ChevronDown, Check, Search, MessageSquare } from "lucide-react";
+import { CaretDown, Check, MagnifyingGlass, ChatDots } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { getAvatarStyle } from "@/lib/avatar-colors";
 import type { Client, Chat } from "@/types/chat";
@@ -188,7 +188,7 @@ export function DropdownSwitcher({
           ) : (
             <span>Select a client&hellip;</span>
           )}
-          <ChevronDown
+          <CaretDown
             className={cn(
               "h-3.5 w-3.5 text-muted-foreground transition-transform duration-150",
               open && "rotate-180"
@@ -219,7 +219,7 @@ export function DropdownSwitcher({
               {/* Search */}
               <div className="border-b border-border p-2">
                 <div className="relative">
-                  <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                  <MagnifyingGlass className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                   <input
                     ref={searchRef}
                     type="text"
@@ -274,7 +274,7 @@ export function DropdownSwitcher({
                           </span>
                           {chatCount > 0 && (
                             <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                              <MessageSquare className="h-3 w-3" />
+                              <ChatDots className="h-3 w-3" />
                               {chatCount} {chatCount === 1 ? "chat" : "chats"}
                             </span>
                           )}

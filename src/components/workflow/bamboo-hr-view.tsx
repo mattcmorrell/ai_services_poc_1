@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, RotateCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowClockwise } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 
 interface BambooHRViewProps {
@@ -19,7 +19,7 @@ export function BambooHRView({ stepTitle }: BambooHRViewProps) {
           <ArrowRight className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-600 dark:text-stone-400">
-          <RotateCw className="h-4 w-4" />
+          <ArrowClockwise className="h-4 w-4" />
         </Button>
         <div className="flex-1 rounded-full bg-stone-100 dark:bg-stone-700 px-4 py-1.5 text-sm text-stone-600 dark:text-stone-300">
           www.bamboohr.com/payroll

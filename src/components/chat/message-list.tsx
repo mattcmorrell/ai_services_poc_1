@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import {
-  ChevronDown,
-  ChevronRight,
-  ArrowUpDown,
+  CaretDown,
+  CaretRight,
+  ArrowsDownUp,
   ThumbsUp,
   Check,
-  MoreHorizontal,
-} from "lucide-react";
+  DotsThree,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Message, Artifact } from "@/types/chat";
@@ -117,7 +117,7 @@ const defaultTransform = (content: string) => {
       const headerCells = headerRow.split("|").filter(c => c.trim()).map(c => `<th style="padding:4px 8px;text-align:left;font-weight:600;border-bottom:1px solid var(--border)">${inlineMd(c.trim())}</th>`);
       let html = `<table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:12px"><thead><tr>${headerCells.join("")}</tr></thead><tbody>`;
       for (const row of dataRows) {
-        const cells = row.split("|").filter(c => c.trim()).map(c => `<td style="padding:4px 8px;border-bottom:1px solid var(--border-subtle)">${inlineMd(c.trim())}</td>`);
+        const cells = row.split("|").filter(c => c.trim()).map(c => `<td style="padding:4px 8px;border-bottom:1px solid var(--border)">${inlineMd(c.trim())}</td>`);
         html += `<tr>${cells.join("")}</tr>`;
       }
       html += "</tbody></table>";
@@ -217,9 +217,9 @@ export function MessageList({
               style={theme.thinkingToggleStyle}
             >
               {expandedThinking[message.id] ? (
-                <ChevronDown className="h-3.5 w-3.5" />
+                <CaretDown className="h-3.5 w-3.5" />
               ) : (
-                <ChevronRight className="h-3.5 w-3.5" />
+                <CaretRight className="h-3.5 w-3.5" />
               )}
               {theme.thinkingLabel || "Show thinking"}
             </button>
@@ -264,9 +264,9 @@ export function MessageList({
                     className="mb-2 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {isExpanded ? (
-                      <ChevronDown className="h-3 w-3" />
+                      <CaretDown className="h-3 w-3" />
                     ) : (
-                      <ChevronRight className="h-3 w-3" />
+                      <CaretRight className="h-3 w-3" />
                     )}
                     {isExpanded ? "Hide response" : "Show full response"}
                   </button>
@@ -400,7 +400,7 @@ export function MessageList({
                 className="mt-4 flex w-full items-center gap-3 rounded-lg border border-border p-3 text-left transition-colors hover:bg-accent cursor-pointer"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                  <ArrowUpDown className="h-5 w-5" />
+                  <ArrowsDownUp className="h-5 w-5" />
                 </div>
                 <div className="flex-1">
                   <div className="font-medium">
@@ -415,7 +415,7 @@ export function MessageList({
                   size="icon"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <MoreHorizontal className="h-4 w-4" />
+                  <DotsThree className="h-4 w-4" />
                 </Button>
               </div>
             ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowLeft, MessageSquare, Clock, Users, Search } from "lucide-react";
+import { ArrowLeft, ChatDots, Clock, Users, MagnifyingGlass } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import type { Client, Chat } from "@/types/chat";
 
@@ -181,7 +181,7 @@ export function CardGrid({
         {/* V2: Search / filter bar */}
         {version >= 2 && clients.length > 0 && (
           <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               value={searchQuery}
@@ -255,7 +255,7 @@ export function CardGrid({
                 {/* Stats row */}
                 <div className="flex w-full items-center gap-4 border-t border-border/50 pt-3 text-xs text-muted-foreground">
                   <span className="inline-flex items-center gap-1.5">
-                    <MessageSquare className="h-3.5 w-3.5" />
+                    <ChatDots className="h-3.5 w-3.5" />
                     {chatCount} {chatCount === 1 ? "chat" : "chats"}
                   </span>
                   {lastActivity && (
@@ -283,7 +283,7 @@ export function CardGrid({
         {/* V2: no results from search */}
         {version >= 2 && clients.length > 0 && displayData.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Search className="mb-3 h-8 w-8 text-muted-foreground/40" />
+            <MagnifyingGlass className="mb-3 h-8 w-8 text-muted-foreground/40" />
             <p className="text-sm text-muted-foreground">
               No clients matching &ldquo;{searchQuery}&rdquo;
             </p>

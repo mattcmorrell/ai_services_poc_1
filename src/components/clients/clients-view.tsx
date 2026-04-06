@@ -6,7 +6,7 @@ import { ClientHomeTab } from "./client-home-tab";
 import { SidebarList } from "./approaches/sidebar-list";
 import { ChatView } from "@/components/chat-view";
 import { Chat, Client } from "@/types/chat";
-import { MessageSquare } from "lucide-react";
+import { ChatDots } from "@phosphor-icons/react";
 
 import { PrototypeSwitcher, ApproachConfig } from "./prototype-switcher";
 import { CardGrid } from "./approaches/card-grid";
@@ -233,7 +233,7 @@ export function ClientsView({
                 : "hidden"
             }
           >
-            <MessageSquare className="h-10 w-10 text-muted-foreground/40" />
+            <ChatDots className="h-10 w-10 text-muted-foreground/40" />
             <p className="text-sm font-medium">{tab.title}</p>
             <p className="text-xs text-muted-foreground">Chat view coming soon</p>
           </div>

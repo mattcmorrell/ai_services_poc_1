@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ChevronRight,
-  ChevronUp,
-  ChevronDown,
-  Search,
-  MessageSquare,
+  CaretRight,
+  CaretUp,
+  CaretDown,
+  MagnifyingGlass,
+  ChatDots,
   ArrowRight,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { getAvatarStyle } from "@/lib/avatar-colors";
 import type { Client, Chat } from "@/types/chat";
@@ -182,9 +182,9 @@ export function BreadcrumbNav({
   function SortIndicator({ column }: { column: SortColumn }) {
     if (version < 2 || sortColumn !== column) return null;
     return sortDirection === "asc" ? (
-      <ChevronUp className="ml-0.5 inline h-3 w-3" />
+      <CaretUp className="ml-0.5 inline h-3 w-3" />
     ) : (
-      <ChevronDown className="ml-0.5 inline h-3 w-3" />
+      <CaretDown className="ml-0.5 inline h-3 w-3" />
     );
   }
 
@@ -218,7 +218,7 @@ export function BreadcrumbNav({
             >
               All Clients
             </button>
-            <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground/60" />
+            <CaretRight className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground/60" />
             {version >= 2 ? (
               // V2: Quick-switch dropdown on client name
               <div className="relative" ref={quickSwitchRef}>
@@ -231,7 +231,7 @@ export function BreadcrumbNav({
                   )}
                 >
                   {selectedClient.name}
-                  <ChevronDown
+                  <CaretDown
                     className={cn(
                       "h-3 w-3 text-muted-foreground transition-transform",
                       quickSwitchOpen && "rotate-180"
@@ -304,7 +304,7 @@ export function BreadcrumbNav({
               All Clients
             </span>
             <div className="relative max-w-xs flex-1">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <MagnifyingGlass className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Filter clients..."
@@ -446,7 +446,7 @@ export function BreadcrumbNav({
                   {/* Active chats */}
                   <td className="px-4 py-3 text-center">
                     <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-                      <MessageSquare className="h-3.5 w-3.5" />
+                      <ChatDots className="h-3.5 w-3.5" />
                       {row.chatCount}
                     </span>
                   </td>

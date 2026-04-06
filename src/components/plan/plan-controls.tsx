@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pause, Square, Play, AlertTriangle } from "lucide-react";
+import { Pause, Stop, Play, Warning } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { ActionPlan } from "@/types/chat";
 
@@ -34,7 +34,7 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
     return (
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-1.5 text-xs" style={{ color: "var(--color-danger)" }}>
-          <AlertTriangle className="w-3 h-3" />
+          <Warning className="w-3 h-3" />
           Stop? {completedSteps}/{plan.steps.length} steps done. Cannot resume.
         </div>
         <div className="flex items-center gap-2">
@@ -47,7 +47,7 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
               border: "1px solid var(--color-danger-muted)",
             }}
           >
-            <Square className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
+            <Stop className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Confirm Stop"}
           </button>
           <button
@@ -86,7 +86,7 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
               border: "1px solid var(--color-danger-muted)",
             }}
           >
-            <Square className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
+            <Stop className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Stop"}
           </button>
         </>
@@ -115,7 +115,7 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
               border: "1px solid var(--color-danger-muted)",
             }}
           >
-            <Square className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
+            <Stop className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Stop"}
           </button>
         </>
@@ -127,7 +127,7 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
 /** Status badge for plan state */
 export function PlanStatusBadge({ status }: { status: ActionPlan["status"] }) {
   const config: Record<string, { label: string; bg: string; text: string; dot: string }> = {
-    pending: { label: "Pending", bg: "var(--surface-subtle)", text: "var(--text-tertiary-alpha)", dot: "var(--text-quaternary-alpha)" },
+    pending: { label: "Pending", bg: "var(--secondary)", text: "var(--muted-foreground)", dot: "var(--muted-foreground)" },
     approved: { label: "Approved", bg: "var(--color-success-muted)", text: "var(--color-success)", dot: "var(--color-success)" },
     executing: { label: "Running", bg: "var(--color-info-muted)", text: "var(--color-info)", dot: "var(--color-info)" },
     paused: { label: "Paused", bg: "var(--color-warning-muted)", text: "var(--color-warning)", dot: "var(--color-warning)" },

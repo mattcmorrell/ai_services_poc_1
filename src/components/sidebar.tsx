@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, MessageSquare, Bot, Settings } from "lucide-react";
+import { SquaresFour, ChatDots, Robot, Gear } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 
@@ -10,9 +10,9 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { id: "dashboard", icon: LayoutDashboard, label: "Dashboard", badge: 12 },
-  { id: "chats", icon: MessageSquare, label: "Chats", badge: 5 },
-  { id: "agents", icon: Bot, label: "Agents", badge: 1 },
+  { id: "dashboard", icon: SquaresFour, label: "Dashboard", badge: 12 },
+  { id: "chats", icon: ChatDots, label: "Chats", badge: 5 },
+  { id: "agents", icon: Robot, label: "Agents", badge: 1 },
 ];
 
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
@@ -33,7 +33,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                 {item.badge}
               </span>
             )}
-            <item.icon className="h-5 w-5" />
+            <item.icon className="h-5 w-5" weight={activeView === item.id ? "fill" : "light"} />
             <span className="mt-1 text-xs">{item.label}</span>
           </button>
         ))}
@@ -41,7 +41,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       <div className="flex flex-col items-center gap-1 w-full">
         <ThemeSwitcher />
         <button className="flex h-10 w-full items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
-          <Settings className="h-4 w-4" />
+          <Gear className="h-4 w-4" />
         </button>
       </div>
     </div>

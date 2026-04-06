@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2 } from "lucide-react";
+import { Buildings } from "@phosphor-icons/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Client } from "@/types/chat";
@@ -28,7 +28,7 @@ export function ChatList({ clients, selectedClientId, onSelectClient }: ChatList
                 selectedClientId === client.id && "bg-accent"
               )}
             >
-              <Building2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <Buildings className="h-4 w-4 shrink-0 text-muted-foreground" />
               <span className="flex-1 truncate text-sm">{client.name}</span>
               {client.unreadCount > 0 && (
                 <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1.5 text-xs font-medium">

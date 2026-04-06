@@ -89,15 +89,6 @@
   --color-danger-muted: rgba(160, 80, 80, 0.1);
   --color-info: #506098;
   --color-info-muted: rgba(80, 96, 152, 0.1);
-  /* Text alpha */
-  --text-primary-alpha: rgba(28, 30, 36, 0.9);
-  --text-secondary-alpha: rgba(28, 30, 36, 0.55);
-  --text-tertiary-alpha: rgba(28, 30, 36, 0.35);
-  --text-quaternary-alpha: rgba(28, 30, 36, 0.2);
-  /* Surface */
-  --surface-hover: rgba(28, 30, 36, 0.04);
-  --surface-subtle: rgba(28, 30, 36, 0.03);
-  --border-subtle: rgba(30, 35, 50, 0.04);
   /* Avatar palette */
   --avatar-1: #3B5888;
   --avatar-2: #4A7A52;
@@ -156,15 +147,6 @@
   --color-danger-muted: rgba(192, 112, 112, 0.12);
   --color-info: #8E9AD0;
   --color-info-muted: rgba(142, 154, 208, 0.12);
-  /* Text alpha */
-  --text-primary-alpha: rgba(232, 233, 237, 0.9);
-  --text-secondary-alpha: rgba(232, 233, 237, 0.55);
-  --text-tertiary-alpha: rgba(232, 233, 237, 0.35);
-  --text-quaternary-alpha: rgba(232, 233, 237, 0.2);
-  /* Surface */
-  --surface-hover: rgba(232, 233, 237, 0.04);
-  --surface-subtle: rgba(232, 233, 237, 0.03);
-  --border-subtle: rgba(180, 185, 200, 0.04);
   /* Avatar palette */
   --avatar-1: #5B78B8;
   --avatar-2: #7BAA82;
@@ -223,15 +205,6 @@
   --color-danger-muted: rgba(201, 107, 107, 0.12);
   --color-info: #A0C09E;
   --color-info-muted: rgba(160, 192, 158, 0.12);
-  /* Text alpha */
-  --text-primary-alpha: rgba(242, 240, 235, 0.9);
-  --text-secondary-alpha: rgba(242, 240, 235, 0.55);
-  --text-tertiary-alpha: rgba(242, 240, 235, 0.35);
-  --text-quaternary-alpha: rgba(242, 240, 235, 0.2);
-  /* Surface */
-  --surface-hover: rgba(242, 240, 235, 0.04);
-  --surface-subtle: rgba(242, 240, 235, 0.03);
-  --border-subtle: rgba(220, 215, 201, 0.04);
   /* Avatar palette */
   --avatar-1: #5B8DB8;
   --avatar-2: #6BAA6B;
@@ -286,15 +259,6 @@
   --color-danger-muted: rgba(168, 68, 68, 0.1);
   --color-info: #5A7A58;
   --color-info-muted: rgba(90, 122, 88, 0.1);
-  /* Text alpha */
-  --text-primary-alpha: rgba(28, 36, 38, 0.9);
-  --text-secondary-alpha: rgba(28, 36, 38, 0.55);
-  --text-tertiary-alpha: rgba(28, 36, 38, 0.35);
-  --text-quaternary-alpha: rgba(28, 36, 38, 0.2);
-  /* Surface */
-  --surface-hover: rgba(28, 36, 38, 0.04);
-  --surface-subtle: rgba(28, 36, 38, 0.03);
-  --border-subtle: rgba(44, 54, 57, 0.05);
   /* Avatar palette */
   --avatar-1: #3B6D98;
   --avatar-2: #4B8A4B;
@@ -353,15 +317,6 @@
   --color-danger-muted: rgba(192, 112, 112, 0.12);
   --color-info: #B0D0E0;
   --color-info-muted: rgba(176, 208, 224, 0.12);
-  /* Text alpha */
-  --text-primary-alpha: rgba(232, 239, 244, 0.9);
-  --text-secondary-alpha: rgba(232, 239, 244, 0.55);
-  --text-tertiary-alpha: rgba(232, 239, 244, 0.35);
-  --text-quaternary-alpha: rgba(232, 239, 244, 0.2);
-  /* Surface */
-  --surface-hover: rgba(232, 239, 244, 0.04);
-  --surface-subtle: rgba(232, 239, 244, 0.03);
-  --border-subtle: rgba(196, 212, 220, 0.04);
   /* Avatar palette */
   --avatar-1: #5B8DB8;
   --avatar-2: #7BAA82;
@@ -416,15 +371,6 @@
   --color-danger-muted: rgba(160, 80, 80, 0.1);
   --color-info: #4A7A98;
   --color-info-muted: rgba(74, 122, 152, 0.1);
-  /* Text alpha */
-  --text-primary-alpha: rgba(26, 40, 48, 0.9);
-  --text-secondary-alpha: rgba(26, 40, 48, 0.55);
-  --text-tertiary-alpha: rgba(26, 40, 48, 0.35);
-  --text-quaternary-alpha: rgba(26, 40, 48, 0.2);
-  /* Surface */
-  --surface-hover: rgba(26, 40, 48, 0.04);
-  --surface-subtle: rgba(26, 40, 48, 0.03);
-  --border-subtle: rgba(26, 40, 48, 0.05);
   /* Avatar palette */
   --avatar-1: #3B6D98;
   --avatar-2: #4A8A52;
@@ -462,18 +408,19 @@
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: var(--text-tertiary-alpha);
+  background: var(--muted-foreground);
+  opacity: 0.5;
   border-radius: 4px;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary-alpha);
+  background: var(--muted-foreground);
 }
 
 /* Firefox scrollbar */
 .dark * {
   scrollbar-width: thin;
-  scrollbar-color: var(--text-tertiary-alpha) transparent;
+  scrollbar-color: var(--muted-foreground) transparent;
 }
 
 /* Inline client chip styles */

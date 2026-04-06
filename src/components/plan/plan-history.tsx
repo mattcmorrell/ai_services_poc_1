@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, XCircle, Clock, Archive } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Archive } from "@phosphor-icons/react";
 import { ActionPlan } from "@/types/chat";
 
 interface PlanHistoryEntry {

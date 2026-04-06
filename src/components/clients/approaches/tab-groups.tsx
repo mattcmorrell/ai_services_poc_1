@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Home, Plus, X } from "lucide-react";
+import { House, Plus, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import type { Client, Chat } from "@/types/chat";
 import type { ClientTab } from "../client-tab-bar";
@@ -244,7 +244,7 @@ export function TabGroups({
                       )}
                       title={`${group.client.name} home`}
                     >
-                      <Home className="h-3.5 w-3.5" />
+                      <House className="h-3.5 w-3.5" />
                     </button>
 
                     {/* Chat tabs */}

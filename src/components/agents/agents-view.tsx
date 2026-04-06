@@ -2,27 +2,27 @@
 
 import { useState, useMemo } from "react";
 import {
-  Search,
-  MoreHorizontal,
+  MagnifyingGlass,
+  DotsThree,
   Plus,
   Star,
-  Banknote,
-  BookOpen,
-  Palmtree,
-  TrendingUp,
+  CurrencyDollar,
+  BookOpenText,
+  TreePalm,
+  TrendUp,
   Users,
   Calculator,
-  Sparkles,
+  Sparkle,
   Heart,
   Clock,
-  Smile,
+  Smiley,
   Wrench,
-  Bot,
-  Presentation,
+  Robot,
+  ProjectorScreen,
   Pizza,
   GraduationCap,
-  PartyPopper,
-} from "lucide-react";
+  Confetti,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -36,22 +36,22 @@ interface AgentsViewProps {
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  banknote: Banknote,
-  "book-open": BookOpen,
-  "palm-tree": Palmtree,
-  "trending-up": TrendingUp,
+  banknote: CurrencyDollar,
+  "book-open": BookOpenText,
+  "palm-tree": TreePalm,
+  "trending-up": TrendUp,
   users: Users,
   calculator: Calculator,
-  sparkles: Sparkles,
+  sparkles: Sparkle,
   heart: Heart,
   clock: Clock,
-  smile: Smile,
+  smile: Smiley,
   wrench: Wrench,
-  bot: Bot,
-  presentation: Presentation,
+  bot: Robot,
+  presentation: ProjectorScreen,
   pizza: Pizza,
   "graduation-cap": GraduationCap,
-  "party-popper": PartyPopper,
+  "party-popper": Confetti,
 };
 
 export function AgentsView({ agents, onAgentClick, onToggleFavorite }: AgentsViewProps) {
@@ -79,7 +79,7 @@ export function AgentsView({ agents, onAgentClick, onToggleFavorite }: AgentsVie
         <h1 className="text-2xl font-semibold">Agents</h1>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -88,7 +88,7 @@ export function AgentsView({ agents, onAgentClick, onToggleFavorite }: AgentsVie
             />
           </div>
           <Button variant="ghost" size="icon">
-            <MoreHorizontal className="h-5 w-5" />
+            <DotsThree className="h-5 w-5" />
           </Button>
         </div>
       </div>
@@ -100,7 +100,7 @@ export function AgentsView({ agents, onAgentClick, onToggleFavorite }: AgentsVie
             <h2 className="mb-4 text-lg font-semibold">Favorites</h2>
             <div className="flex flex-wrap gap-4">
               {favoriteAgents.map((agent) => {
-                const IconComponent = iconMap[agent.icon] || Bot;
+                const IconComponent = iconMap[agent.icon] || Robot;
                 return (
                   <div
                     key={agent.id}
@@ -142,7 +142,7 @@ export function AgentsView({ agents, onAgentClick, onToggleFavorite }: AgentsVie
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {allAgents.map((agent) => {
-              const IconComponent = iconMap[agent.icon] || Bot;
+              const IconComponent = iconMap[agent.icon] || Robot;
               return (
                 <div
                   key={agent.id}

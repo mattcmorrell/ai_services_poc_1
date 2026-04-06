@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Banknote,
-  Presentation,
-  PartyPopper,
-  Sparkles,
-  AlertTriangle,
-} from "lucide-react";
+  CurrencyDollar,
+  ProjectorScreen,
+  Confetti,
+  Sparkle,
+  Warning,
+} from "@phosphor-icons/react";
 import { AgentAttention } from "@/types/dashboard";
 import { cn } from "@/lib/utils";
 
@@ -16,10 +16,10 @@ interface AgentsAttentionProps {
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  banknote: Banknote,
-  presentation: Presentation,
-  "party-popper": PartyPopper,
-  sparkles: Sparkles,
+  banknote: CurrencyDollar,
+  presentation: ProjectorScreen,
+  "party-popper": Confetti,
+  sparkles: Sparkle,
 };
 
 function formatTimestamp(date: Date): string {
@@ -50,7 +50,7 @@ export function AgentsAttention({ agents, onAgentClick }: AgentsAttentionProps) 
       </h3>
       <div className="space-y-4">
         {agents.map((agent) => {
-          const IconComponent = iconMap[agent.agentIcon] || Sparkles;
+          const IconComponent = iconMap[agent.agentIcon] || Sparkle;
           return (
             <button
               key={agent.id}
@@ -65,7 +65,7 @@ export function AgentsAttention({ agents, onAgentClick }: AgentsAttentionProps) 
                   <span className="font-medium">{agent.agentName}</span>
                   {agent.isUrgent && (
                     <span className="inline-flex items-center gap-1 rounded bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
-                      <AlertTriangle className="h-3 w-3" />
+                      <Warning className="h-3 w-3" />
                       Urgent
                     </span>
                   )}
