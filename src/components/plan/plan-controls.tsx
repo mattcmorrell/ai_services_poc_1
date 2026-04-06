@@ -131,17 +131,17 @@ export function PlanStatusBadge({ status }: { status: ActionPlan["status"] }) {
     approved: { label: "Approved", bg: "var(--color-success-muted)", text: "var(--color-success)", dot: "var(--color-success)" },
     executing: { label: "Running", bg: "var(--color-info-muted)", text: "var(--color-info)", dot: "var(--color-info)" },
     paused: { label: "Paused", bg: "var(--color-warning-muted)", text: "var(--color-warning)", dot: "var(--color-warning)" },
-    stopped: { label: "Stopped", bg: "var(--color-danger-muted)", text: "var(--color-danger)", dot: "var(--color-danger)" },
+    stopped: { label: "Stopped", bg: "color-mix(in srgb, var(--color-danger) 8%, transparent)", text: "color-mix(in srgb, var(--color-danger) 50%, var(--muted-foreground))", dot: "color-mix(in srgb, var(--color-danger) 40%, var(--muted-foreground))" },
     completed: { label: "Done", bg: "var(--color-success-muted)", text: "var(--color-success)", dot: "var(--color-success)" },
-    declined: { label: "Declined", bg: "var(--color-danger-muted)", text: "var(--color-danger)", dot: "var(--color-danger)" },
+    declined: { label: "Declined", bg: "color-mix(in srgb, var(--color-danger) 8%, transparent)", text: "color-mix(in srgb, var(--color-danger) 50%, var(--muted-foreground))", dot: "color-mix(in srgb, var(--color-danger) 40%, var(--muted-foreground))" },
   };
 
   const c = config[status] || config.pending;
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full font-mono text-xs font-medium"
-      style={{ background: c.bg, color: c.text }}
+      className="inline-flex items-center gap-1.5 rounded-full font-mono text-xs font-semibold"
+      style={{ background: c.bg, color: c.text, padding: "3px 10px" }}
     >
       <span
         className={cn(

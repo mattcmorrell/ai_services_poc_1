@@ -80,39 +80,28 @@ Audit of codebase against `public/mockups/design-system.html` (2026-04-06). Refe
   - message-list.tsx — approved button tokenized
   - Note: workflow/ (BambooHR brand green) and clients/ (prototypes) left as-is — not in design system scope
 
-- [ ] **Stopped/Declined badges use full danger instead of desaturated**
-  - `plan-controls.tsx:134-136` — uses `--color-danger-muted` bg + `--color-danger` text
-  - Spec: `color-mix(in srgb, var(--color-danger) 8%, transparent)` bg, `color-mix(in srgb, var(--color-danger) 50%, var(--muted-foreground))` text
-  - Hierarchy: danger = "act now", stopped/declined = "ended negatively but resolved"
+- [x] **Stopped/Declined badges use full danger instead of desaturated** *(fixed 2026-04-06)*
+  - plan-controls.tsx — stopped/declined now use color-mix desaturated treatment
+  - action-card.tsx, action-card-compact.tsx — status icons also desaturated
 
 - [x] **Card border-radius 8px → 12px** *(fixed 2026-04-06)*
   - gate-approval-card, approval-request-card, clarifying-questions-card, artifact-card
 
-- [ ] **Chat user bubble padding and asymmetric radius**
-  - `message-list.tsx:289` — `px-4 py-2` (16px 8px) → spec: 14px 18px
-  - `message-list.tsx:289` — `rounded-lg` (8px uniform) → spec: 12px with bottom-right 4px
+- [x] **Chat user bubble padding and asymmetric radius** *(fixed 2026-04-06)*
+  - message-list.tsx — padding now 14px 18px, radius 12px with bottom-right 4px
 
 ### Medium — Component-Level Fixes
 
-- [ ] **Badge padding** — `plan-controls.tsx:143` uses `px-2 py-0.5` (8px 2px), spec: 3px 10px
-- [ ] **Badge dot size** — `plan-controls.tsx:148` uses `w-1.5 h-1.5` (6px) — correct per spec
-- [ ] **Status label font weight** — `font-medium` (500) throughout, spec says 600
-  - `gate-approval-card.tsx:58,75,97`
-  - `approval-request-card.tsx:51,66,85`
-  - `action-card.tsx:123`
-- [ ] **Button font size** — approve/decline buttons use `text-[12px]`, spec says 14px (or 13px small)
-  - `action-card-compact.tsx:82,91`
-  - `approval-request-card.tsx:101,108`
-  - `gate-approval-card.tsx:117,124`
-- [ ] **Button border-radius** — `rounded-md` (6px), spec says 8px (`rounded-lg`)
-  - Same files as above + `clarifying-questions-card.tsx:288,300`
-- [ ] **Button padding** — `py-2.5` only, spec says 8px 20px
-- [ ] **Inline data chip** — `globals.css:427-440`
-  - Padding: 2px 8px → spec: 1px 6px
-  - Border-radius: 6px → spec: 3px
-  - Extra border not in spec
-- [ ] **Chat input padding** — `chat-view.tsx:161` uses `p-3` (12px), spec: 14px 16px
-- [ ] **Label letter-spacing** — `action-card.tsx:123` uses `tracking-wide` (0.025em), spec: 0.06em
+- [x] **Badge padding** — *(fixed 2026-04-06)* now 3px 10px
+- [x] **Badge dot size** — already correct (6px)
+- [x] **Status label font weight** — *(fixed 2026-04-06)* font-medium → font-semibold (600)
+  - gate-approval-card, approval-request-card, action-card
+- [x] **Button font size, border-radius, and padding** *(fixed 2026-04-06)*
+  - gate-approval-card, approval-request-card, action-card-compact, clarifying-questions-card
+  - text-[12px] → text-sm (14px), rounded-md → rounded-lg (8px), py-2.5 → 8px 20px
+- [x] **Inline data chip** — *(fixed 2026-04-06)* padding 1px 6px, radius 3px, border removed
+- [x] **Chat input padding** — *(fixed 2026-04-06)* now 14px 16px
+- [x] **Label letter-spacing** — *(fixed 2026-04-06)* now 0.06em
 
 ### Low — Missing Implementations
 

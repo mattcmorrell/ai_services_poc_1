@@ -285,11 +285,12 @@ export function ClarifyingQuestionsCard({
           <button
             onClick={() => setActiveTab(activeTab + 1)}
             disabled={!hasAnswer(currentQuestion.id)}
-            className={`w-full py-2.5 border-none rounded-md text-[12px] font-medium tracking-wide transition-all duration-200 ${
+            className={`w-full border-none rounded-lg text-sm font-medium transition-all duration-200 ${
               hasAnswer(currentQuestion.id)
                 ? "bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
                 : "bg-muted/50 text-muted-foreground/40 cursor-not-allowed"
             }`}
+            style={{ padding: "8px 20px" }}
           >
             Next
           </button>
@@ -297,11 +298,12 @@ export function ClarifyingQuestionsCard({
           <button
             onClick={handleSubmit}
             disabled={!allAnswered}
-            className={`w-full py-2.5 border-none rounded-md text-[12px] font-medium tracking-wide transition-all duration-200 ${
+            className={`w-full border-none rounded-lg text-sm font-medium transition-all duration-200 ${
               allAnswered
                 ? "bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
                 : "bg-muted/50 text-muted-foreground/40 cursor-not-allowed"
             }`}
+            style={{ padding: "8px 20px" }}
           >
             Submit answers ({answeredCount}/{questions.length})
           </button>

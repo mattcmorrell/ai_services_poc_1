@@ -34,7 +34,7 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
 
   const getStatusIcon = () => {
     if (isCompleted) return <CheckCircle className="w-4 h-4 shrink-0" style={{ color: "var(--color-success)" }} />;
-    if (isDeclined || isStopped) return <XCircle className="w-4 h-4 shrink-0" style={{ color: "var(--color-danger)" }} />;
+    if (isDeclined || isStopped) return <XCircle className="w-4 h-4 shrink-0" style={{ color: "color-mix(in srgb, var(--color-danger) 50%, var(--muted-foreground))" }} />;
     if (isPaused) return <Pause className="w-4 h-4 shrink-0" style={{ color: "var(--color-warning)" }} />;
     if (isExecuting) return <CircleNotch weight="regular" className="w-4 h-4 shrink-0 animate-spin" style={{ color: "var(--color-info)" }} />;
     if (isApproved) return <Check className="w-4 h-4 shrink-0" style={{ color: "var(--color-success)" }} />;
@@ -79,18 +79,20 @@ export function ActionCardCompact({ plan, onOpenPanel, onApprove, onDecline }: A
           {onApprove && (
             <button
               onClick={(e) => { e.stopPropagation(); onApprove(); }}
-              className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-md text-[12px] font-medium tracking-wide transition-all duration-200 bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
+              className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
+              style={{ padding: "8px 20px" }}
             >
-              <Check className="w-3.5 h-3.5" />
+              <Check className="w-4 h-4" />
               Approve plan
             </button>
           )}
           {onDecline && (
             <button
               onClick={(e) => { e.stopPropagation(); onDecline(); }}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-[12px] font-medium tracking-wide transition-all duration-200 cursor-pointer bg-muted text-muted-foreground border border-border"
+              className="inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer bg-muted text-muted-foreground border border-border"
+              style={{ padding: "8px 20px" }}
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
               Decline
             </button>
           )}

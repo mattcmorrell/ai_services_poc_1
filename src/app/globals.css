@@ -430,9 +430,8 @@
   gap: 4px;
   background: var(--color-info-muted);
   color: var(--primary);
-  padding: 2px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 3px;
   font-weight: 600;
   white-space: nowrap;
   vertical-align: middle;

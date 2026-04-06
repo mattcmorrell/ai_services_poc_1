@@ -55,7 +55,7 @@ export function GateApprovalCard({
   if (isApproved) {
     return (
       <div className="mt-4 rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-success) 20%, transparent)" }}>
-        <div className="flex items-center gap-2 text-[12px] font-medium tracking-wide uppercase" style={{ color: "var(--color-success)", opacity: 0.7 }}>
+        <div className="flex items-center gap-2 text-[12px] font-semibold tracking-wide uppercase" style={{ color: "var(--color-success)", opacity: 0.7 }}>
           <Check size={12} />
           <span>
             Step {gateApproval.stepIndex + 1} approved
@@ -72,7 +72,7 @@ export function GateApprovalCard({
   if (isDeclined) {
     return (
       <div className="mt-4 rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-danger) 20%, transparent)" }}>
-        <div className="flex items-center gap-2 text-[12px] font-medium tracking-wide uppercase" style={{ color: "var(--color-danger)", opacity: 0.7 }}>
+        <div className="flex items-center gap-2 text-[12px] font-semibold tracking-wide uppercase" style={{ color: "var(--color-danger)", opacity: 0.7 }}>
           <X size={12} />
           <span>
             Step {gateApproval.stepIndex + 1} — plan modified
@@ -94,7 +94,7 @@ export function GateApprovalCard({
           <ShieldWarning className="w-4 h-4 text-foreground/40" />
         </div>
         <div>
-          <div className="text-[12px] font-medium tracking-wide uppercase text-muted-foreground/80">
+          <div className="text-[12px] font-semibold tracking-wide uppercase text-muted-foreground/80">
             Step {gateApproval.stepIndex + 1} — Approval required
           </div>
         </div>
@@ -114,16 +114,16 @@ export function GateApprovalCard({
       <div className="p-3 px-5 border-t border-border flex gap-2.5">
         <button
           onClick={onApprove}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md text-[12px] font-medium tracking-wide transition-all duration-200 text-primary-foreground cursor-pointer"
-          style={{ background: "var(--primary)" }}
+          className="flex-1 flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 text-primary-foreground cursor-pointer"
+          style={{ background: "var(--primary)", padding: "8px 20px" }}
         >
-          <Check className="w-3.5 h-3.5" />
+          <Check className="w-4 h-4" />
           Approve & continue
         </button>
         <button
           onClick={onModify}
-          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-[12px] font-medium tracking-wide transition-all duration-200 bg-transparent cursor-pointer"
-          style={{ color: "var(--color-danger)", border: "1px solid color-mix(in srgb, var(--color-danger) 30%, transparent)" }}
+          className="flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 bg-transparent cursor-pointer"
+          style={{ color: "var(--color-danger)", border: "1px solid color-mix(in srgb, var(--color-danger) 30%, transparent)", padding: "8px 20px" }}
         >
           <PencilSimple className="w-3.5 h-3.5" />
           Modify

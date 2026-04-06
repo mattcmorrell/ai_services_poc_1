@@ -45,7 +45,7 @@ export function ActionCard({ plan, workflow, onApprove, onDecline, onWorkflowCli
       return <CheckCircle className="w-5 h-5" style={{ color: "var(--color-success)" }} />;
     }
     if (isDeclined || isStopped) {
-      return <XCircle className="w-5 h-5" style={{ color: "var(--color-danger)" }} />;
+      return <XCircle className="w-5 h-5" style={{ color: "color-mix(in srgb, var(--color-danger) 50%, var(--muted-foreground))" }} />;
     }
     if (isPaused) {
       return <Pause className="w-5 h-5" style={{ color: "var(--color-warning)" }} />;
@@ -120,7 +120,7 @@ export function ActionCard({ plan, workflow, onApprove, onDecline, onWorkflowCli
 
       {/* Steps */}
       <div className="border-t border-border pt-4 mb-4">
-        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+        <div className="text-xs font-semibold text-muted-foreground uppercase mb-3" style={{ letterSpacing: "0.06em" }}>
           Steps
         </div>
         <div className="space-y-2">

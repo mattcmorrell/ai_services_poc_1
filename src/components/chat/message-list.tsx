@@ -286,12 +286,12 @@ export function MessageList({
                       className={cn(
                         message.role === "user"
                           ? theme.userBubbleClass ||
-                              "inline-block rounded-lg bg-muted px-4 py-2 text-foreground"
+                              "inline-block bg-muted text-foreground"
                           : theme.assistantClass
                       )}
                       style={
                         message.role === "user"
-                          ? theme.userBubbleStyle
+                          ? theme.userBubbleStyle || { padding: "14px 18px", borderRadius: "12px 12px 4px 12px" }
                           : theme.assistantStyle
                       }
                       dangerouslySetInnerHTML={{
