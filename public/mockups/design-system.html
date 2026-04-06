@@ -441,10 +441,13 @@ body {
 .dash-card-header-link:hover { opacity: 0.8; }
 .dash-card-row {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 20px; border-bottom: 1px solid var(--border);
-  font-size: 14px;
+  padding: 10px 20px; font-size: 14px;
+  position: relative;
 }
-.dash-card-row:last-child { border-bottom: none; }
+.dash-card-row + .dash-card-row::after {
+  content: ''; position: absolute; top: 0; left: 20px; right: 20px;
+  height: 1px; background: var(--border);
+}
 .dash-card-row-primary { color: var(--foreground); font-weight: 500; }
 .dash-card-row-secondary { color: var(--muted-foreground); font-size: 12px; }
 .dash-card-empty {
@@ -455,9 +458,12 @@ body {
 /* Attention item */
 .attention-item {
   display: flex; align-items: flex-start; gap: 12px;
-  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  padding: 16px 20px; position: relative;
 }
-.attention-item:last-child { border-bottom: none; }
+.attention-item + .attention-item::after {
+  content: ''; position: absolute; top: 0; left: 20px; right: 20px;
+  height: 1px; background: var(--border);
+}
 .attention-sev {
   font-family: 'Geist', sans-serif; font-size: 11px; font-weight: 600;
   text-transform: uppercase; text-align: center;
@@ -482,8 +488,11 @@ body {
 }
 
 /* Mini plan row */
-.mini-plan { padding: 12px 20px; border-bottom: 1px solid var(--border); }
-.mini-plan:last-child { border-bottom: none; }
+.mini-plan { padding: 12px 20px; position: relative; }
+.mini-plan + .mini-plan::after {
+  content: ''; position: absolute; top: 0; left: 20px; right: 20px;
+  height: 1px; background: var(--border);
+}
 .mini-plan-top {
   display: flex; align-items: center; justify-content: space-between;
   gap: 8px; margin-bottom: 6px;
