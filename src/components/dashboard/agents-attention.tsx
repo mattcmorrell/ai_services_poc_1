@@ -64,7 +64,7 @@ export function AgentsAttention({ agents, onAgentClick }: AgentsAttentionProps) 
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{agent.agentName}</span>
                   {agent.isUrgent && (
-                    <span className="inline-flex items-center gap-1 rounded bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold" style={{ padding: "3px 10px", borderRadius: 4, background: "color-mix(in srgb, var(--destructive) 12%, transparent)", color: "var(--destructive)" }}>
                       <Warning className="h-3 w-3" />
                       Urgent
                     </span>

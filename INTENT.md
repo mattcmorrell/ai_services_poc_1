@@ -106,8 +106,8 @@ Audit of codebase against `public/mockups/design-system.html` (2026-04-06). Refe
 ### Low — Missing Implementations
 
 - [ ] **Anomaly card** — fully spec'd in design system, no component exists yet
-- [ ] **Alert pills** — spec defines urgent/attention variants (4px radius, sans), not formally built
-- [ ] **Activity feed font size** — code uses 14px, spec has internal inconsistency (type scale says 14px for `.type-feed`, component specimen CSS says 13px for `.feed-line`)
+- [x] **Alert pills** — *(fixed 2026-04-06)* agents-attention.tsx and card-grid.tsx now use spec styling (4px radius, sans 600, token colors)
+- [x] **Activity feed font size** — *(fixed 2026-04-06)* 14px → 13px per component specimen (type scale says 14 but specimen renders 13)
 
 ### Notes
 - Design system spec: `public/mockups/design-system.html#patterns`

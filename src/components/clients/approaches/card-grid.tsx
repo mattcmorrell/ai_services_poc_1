@@ -268,12 +268,12 @@ export function CardGrid({
 
                 {/* V2: Status indicator */}
                 {version >= 2 && unread >= 4 && (
-                  <p className="text-xs font-medium text-red-400">Urgent</p>
+                  <span className="inline-flex items-center text-xs font-semibold" style={{ padding: "3px 10px", borderRadius: 4, background: "color-mix(in srgb, var(--destructive) 12%, transparent)", color: "var(--destructive)" }}>Urgent</span>
                 )}
                 {version >= 2 && unread >= 1 && unread < 4 && (
-                  <p className="text-xs font-medium text-amber-400">
+                  <span className="inline-flex items-center text-xs font-semibold" style={{ padding: "3px 10px", borderRadius: 4, background: "var(--color-warning-muted)", color: "var(--color-warning)" }}>
                     Needs attention
-                  </p>
+                  </span>
                 )}
               </button>
             );
