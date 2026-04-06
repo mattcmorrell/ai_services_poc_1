@@ -96,8 +96,7 @@ V1 replaces all simulated actions with real BambooHR API tool calls.
 ### Authentication & Multi-User
 
 - User accounts with BambooHR SSO integration
-- Role-based access control (admin, consultant, read-only)
-- Audit trail for all agent-executed actions
+- Audit trail for all agent-executed actions (handled by agent history service?)
 
 ### Client Management
 
@@ -173,20 +172,17 @@ Key UX patterns validated in prototype:
 
 ## Technical Architecture
 
-
-### Streaming Architecture (V1 upgrade)
-
-
-### Key Architectural Decisions
-
-
 ---
 
 ## Roadmap (Post-V1)
-
 
 ---
 
 ## Open Questions
 
-
+| Question | Context | Impact |
+|----------|---------|--------|
+| Which design variant to finalize | 15 variants explored; need to select one direction | Blocks design system finalization |
+| Client switching UX | Sidebar (leading), dropdown, or tab groups | Validated sidebar in prototype but final decision needed |
+| LLM model for V1 | Currently GPT-5.2; evaluate alternatives | Affects cost, latency, capability |
+| BHR API access scope | Which endpoints are available for tool execution | Defines agent capability boundaries |
