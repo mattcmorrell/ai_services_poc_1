@@ -114,10 +114,25 @@ Audit of codebase against `public/mockups/design-system.html` (2026-04-06). Refe
 - Design system badge hierarchy: danger (act now) > warning (paused) > stopped/declined (desaturated red, resolved) > muted (pending, neutral)
 - Voice rule: mono = agent produced, sans = human space. The font signals *who produced this*.
 
-## Next Steps (Monday 2026-04-07)
-1. Work through design system alignment checklist above
-2. Get screenshots + design tokens into Figma
-3. Resolve dashboard layout
-4. Resolve client nav question
-5. Fix header height mismatch
-6. Prepare for board presentation
+## Session: 2026-04-06 — Type Audit & Figma Sync
+
+### Completed
+- **Type scale enforced**: 11px floor across all components (25 violations fixed), then full audit against 13-token type scale — fixed orphaned sizes (15px, 20px, 30px), weight mismatches (11px bold→medium, 12px/13px semibold→medium, 18px semibold→medium), font family mismatches (approval cards mono→sans, activity feed 13→14px)
+- **Type token labels** added to design system page (.type-page-title through .type-stat-sm)
+- **Inkwell/Orbital success green** saturated for Done vs Running distinction (Inkwell: #34D058, Orbital: #5BC870)
+- **Mercury Dark contrast bump**: card #191B1F→#1D2024, inner #222428→#282A30 (before/after comparison in design system)
+- **Inkwell accent fixed in Figma**: was warm brown A27B5B, corrected to sage green 7A9A78/5A7A58 via Plugin API
+- **Figma variable sync**: added 9 new variables to PanCom Palette (sidebar, border, success, danger, info, 4 muteds), bound colors across 4 captured frames, fixed Arimo→Geist Sans font replacement (303 segments)
+- **PandaCommand wordmark**: replaced Pandopticon PNG with text logo (48px/800 Geist Sans + 18px/600 mono subtitle)
+- **Plan panel type alignment**: metadata labels now mono, badge weights fixed, timestamps to 13px meta
+- **Chat header**: bg-muted (inner color) across all themes
+- **Theme switcher dropdown**: fixed left-edge overflow
+- **Agent description truncation**: fixed in agents-view
+
+### Open Questions (updated)
+- [ ] Anomaly card component — spec'd in design system, not built yet
+- [ ] Dashboard layout — what goes where?
+- [ ] Client nav sidebar question
+- [ ] Header height mismatch on recent chats
+- [ ] Push remaining code-only variables back to Figma (chart-*, avatar-*, ring, input)
+- [ ] Type utility classes (.type-*) — labels are in the design system, CSS classes not yet in globals.css. Add when ready to refactor away ad-hoc Tailwind.
