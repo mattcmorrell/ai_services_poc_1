@@ -111,7 +111,7 @@ export function PlanStepTimeline({ steps, compact = false }: PlanStepTimelinePro
                 </div>
 
                 {step.completedAt && isCompleted && (
-                  <span className="text-xs mt-0.5 block text-muted-foreground opacity-60">
+                  <span className="text-[13px] mt-0.5 block text-muted-foreground opacity-60">
                     Completed {step.completedAt.toLocaleTimeString()}
                   </span>
                 )}

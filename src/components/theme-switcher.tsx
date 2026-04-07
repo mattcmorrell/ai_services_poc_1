@@ -32,7 +32,7 @@ export function ThemeSwitcher() {
     <div ref={ref} className="relative flex w-full flex-col items-center gap-1">
       {/* Colorway dropdown */}
       {open && (
-        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-[140px] rounded-lg border border-border bg-popover p-1.5 shadow-xl z-50">
+        <div className="absolute bottom-full mb-2 left-0 w-[140px] rounded-lg border border-border bg-popover p-1.5 shadow-xl z-50">
           {colorways.map((c) => (
             <button
               key={c.id}

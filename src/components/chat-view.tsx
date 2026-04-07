@@ -215,7 +215,7 @@ export function ChatView({
   return (
     <div className="flex h-full flex-1 flex-col overflow-hidden bg-background">
       {/* Header — full width, above split */}
-      <div className="flex items-center justify-between border-b border-border px-6 py-4 shrink-0">
+      <div className="flex items-center justify-between border-b border-border px-6 py-4 shrink-0 bg-muted">
         <div>
           <h1 className="text-[24px] font-semibold">{chatTitle}</h1>
           {client && (

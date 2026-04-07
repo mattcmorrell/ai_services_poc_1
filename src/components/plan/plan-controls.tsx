@@ -140,7 +140,7 @@ export function PlanStatusBadge({ status }: { status: ActionPlan["status"] }) {
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full font-mono text-xs font-semibold"
+      className="inline-flex items-center gap-1.5 rounded-full font-mono text-xs font-medium"
       style={{ background: c.bg, color: c.text, padding: "3px 10px" }}
     >
       <span

@@ -60,7 +60,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
           {!showClockCounterClockwise ? (
             <div>
               {/* Plan description */}
-              <p className="text-sm mb-5 text-muted-foreground font-light">
+              <p className="text-sm mb-5 text-muted-foreground">
                 {plan.description}
               </p>
 
@@ -72,7 +72,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
                       <div className="text-[18px] font-medium text-foreground">
                         {plan.metadata.affectedCount}
                       </div>
-                      <div className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
+                      <div className="text-[11px] font-mono font-medium uppercase tracking-[0.1em] text-muted-foreground">
                         {plan.metadata.affectedLabel || "items"}
                       </div>
                     </div>
@@ -82,7 +82,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
                       <div className="text-[18px] font-medium text-foreground">
                         {plan.metadata.estimatedTime}
                       </div>
-                      <div className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
+                      <div className="text-[11px] font-mono font-medium uppercase tracking-[0.1em] text-muted-foreground">
                         estimated
                       </div>
                     </div>
@@ -122,7 +122,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
           />
           <button
             onClick={() => setShowClockCounterClockwise(!showClockCounterClockwise)}
-            className="flex items-center gap-1.5 text-[11px] transition-colors text-muted-foreground hover:text-foreground"
+            className="flex items-center gap-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.1em] transition-colors text-muted-foreground hover:text-foreground"
           >
             <ClockCounterClockwise className="w-3.5 h-3.5" />
             {showClockCounterClockwise ? "Current plan" : "Past plans"}
