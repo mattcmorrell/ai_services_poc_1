@@ -26,7 +26,7 @@ export function ClientTabBar({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex h-9 w-full shrink-0 items-stretch border-b border-border bg-card">
+    <div className="flex h-9 w-full shrink-0 items-stretch border-b border-border bg-muted dark:bg-card">
       {/* Scrollable tab list */}
       <div
         ref={scrollRef}

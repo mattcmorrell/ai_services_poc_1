@@ -82,9 +82,9 @@ export function SidebarList({
 
   return (
     <div className="flex h-full flex-1">
-      <aside className="flex flex-shrink-0" style={{ width }}><div className="flex min-w-0 flex-1 flex-col bg-card">
+      <aside className="flex flex-shrink-0" style={{ width }}><div className="flex min-w-0 flex-1 flex-col bg-muted dark:bg-card">
         {/* Sidebar header */}
-        <div className="flex flex-shrink-0 items-center border-b border-border px-3 py-4">
+        <div className="flex flex-shrink-0 items-center px-3 py-4">
           <h2 className="text-base font-semibold">Clients</h2>
         </div>
 

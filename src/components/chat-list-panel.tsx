@@ -124,7 +124,7 @@ export function ChatListPanel({
 
   return (
     <div className="flex flex-shrink-0" style={{ width }}>
-    <div className="flex min-w-0 flex-1 flex-col bg-card">
+    <div className="flex min-w-0 flex-1 flex-col bg-muted dark:bg-card">
       {/* Header: title + new chat + search */}
       <div className="flex flex-col justify-center border-b border-border px-3 py-4">
         <h2 className="text-base font-semibold">Recent Chats</h2>

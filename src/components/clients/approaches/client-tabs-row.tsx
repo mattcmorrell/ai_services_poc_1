@@ -55,7 +55,7 @@ export function ClientTabsRow({
   return (
     <div className="flex h-full flex-1 flex-col overflow-hidden">
       {/* Horizontal client avatar bar */}
-      <div className="flex flex-shrink-0 items-center gap-2 border-b border-border bg-card px-3 py-1">
+      <div className="flex flex-shrink-0 items-center gap-2 border-b border-border bg-muted dark:bg-card px-3 py-1">
         <span className="mr-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           Clients
         </span>

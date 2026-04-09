@@ -146,9 +146,9 @@ export function ClarifyingQuestionsCard({
 
   // Active state: tabbed question UI
   return (
-    <div className="rounded-xl border border-border bg-card/50 overflow-hidden max-w-[520px]">
+    <div className="rounded-xl border border-border bg-muted dark:bg-card/50 overflow-hidden max-w-[520px]">
       {/* Tab bar */}
-      <div className="flex border-b border-border bg-muted/30 overflow-x-auto">
+      <div className="flex border-b border-border bg-muted dark:bg-muted/30 overflow-x-auto">
         {questions.map((q, idx) => {
           const tabAnswered = hasAnswer(q.id);
           const isActive = idx === activeTab;
@@ -198,13 +198,13 @@ export function ClarifyingQuestionsCard({
                   className={`p-2.5 px-3.5 text-left rounded-md cursor-pointer transition-all duration-150 w-full border flex items-start gap-3 ${
                     isSelected
                       ? "bg-primary/10 border-primary/30"
-                      : "bg-muted/30 border-border hover:border-border/80 hover:bg-muted/50"
+                      : "bg-card dark:bg-muted/30 border-border hover:border-border/80 hover:bg-card/80 dark:hover:bg-muted/50"
                   }`}
                 >
                   <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[12px] font-medium ${
                     isSelected
                       ? "bg-primary/20 text-foreground"
-                      : "bg-muted/60 text-foreground/50"
+                      : "bg-muted dark:bg-muted/60 text-muted-foreground dark:text-foreground/50"
                   }`}>
                     {idx + 1}
                   </span>
@@ -244,7 +244,7 @@ export function ClarifyingQuestionsCard({
                     className={`p-2.5 px-3.5 text-left rounded-md cursor-pointer transition-all duration-150 w-full border ${
                       isOtherSelected
                         ? "bg-primary/10 border-primary/30"
-                        : "bg-muted/30 border-border hover:border-border/80 hover:bg-muted/50"
+                        : "bg-card dark:bg-muted/30 border-border hover:border-border/80 hover:bg-card/80 dark:hover:bg-muted/50"
                     }`}
                   >
                     <div
