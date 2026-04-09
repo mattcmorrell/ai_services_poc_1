@@ -38,7 +38,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                   )}
                 >
                   {item.badge !== null && (
-                    <span className="absolute -right-1 -top-1 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[11px] font-semibold leading-none text-primary-foreground">
+                    <span className="absolute -right-1 -top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-primary text-[11px] font-semibold leading-none text-primary-foreground">
                       {item.badge}
                     </span>
                   )}
