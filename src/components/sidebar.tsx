@@ -26,7 +26,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   return (
     <TooltipProvider delayDuration={300}>
       <div className="flex h-full w-16 flex-col items-center border-r border-border bg-card py-4 px-2">
-        <nav className="flex flex-1 flex-col items-center gap-6 w-full">
+        <nav className="flex flex-1 flex-col items-center gap-4 w-full">
           {navItems.map((item) => (
             <Tooltip key={item.id}>
               <TooltipTrigger asChild>
