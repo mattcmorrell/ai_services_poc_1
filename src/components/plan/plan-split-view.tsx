@@ -22,7 +22,7 @@ export function PlanSplitView({ plan, onClose, onPause, onStop, onResume, onAppr
   const gatedStep = isPausedByGate ? plan.steps.find((s) => s.status === "in_progress") : null;
 
   return (
-    <div className="flex flex-col h-full bg-muted/50">
+    <div className="flex flex-col h-full bg-card">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 shrink-0 border-b" style={{ borderColor: "var(--border)" }}>
         <div className="flex items-center gap-2.5 min-w-0">

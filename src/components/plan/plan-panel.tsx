@@ -31,7 +31,7 @@ export function PlanPanel({ plan, onClose, onPause, onStop, onResume }: PlanPane
     <>
       <ResizeHandle onMouseDown={onDragStart} />
       <div
-        className="flex flex-col h-full shrink-0 bg-background border-l border-border"
+        className="flex flex-col h-full shrink-0 bg-card border-l border-border"
         style={{ width: `${width}px` }}
       >
         {/* Header */}

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-Tier Section Colors</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #0a0b0c; color: #E8E9ED; padding: 32px; }
+
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 24px; color: #9DA0A8; }
+
+  .layout {
+    display: flex;
+    height: 600px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(180,185,200,0.1);
+  }
+
+  /* Tier labels */
+  .tier-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .tier-1 { background: #101214; color: #6878B8; border: 1px solid rgba(104,120,184,0.3); }
+  .tier-2 { background: #1D2024; color: #9DA0A8; border: 1px solid rgba(180,185,200,0.15); }
+  .tier-3 { background: #282A30; color: #E8E9ED; border: 1px solid rgba(180,185,200,0.15); }
+
+  /* Nav sidebar */
+  .nav-sidebar {
+    width: 56px;
+    background: #101214;
+    border-right: 1px solid rgba(180,185,200,0.07);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+    gap: 12px;
+  }
+  .nav-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: rgba(180,185,200,0.07);
+    display: flex; align-items: center; justify-content: center;
+    color: #9DA0A8;
+    font-size: 14px;
+  }
+  .nav-icon.active { background: #282A30; color: #E8E9ED; }
+
+  /* Chat list — TIER 2 (mid) */
+  .chat-list {
+    width: 240px;
+    background: #1D2024;
+    border-right: 1px solid rgba(180,185,200,0.07);
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-list-header {
+    padding: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(180,185,200,0.07);
+  }
+  .chat-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(180,185,200,0.04);
+    cursor: pointer;
+  }
+  .chat-item.active { background: rgba(180,185,200,0.06); }
+  .chat-item-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .chat-item-sub { font-size: 12px; color: #9DA0A8; }
+
+  /* Main area */
+  .main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  /* Header — TIER 2 (mid) */
+  .header {
+    background: #1D2024;
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(180,185,200,0.07);
+  }
+  .header-title { font-size: 20px; font-weight: 600; }
+  .header-sub { font-size: 13px; color: #9DA0A8; margin-top: 2px; }
+
+  /* Chat messages — TIER 1 (darkest) */
+  .messages {
+    flex: 1;
+    background: #101214;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .msg { max-width: 520px; }
+  .msg-user { align-self: flex-end; }
+  .msg-bubble {
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .msg-user .msg-bubble { background: #282A30; }
+  .msg-ai .msg-bubble { background: transparent; color: #E8E9ED; }
+  .msg-label { font-size: 11px; color: #9DA0A8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+  /* Action card — TIER 3 (lightest) */
+  .action-card {
+    background: #282A30;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 4px;
+    max-width: 520px;
+  }
+  .action-card-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .action-step {
+    font-size: 13px;
+    color: #9DA0A8;
+    padding: 4px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+  .action-step::before {
+    content: "○";
+    position: absolute;
+    left: 0;
+    color: #6878B8;
+    font-size: 11px;
+  }
+
+  /* Chat input — TIER 3 (lightest) input box, on TIER 1 background */
+  .input-area {
+    padding: 16px 24px;
+    background: #101214;
+  }
+  .input-box {
+    background: #282A30;
+    border: 1px solid rgba(180,185,200,0.1);
+    border-radius: 12px;
+    padding: 14px 16px;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .input-placeholder { font-size: 14px; color: #9DA0A8; }
+  .input-toolbar { display: flex; justify-content: space-between; margin-top: 8px; color: #9DA0A8; font-size: 12px; }
+
+  /* Plan panel — TIER 2 (mid) */
+  .plan-panel {
+    width: 300px;
+    background: #1D2024;
+    border-left: 1px solid rgba(180,185,200,0.07);
+    display: flex;
+    flex-direction: column;
+  }
+  .plan-header {
+    padding: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(180,185,200,0.07);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .plan-content { padding: 16px; flex: 1; }
+  .plan-step {
+    padding: 8px 0;
+    font-size: 13px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .plan-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+  .plan-dot.done { background: #7BAA82; }
+  .plan-dot.active { background: #6878B8; }
+  .plan-dot.pending { background: #9DA0A8; opacity: 0.4; }
+  .plan-step-text { color: #9DA0A8; }
+  .plan-step-text.done { color: #E8E9ED; }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .legend-swatch {
+    width: 32px;
+    height: 20px;
+    border-radius: 4px;
+    border: 1px solid rgba(180,185,200,0.1);
+  }
+  .legend-label { font-size: 13px; color: #9DA0A8; }
+  .legend-hex { font-family: monospace; font-size: 12px; color: #6878B8; }
+</style>
+</head>
+<body>
+
+<h1>3-Tier Section Coloring — Mercury Dark</h1>
+
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:#101214"></div>
+    <span class="tier-label tier-1">Tier 1 — Darkest</span>
+    <span class="legend-hex">#101214</span>
+    <span class="legend-label">Chat messages</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:#1D2024"></div>
+    <span class="tier-label tier-2">Tier 2 — Mid</span>
+    <span class="legend-hex">#1D2024</span>
+    <span class="legend-label">Header, chat list, plan panel</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:#282A30"></div>
+    <span class="tier-label tier-3">Tier 3 — Lightest</span>
+    <span class="legend-hex">#282A30</span>
+    <span class="legend-label">Chat input, action cards</span>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- Nav sidebar -->
+  <div class="nav-sidebar">
+    <div class="nav-icon">P</div>
+    <div class="nav-icon">🏠</div>
+    <div class="nav-icon active">💬</div>
+    <div class="nav-icon">🏢</div>
+    <div class="nav-icon">🤖</div>
+  </div>
+
+  <!-- Chat list — TIER 2 -->
+  <div class="chat-list">
+    <div class="chat-list-header">Recent Chats</div>
+    <div class="chat-item active">
+      <div class="chat-item-title">January Payroll</div>
+      <div class="chat-item-sub">Acme Corp · 3 min ago</div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-item-title">Bonus Calculations</div>
+      <div class="chat-item-sub">TechStart · 1 hr ago</div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-item-title">Benefits Review</div>
+      <div class="chat-item-sub">NovaTech · 2 hrs ago</div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-item-title">Tax Forms 2025</div>
+      <div class="chat-item-sub">Greenfield · yesterday</div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-area">
+    <!-- Header — TIER 2 -->
+    <div class="header">
+      <div class="header-title">January Payroll</div>
+      <div class="header-sub">Acme Corp</div>
+    </div>
+
+    <!-- Messages — TIER 1 (darkest) -->
+    <div class="messages">
+      <div class="msg msg-user">
+        <div class="msg-label">You</div>
+        <div class="msg-bubble">Can you run the January payroll for Acme? They have 68 employees this period.</div>
+      </div>
+      <div class="msg msg-ai">
+        <div class="msg-label">Agent</div>
+        <div class="msg-bubble">I'll process the January payroll for Acme Corp. Let me pull up their current records and prepare the run.</div>
+
+        <!-- Action card — TIER 3 (lightest) -->
+        <div class="action-card">
+          <div class="action-card-title">Payroll Processing Plan</div>
+          <div class="action-step"><span class="plan-step-text">Pull employee roster from BambooHR</span></div>
+          <div class="action-step"><span class="plan-step-text">Calculate gross pay + deductions</span></div>
+          <div class="action-step"><span class="plan-step-text">Generate payroll summary for review</span></div>
+          <div class="action-step"><span class="plan-step-text">Submit to payroll provider</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input — TIER 3 box sitting on TIER 1 background -->
+    <div class="input-area">
+      <div class="input-box">
+        <div class="input-placeholder">Ask anything...</div>
+        <div class="input-toolbar">
+          <span>＋</span>
+          <span>🎤</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan panel — TIER 2 -->
+  <div class="plan-panel">
+    <div class="plan-header">
+      <span>Action Plan</span>
+      <span style="color:#9DA0A8; cursor:pointer;">✕</span>
+    </div>
+    <div class="plan-content">
+      <div class="plan-step">
+        <div class="plan-dot done"></div>
+        <span class="plan-step-text done">Pull employee roster</span>
+      </div>
+      <div class="plan-step">
+        <div class="plan-dot done"></div>
+        <span class="plan-step-text done">Validate pay rates</span>
+      </div>
+      <div class="plan-step">
+        <div class="plan-dot active"></div>
+        <span class="plan-step-text done">Calculate deductions</span>
+      </div>
+      <div class="plan-step">
+        <div class="plan-dot pending"></div>
+        <span class="plan-step-text">Generate summary</span>
+      </div>
+      <div class="plan-step">
+        <div class="plan-dot pending"></div>
+        <span class="plan-step-text">Submit to provider</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

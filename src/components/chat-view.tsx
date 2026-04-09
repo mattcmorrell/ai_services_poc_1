@@ -142,7 +142,7 @@ export function ChatView({
       <div className="p-4 shrink-0">
         <div className="mx-auto max-w-3xl">
           <form onSubmit={handleSubmit}>
-            <div className="rounded-xl border border-border bg-card" style={{ padding: "14px 16px" }}>
+            <div className="rounded-xl border border-border bg-muted" style={{ padding: "14px 16px" }}>
               <textarea
                 ref={inputRef}
                 value={input}
@@ -179,7 +179,7 @@ export function ChatView({
   return (
     <div className="flex h-full flex-1 flex-col overflow-hidden bg-background">
       {/* Header — full width, above split */}
-      <div className="flex items-center justify-between border-b border-border px-6 py-4 shrink-0 bg-muted">
+      <div className="flex items-center justify-between border-b border-border px-6 py-4 shrink-0 bg-card">
         <div>
           <h1 className="text-[24px] font-semibold">{chatTitle}</h1>
           {client && (
