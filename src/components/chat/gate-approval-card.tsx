@@ -56,7 +56,7 @@ export function GateApprovalCard({
   // Approved state: compact summary
   if (isApproved) {
     return (
-      <div className="mt-4 rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-success) 20%, transparent)" }}>
+      <div className="mt-4 rounded-xl bg-muted dark:bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-success) 20%, transparent)" }}>
         <StatusLabel variant="success">
           <Check size={12} />
           <span>Step {gateApproval.stepIndex + 1} approved</span>
@@ -71,7 +71,7 @@ export function GateApprovalCard({
   // Declined state: compact summary
   if (isDeclined) {
     return (
-      <div className="mt-4 rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-danger) 20%, transparent)" }}>
+      <div className="mt-4 rounded-xl bg-muted dark:bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-danger) 20%, transparent)" }}>
         <StatusLabel variant="danger">
           <X size={12} />
           <span>Step {gateApproval.stepIndex + 1} — plan modified</span>
@@ -85,7 +85,7 @@ export function GateApprovalCard({
 
   // Pending state: big approval card
   return (
-    <div className="mt-4 rounded-xl border border-border bg-card/50 overflow-hidden max-w-[520px]">
+    <div className="mt-4 rounded-xl border border-border bg-muted dark:bg-card/50 overflow-hidden max-w-[520px]">
       {/* Header */}
       <div className="flex items-center gap-2.5 px-5 py-3 border-b border-border bg-muted/30">
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted/60">
