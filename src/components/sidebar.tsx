@@ -19,7 +19,7 @@ const navItems = [
   { id: "dashboard", icon: House, label: "Dashboard", badge: 12 },
   { id: "chats", icon: ChatDots, label: "Chats", badge: 5 },
   { id: "clients", icon: Buildings, label: "Clients", badge: null },
-  { id: "agents", icon: Robot, label: "Agents", badge: 1 },
+  { id: "agents", icon: Robot, label: "Agents", badge: null },
 ];
 
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
