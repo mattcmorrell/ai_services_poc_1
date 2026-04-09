@@ -126,9 +126,9 @@ export function ChatListPanel({
     <div className="flex flex-shrink-0" style={{ width }}>
     <div className="flex min-w-0 flex-1 flex-col bg-background">
       {/* Header: title + new chat + search */}
-      <div className="flex min-h-[82px] flex-col justify-end border-b border-border px-3 pb-3">
-        <h2 className="mb-2 text-base font-semibold">Recent Chats</h2>
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col justify-center border-b border-border px-3 py-4">
+        <h2 className="text-base font-semibold">Recent Chats</h2>
+        <div className="mt-1 flex items-center justify-between">
           <button
             onClick={() => {
               const firstClient = clients[0];
