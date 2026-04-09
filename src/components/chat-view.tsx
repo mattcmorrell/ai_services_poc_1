@@ -155,7 +155,7 @@ export function ChatView({
       </ScrollArea>
 
       {/* Input */}
-      <div className="border-t border-border p-4 shrink-0">
+      <div className="p-4 shrink-0">
         <div className="mx-auto max-w-3xl">
           <form onSubmit={handleSubmit}>
             <div className="rounded-xl border border-border bg-card" style={{ padding: "14px 16px" }}>

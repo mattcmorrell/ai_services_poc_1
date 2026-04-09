@@ -286,7 +286,7 @@ export function MessageList({
                       className={cn(
                         message.role === "user"
                           ? theme.userBubbleClass ||
-                              "inline-block bg-muted text-foreground"
+                              "inline-block bg-accent text-foreground"
                           : theme.assistantClass
                       )}
                       style={
