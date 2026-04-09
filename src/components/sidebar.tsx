@@ -33,12 +33,12 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                 <button
                   onClick={() => onViewChange(item.id)}
                   className={cn(
-                    "relative flex h-10 w-full items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
+                    "relative flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
                     activeView === item.id && "bg-accent text-accent-foreground"
                   )}
                 >
                   {item.badge !== null && (
-                    <span className="absolute -right-1 -top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-primary text-[11px] font-semibold leading-none text-primary-foreground">
+                    <span className="absolute -right-1 -top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-semibold leading-none text-primary-foreground">
                       {item.badge}
                     </span>
                   )}
@@ -55,7 +55,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           <ThemeSwitcher />
           <Tooltip>
             <TooltipTrigger asChild>
-              <button className="flex h-10 w-full items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
+              <button className="flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
                 <Gear className="h-4 w-4" />
               </button>
             </TooltipTrigger>
