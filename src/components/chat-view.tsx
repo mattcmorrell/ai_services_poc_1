@@ -3,18 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import {
   DotsThree,
-  CaretDown,
   Plus,
   Microphone,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
 import { PlanSplitView } from "@/components/plan/plan-split-view";
 import { PlanPanelPill } from "@/components/plan/plan-panel";
@@ -49,14 +42,6 @@ interface ChatViewProps {
   onDeclineRequest?: (messageId: string) => void;
 }
 
-const models = [
-  "GPT-4o",
-  "GPT-4 Turbo",
-  "Claude 3.5 Sonnet",
-  "Claude 3 Opus",
-  "Gemini 1.5 Pro",
-  "Gemini 2.0 Flash",
-];
 
 const ogTheme: MessageListTheme = {
   messageSpacing: "mb-6",
@@ -91,7 +76,6 @@ export function ChatView({
   onDeclineRequest,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
-  const [selectedModel, setSelectedModel] = useState("GPT-4o");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -118,8 +102,8 @@ export function ChatView({
       onSendMessage(input.trim());
       setInput("");
       if (inputRef.current) {
-        inputRef.current.style.height = "auto";
-        inputRef.current.style.overflowY = "hidden";
+        inputRef.current.style.height = "20px";
+        inputRef.current.style.overflow = "hidden";
       }
     }
   };
@@ -169,41 +153,21 @@ export function ChatView({
                   const lineHeight = 20;
                   const maxHeight = lineHeight * 5.5;
                   el.style.height = `${Math.min(el.scrollHeight, maxHeight)}px`;
-                  el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
+                  el.style.overflow = el.scrollHeight > maxHeight ? "auto" : "hidden";
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder="Ask anything..."
                 rows={1}
                 className="w-full resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                style={{ lineHeight: "20px", overflowY: "hidden" }}
+                style={{ lineHeight: "20px", overflow: "hidden", minHeight: "20px", height: "20px" }}
               />
               <div className="mt-2 flex items-center justify-between">
                 <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
                   <Plus className="h-4 w-4" />
                 </Button>
-                <div className="flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
-                        {selectedModel}
-                        <CaretDown className="h-3 w-3" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {models.map((model) => (
-                        <DropdownMenuItem
-                          key={model}
-                          onClick={() => setSelectedModel(model)}
-                        >
-                          {model}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
-                    <Microphone className="h-4 w-4" />
-                  </Button>
-                </div>
+                <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
+                  <Microphone className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </form>
