@@ -1,6 +1,6 @@
 "use client";
 
-import { SquaresFour, ChatDots, Buildings, Robot, Gear } from "@phosphor-icons/react";
+import { House, ChatDots, Buildings, Robot, Gear } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import {
@@ -16,7 +16,7 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { id: "dashboard", icon: SquaresFour, label: "Dashboard", badge: 12 },
+  { id: "dashboard", icon: House, label: "Dashboard", badge: 12 },
   { id: "chats", icon: ChatDots, label: "Chats", badge: 5 },
   { id: "clients", icon: Buildings, label: "Clients", badge: null },
   { id: "agents", icon: Robot, label: "Agents", badge: 1 },
@@ -25,7 +25,7 @@ const navItems = [
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="flex h-full w-13 flex-col items-center border-r border-border bg-card py-4 px-1.5">
+      <div className="flex h-full w-16 flex-col items-center border-r border-border bg-card py-4 px-2">
         <nav className="flex flex-1 flex-col items-center gap-1 w-full">
           {navItems.map((item) => (
             <Tooltip key={item.id}>
@@ -38,7 +38,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                   )}
                 >
                   {item.badge !== null && (
-                    <span className="absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[11px] font-semibold text-primary-foreground">
+                    <span className="absolute -right-1 -top-1 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-primary px-0.5 text-[11px] font-semibold leading-none text-primary-foreground">
                       {item.badge}
                     </span>
                   )}
