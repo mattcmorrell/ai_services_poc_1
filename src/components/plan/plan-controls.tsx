@@ -40,12 +40,8 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
         <div className="flex items-center gap-2">
           <button
             onClick={() => { onStop(); setConfirmingStop(false); }}
-            className={cn(buttonBase, "font-medium")}
-            style={{
-              background: "var(--color-danger-muted)",
-              color: "var(--color-danger)",
-              border: "1px solid var(--color-danger-muted)",
-            }}
+            className={cn(buttonBase, "font-medium text-white")}
+            style={{ background: "var(--color-danger)" }}
           >
             <Stop className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Confirm Stop"}
@@ -67,24 +63,16 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
         <>
           <button
             onClick={onPause}
-            className={cn(buttonBase, "font-medium")}
-            style={{
-              background: "var(--color-warning-muted)",
-              color: "var(--color-warning)",
-              border: "1px solid var(--color-warning-muted)",
-            }}
+            className={cn(buttonBase, "font-medium text-white")}
+            style={{ background: "var(--color-warning)" }}
           >
             <Pause className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Pause"}
           </button>
           <button
             onClick={() => setConfirmingStop(true)}
-            className={cn(buttonBase, "font-medium")}
-            style={{
-              background: "var(--color-danger-muted)",
-              color: "var(--color-danger)",
-              border: "1px solid var(--color-danger-muted)",
-            }}
+            className={cn(buttonBase, "font-medium text-white")}
+            style={{ background: "var(--color-danger)" }}
           >
             <Stop className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Stop"}
@@ -96,24 +84,16 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
         <>
           <button
             onClick={onResume}
-            className={cn(buttonBase, "font-medium")}
-            style={{
-              background: "var(--color-success-muted)",
-              color: "var(--color-success)",
-              border: "1px solid var(--color-success-muted)",
-            }}
+            className={cn(buttonBase, "font-medium text-white")}
+            style={{ background: "var(--color-success)" }}
           >
             <Play className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Resume"}
           </button>
           <button
             onClick={() => setConfirmingStop(true)}
-            className={cn(buttonBase, "font-medium")}
-            style={{
-              background: "var(--color-danger-muted)",
-              color: "var(--color-danger)",
-              border: "1px solid var(--color-danger-muted)",
-            }}
+            className={cn(buttonBase, "font-medium text-white")}
+            style={{ background: "var(--color-danger)" }}
           >
             <Stop className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Stop"}
