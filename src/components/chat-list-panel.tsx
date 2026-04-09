@@ -5,10 +5,7 @@ import { Plus, MagnifyingGlass, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Client, Chat } from "@/types/chat";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChatClientToggle } from "@/components/chat-client-toggle";
 import { useResizable, ResizeHandle } from "@/components/ui/resize-handle";
-
-type ViewMode = "recent" | "clients";
 
 interface ChatListPanelProps {
   clients: Client[];
@@ -16,8 +13,6 @@ interface ChatListPanelProps {
   selectedChatId: string | null;
   onSelectChat: (chatId: string) => void;
   onNewChat: (clientId: string) => void;
-  viewMode: ViewMode;
-  onViewModeChange: (mode: ViewMode) => void;
 }
 
 function formatTimeAgo(date: Date): string {
@@ -77,8 +72,6 @@ export function ChatListPanel({
   selectedChatId,
   onSelectChat,
   onNewChat,
-  viewMode,
-  onViewModeChange,
 }: ChatListPanelProps) {
   const { width, onDragStart } = useResizable({
     defaultWidth: 288,
@@ -132,37 +125,35 @@ export function ChatListPanel({
   return (
     <div className="flex flex-shrink-0" style={{ width }}>
     <div className="flex min-w-0 flex-1 flex-col bg-background">
-      {/* Toggle */}
-      <div className="p-3 border-b border-border">
-        <ChatClientToggle mode={viewMode} onChange={onViewModeChange} />
-      </div>
-
-      {/* New Chat + Search */}
-      <div className="flex items-center justify-between p-3 border-b border-border">
-        <button
-          onClick={() => {
-            const firstClient = clients[0];
-            if (firstClient) {
-              onNewChat(firstClient.id);
-            }
-          }}
-          className="flex items-center gap-2 text-primary hover:text-primary/80 text-sm"
-        >
-          <Plus className="w-4 h-4" />
-          New Chat
-        </button>
-        <button
-          onClick={handleSearchToggle}
-          className={cn(
-            "inline-flex h-7 w-7 items-center justify-center rounded-md",
-            "text-muted-foreground transition-colors",
-            "hover:bg-muted hover:text-foreground",
-            searchOpen && "bg-muted text-foreground"
-          )}
-          aria-label={searchOpen ? "Close search" : "Search chats"}
-        >
-          {searchOpen ? <X className="h-3.5 w-3.5" /> : <MagnifyingGlass className="h-3.5 w-3.5" />}
-        </button>
+      {/* Header: title + new chat + search */}
+      <div className="flex min-h-[82px] flex-col justify-end border-b border-border px-3 pb-3">
+        <h2 className="mb-2 text-base font-semibold">Recent Chats</h2>
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => {
+              const firstClient = clients[0];
+              if (firstClient) {
+                onNewChat(firstClient.id);
+              }
+            }}
+            className="flex items-center gap-2 text-primary hover:text-primary/80 text-sm"
+          >
+            <Plus className="w-4 h-4" />
+            New Chat
+          </button>
+          <button
+            onClick={handleSearchToggle}
+            className={cn(
+              "inline-flex h-7 w-7 items-center justify-center rounded-md",
+              "text-muted-foreground transition-colors",
+              "hover:bg-muted hover:text-foreground",
+              searchOpen && "bg-muted text-foreground"
+            )}
+            aria-label={searchOpen ? "Close search" : "Search chats"}
+          >
+            {searchOpen ? <X className="h-3.5 w-3.5" /> : <MagnifyingGlass className="h-3.5 w-3.5" />}
+          </button>
+        </div>
       </div>
 
       {/* Search input */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { SquaresFour, ChatDots, Robot, Gear } from "@phosphor-icons/react";
+import { SquaresFour, ChatDots, Buildings, Robot, Gear } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 
@@ -12,6 +12,7 @@ interface SidebarProps {
 const navItems = [
   { id: "dashboard", icon: SquaresFour, label: "Dashboard", badge: 12 },
   { id: "chats", icon: ChatDots, label: "Chats", badge: 5 },
+  { id: "clients", icon: Buildings, label: "Clients", badge: null },
   { id: "agents", icon: Robot, label: "Agents", badge: 1 },
 ];
 

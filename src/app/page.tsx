@@ -20,8 +20,7 @@ import { useStreamingChatSession } from "@/hooks/use-streaming-chat-session";
 
 export default function Home() {
   const [activeView, setActiveView] = useState("dashboard");
-  const [chatPanelMode, setChatPanelMode] = useState<"recent" | "clients">("recent");
-  const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
+const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
   const [chats, setChats] = useState<Chat[]>(mockChats);
   // Loading state is now derived from streamingSession.loadingChatId
   const [agents, setAgents] = useState<Agent[]>(mockAgents);
@@ -652,7 +651,6 @@ export default function Home() {
       handleNewChat(clientId);
     }
     setActiveView("chats");
-    setChatPanelMode("recent");
   };
 
   // Pending message from dashboard — sent via streaming hook after chat becomes active
@@ -684,7 +682,6 @@ export default function Home() {
       pendingDashboardMessageRef.current = message;
       setSelectedChatId(newChatId);
       setActiveView("chats");
-      setChatPanelMode("recent");
     },
     []
   );
@@ -747,7 +744,6 @@ export default function Home() {
     setClientSelectOpen(false);
     setSelectedAgentForClient(null);
     setActiveView("chats");
-    setChatPanelMode("recent");
   };
 
   const handleToggleFavorite = (agentId: string) => {
@@ -780,17 +776,13 @@ export default function Home() {
 
     if (activeView === "chats") {
       return (
-        <>
-          {/* Recent Chats mode */}
-          <div className={chatPanelMode === "recent" ? "flex flex-1 overflow-hidden" : "hidden"}>
+        <div className="flex flex-1 overflow-hidden">
             <ChatListPanel
               clients={mockClients}
               chats={chats}
               selectedChatId={selectedChatId}
               onSelectChat={setSelectedChatId}
               onNewChat={handleNewChat}
-              viewMode={chatPanelMode}
-              onViewModeChange={setChatPanelMode}
             />
             {selectedChat ? (
               <ChatView
@@ -824,7 +816,7 @@ export default function Home() {
                 Select a chat to start messaging
               </div>
             )}
-            {selectedArtifact && chatPanelMode === "recent" && (
+            {selectedArtifact && (
               <ArtifactPanel
                 artifact={selectedArtifact}
                 onClose={() => setSelectedArtifactId(null)}
@@ -846,25 +838,23 @@ export default function Home() {
                 onClose={() => setWorkflowPanelOpen(false)}
               />
             )}
-          </div>
+        </div>
+      );
+    }
 
-          {/* Clients mode */}
-          <div className={chatPanelMode === "clients" ? "flex flex-1 overflow-hidden" : "hidden"}>
-            <ClientsView
-              clients={mockClients}
-              chats={chats}
-              onSendMessage={handleSendMessageForChat}
-              onApprove={handleApproveForChat}
-              onDecline={handleDeclineForChat}
-              onNewChat={handleNewChat}
-              onWorkflowClick={handleWorkflowClick}
-              onArtifactClick={setSelectedArtifactId}
-              loadingChatId={streamingSession.loadingChatId}
-              chatPanelMode={chatPanelMode}
-              onChatPanelModeChange={setChatPanelMode}
-            />
-          </div>
-        </>
+    if (activeView === "clients") {
+      return (
+        <ClientsView
+          clients={mockClients}
+          chats={chats}
+          onSendMessage={handleSendMessageForChat}
+          onApprove={handleApproveForChat}
+          onDecline={handleDeclineForChat}
+          onNewChat={handleNewChat}
+          onWorkflowClick={handleWorkflowClick}
+          onArtifactClick={setSelectedArtifactId}
+          loadingChatId={streamingSession.loadingChatId}
+        />
       );
     }
 

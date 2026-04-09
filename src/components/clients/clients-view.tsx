@@ -36,8 +36,6 @@ interface ClientsViewProps {
   onWorkflowClick: (workflowId: string) => void;
   onArtifactClick: (artifactId: string) => void;
   loadingChatId: string | null;
-  chatPanelMode: "recent" | "clients";
-  onChatPanelModeChange: (mode: "recent" | "clients") => void;
 }
 
 export function ClientsView({
@@ -50,8 +48,6 @@ export function ClientsView({
   onWorkflowClick,
   onArtifactClick,
   loadingChatId,
-  chatPanelMode,
-  onChatPanelModeChange,
 }: ClientsViewProps) {
   // ── Approach switcher state ───────────────────────────────────────
   const [currentApproach, setCurrentApproach] = useState("C");
@@ -295,8 +291,6 @@ export function ClientsView({
           selectedClientId={selectedClientId}
           onSelectClient={handleSelectClient}
           tabBar={tabBar}
-          chatPanelMode={chatPanelMode}
-          onChatPanelModeChange={onChatPanelModeChange}
         >
           {productionTabContent}
         </SidebarList>
