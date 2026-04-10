@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avatar Color Proposal</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #0d0d14;
+    color: #e0e0e8;
+    padding: 32px 40px 80px;
+    line-height: 1.5;
+  }
+
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { font-size: 14px; color: #999; margin-bottom: 28px; }
+
+  /* Tab switcher */
+  .switcher {
+    display: flex; gap: 4px; margin-bottom: 32px;
+    background: rgba(255,255,255,0.04); border-radius: 10px; padding: 4px;
+    width: fit-content;
+  }
+  .switcher button {
+    padding: 8px 18px; border: none; border-radius: 8px;
+    background: transparent; color: #999; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+  }
+  .switcher button.active {
+    background: rgba(255,255,255,0.1); color: #e0e0e8;
+  }
+  .switcher button:hover:not(.active) { color: #ccc; }
+
+  .design-panel { display: none; }
+  .design-panel.active { display: block; }
+
+  /* Section layout */
+  .theme-section {
+    margin-bottom: 40px;
+    padding: 28px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+  }
+  .theme-section h2 {
+    font-size: 16px; font-weight: 700; margin-bottom: 4px;
+  }
+  .theme-desc {
+    font-size: 13px; color: #888; margin-bottom: 20px;
+  }
+
+  .mode-row {
+    display: flex; gap: 32px; margin-bottom: 20px; align-items: flex-start;
+  }
+  .mode-row:last-child { margin-bottom: 0; }
+
+  .mode-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #777; margin-bottom: 10px;
+    width: 50px; flex-shrink: 0; padding-top: 12px;
+  }
+
+  /* Avatar display strip */
+  .avatar-strip {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding: 20px 24px;
+    border-radius: 12px;
+    flex: 1;
+  }
+  .avatar-strip.dark-bg {
+    background: #1a1c22;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .avatar-strip.light-bg {
+    background: #e8e9ed;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .avatar-strip.inkwell-dark-bg {
+    background: #1c2426;
+    border: 1px solid rgba(220,215,201,0.08);
+  }
+  .avatar-strip.inkwell-light-bg {
+    background: #ebe8e0;
+    border: 1px solid rgba(44,54,57,0.1);
+  }
+  .avatar-strip.orbital-dark-bg {
+    background: #1e2830;
+    border: 1px solid rgba(196,212,220,0.08);
+  }
+  .avatar-strip.orbital-light-bg {
+    background: #e0eaf2;
+    border: 1px solid rgba(26,40,48,0.08);
+  }
+
+  .avatar-item {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .avatar-circle {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: white;
+    flex-shrink: 0;
+  }
+  .avatar-hex {
+    font-size: 11px; font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #888; white-space: nowrap;
+  }
+  .avatar-strip.light-bg .avatar-hex,
+  .avatar-strip.inkwell-light-bg .avatar-hex,
+  .avatar-strip.orbital-light-bg .avatar-hex {
+    color: #777;
+  }
+  .avatar-name {
+    font-size: 11px; color: #aaa; font-weight: 600;
+  }
+  .avatar-strip.light-bg .avatar-name,
+  .avatar-strip.inkwell-light-bg .avatar-name,
+  .avatar-strip.orbital-light-bg .avatar-name {
+    color: #666;
+  }
+
+  /* Comparison panel specifics */
+  .comparison-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  }
+  .comparison-side { display: flex; flex-direction: column; }
+  .comparison-side h3 {
+    font-size: 13px; font-weight: 700; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tag {
+    font-size: 11px; font-weight: 600; padding: 2px 8px;
+    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .tag-current { background: rgba(255,255,255,0.06); color: #888; }
+  .tag-new { background: rgba(99,180,255,0.12); color: #63b4ff; }
+
+  /* Context simulation — sidebar with avatars */
+  .context-sim {
+    display: flex; gap: 24px; margin-top: 24px;
+  }
+  .sim-sidebar {
+    width: 260px; border-radius: 12px; padding: 14px;
+    display: flex; flex-direction: column; gap: 2px;
+    flex-shrink: 0;
+  }
+  .sim-sidebar.dark-bg {
+    background: #1a1c22;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .sim-sidebar.light-bg {
+    background: #f7f7fa;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .sim-sidebar.inkwell-dark-bg { background: #1c2426; border: 1px solid rgba(220,215,201,0.08); }
+  .sim-sidebar.inkwell-light-bg { background: #f7f5f1; border: 1px solid rgba(44,54,57,0.1); }
+  .sim-sidebar.orbital-dark-bg { background: #1e2830; border: 1px solid rgba(196,212,220,0.08); }
+  .sim-sidebar.orbital-light-bg { background: #f0f2f5; border: 1px solid rgba(26,40,48,0.08); }
+
+  .sim-sidebar-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 4px 8px; margin-bottom: 6px;
+  }
+  .sim-sidebar.dark-bg .sim-sidebar-title,
+  .sim-sidebar.inkwell-dark-bg .sim-sidebar-title,
+  .sim-sidebar.orbital-dark-bg .sim-sidebar-title { color: #777; }
+  .sim-sidebar.light-bg .sim-sidebar-title,
+  .sim-sidebar.inkwell-light-bg .sim-sidebar-title,
+  .sim-sidebar.orbital-light-bg .sim-sidebar-title { color: #999; }
+
+  .sim-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px; border-radius: 8px; cursor: default;
+    transition: background 0.15s;
+  }
+  .sim-sidebar.dark-bg .sim-row:hover,
+  .sim-sidebar.inkwell-dark-bg .sim-row:hover,
+  .sim-sidebar.orbital-dark-bg .sim-row:hover { background: rgba(255,255,255,0.04); }
+  .sim-sidebar.light-bg .sim-row:hover,
+  .sim-sidebar.inkwell-light-bg .sim-row:hover,
+  .sim-sidebar.orbital-light-bg .sim-row:hover { background: rgba(0,0,0,0.04); }
+
+  .sim-row .avatar-circle { width: 32px; height: 32px; font-size: 12px; }
+  .sim-client-name { font-size: 13px; font-weight: 600; }
+  .sim-sidebar.dark-bg .sim-client-name,
+  .sim-sidebar.inkwell-dark-bg .sim-client-name,
+  .sim-sidebar.orbital-dark-bg .sim-client-name { color: #e0e0e8; }
+  .sim-sidebar.light-bg .sim-client-name,
+  .sim-sidebar.inkwell-light-bg .sim-client-name,
+  .sim-sidebar.orbital-light-bg .sim-client-name { color: #2a2a30; }
+  .sim-client-detail { font-size: 12px; }
+  .sim-sidebar.dark-bg .sim-client-detail,
+  .sim-sidebar.inkwell-dark-bg .sim-client-detail,
+  .sim-sidebar.orbital-dark-bg .sim-client-detail { color: #888; }
+  .sim-sidebar.light-bg .sim-client-detail,
+  .sim-sidebar.inkwell-light-bg .sim-client-detail,
+  .sim-sidebar.orbital-light-bg .sim-client-detail { color: #888; }
+
+  /* Activity row with small avatars */
+  .sim-activity {
+    flex: 1; border-radius: 12px; padding: 18px 20px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .sim-activity.dark-bg { background: #1a1c22; border: 1px solid rgba(255,255,255,0.06); }
+  .sim-activity.light-bg { background: #ffffff; border: 1px solid rgba(0,0,0,0.08); }
+  .sim-activity.inkwell-dark-bg { background: #1c2426; border: 1px solid rgba(220,215,201,0.08); }
+  .sim-activity.inkwell-light-bg { background: #ffffff; border: 1px solid rgba(44,54,57,0.1); }
+  .sim-activity.orbital-dark-bg { background: #1e2830; border: 1px solid rgba(196,212,220,0.08); }
+  .sim-activity.orbital-light-bg { background: #ffffff; border: 1px solid rgba(26,40,48,0.08); }
+
+  .sim-activity-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .sim-activity.dark-bg .sim-activity-title,
+  .sim-activity.inkwell-dark-bg .sim-activity-title,
+  .sim-activity.orbital-dark-bg .sim-activity-title { color: #777; }
+  .sim-activity.light-bg .sim-activity-title,
+  .sim-activity.inkwell-light-bg .sim-activity-title,
+  .sim-activity.orbital-light-bg .sim-activity-title { color: #999; }
+
+  .activity-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .activity-row .avatar-circle { width: 28px; height: 28px; font-size: 11px; }
+  .activity-text { font-size: 13px; }
+  .sim-activity.dark-bg .activity-text,
+  .sim-activity.inkwell-dark-bg .activity-text,
+  .sim-activity.orbital-dark-bg .activity-text { color: #ccc; }
+  .sim-activity.light-bg .activity-text,
+  .sim-activity.inkwell-light-bg .activity-text,
+  .sim-activity.orbital-light-bg .activity-text { color: #444; }
+  .activity-text strong { font-weight: 600; }
+  .sim-activity.dark-bg .activity-text strong,
+  .sim-activity.inkwell-dark-bg .activity-text strong,
+  .sim-activity.orbital-dark-bg .activity-text strong { color: #e0e0e8; }
+  .sim-activity.light-bg .activity-text strong,
+  .sim-activity.inkwell-light-bg .activity-text strong,
+  .sim-activity.orbital-light-bg .activity-text strong { color: #1a1a20; }
+
+  .divider {
+    height: 1px; margin: 16px 0;
+  }
+  .theme-section .divider { background: rgba(255,255,255,0.06); }
+
+  /* Selected-state simulation */
+  .selected-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  }
+  .selected-side h3 {
+    font-size: 13px; font-weight: 700; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .selected-strip {
+    display: flex; flex-direction: column; gap: 0;
+    border-radius: 12px; overflow: hidden;
+  }
+  .selected-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px;
+    transition: background 0.15s;
+  }
+  .selected-row .avatar-circle {
+    width: 32px; height: 32px; font-size: 12px; flex-shrink: 0;
+  }
+  .selected-row-text {
+    display: flex; flex-direction: column;
+  }
+  .selected-row-name {
+    font-size: 13px; font-weight: 600;
+  }
+  .selected-row-detail {
+    font-size: 12px;
+  }
+  /* Dark unselected row */
+  .selected-strip.dark-strip .selected-row {
+    background: #1a1c22;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .selected-strip.dark-strip .selected-row-name { color: #c8c8d0; }
+  .selected-strip.dark-strip .selected-row-detail { color: #888; }
+  .selected-strip.dark-strip .selected-row.is-selected .selected-row-name { color: #fff; }
+  .selected-strip.dark-strip .selected-row.is-selected .selected-row-detail { color: rgba(255,255,255,0.7); }
+
+  /* Light unselected row */
+  .selected-strip.light-strip .selected-row {
+    background: #f7f7fa;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .selected-strip.light-strip .selected-row-name { color: #2a2a30; }
+  .selected-strip.light-strip .selected-row-detail { color: #888; }
+  .selected-strip.light-strip .selected-row.is-selected .selected-row-name { color: #fff; }
+  .selected-strip.light-strip .selected-row.is-selected .selected-row-detail { color: rgba(255,255,255,0.7); }
+
+  /* Inkwell dark */
+  .selected-strip.inkwell-dark-strip .selected-row {
+    background: #1c2426;
+    border-bottom: 1px solid rgba(220,215,201,0.06);
+  }
+  .selected-strip.inkwell-dark-strip .selected-row-name { color: #c8c2b4; }
+  .selected-strip.inkwell-dark-strip .selected-row-detail { color: #888; }
+  .selected-strip.inkwell-dark-strip .selected-row.is-selected .selected-row-name { color: #fff; }
+  .selected-strip.inkwell-dark-strip .selected-row.is-selected .selected-row-detail { color: rgba(255,255,255,0.7); }
+
+  /* Inkwell light */
+  .selected-strip.inkwell-light-strip .selected-row {
+    background: #f7f5f1;
+    border-bottom: 1px solid rgba(44,54,57,0.08);
+  }
+  .selected-strip.inkwell-light-strip .selected-row-name { color: #2e3b3d; }
+  .selected-strip.inkwell-light-strip .selected-row-detail { color: #888; }
+  .selected-strip.inkwell-light-strip .selected-row.is-selected .selected-row-name { color: #fff; }
+  .selected-strip.inkwell-light-strip .selected-row.is-selected .selected-row-detail { color: rgba(255,255,255,0.7); }
+
+  /* Orbital dark */
+  .selected-strip.orbital-dark-strip .selected-row {
+    background: #1e2830;
+    border-bottom: 1px solid rgba(196,212,220,0.06);
+  }
+  .selected-strip.orbital-dark-strip .selected-row-name { color: #c8d4dc; }
+  .selected-strip.orbital-dark-strip .selected-row-detail { color: #888; }
+  .selected-strip.orbital-dark-strip .selected-row.is-selected .selected-row-name { color: #fff; }
+  .selected-strip.orbital-dark-strip .selected-row.is-selected .selected-row-detail { color: rgba(255,255,255,0.7); }
+
+  /* Orbital light */
+  .selected-strip.orbital-light-strip .selected-row {
+    background: #f0f2f5;
+    border-bottom: 1px solid rgba(26,40,48,0.08);
+  }
+  .selected-strip.orbital-light-strip .selected-row-name { color: #2a3a44; }
+  .selected-strip.orbital-light-strip .selected-row-detail { color: #888; }
+  .selected-strip.orbital-light-strip .selected-row.is-selected .selected-row-name { color: #fff; }
+  .selected-strip.orbital-light-strip .selected-row.is-selected .selected-row-detail { color: rgba(255,255,255,0.7); }
+
+  /* Selected row left border accent */
+  .selected-row.is-selected {
+    border-left: 3px solid rgba(255,255,255,0.3);
+  }
+</style>
+</head>
+<body>
+
+<h1>Avatar Color Proposal</h1>
+<p class="subtitle">Current (drab) vs proposed (brighter, more saturated) — shown across all 3 themes in dark + light mode</p>
+
+<div class="switcher">
+  <button class="active" onclick="switchTab(0)">1 Swatches</button>
+  <button onclick="switchTab(1)">2 In Context</button>
+  <button onclick="switchTab(2)">3 Side-by-Side</button>
+  <button onclick="switchTab(3)">4 Selected State</button>
+</div>
+
+<!-- ============================================ -->
+<!-- TAB 1: SWATCHES                              -->
+<!-- ============================================ -->
+<div class="design-panel active" id="tab-0">
+
+  <div class="theme-section">
+    <h2>Mercury <span style="color:#6878B8">●</span></h2>
+    <p class="theme-desc">Cool desaturated steel blue</p>
+
+    <div class="mode-row">
+      <div class="mode-label">Dark</div>
+      <div class="avatar-strip dark-bg" id="mercury-dark-new"></div>
+    </div>
+    <div class="mode-row">
+      <div class="mode-label">Light</div>
+      <div class="avatar-strip light-bg" id="mercury-light-new"></div>
+    </div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Inkwell <span style="color:#7A9A78">●</span></h2>
+    <p class="theme-desc">Warm earthy sage</p>
+
+    <div class="mode-row">
+      <div class="mode-label">Dark</div>
+      <div class="avatar-strip inkwell-dark-bg" id="inkwell-dark-new"></div>
+    </div>
+    <div class="mode-row">
+      <div class="mode-label">Light</div>
+      <div class="avatar-strip inkwell-light-bg" id="inkwell-light-new"></div>
+    </div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Orbital <span style="color:#8AAEC4">●</span></h2>
+    <p class="theme-desc">Blue-steel technical</p>
+
+    <div class="mode-row">
+      <div class="mode-label">Dark</div>
+      <div class="avatar-strip orbital-dark-bg" id="orbital-dark-new"></div>
+    </div>
+    <div class="mode-row">
+      <div class="mode-label">Light</div>
+      <div class="avatar-strip orbital-light-bg" id="orbital-light-new"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- TAB 2: IN CONTEXT                            -->
+<!-- ============================================ -->
+<div class="design-panel" id="tab-1">
+
+  <div class="theme-section">
+    <h2>Mercury Dark — In Context</h2>
+    <p class="theme-desc">Client sidebar + activity feed simulation</p>
+    <div class="context-sim" id="ctx-mercury-dark"></div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Mercury Light — In Context</h2>
+    <p class="theme-desc">Client sidebar + activity feed simulation</p>
+    <div class="context-sim" id="ctx-mercury-light"></div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Inkwell Dark — In Context</h2>
+    <p class="theme-desc">Client sidebar + activity feed simulation</p>
+    <div class="context-sim" id="ctx-inkwell-dark"></div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Inkwell Light — In Context</h2>
+    <p class="theme-desc">Client sidebar + activity feed simulation</p>
+    <div class="context-sim" id="ctx-inkwell-light"></div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Orbital Dark — In Context</h2>
+    <p class="theme-desc">Client sidebar + activity feed simulation</p>
+    <div class="context-sim" id="ctx-orbital-dark"></div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Orbital Light — In Context</h2>
+    <p class="theme-desc">Client sidebar + activity feed simulation</p>
+    <div class="context-sim" id="ctx-orbital-light"></div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- TAB 3: SIDE-BY-SIDE COMPARISON               -->
+<!-- ============================================ -->
+<div class="design-panel" id="tab-2">
+
+  <div class="theme-section">
+    <h2>Mercury Dark — Current vs Proposed</h2>
+    <div class="comparison-grid">
+      <div class="comparison-side">
+        <h3><span class="tag tag-current">Current</span></h3>
+        <div class="avatar-strip dark-bg" id="cmp-mercury-dark-old"></div>
+      </div>
+      <div class="comparison-side">
+        <h3><span class="tag tag-new">Proposed</span></h3>
+        <div class="avatar-strip dark-bg" id="cmp-mercury-dark-new"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Mercury Light — Current vs Proposed</h2>
+    <div class="comparison-grid">
+      <div class="comparison-side">
+        <h3><span class="tag tag-current">Current</span></h3>
+        <div class="avatar-strip light-bg" id="cmp-mercury-light-old"></div>
+      </div>
+      <div class="comparison-side">
+        <h3><span class="tag tag-new">Proposed</span></h3>
+        <div class="avatar-strip light-bg" id="cmp-mercury-light-new"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Inkwell Dark — Current vs Proposed</h2>
+    <div class="comparison-grid">
+      <div class="comparison-side">
+        <h3><span class="tag tag-current">Current</span></h3>
+        <div class="avatar-strip inkwell-dark-bg" id="cmp-inkwell-dark-old"></div>
+      </div>
+      <div class="comparison-side">
+        <h3><span class="tag tag-new">Proposed</span></h3>
+        <div class="avatar-strip inkwell-dark-bg" id="cmp-inkwell-dark-new"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Inkwell Light — Current vs Proposed</h2>
+    <div class="comparison-grid">
+      <div class="comparison-side">
+        <h3><span class="tag tag-current">Current</span></h3>
+        <div class="avatar-strip inkwell-light-bg" id="cmp-inkwell-light-old"></div>
+      </div>
+      <div class="comparison-side">
+        <h3><span class="tag tag-new">Proposed</span></h3>
+        <div class="avatar-strip inkwell-light-bg" id="cmp-inkwell-light-new"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Orbital Dark — Current vs Proposed</h2>
+    <div class="comparison-grid">
+      <div class="comparison-side">
+        <h3><span class="tag tag-current">Current</span></h3>
+        <div class="avatar-strip orbital-dark-bg" id="cmp-orbital-dark-old"></div>
+      </div>
+      <div class="comparison-side">
+        <h3><span class="tag tag-new">Proposed</span></h3>
+        <div class="avatar-strip orbital-dark-bg" id="cmp-orbital-dark-new"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Orbital Light — Current vs Proposed</h2>
+    <div class="comparison-grid">
+      <div class="comparison-side">
+        <h3><span class="tag tag-current">Current</span></h3>
+        <div class="avatar-strip orbital-light-bg" id="cmp-orbital-light-old"></div>
+      </div>
+      <div class="comparison-side">
+        <h3><span class="tag tag-new">Proposed</span></h3>
+        <div class="avatar-strip orbital-light-bg" id="cmp-orbital-light-new"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- TAB 4: SELECTED STATE                        -->
+<!-- ============================================ -->
+<div class="design-panel" id="tab-3">
+
+  <div class="theme-section" style="border-color: rgba(255,100,100,0.2); background: rgba(255,60,60,0.03);">
+    <h2>Clash Examples — What We Fixed</h2>
+    <p class="theme-desc">Old Cobalt &amp; Iris on Mercury/Orbital selected rows — the avatar disappears into the accent background</p>
+    <div class="selected-grid">
+      <div class="selected-side">
+        <h3>Mercury Dark <span class="tag" style="background:rgba(255,80,80,0.15);color:#ff8080;">old cobalt + iris</span></h3>
+        <div class="selected-strip dark-strip" id="clash-mercury-dark-old"></div>
+      </div>
+      <div class="selected-side">
+        <h3>Mercury Dark <span class="tag tag-new">fixed: indigo + chartreuse</span></h3>
+        <div class="selected-strip dark-strip" id="clash-mercury-dark-new"></div>
+      </div>
+    </div>
+    <div style="height:16px"></div>
+    <div class="selected-grid">
+      <div class="selected-side">
+        <h3>Orbital Light <span class="tag" style="background:rgba(255,80,80,0.15);color:#ff8080;">old cobalt + iris</span></h3>
+        <div class="selected-strip orbital-light-strip" id="clash-orbital-light-old"></div>
+      </div>
+      <div class="selected-side">
+        <h3>Orbital Light <span class="tag tag-new">fixed: indigo + chartreuse</span></h3>
+        <div class="selected-strip orbital-light-strip" id="clash-orbital-light-new"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Mercury <span style="color:#6878B8">●</span> — Selected State</h2>
+    <p class="theme-desc">All 10 proposed avatars on primary-color row background. Every 3rd row selected.</p>
+
+    <div class="selected-grid">
+      <div class="selected-side">
+        <h3>Dark <span class="tag tag-current" style="margin-left:auto">primary: #6878B8</span></h3>
+        <div class="selected-strip dark-strip" id="sel-mercury-dark"></div>
+      </div>
+      <div class="selected-side">
+        <h3>Light <span class="tag tag-current" style="margin-left:auto">primary: #506098</span></h3>
+        <div class="selected-strip light-strip" id="sel-mercury-light"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Inkwell <span style="color:#7A9A78">●</span> — Selected State</h2>
+    <p class="theme-desc">Avatar on primary-color row background</p>
+
+    <div class="selected-grid">
+      <div class="selected-side">
+        <h3>Dark <span class="tag tag-current" style="margin-left:auto">primary: #7A9A78</span></h3>
+        <div class="selected-strip inkwell-dark-strip" id="sel-inkwell-dark"></div>
+      </div>
+      <div class="selected-side">
+        <h3>Light <span class="tag tag-current" style="margin-left:auto">primary: #5A7A58</span></h3>
+        <div class="selected-strip inkwell-light-strip" id="sel-inkwell-light"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="theme-section">
+    <h2>Orbital <span style="color:#8AAEC4">●</span> — Selected State</h2>
+    <p class="theme-desc">Avatar on primary-color row background</p>
+
+    <div class="selected-grid">
+      <div class="selected-side">
+        <h3>Dark <span class="tag tag-current" style="margin-left:auto">primary: #8AAEC4</span></h3>
+        <div class="selected-strip orbital-dark-strip" id="sel-orbital-dark"></div>
+      </div>
+      <div class="selected-side">
+        <h3>Light <span class="tag tag-current" style="margin-left:auto">primary: #4A7A98</span></h3>
+        <div class="selected-strip orbital-light-strip" id="sel-orbital-light"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- Data ----
+const NAMES = ['Indigo','Jade','Amethyst','Goldenrod','Coral','Cyan','Chartreuse','Emerald','Tangerine','Fuchsia'];
+const INITIALS = ['AS','UC','WY','BM','CS','TC','JP','MC','PR','KL'];
+const CLIENT_NAMES = ['Aperture Science','Umbrella Corp','Weyland-Yutani','Black Mesa','Cyberdyne Systems','Tyrell Corp','Jessica Park','Marcus Chen','Payroll Runner','CX Oracle'];
+
+const CURRENT = {
+  'mercury-dark':   ['#5B78B8','#7BAA82','#9B7AB8','#C4A060','#B87A7A','#5BAAAA','#8E9AD0','#6B9A7A','#D08860','#B87AA0'],
+  'mercury-light':  ['#3B5888','#4A7A52','#7B5A98','#8A7040','#985A5A','#3B8A8A','#506098','#4B7A5A','#A06828','#985A80'],
+  'inkwell-dark':   ['#5B8DB8','#6BAA6B','#9B7AB8','#C4965A','#B87A7A','#5BAAAA','#7A7AB8','#6B9A7A','#C4805A','#B87AA0'],
+  'inkwell-light':  ['#3B6D98','#4B8A4B','#7B5A98','#A47640','#985A5A','#3B8A8A','#5A5A98','#4B7A5A','#A4603A','#985A80'],
+  'orbital-dark':   ['#5B8DB8','#7BAA82','#9B7AB8','#C4A060','#B87A7A','#6BBABA','#8AAEC4','#6B9A7A','#D08860','#B87AA0'],
+  'orbital-light':  ['#3B6D98','#4A8A52','#7B5A98','#8A7040','#985A5A','#3B8A8A','#4A7A98','#4B7A5A','#A06828','#985A80'],
+};
+
+const PROPOSED = {
+  'mercury-dark':   ['#6470E8','#58C088','#A87AE8','#D8A840','#E06868','#48C4D0','#8CB838','#50B870','#E89050','#D868B0'],
+  'mercury-light':  ['#3C48C0','#2D8A5E','#7E52C4','#A88420','#C04848','#1A8EA0','#5C8418','#2E8850','#C06A18','#B84888'],
+  'inkwell-dark':   ['#6470E8','#58B860','#A578E0','#DAA040','#E06460','#48C0C0','#8CB838','#50B868','#E88848','#D868A8'],
+  'inkwell-light':  ['#3C48C0','#338A3E','#7C50BE','#B88518','#C0463C','#1E9090','#5C8418','#2E8848','#C06020','#B84A80'],
+  'orbital-dark':   ['#6470E8','#58C08A','#A87AEC','#D4A840','#E07070','#48C8D8','#8CB838','#50BA72','#EA9050','#DA68B8'],
+  'orbital-light':  ['#3C48C0','#2A8A58','#7850C8','#A48420','#C04850','#1890A8','#5C8418','#2C8A52','#C46818','#BA4890'],
+};
+
+// ---- Render helpers ----
+function avatarHTML(color, initial, name, hex) {
+  return `<div class="avatar-item">
+    <div class="avatar-circle" style="background:${color}">${initial}</div>
+    ${hex ? `<div class="avatar-hex">${color}</div>` : ''}
+    ${name ? `<div class="avatar-name">${name}</div>` : ''}
+  </div>`;
+}
+
+function renderStrip(containerId, colors, showHex, showName) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = colors.map((c, i) =>
+    avatarHTML(c, INITIALS[i], showName ? NAMES[i] : null, showHex)
+  ).join('');
+}
+
+function renderContext(containerId, colors, bgClass) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  const sidebarRows = CLIENT_NAMES.slice(0, 6).map((name, i) => `
+    <div class="sim-row">
+      <div class="avatar-circle" style="background:${colors[i]}">${INITIALS[i]}</div>
+      <div>
+        <div class="sim-client-name">${name}</div>
+        <div class="sim-client-detail">${['8 min ago','3h ago','yesterday','2d ago','1w ago','2w ago'][i]}</div>
+      </div>
+    </div>
+  `).join('');
+
+  const activityRows = [
+    { idx: 6, action: 'ran Q4 compensation report' },
+    { idx: 7, action: 'resolved payroll discrepancy' },
+    { idx: 0, action: 'updated enrollment settings' },
+    { idx: 8, action: 'completed Q1 calculations' },
+    { idx: 9, action: 'generated satisfaction report' },
+    { idx: 4, action: 'flagged 2 regulation updates' },
+  ].map(r => `
+    <div class="activity-row">
+      <div class="avatar-circle" style="background:${colors[r.idx]}">${INITIALS[r.idx]}</div>
+      <div class="activity-text"><strong>${CLIENT_NAMES[r.idx]}</strong> ${r.action}</div>
+    </div>
+  `).join('');
+
+  el.innerHTML = `
+    <div class="sim-sidebar ${bgClass}">
+      <div class="sim-sidebar-title">Clients</div>
+      ${sidebarRows}
+    </div>
+    <div class="sim-activity ${bgClass.replace('sim-sidebar','sim-activity')}">
+      <div class="sim-activity-title">Recent Activity</div>
+      ${activityRows}
+    </div>
+  `;
+}
+
+// ---- Tab 1: Swatches ----
+const themes = ['mercury','inkwell','orbital'];
+const modes = ['dark','light'];
+themes.forEach(t => {
+  modes.forEach(m => {
+    renderStrip(`${t}-${m}-new`, PROPOSED[`${t}-${m}`], true, true);
+  });
+});
+
+// ---- Tab 2: In Context ----
+const bgMap = {
+  'mercury-dark': 'dark-bg',
+  'mercury-light': 'light-bg',
+  'inkwell-dark': 'inkwell-dark-bg',
+  'inkwell-light': 'inkwell-light-bg',
+  'orbital-dark': 'orbital-dark-bg',
+  'orbital-light': 'orbital-light-bg',
+};
+themes.forEach(t => {
+  modes.forEach(m => {
+    const key = `${t}-${m}`;
+    renderContext(`ctx-${key}`, PROPOSED[key], bgMap[key]);
+  });
+});
+
+// ---- Tab 3: Side-by-side ----
+themes.forEach(t => {
+  modes.forEach(m => {
+    const key = `${t}-${m}`;
+    renderStrip(`cmp-${key}-old`, CURRENT[key], true, false);
+    renderStrip(`cmp-${key}-new`, PROPOSED[key], true, false);
+  });
+});
+
+// ---- Tab 4: Selected State ----
+const PRIMARY_COLORS = {
+  'mercury-dark': '#6878B8',
+  'mercury-light': '#506098',
+  'inkwell-dark': '#7A9A78',
+  'inkwell-light': '#5A7A58',
+  'orbital-dark': '#8AAEC4',
+  'orbital-light': '#4A7A98',
+};
+
+const STRIP_CLASSES = {
+  'mercury-dark': 'dark-strip',
+  'mercury-light': 'light-strip',
+  'inkwell-dark': 'inkwell-dark-strip',
+  'inkwell-light': 'inkwell-light-strip',
+  'orbital-dark': 'orbital-dark-strip',
+  'orbital-light': 'orbital-light-strip',
+};
+
+function renderSelectedState(containerId, colors, primaryColor) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  // Show 10 rows. Cycle which one is "selected" — show first 5 with selection rotating
+  // Actually, show all 10, with every other one selected to see multiple on primary bg
+  const times = ['8 min ago','3h ago','yesterday','2d ago','1w ago','2w ago','3d ago','5d ago','1w ago','2w ago'];
+
+  el.innerHTML = colors.map((c, i) => {
+    const isSelected = (i % 3 === 0); // select every 3rd row for variety
+    return `
+      <div class="selected-row ${isSelected ? 'is-selected' : ''}"
+           style="${isSelected ? `background: ${primaryColor} !important;` : ''}">
+        <div class="avatar-circle" style="background:${c}">${INITIALS[i]}</div>
+        <div class="selected-row-text">
+          <div class="selected-row-name">${CLIENT_NAMES[i]}</div>
+          <div class="selected-row-detail">${times[i]}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+themes.forEach(t => {
+  modes.forEach(m => {
+    const key = `${t}-${m}`;
+    renderSelectedState(`sel-${key}`, PROPOSED[key], PRIMARY_COLORS[key]);
+  });
+});
+
+// ---- Clash examples (old problematic colors vs fixed) ----
+// Show just slots 1 (Cobalt/Indigo) and 7 (Iris/Chartreuse) — the problem children
+const OLD_COBALT_IRIS = {
+  'mercury-dark': { cobalt: '#5A90E0', iris: '#7A90E8' },
+  'orbital-light': { cobalt: '#2868B8', iris: '#4878C0' },
+};
+const NEW_FIXED = {
+  'mercury-dark': { indigo: '#6470E8', chartreuse: '#8CB838' },
+  'orbital-light': { indigo: '#3C48C0', chartreuse: '#5C8418' },
+};
+
+function renderClashExample(containerId, avatarPairs, primaryColor, otherColors) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const entries = Object.entries(avatarPairs);
+  el.innerHTML = entries.map(([name, color], i) => `
+    <div class="selected-row is-selected" style="background: ${primaryColor} !important;">
+      <div class="avatar-circle" style="background:${color}">${['AS','JP'][i]}</div>
+      <div class="selected-row-text">
+        <div class="selected-row-name">${['Aperture Science','Jessica Park'][i]}</div>
+        <div class="selected-row-detail" style="color:rgba(255,255,255,0.6);font-size:11px">${name}: ${color}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+renderClashExample('clash-mercury-dark-old', OLD_COBALT_IRIS['mercury-dark'], PRIMARY_COLORS['mercury-dark']);
+renderClashExample('clash-mercury-dark-new', NEW_FIXED['mercury-dark'], PRIMARY_COLORS['mercury-dark']);
+renderClashExample('clash-orbital-light-old', OLD_COBALT_IRIS['orbital-light'], PRIMARY_COLORS['orbital-light']);
+renderClashExample('clash-orbital-light-new', NEW_FIXED['orbital-light'], PRIMARY_COLORS['orbital-light']);
+
+// ---- Tab switching ----
+function switchTab(idx) {
+  document.querySelectorAll('.design-panel').forEach((p, i) => {
+    p.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.switcher button').forEach((b, i) => {
+    b.classList.toggle('active', i === idx);
+  });
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  const n = parseInt(e.key);
+  if (n >= 1 && n <= 4) switchTab(n - 1);
+});
+</script>
+
+<script src="feedback-panel.js"></script>
+</body>
+</html>
