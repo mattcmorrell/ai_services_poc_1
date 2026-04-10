@@ -64,7 +64,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
   const visibleAgents = showMoreActivity ? homeData.recentActivity.agents : homeData.recentActivity.agents.slice(0, 3);
 
   return (
-    <div className="flex flex-1 flex-col overflow-y-auto bg-background p-8">
+    <div className="flex-1 overflow-y-auto bg-background p-8">
       {/* Client header */}
       <div className="mb-8">
         <div className="mb-2 flex items-center gap-3">

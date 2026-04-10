@@ -139,8 +139,8 @@ export function ClientsView({
   // ── Tab content ───────────────────────────────────────────────────
   const tabContent =
     selectedClientId && client ? (
-      <div className="flex flex-1 overflow-hidden">
-        <div className={activeTabId === "home" ? "flex flex-1 overflow-hidden" : "hidden"}>
+      <div className="flex min-h-0 flex-1 overflow-hidden">
+        <div className={activeTabId === "home" ? "flex min-h-0 flex-1 overflow-hidden" : "hidden"}>
           <ClientHomeTab client={client} chats={clientChats} onOpenChat={openChat} />
         </div>
         {tabs
