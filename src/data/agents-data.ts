@@ -38,8 +38,8 @@ export const mockAgents: Agent[] = [
   },
   {
     id: "agent-payroll-thing",
-    name: "Payroll Thingamajig",
-    description: "Does a whatsit",
+    name: "Payroll - UK",
+    description: "Payroll for the United Kingdom",
     icon: "calculator",
     isFavorite: false,
   },
@@ -52,14 +52,14 @@ export const mockAgents: Agent[] = [
   },
   {
     id: "agent-benefits",
-    name: "Benefits Thing",
+    name: "Benefits Review",
     description: "Does something with benefits",
     icon: "heart",
     isFavorite: false,
   },
   {
     id: "agent-time-tracking",
-    name: "Time Tracking Whats-it",
+    name: "Time Tracking Insights",
     description: "Tracks employee time",
     icon: "clock",
     isFavorite: false,
