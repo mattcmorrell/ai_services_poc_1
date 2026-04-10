@@ -278,7 +278,7 @@ export function MessageList({
                       theme.contentWrapperClass?.(message.role) ||
                       cn(
                         "prose prose-sm dark:prose-invert max-w-none",
-                        message.role === "user" && "text-right"
+                        message.role === "user" && "flex justify-end"
                       )
                     }
                   >
@@ -286,7 +286,7 @@ export function MessageList({
                       className={cn(
                         message.role === "user"
                           ? theme.userBubbleClass ||
-                              "inline-block bg-accent text-foreground"
+                              "bg-secondary dark:bg-card text-foreground text-left max-w-[75%]"
                           : theme.assistantClass
                       )}
                       style={
