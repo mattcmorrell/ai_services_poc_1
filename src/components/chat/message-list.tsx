@@ -230,7 +230,7 @@ export function MessageList({
             <div
               className={
                 theme.thinkingBoxClass ||
-                "mb-4 rounded-lg border border-border bg-muted/50 p-4 text-sm text-muted-foreground"
+                "mb-4 rounded-lg border border-border bg-muted/50 p-4 text-sm text-muted-foreground font-mono"
               }
               style={theme.thinkingBoxStyle}
             >

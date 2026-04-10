@@ -132,7 +132,7 @@ export function ClientHomeTab({ client, chats, onOpenChat }: ClientHomeTabProps)
                     )}
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
-                    <Button variant="outline" size="sm">
+                    <Button variant="secondary" size="sm">
                       {item.primaryAction}
                     </Button>
                     <Button variant="ghost" size="sm" className="text-muted-foreground">

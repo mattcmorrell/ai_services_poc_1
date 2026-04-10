@@ -16,7 +16,7 @@ export function SuggestedActions({ actions, onActionClick }: SuggestedActionsPro
           key={action.id}
           variant="outline"
           size="sm"
-          className="rounded-full"
+          className="rounded-full bg-card"
           onClick={() => onActionClick(action.prompt)}
         >
           {action.label}
