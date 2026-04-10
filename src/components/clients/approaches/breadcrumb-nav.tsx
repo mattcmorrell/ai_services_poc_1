@@ -2,14 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ChevronRight,
-  ChevronUp,
-  ChevronDown,
-  Search,
-  MessageSquare,
+  CaretRight,
+  CaretUp,
+  CaretDown,
+  MagnifyingGlass,
+  ChatDots,
   ArrowRight,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { getAvatarStyle } from "@/lib/avatar-colors";
 import type { Client, Chat } from "@/types/chat";
 
 interface ApproachProps {
@@ -20,28 +21,6 @@ interface ApproachProps {
   children: React.ReactNode;
   tabBar?: React.ReactNode;
   version: number;
-}
-
-// Deterministic color palette for client initials
-const AVATAR_COLORS = [
-  "bg-blue-600",
-  "bg-emerald-600",
-  "bg-violet-600",
-  "bg-amber-600",
-  "bg-rose-600",
-  "bg-cyan-600",
-  "bg-indigo-600",
-  "bg-teal-600",
-  "bg-orange-600",
-  "bg-pink-600",
-];
-
-function getAvatarColor(clientId: string): string {
-  let hash = 0;
-  for (let i = 0; i < clientId.length; i++) {
-    hash = clientId.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
 function getInitials(name: string): string {
@@ -203,9 +182,9 @@ export function BreadcrumbNav({
   function SortIndicator({ column }: { column: SortColumn }) {
     if (version < 2 || sortColumn !== column) return null;
     return sortDirection === "asc" ? (
-      <ChevronUp className="ml-0.5 inline h-3 w-3" />
+      <CaretUp className="ml-0.5 inline h-3 w-3" />
     ) : (
-      <ChevronDown className="ml-0.5 inline h-3 w-3" />
+      <CaretDown className="ml-0.5 inline h-3 w-3" />
     );
   }
 
@@ -239,7 +218,7 @@ export function BreadcrumbNav({
             >
               All Clients
             </button>
-            <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground/60" />
+            <CaretRight className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground/60" />
             {version >= 2 ? (
               // V2: Quick-switch dropdown on client name
               <div className="relative" ref={quickSwitchRef}>
@@ -252,7 +231,7 @@ export function BreadcrumbNav({
                   )}
                 >
                   {selectedClient.name}
-                  <ChevronDown
+                  <CaretDown
                     className={cn(
                       "h-3 w-3 text-muted-foreground transition-transform",
                       quickSwitchOpen && "rotate-180"
@@ -283,10 +262,8 @@ export function BreadcrumbNav({
                           )}
                         >
                           <div
-                            className={cn(
-                              "flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white",
-                              getAvatarColor(client.id)
-                            )}
+                            className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-medium text-white"
+                            style={getAvatarStyle(client.id)}
                           >
                             {getInitials(client.name)}
                           </div>
@@ -297,7 +274,7 @@ export function BreadcrumbNav({
                             <span
                               className={cn(
                                 "inline-flex h-4 min-w-4 items-center justify-center",
-                                "rounded-full bg-primary px-1 text-[9px] font-semibold leading-none text-primary-foreground"
+                                "rounded-full bg-primary px-1.5 text-[11px] font-medium leading-none text-primary-foreground"
                               )}
                             >
                               {client.unreadCount}
@@ -327,7 +304,7 @@ export function BreadcrumbNav({
               All Clients
             </span>
             <div className="relative max-w-xs flex-1">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <MagnifyingGlass className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Filter clients..."
@@ -356,7 +333,7 @@ export function BreadcrumbNav({
           {/* V2: Recently Viewed quick-access bar */}
           {version >= 2 && recentClients.length > 0 && (
             <div className="flex items-center gap-3 border-b border-border/50 bg-muted/20 px-4 py-2">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
                 Recent
               </span>
               <div className="flex items-center gap-2">
@@ -368,9 +345,9 @@ export function BreadcrumbNav({
                     className={cn(
                       "flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white transition-all",
                       "ring-2 ring-transparent hover:ring-primary/50 hover:scale-110",
-                      "focus-visible:outline-none focus-visible:ring-primary",
-                      getAvatarColor(row.client.id)
+                      "focus-visible:outline-none focus-visible:ring-primary"
                     )}
+                    style={getAvatarStyle(row.client.id)}
                   >
                     {getInitials(row.client.name)}
                   </button>
@@ -455,10 +432,8 @@ export function BreadcrumbNav({
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div
-                        className={cn(
-                          "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white",
-                          getAvatarColor(row.client.id)
-                        )}
+                        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+                        style={getAvatarStyle(row.client.id)}
                       >
                         {getInitials(row.client.name)}
                       </div>
@@ -471,7 +446,7 @@ export function BreadcrumbNav({
                   {/* Active chats */}
                   <td className="px-4 py-3 text-center">
                     <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-                      <MessageSquare className="h-3.5 w-3.5" />
+                      <ChatDots className="h-3.5 w-3.5" />
                       {row.chatCount}
                     </span>
                   </td>
@@ -482,7 +457,7 @@ export function BreadcrumbNav({
                       <span
                         className={cn(
                           "inline-flex h-5 min-w-5 items-center justify-center",
-                          "rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground"
+                          "rounded-full bg-primary px-1.5 text-[11px] font-medium leading-none text-primary-foreground"
                         )}
                       >
                         {row.unreadCount}

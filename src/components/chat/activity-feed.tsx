@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Loader2, AlertCircle, Activity } from "lucide-react";
+import { Check, CircleNotch, WarningCircle, Lightning } from "@phosphor-icons/react";
 import type { StatusUpdate } from "@/types/chat";
 
 interface ActivityFeedProps {
@@ -15,21 +15,21 @@ export function ActivityFeed({ updates }: ActivityFeedProps) {
       {updates.map((update) => (
         <div
           key={update.id}
-          className="flex items-center gap-2 text-[13px] leading-relaxed"
+          className="flex items-center gap-2 font-mono text-[13px] leading-relaxed"
         >
           {/* Status icon */}
           <span className="flex h-4 w-4 shrink-0 items-center justify-center">
             {update.status === "running" ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-400" />
+              <CircleNotch weight="regular" className="h-3.5 w-3.5 animate-spin" style={{ color: "var(--color-info)" }} />
             ) : update.status === "error" ? (
-              <AlertCircle className="h-3.5 w-3.5 text-red-400" />
+              <WarningCircle className="h-3.5 w-3.5" style={{ color: "var(--color-danger)" }} />
             ) : (
-              <Check className="h-3.5 w-3.5 text-emerald-400" />
+              <Check className="h-3.5 w-3.5" style={{ color: "var(--color-success)" }} />
             )}
           </span>
 
-          {/* Activity icon + label */}
-          <Activity className="h-3 w-3 shrink-0 text-muted-foreground/50" />
+          {/* Lightning icon + label */}
+          <Lightning className="h-3 w-3 shrink-0 text-muted-foreground/50" />
           <span
             className={
               update.status === "running"

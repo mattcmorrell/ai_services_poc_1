@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pause, Square, Play, AlertTriangle } from "lucide-react";
+import { Pause, Stop, Play, Warning } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { ActionPlan } from "@/types/chat";
 
@@ -33,31 +33,22 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
   if (confirmingStop) {
     return (
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-1.5 text-xs" style={{ color: "rgba(239, 68, 68, 0.8)" }}>
-          <AlertTriangle className="w-3 h-3" />
+        <div className="flex items-center gap-1.5 text-xs" style={{ color: "var(--color-danger)" }}>
+          <Warning className="w-3 h-3" />
           Stop? {completedSteps}/{plan.steps.length} steps done. Cannot resume.
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => { onStop(); setConfirmingStop(false); }}
-            className={cn(buttonBase, "font-medium")}
-            style={{
-              background: "rgba(239, 68, 68, 0.15)",
-              color: "rgba(239, 68, 68, 0.9)",
-              border: "1px solid rgba(239, 68, 68, 0.2)",
-            }}
+            className={cn(buttonBase, "font-medium text-white")}
+            style={{ background: "var(--color-danger)" }}
           >
-            <Square className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
+            <Stop className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Confirm Stop"}
           </button>
           <button
             onClick={() => setConfirmingStop(false)}
-            className={cn(buttonBase, "font-medium")}
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              color: "rgba(255,255,255,0.5)",
-              border: "1px solid rgba(255,255,255,0.06)",
-            }}
+            className={cn(buttonBase, "font-medium bg-muted text-muted-foreground border border-border")}
           >
             {!compact ? "Cancel" : "Back"}
           </button>
@@ -72,26 +63,18 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
         <>
           <button
             onClick={onPause}
-            className={cn(buttonBase, "font-medium")}
-            style={{
-              background: "rgba(251, 191, 36, 0.1)",
-              color: "rgba(251, 191, 36, 0.85)",
-              border: "1px solid rgba(251, 191, 36, 0.15)",
-            }}
+            className={cn(buttonBase, "font-medium text-white")}
+            style={{ background: "var(--color-warning)" }}
           >
             <Pause className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Pause"}
           </button>
           <button
             onClick={() => setConfirmingStop(true)}
-            className={cn(buttonBase, "font-medium")}
-            style={{
-              background: "rgba(239, 68, 68, 0.1)",
-              color: "rgba(239, 68, 68, 0.85)",
-              border: "1px solid rgba(239, 68, 68, 0.15)",
-            }}
+            className={cn(buttonBase, "font-medium text-white")}
+            style={{ background: "var(--color-danger)" }}
           >
-            <Square className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
+            <Stop className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Stop"}
           </button>
         </>
@@ -101,26 +84,18 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
         <>
           <button
             onClick={onResume}
-            className={cn(buttonBase, "font-medium")}
-            style={{
-              background: "rgba(74, 222, 128, 0.1)",
-              color: "rgba(74, 222, 128, 0.85)",
-              border: "1px solid rgba(74, 222, 128, 0.15)",
-            }}
+            className={cn(buttonBase, "font-medium text-white")}
+            style={{ background: "var(--color-success)" }}
           >
             <Play className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Resume"}
           </button>
           <button
             onClick={() => setConfirmingStop(true)}
-            className={cn(buttonBase, "font-medium")}
-            style={{
-              background: "rgba(239, 68, 68, 0.1)",
-              color: "rgba(239, 68, 68, 0.85)",
-              border: "1px solid rgba(239, 68, 68, 0.15)",
-            }}
+            className={cn(buttonBase, "font-medium text-white")}
+            style={{ background: "var(--color-danger)" }}
           >
-            <Square className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
+            <Stop className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
             {!compact && "Stop"}
           </button>
         </>
@@ -132,21 +107,21 @@ export function PlanControls({ plan, onPause, onStop, onResume, compact = false 
 /** Status badge for plan state */
 export function PlanStatusBadge({ status }: { status: ActionPlan["status"] }) {
   const config: Record<string, { label: string; bg: string; text: string; dot: string }> = {
-    pending: { label: "Pending", bg: "rgba(255,255,255,0.04)", text: "rgba(255,255,255,0.4)", dot: "rgba(255,255,255,0.3)" },
-    approved: { label: "Approved", bg: "rgba(74, 222, 128, 0.08)", text: "rgba(74, 222, 128, 0.8)", dot: "rgba(74, 222, 128, 0.8)" },
-    executing: { label: "Running", bg: "rgba(96, 165, 250, 0.08)", text: "rgba(96, 165, 250, 0.8)", dot: "rgba(96, 165, 250, 0.8)" },
-    paused: { label: "Paused", bg: "rgba(251, 191, 36, 0.08)", text: "rgba(251, 191, 36, 0.8)", dot: "rgba(251, 191, 36, 0.8)" },
-    stopped: { label: "Stopped", bg: "rgba(239, 68, 68, 0.08)", text: "rgba(239, 68, 68, 0.8)", dot: "rgba(239, 68, 68, 0.8)" },
-    completed: { label: "Done", bg: "rgba(74, 222, 128, 0.08)", text: "rgba(74, 222, 128, 0.8)", dot: "rgba(74, 222, 128, 0.8)" },
-    declined: { label: "Declined", bg: "rgba(239, 68, 68, 0.08)", text: "rgba(239, 68, 68, 0.6)", dot: "rgba(239, 68, 68, 0.6)" },
+    pending: { label: "Pending", bg: "var(--secondary)", text: "var(--muted-foreground)", dot: "var(--muted-foreground)" },
+    approved: { label: "Approved", bg: "var(--color-success-muted)", text: "var(--color-success)", dot: "var(--color-success)" },
+    executing: { label: "Running", bg: "var(--color-info-muted)", text: "var(--color-info)", dot: "var(--color-info)" },
+    paused: { label: "Paused", bg: "var(--color-warning-muted)", text: "var(--color-warning)", dot: "var(--color-warning)" },
+    stopped: { label: "Stopped", bg: "color-mix(in srgb, var(--color-danger) 8%, transparent)", text: "color-mix(in srgb, var(--color-danger) 50%, var(--muted-foreground))", dot: "color-mix(in srgb, var(--color-danger) 40%, var(--muted-foreground))" },
+    completed: { label: "Done", bg: "var(--color-success-muted)", text: "var(--color-success)", dot: "var(--color-success)" },
+    declined: { label: "Declined", bg: "color-mix(in srgb, var(--color-danger) 8%, transparent)", text: "color-mix(in srgb, var(--color-danger) 50%, var(--muted-foreground))", dot: "color-mix(in srgb, var(--color-danger) 40%, var(--muted-foreground))" },
   };
 
   const c = config[status] || config.pending;
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium"
-      style={{ background: c.bg, color: c.text }}
+      className="inline-flex items-center gap-1.5 rounded-full font-mono text-xs font-medium"
+      style={{ background: c.bg, color: c.text, padding: "3px 10px" }}
     >
       <span
         className={cn(

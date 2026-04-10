@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Code, Table, List, MoreHorizontal, Pencil, Copy, Download, Trash2 } from "lucide-react";
+import { FileText, Code, Table, ListBullets, DotsThree, PencilSimple, Copy, DownloadSimple, Trash } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,7 +17,7 @@ interface ArtifactCardProps {
   onClick: () => void;
   onEdit?: () => void;
   onCopy?: () => void;
-  onDownload?: () => void;
+  onDownloadSimple?: () => void;
   onDelete?: () => void;
 }
 
@@ -25,7 +25,7 @@ const typeIcons = {
   document: FileText,
   code: Code,
   table: Table,
-  list: List,
+  list: ListBullets,
 };
 
 function formatDate(date: Date): string {
@@ -36,13 +36,13 @@ function formatDate(date: Date): string {
   }).format(date);
 }
 
-export function ArtifactCard({ artifact, isSelected, onClick, onEdit, onCopy, onDownload, onDelete }: ArtifactCardProps) {
+export function ArtifactCard({ artifact, isSelected, onClick, onEdit, onCopy, onDownloadSimple, onDelete }: ArtifactCardProps) {
   const Icon = typeIcons[artifact.type];
 
   return (
     <div
       className={cn(
-        "w-full max-w-xs text-left p-3 rounded-lg border transition-colors",
+        "w-full max-w-xs text-left p-3 rounded-xl border transition-colors",
         "hover:bg-accent/50",
         isSelected
           ? "border-primary bg-accent"
@@ -73,24 +73,24 @@ export function ArtifactCard({ artifact, isSelected, onClick, onEdit, onCopy, on
               className="h-8 w-8 shrink-0"
               onClick={(e) => e.stopPropagation()}
             >
-              <MoreHorizontal className="h-4 w-4" />
+              <DotsThree className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={onEdit}>
-              <Pencil className="w-4 h-4 mr-2" />
+              <PencilSimple className="w-4 h-4 mr-2" />
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onCopy}>
               <Copy className="w-4 h-4 mr-2" />
               Copy
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onDownload}>
-              <Download className="w-4 h-4 mr-2" />
-              Download
+            <DropdownMenuItem onClick={onDownloadSimple}>
+              <DownloadSimple className="w-4 h-4 mr-2" />
+              DownloadSimple
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onDelete} className="text-destructive">
-              <Trash2 className="w-4 h-4 mr-2" />
+              <Trash className="w-4 h-4 mr-2" />
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>

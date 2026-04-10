@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowLeft, MessageSquare, Clock, Users, Search } from "lucide-react";
+import { ArrowLeft, ChatDots, Clock, Users, MagnifyingGlass } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { AlertPill } from "@/components/ui/alert-pill";
 import type { Client, Chat } from "@/types/chat";
 
 interface ApproachProps {
@@ -169,7 +170,7 @@ export function CardGrid({
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-2">
             <Users className="h-6 w-6 text-muted-foreground" />
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            <h1 className="text-[24px] font-semibold tracking-tight text-foreground">
               Your Clients
             </h1>
           </div>
@@ -181,7 +182,7 @@ export function CardGrid({
         {/* V2: Search / filter bar */}
         {version >= 2 && clients.length > 0 && (
           <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               value={searchQuery}
@@ -228,7 +229,7 @@ export function CardGrid({
                   <span
                     className={cn(
                       "absolute right-4 top-4 flex h-5 min-w-5 items-center justify-center",
-                      "rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
+                      "rounded-full bg-primary px-1.5 text-[11px] font-medium leading-none text-primary-foreground"
                     )}
                   >
                     {unread}
@@ -255,7 +256,7 @@ export function CardGrid({
                 {/* Stats row */}
                 <div className="flex w-full items-center gap-4 border-t border-border/50 pt-3 text-xs text-muted-foreground">
                   <span className="inline-flex items-center gap-1.5">
-                    <MessageSquare className="h-3.5 w-3.5" />
+                    <ChatDots className="h-3.5 w-3.5" />
                     {chatCount} {chatCount === 1 ? "chat" : "chats"}
                   </span>
                   {lastActivity && (
@@ -268,12 +269,10 @@ export function CardGrid({
 
                 {/* V2: Status indicator */}
                 {version >= 2 && unread >= 4 && (
-                  <p className="text-xs font-medium text-red-400">Urgent</p>
+                  <AlertPill variant="urgent">Urgent</AlertPill>
                 )}
                 {version >= 2 && unread >= 1 && unread < 4 && (
-                  <p className="text-xs font-medium text-amber-400">
-                    Needs attention
-                  </p>
+                  <AlertPill variant="attention">Needs attention</AlertPill>
                 )}
               </button>
             );
@@ -283,7 +282,7 @@ export function CardGrid({
         {/* V2: no results from search */}
         {version >= 2 && clients.length > 0 && displayData.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Search className="mb-3 h-8 w-8 text-muted-foreground/40" />
+            <MagnifyingGlass className="mb-3 h-8 w-8 text-muted-foreground/40" />
             <p className="text-sm text-muted-foreground">
               No clients matching &ldquo;{searchQuery}&rdquo;
             </p>
@@ -294,7 +293,7 @@ export function CardGrid({
         {clients.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Users className="mb-4 h-12 w-12 text-muted-foreground/40" />
-            <h2 className="text-lg font-medium text-foreground">
+            <h2 className="text-[18px] font-medium text-foreground">
               No clients yet
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">

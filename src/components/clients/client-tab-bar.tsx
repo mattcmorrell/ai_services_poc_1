@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Home, X, Plus } from "lucide-react";
+import { House, X, Plus } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 export type ClientTab =
@@ -26,7 +26,7 @@ export function ClientTabBar({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex h-9 w-full shrink-0 items-stretch border-b border-border bg-card">
+    <div className="flex h-9 w-full shrink-0 items-stretch border-b border-border bg-muted dark:bg-card">
       {/* Scrollable tab list */}
       <div
         ref={scrollRef}
@@ -45,7 +45,7 @@ export function ClientTabBar({
                   isActive && "bg-background text-foreground shadow-[inset_0_-2px_0_0] shadow-primary"
                 )}
               >
-                <Home className="h-3.5 w-3.5" />
+                <House className="h-3.5 w-3.5" />
               </button>
             );
           }

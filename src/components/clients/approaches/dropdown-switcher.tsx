@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { ChevronDown, Check, Search, MessageSquare } from "lucide-react";
+import { CaretDown, Check, MagnifyingGlass, ChatDots } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { getAvatarStyle } from "@/lib/avatar-colors";
 import type { Client, Chat } from "@/types/chat";
 
 interface ApproachProps {
@@ -13,27 +14,6 @@ interface ApproachProps {
   children: React.ReactNode;
   tabBar?: React.ReactNode;
   version: number;
-}
-
-const AVATAR_COLORS = [
-  "bg-blue-600",
-  "bg-emerald-600",
-  "bg-violet-600",
-  "bg-amber-600",
-  "bg-rose-600",
-  "bg-cyan-600",
-  "bg-indigo-600",
-  "bg-teal-600",
-  "bg-orange-600",
-  "bg-pink-600",
-];
-
-function getAvatarColor(clientId: string): string {
-  let hash = 0;
-  for (let i = 0; i < clientId.length; i++) {
-    hash = clientId.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
 function getInitials(name: string): string {
@@ -191,10 +171,8 @@ export function DropdownSwitcher({
           {selectedClient ? (
             <>
               <span
-                className={cn(
-                  "flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold leading-none text-white",
-                  getAvatarColor(selectedClient.id)
-                )}
+                className="flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-medium leading-none text-white"
+                style={getAvatarStyle(selectedClient.id)}
               >
                 {getInitials(selectedClient.name)}
               </span>
@@ -210,7 +188,7 @@ export function DropdownSwitcher({
           ) : (
             <span>Select a client&hellip;</span>
           )}
-          <ChevronDown
+          <CaretDown
             className={cn(
               "h-3.5 w-3.5 text-muted-foreground transition-transform duration-150",
               open && "rotate-180"
@@ -241,7 +219,7 @@ export function DropdownSwitcher({
               {/* Search */}
               <div className="border-b border-border p-2">
                 <div className="relative">
-                  <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                  <MagnifyingGlass className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                   <input
                     ref={searchRef}
                     type="text"
@@ -283,10 +261,8 @@ export function DropdownSwitcher({
                       >
                         {/* Initial circle */}
                         <span
-                          className={cn(
-                            "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-semibold leading-none text-white",
-                            getAvatarColor(client.id)
-                          )}
+                          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-medium leading-none text-white"
+                          style={getAvatarStyle(client.id)}
                         >
                           {getInitials(client.name)}
                         </span>
@@ -298,7 +274,7 @@ export function DropdownSwitcher({
                           </span>
                           {chatCount > 0 && (
                             <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                              <MessageSquare className="h-3 w-3" />
+                              <ChatDots className="h-3 w-3" />
                               {chatCount} {chatCount === 1 ? "chat" : "chats"}
                             </span>
                           )}
@@ -316,7 +292,7 @@ export function DropdownSwitcher({
                           <span
                             className={cn(
                               "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
-                              "rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground"
+                              "rounded-full bg-primary px-1.5 text-[11px] font-medium leading-none text-primary-foreground"
                             )}
                           >
                             {client.unreadCount}
@@ -336,11 +312,11 @@ export function DropdownSwitcher({
               {/* V2+: keyboard hint footer */}
               {version >= 2 && (
                 <div className="border-t border-border px-3 py-1.5 flex items-center justify-between">
-                  <span className="text-[10px] text-muted-foreground">
+                  <span className="text-[11px] text-muted-foreground">
                     ⌘K to quick search
                   </span>
                   {version >= 3 && clientsNeedingAttention > 0 && (
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-[11px] text-muted-foreground">
                       {filteredClients.length} clients
                     </span>
                   )}

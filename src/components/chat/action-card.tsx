@@ -4,17 +4,17 @@ import { useState, useEffect } from "react";
 import {
   Check,
   X,
-  ClipboardList,
+  ClipboardText,
   Users,
   Clock,
   CheckCircle,
   XCircle,
-  ArrowUpDown,
-  ChevronRight,
-  MoreHorizontal,
+  ArrowsDownUp,
+  CaretRight,
+  DotsThree,
   Pause,
-  Square,
-} from "lucide-react";
+  Stop,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ActionPlan, ActionPlanStep } from "@/types/chat";
@@ -42,15 +42,15 @@ export function ActionCard({ plan, workflow, onApprove, onDecline, onWorkflowCli
 
   const getStatusIcon = () => {
     if (isCompleted) {
-      return <CheckCircle className="w-5 h-5 text-green-500" />;
+      return <CheckCircle className="w-5 h-5" style={{ color: "var(--color-success)" }} />;
     }
     if (isDeclined || isStopped) {
-      return <XCircle className="w-5 h-5 text-red-500" />;
+      return <XCircle className="w-5 h-5" style={{ color: "color-mix(in srgb, var(--color-danger) 50%, var(--muted-foreground))" }} />;
     }
     if (isPaused) {
-      return <Pause className="w-5 h-5 text-yellow-500" />;
+      return <Pause className="w-5 h-5" style={{ color: "var(--color-warning)" }} />;
     }
-    return <ClipboardList className="w-5 h-5 text-muted-foreground" />;
+    return <ClipboardText className="w-5 h-5 text-muted-foreground" />;
   };
 
   const getTimeDisplay = () => {
@@ -70,7 +70,7 @@ export function ActionCard({ plan, workflow, onApprove, onDecline, onWorkflowCli
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-lg font-semibold">{plan.title}</h3>
+        <h3 className="text-[18px] font-medium">{plan.title}</h3>
         {getStatusIcon()}
       </div>
 
@@ -108,19 +108,19 @@ export function ActionCard({ plan, workflow, onApprove, onDecline, onWorkflowCli
           className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/30 mb-4 cursor-pointer hover:bg-muted/50 transition-colors"
         >
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-            <ArrowUpDown className="h-4 w-4" />
+            <ArrowsDownUp className="h-4 w-4" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-medium text-sm">{workflow.name}</div>
             <div className="text-xs text-muted-foreground">{workflow.description}</div>
           </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          <CaretRight className="w-4 h-4 text-muted-foreground" />
         </div>
       )}
 
       {/* Steps */}
       <div className="border-t border-border pt-4 mb-4">
-        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+        <div className="text-xs font-semibold text-muted-foreground uppercase mb-3" style={{ letterSpacing: "0.06em" }}>
           Steps
         </div>
         <div className="space-y-2">
@@ -154,7 +154,7 @@ export function ActionCard({ plan, workflow, onApprove, onDecline, onWorkflowCli
       )}
 
       {(isApproved || isExecuting) && (
-        <Button disabled className="gap-2 bg-green-600 hover:bg-green-600 text-white">
+        <Button disabled className="gap-2 text-white" style={{ background: "var(--color-success)" }}>
           <Check className="w-4 h-4" />
           Approved
         </Button>
@@ -174,7 +174,7 @@ export function ActionCard({ plan, workflow, onApprove, onDecline, onWorkflowCli
 
       {/* Completion Banner */}
       {isCompleted && plan.completionSummary && (
-        <div className="flex items-center gap-2.5 p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-sm text-green-400">
+        <div className="flex items-center gap-2.5 p-3 rounded-lg text-sm" style={{ background: "var(--color-success-muted)", borderWidth: 1, borderStyle: "solid", borderColor: "color-mix(in srgb, var(--color-success) 20%, transparent)", color: "var(--color-success)" }}>
           <CheckCircle className="w-5 h-5 shrink-0" />
           <span>{plan.completionSummary}</span>
         </div>
@@ -203,13 +203,19 @@ function StepItem({ step, index, isDeclined }: StepItemProps) {
       <div
         className={cn(
           "w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold shrink-0",
-          isCompleted && "bg-green-600 text-white",
-          isInProgress && "bg-blue-600 text-white animate-pulse",
+          isInProgress && "animate-pulse",
           !isCompleted && !isInProgress && "bg-muted text-muted-foreground"
         )}
+        style={
+          isCompleted
+            ? { background: "var(--color-success-muted)", color: "var(--color-success)" }
+            : isInProgress
+              ? { background: "var(--color-info-muted)", color: "var(--color-info)" }
+              : undefined
+        }
       >
         {isCompleted ? (
-          <Check className="w-3 h-3" strokeWidth={3} />
+          <Check className="w-3 h-3" />
         ) : (
           index
         )}

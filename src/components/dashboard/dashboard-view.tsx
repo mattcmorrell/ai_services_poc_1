@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { DashboardInput } from "./dashboard-input";
 import { SuggestedActions } from "./suggested-actions";
 import { AgentsAttention } from "./agents-attention";
@@ -54,15 +53,13 @@ export function DashboardView({
     <div className="flex h-full min-w-0 flex-1 flex-col bg-background">
       <div className="flex flex-1 flex-col items-center overflow-auto px-6 py-8">
         {/* Logo */}
-        <div className="mb-8">
-          <Image
-            src="/Pandopticon-logo.png"
-            alt="Pandopticon"
-            width={810}
-            height={180}
-            className="h-16 w-auto"
-            priority
-          />
+        <div className="mb-8 text-center">
+          <div className="text-[48px] font-extrabold tracking-[-0.04em] text-foreground leading-none">
+            PandaCommand
+          </div>
+          <div className="font-mono text-[18px] font-semibold tracking-[0.1em] uppercase text-primary mt-1">
+            Agent mission control
+          </div>
         </div>
 
         {/* Input */}

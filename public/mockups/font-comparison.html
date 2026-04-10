@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Font Combos — AI Services</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0e0e10;
+    color: #e0e0e0;
+    font-family: 'Inter', sans-serif;
+    padding: 40px 48px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: #999;
+    margin-bottom: 16px;
+  }
+
+  .deep-dive-link {
+    display: inline-block;
+    font-size: 14px;
+    color: #818cf8;
+    text-decoration: none;
+    margin-bottom: 40px;
+    padding: 8px 16px;
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    border-radius: 6px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .deep-dive-link:hover {
+    background: rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.4);
+  }
+
+  .font-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .font-card {
+    background: #18181b;
+    border: 1px solid #27272a;
+    border-radius: 12px;
+    padding: 28px 32px;
+    transition: border-color 0.2s;
+  }
+
+  .font-card:hover {
+    border-color: #3f3f46;
+  }
+
+  .font-card.has-mono {
+    border-color: #6366f1;
+    background: #18181f;
+  }
+
+  .font-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .font-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .badge.mono-badge {
+    color: #6366f1;
+    background: rgba(99, 102, 241, 0.12);
+  }
+
+  .badge.solo-badge {
+    color: #999;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .font-combo-label {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 20px;
+  }
+
+  .font-combo-label .sans-name { color: #818cf8; }
+  .font-combo-label .mono-name { color: #fbbf24; }
+
+  .sample-hero {
+    font-size: 32px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .sample-client {
+    font-size: 13px;
+    font-weight: 400;
+    color: #999;
+    margin-bottom: 16px;
+    letter-spacing: 0.02em;
+  }
+
+  .sample-body {
+    font-size: 14px;
+    font-weight: 400;
+    color: #aaa;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .sample-data-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .data-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .data-value {
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+
+  .data-label {
+    font-size: 11px;
+    font-weight: 400;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .ui-samples {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #27272a;
+  }
+
+  .ui-chip {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: #27272a;
+    color: #ccc;
+  }
+
+  .ui-chip.primary {
+    background: #4f46e5;
+    color: #fff;
+  }
+
+  .ui-chip.gate {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+
+  .ui-chip.status {
+    background: rgba(99, 102, 241, 0.1);
+    color: #818cf8;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .step-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .step {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 13px;
+    color: #aaa;
+  }
+
+  .step-num {
+    font-size: 12px;
+    color: #999;
+    min-width: 20px;
+  }
+
+  .step-time {
+    font-size: 11px;
+    color: #999;
+    margin-left: auto;
+  }
+
+  @media (max-width: 900px) {
+    .font-grid { grid-template-columns: 1fr; }
+    body { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Font Comparison</h1>
+<p class="subtitle">Fonts with a monospace sibling show the pairing. Solo fonts do everything themselves.</p>
+<a href="font-mono-deep-dive.html" class="deep-dive-link">Mono pairings deep dive &rarr; Type scales, chat, plans, tables, feeds</a>
+
+<div class="font-grid">
+
+  <!-- Geist + Geist Mono -->
+  <div class="font-card has-mono">
+    <div class="font-label">
+      <span class="font-name">Geist + Geist Mono</span>
+      <span class="badge mono-badge">Has Mono</span>
+    </div>
+    <div class="font-combo-label"><span class="sans-name">Geist</span> headings &amp; body &middot; <span class="mono-name">Geist Mono</span> data &amp; system</div>
+    <div class="sample-hero" style="font-family: 'Geist', sans-serif;">January Payroll</div>
+    <div class="sample-client" style="font-family: 'Geist Mono', monospace;">Black Mesa &middot; 47 employees</div>
+    <div class="sample-body" style="font-family: 'Geist', sans-serif;">Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase — it's the OT that's unusual.</div>
+    <div class="sample-data-row" style="font-family: 'Geist Mono', monospace;">
+      <div class="data-item"><span class="data-value">$4,132</span><span class="data-label">Gross Diff</span></div>
+      <div class="data-item"><span class="data-value">82 hrs</span><span class="data-label">Average</span></div>
+      <div class="data-item"><span class="data-value">2/8</span><span class="data-label">Steps</span></div>
+    </div>
+    <div class="step-list">
+      <div class="step" style="font-family: 'Geist', sans-serif;"><span class="step-num" style="font-family: 'Geist Mono', monospace;">01</span> Collect and validate employee hours <span class="step-time" style="font-family: 'Geist Mono', monospace;">10:34 AM</span></div>
+      <div class="step" style="font-family: 'Geist', sans-serif;"><span class="step-num" style="font-family: 'Geist Mono', monospace;">02</span> Review individual employees against previous <span class="step-time" style="font-family: 'Geist Mono', monospace;">10:35 AM</span></div>
+      <div class="step" style="font-family: 'Geist', sans-serif;"><span class="step-num" style="font-family: 'Geist Mono', monospace;">03</span> Approve payroll run</div>
+    </div>
+    <div class="ui-samples">
+      <div class="ui-chip primary" style="font-family: 'Geist', sans-serif;">Approve Plan</div>
+      <div class="ui-chip" style="font-family: 'Geist', sans-serif;">Decline</div>
+      <div class="ui-chip gate" style="font-family: 'Geist Mono', monospace;">Gate</div>
+      <div class="ui-chip status" style="font-family: 'Geist Mono', monospace;">Running</div>
+    </div>
+  </div>
+
+  <!-- DM Sans + DM Mono -->
+  <div class="font-card has-mono">
+    <div class="font-label">
+      <span class="font-name">DM Sans + DM Mono</span>
+      <span class="badge mono-badge">Has Mono</span>
+    </div>
+    <div class="font-combo-label"><span class="sans-name">DM Sans</span> headings &amp; body &middot; <span class="mono-name">DM Mono</span> data &amp; system</div>
+    <div class="sample-hero" style="font-family: 'DM Sans', sans-serif;">January Payroll</div>
+    <div class="sample-client" style="font-family: 'DM Mono', monospace;">Black Mesa &middot; 47 employees</div>
+    <div class="sample-body" style="font-family: 'DM Sans', sans-serif;">Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase — it's the OT that's unusual.</div>
+    <div class="sample-data-row" style="font-family: 'DM Mono', monospace;">
+      <div class="data-item"><span class="data-value">$4,132</span><span class="data-label">Gross Diff</span></div>
+      <div class="data-item"><span class="data-value">82 hrs</span><span class="data-label">Average</span></div>
+      <div class="data-item"><span class="data-value">2/8</span><span class="data-label">Steps</span></div>
+    </div>
+    <div class="step-list">
+      <div class="step" style="font-family: 'DM Sans', sans-serif;"><span class="step-num" style="font-family: 'DM Mono', monospace;">01</span> Collect and validate employee hours <span class="step-time" style="font-family: 'DM Mono', monospace;">10:34 AM</span></div>
+      <div class="step" style="font-family: 'DM Sans', sans-serif;"><span class="step-num" style="font-family: 'DM Mono', monospace;">02</span> Review individual employees against previous <span class="step-time" style="font-family: 'DM Mono', monospace;">10:35 AM</span></div>
+      <div class="step" style="font-family: 'DM Sans', sans-serif;"><span class="step-num" style="font-family: 'DM Mono', monospace;">03</span> Approve payroll run</div>
+    </div>
+    <div class="ui-samples">
+      <div class="ui-chip primary" style="font-family: 'DM Sans', sans-serif;">Approve Plan</div>
+      <div class="ui-chip" style="font-family: 'DM Sans', sans-serif;">Decline</div>
+      <div class="ui-chip gate" style="font-family: 'DM Mono', monospace;">Gate</div>
+      <div class="ui-chip status" style="font-family: 'DM Mono', monospace;">Running</div>
+    </div>
+  </div>
+
+  <!-- IBM Plex Sans + IBM Plex Mono -->
+  <div class="font-card has-mono">
+    <div class="font-label">
+      <span class="font-name">IBM Plex Sans + IBM Plex Mono</span>
+      <span class="badge mono-badge">Has Mono</span>
+    </div>
+    <div class="font-combo-label"><span class="sans-name">IBM Plex Sans</span> headings &amp; body &middot; <span class="mono-name">IBM Plex Mono</span> data &amp; system</div>
+    <div class="sample-hero" style="font-family: 'IBM Plex Sans', sans-serif;">January Payroll</div>
+    <div class="sample-client" style="font-family: 'IBM Plex Mono', monospace;">Black Mesa &middot; 47 employees</div>
+    <div class="sample-body" style="font-family: 'IBM Plex Sans', sans-serif;">Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase — it's the OT that's unusual.</div>
+    <div class="sample-data-row" style="font-family: 'IBM Plex Mono', monospace;">
+      <div class="data-item"><span class="data-value">$4,132</span><span class="data-label">Gross Diff</span></div>
+      <div class="data-item"><span class="data-value">82 hrs</span><span class="data-label">Average</span></div>
+      <div class="data-item"><span class="data-value">2/8</span><span class="data-label">Steps</span></div>
+    </div>
+    <div class="step-list">
+      <div class="step" style="font-family: 'IBM Plex Sans', sans-serif;"><span class="step-num" style="font-family: 'IBM Plex Mono', monospace;">01</span> Collect and validate employee hours <span class="step-time" style="font-family: 'IBM Plex Mono', monospace;">10:34 AM</span></div>
+      <div class="step" style="font-family: 'IBM Plex Sans', sans-serif;"><span class="step-num" style="font-family: 'IBM Plex Mono', monospace;">02</span> Review individual employees against previous <span class="step-time" style="font-family: 'IBM Plex Mono', monospace;">10:35 AM</span></div>
+      <div class="step" style="font-family: 'IBM Plex Sans', sans-serif;"><span class="step-num" style="font-family: 'IBM Plex Mono', monospace;">03</span> Approve payroll run</div>
+    </div>
+    <div class="ui-samples">
+      <div class="ui-chip primary" style="font-family: 'IBM Plex Sans', sans-serif;">Approve Plan</div>
+      <div class="ui-chip" style="font-family: 'IBM Plex Sans', sans-serif;">Decline</div>
+      <div class="ui-chip gate" style="font-family: 'IBM Plex Mono', monospace;">Gate</div>
+      <div class="ui-chip status" style="font-family: 'IBM Plex Mono', monospace;">Running</div>
+    </div>
+  </div>
+
+  <!-- Inter (solo) -->
+  <div class="font-card">
+    <div class="font-label">
+      <span class="font-name">Inter</span>
+      <span class="badge solo-badge">Sans only</span>
+    </div>
+    <div class="font-combo-label">Single font for everything</div>
+    <div class="sample-hero" style="font-family: 'Inter', sans-serif;">January Payroll</div>
+    <div class="sample-client" style="font-family: 'Inter', sans-serif;">Black Mesa &middot; 47 employees</div>
+    <div class="sample-body" style="font-family: 'Inter', sans-serif;">Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase — it's the OT that's unusual.</div>
+    <div class="sample-data-row" style="font-family: 'Inter', sans-serif;">
+      <div class="data-item"><span class="data-value">$4,132</span><span class="data-label">Gross Diff</span></div>
+      <div class="data-item"><span class="data-value">82 hrs</span><span class="data-label">Average</span></div>
+      <div class="data-item"><span class="data-value">2/8</span><span class="data-label">Steps</span></div>
+    </div>
+    <div class="step-list" style="font-family: 'Inter', sans-serif;">
+      <div class="step"><span class="step-num">01</span> Collect and validate employee hours <span class="step-time">10:34 AM</span></div>
+      <div class="step"><span class="step-num">02</span> Review individual employees against previous <span class="step-time">10:35 AM</span></div>
+      <div class="step"><span class="step-num">03</span> Approve payroll run</div>
+    </div>
+    <div class="ui-samples" style="font-family: 'Inter', sans-serif;">
+      <div class="ui-chip primary">Approve Plan</div>
+      <div class="ui-chip">Decline</div>
+      <div class="ui-chip gate">Gate</div>
+      <div class="ui-chip status">Running</div>
+    </div>
+  </div>
+
+  <!-- Plus Jakarta Sans (solo) -->
+  <div class="font-card">
+    <div class="font-label">
+      <span class="font-name">Plus Jakarta Sans</span>
+      <span class="badge solo-badge">Sans only</span>
+    </div>
+    <div class="font-combo-label">Single font for everything</div>
+    <div class="sample-hero" style="font-family: 'Plus Jakarta Sans', sans-serif;">January Payroll</div>
+    <div class="sample-client" style="font-family: 'Plus Jakarta Sans', sans-serif;">Black Mesa &middot; 47 employees</div>
+    <div class="sample-body" style="font-family: 'Plus Jakarta Sans', sans-serif;">Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase — it's the OT that's unusual.</div>
+    <div class="sample-data-row" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+      <div class="data-item"><span class="data-value">$4,132</span><span class="data-label">Gross Diff</span></div>
+      <div class="data-item"><span class="data-value">82 hrs</span><span class="data-label">Average</span></div>
+      <div class="data-item"><span class="data-value">2/8</span><span class="data-label">Steps</span></div>
+    </div>
+    <div class="step-list" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+      <div class="step"><span class="step-num">01</span> Collect and validate employee hours <span class="step-time">10:34 AM</span></div>
+      <div class="step"><span class="step-num">02</span> Review individual employees against previous <span class="step-time">10:35 AM</span></div>
+      <div class="step"><span class="step-num">03</span> Approve payroll run</div>
+    </div>
+    <div class="ui-samples" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+      <div class="ui-chip primary">Approve Plan</div>
+      <div class="ui-chip">Decline</div>
+      <div class="ui-chip gate">Gate</div>
+      <div class="ui-chip status">Running</div>
+    </div>
+  </div>
+
+  <!-- Manrope (solo) -->
+  <div class="font-card">
+    <div class="font-label">
+      <span class="font-name">Manrope</span>
+      <span class="badge solo-badge">Sans only</span>
+    </div>
+    <div class="font-combo-label">Single font for everything</div>
+    <div class="sample-hero" style="font-family: 'Manrope', sans-serif;">January Payroll</div>
+    <div class="sample-client" style="font-family: 'Manrope', sans-serif;">Black Mesa &middot; 47 employees</div>
+    <div class="sample-body" style="font-family: 'Manrope', sans-serif;">Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase — it's the OT that's unusual.</div>
+    <div class="sample-data-row" style="font-family: 'Manrope', sans-serif;">
+      <div class="data-item"><span class="data-value">$4,132</span><span class="data-label">Gross Diff</span></div>
+      <div class="data-item"><span class="data-value">82 hrs</span><span class="data-label">Average</span></div>
+      <div class="data-item"><span class="data-value">2/8</span><span class="data-label">Steps</span></div>
+    </div>
+    <div class="step-list" style="font-family: 'Manrope', sans-serif;">
+      <div class="step"><span class="step-num">01</span> Collect and validate employee hours <span class="step-time">10:34 AM</span></div>
+      <div class="step"><span class="step-num">02</span> Review individual employees against previous <span class="step-time">10:35 AM</span></div>
+      <div class="step"><span class="step-num">03</span> Approve payroll run</div>
+    </div>
+    <div class="ui-samples" style="font-family: 'Manrope', sans-serif;">
+      <div class="ui-chip primary">Approve Plan</div>
+      <div class="ui-chip">Decline</div>
+      <div class="ui-chip gate">Gate</div>
+      <div class="ui-chip status">Running</div>
+    </div>
+  </div>
+
+  <!-- Outfit (solo) -->
+  <div class="font-card">
+    <div class="font-label">
+      <span class="font-name">Outfit</span>
+      <span class="badge solo-badge">Sans only</span>
+    </div>
+    <div class="font-combo-label">Single font for everything</div>
+    <div class="sample-hero" style="font-family: 'Outfit', sans-serif;">January Payroll</div>
+    <div class="sample-client" style="font-family: 'Outfit', sans-serif;">Black Mesa &middot; 47 employees</div>
+    <div class="sample-body" style="font-family: 'Outfit', sans-serif;">Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase — it's the OT that's unusual.</div>
+    <div class="sample-data-row" style="font-family: 'Outfit', sans-serif;">
+      <div class="data-item"><span class="data-value">$4,132</span><span class="data-label">Gross Diff</span></div>
+      <div class="data-item"><span class="data-value">82 hrs</span><span class="data-label">Average</span></div>
+      <div class="data-item"><span class="data-value">2/8</span><span class="data-label">Steps</span></div>
+    </div>
+    <div class="step-list" style="font-family: 'Outfit', sans-serif;">
+      <div class="step"><span class="step-num">01</span> Collect and validate employee hours <span class="step-time">10:34 AM</span></div>
+      <div class="step"><span class="step-num">02</span> Review individual employees against previous <span class="step-time">10:35 AM</span></div>
+      <div class="step"><span class="step-num">03</span> Approve payroll run</div>
+    </div>
+    <div class="ui-samples" style="font-family: 'Outfit', sans-serif;">
+      <div class="ui-chip primary">Approve Plan</div>
+      <div class="ui-chip">Decline</div>
+      <div class="ui-chip gate">Gate</div>
+      <div class="ui-chip status">Running</div>
+    </div>
+  </div>
+
+  <!-- Sora (solo) -->
+  <div class="font-card">
+    <div class="font-label">
+      <span class="font-name">Sora</span>
+      <span class="badge solo-badge">Sans only</span>
+    </div>
+    <div class="font-combo-label">Single font for everything</div>
+    <div class="sample-hero" style="font-family: 'Sora', sans-serif;">January Payroll</div>
+    <div class="sample-client" style="font-family: 'Sora', sans-serif;">Black Mesa &middot; 47 employees</div>
+    <div class="sample-body" style="font-family: 'Sora', sans-serif;">Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase — it's the OT that's unusual.</div>
+    <div class="sample-data-row" style="font-family: 'Sora', sans-serif;">
+      <div class="data-item"><span class="data-value">$4,132</span><span class="data-label">Gross Diff</span></div>
+      <div class="data-item"><span class="data-value">82 hrs</span><span class="data-label">Average</span></div>
+      <div class="data-item"><span class="data-value">2/8</span><span class="data-label">Steps</span></div>
+    </div>
+    <div class="step-list" style="font-family: 'Sora', sans-serif;">
+      <div class="step"><span class="step-num">01</span> Collect and validate employee hours <span class="step-time">10:34 AM</span></div>
+      <div class="step"><span class="step-num">02</span> Review individual employees against previous <span class="step-time">10:35 AM</span></div>
+      <div class="step"><span class="step-num">03</span> Approve payroll run</div>
+    </div>
+    <div class="ui-samples" style="font-family: 'Sora', sans-serif;">
+      <div class="ui-chip primary">Approve Plan</div>
+      <div class="ui-chip">Decline</div>
+      <div class="ui-chip gate">Gate</div>
+      <div class="ui-chip status">Running</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -5,7 +5,7 @@ import { DefaultChatTransport } from "ai";
 import { useChat } from "@ai-sdk/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Send, FileText, ClipboardCopy, Check, Loader2 } from "lucide-react";
+import { PaperPlaneTilt, FileText, Copy, Check, CircleNotch } from "@phosphor-icons/react";
 import { getTextFromParts } from "@/lib/ai/message-adapter";
 
 interface DisplayMessage {
@@ -113,7 +113,7 @@ export function InterviewChat() {
     }
   }, [isLoading, uiMessages]);
 
-  function handleSend(content: string) {
+  function handlePaperPlaneTilt(content: string) {
     sendMessage({ text: content });
   }
 
@@ -121,7 +121,7 @@ export function InterviewChat() {
     e.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
-    handleSend(trimmed);
+    handlePaperPlaneTilt(trimmed);
     setInput("");
   }
 
@@ -135,7 +135,7 @@ export function InterviewChat() {
   function generateSummary() {
     if (isLoading) return;
     pendingSummaryRef.current = true;
-    handleSend("Please generate a summary of everything we've discussed.");
+    handlePaperPlaneTilt("Please generate a summary of everything we've discussed.");
   }
 
   async function copySummary(content: string) {
@@ -199,7 +199,7 @@ export function InterviewChat() {
                 >
                   {msg.isSummary && (
                     <div className="mb-3 flex items-center justify-between">
-                      <span className="text-xs font-medium uppercase tracking-wide text-primary">
+                      <span className="text-xs font-medium uppercase tracking-[0.06em] text-primary">
                         Policy Summary
                       </span>
                       <Button
@@ -215,7 +215,7 @@ export function InterviewChat() {
                           </>
                         ) : (
                           <>
-                            <ClipboardCopy className="h-3 w-3" />
+                            <Copy className="h-3 w-3" />
                             Copy
                           </>
                         )}
@@ -238,7 +238,7 @@ export function InterviewChat() {
             {isLoading && (
               <div className="flex justify-start">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <CircleNotch weight="regular" className="h-4 w-4 animate-spin" />
                   <span>Thinking...</span>
                 </div>
               </div>
@@ -276,7 +276,7 @@ export function InterviewChat() {
             disabled={!input.trim() || isLoading}
             className="h-10 w-10 shrink-0 rounded-xl"
           >
-            <Send className="h-4 w-4" />
+            <PaperPlaneTilt className="h-4 w-4" />
           </Button>
         </form>
       </div>

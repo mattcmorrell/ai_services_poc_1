@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geist — Colorway Comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ============================================ */
+  /* THEME SYSTEM — colorway + mode via variables */
+  /* ============================================ */
+
+  /* INKWELL DARK */
+  body.inkwell.dark {
+    --bg: #111617; --card: #1C2426; --inner: #2E3B3D;
+    --accent: #7A9A78; --accent-bright: #A0C09E; --accent-dim: #5E7A5C;
+    --accent-bg: rgba(122,154,120,0.12); --accent-border: rgba(122,154,120,0.2);
+    --text-bright: #F2F0EB; --text-primary: #F2F0EB; --text-secondary: #C8C2B4;
+    --alert: #D4875A; --alert-bright: #E8A070; --alert-bg: rgba(212,135,90,0.1); --alert-border: rgba(212,135,90,0.2);
+    --border: rgba(220,215,201,0.08); --border-strong: rgba(220,215,201,0.12);
+    --success: #6aba7a; --warning: #d4a456; --danger: #c96b6b;
+    --inner-border: rgba(220,215,201,0.06);
+  }
+  /* INKWELL LIGHT */
+  body.inkwell.light {
+    --bg: #EBE8E0; --card: #fff; --inner: #F7F5F1;
+    --accent: #5A7A58; --accent-bright: #4A6848; --accent-dim: #4A6848;
+    --accent-bg: rgba(90,122,88,0.1); --accent-border: rgba(90,122,88,0.15);
+    --text-bright: #1C2426; --text-primary: #2E3B3D; --text-secondary: #6B7574;
+    --alert: #B86E3A; --alert-bright: #B86E3A; --alert-bg: rgba(184,110,58,0.08); --alert-border: rgba(184,110,58,0.15);
+    --border: rgba(44,54,57,0.08); --border-strong: rgba(44,54,57,0.12);
+    --success: #3d8a4d; --warning: #A27B5B; --danger: #a84444;
+    --inner-border: rgba(44,54,57,0.06);
+  }
+  /* MERCURY DARK */
+  body.mercury.dark {
+    --bg: #101214; --card: #191B1F; --inner: #222428;
+    --accent: #6878B8; --accent-bright: #8E9AD0; --accent-dim: #506098;
+    --accent-bg: rgba(104,120,184,0.08); --accent-border: rgba(104,120,184,0.14);
+    --text-bright: #E8E9ED; --text-primary: #E8E9ED; --text-secondary: #9DA0A8;
+    --alert: #E08850; --alert-bright: #F0A468; --alert-bg: rgba(224,136,80,0.12); --alert-border: rgba(224,136,80,0.22);
+    --border: rgba(180,185,200,0.07); --border-strong: rgba(180,185,200,0.11);
+    --success: #7BAA82; --warning: #C4A060; --danger: #C07070;
+    --inner-border: rgba(180,185,200,0.05);
+  }
+  /* MERCURY LIGHT */
+  body.mercury.light {
+    --bg: #F3F4F6; --card: #fff; --inner: #F4F5F7;
+    --accent: #506098; --accent-bright: #506098; --accent-dim: #405080;
+    --accent-bg: rgba(80,96,152,0.07); --accent-border: rgba(80,96,152,0.12);
+    --text-bright: #1C1E24; --text-primary: #3C3F48; --text-secondary: #6E7178;
+    --alert: #C06828; --alert-bright: #C06828; --alert-bg: rgba(192,104,40,0.08); --alert-border: rgba(192,104,40,0.15);
+    --border: rgba(30,35,50,0.07); --border-strong: rgba(30,35,50,0.11);
+    --success: #4A7A52; --warning: #9A8050; --danger: #A05050;
+    --inner-border: rgba(30,35,50,0.05);
+  }
+  /* ORBITAL DARK */
+  body.orbital.dark {
+    --bg: #161C22; --card: #1E2830; --inner: #2A3640;
+    --accent: #8AAEC4; --accent-bright: #B0D0E0; --accent-dim: #6890A8;
+    --accent-bg: rgba(138,174,196,0.08); --accent-border: rgba(138,174,196,0.15);
+    --text-bright: #E8EFF4; --text-primary: #E8EFF4; --text-secondary: #9AABB8;
+    --alert: #E08850; --alert-bright: #F0A468; --alert-bg: rgba(224,136,80,0.12); --alert-border: rgba(224,136,80,0.22);
+    --border: rgba(196,212,220,0.08); --border-strong: rgba(196,212,220,0.12);
+    --success: #7BAA82; --warning: #C4A060; --danger: #C07070;
+    --inner-border: rgba(196,212,220,0.06);
+  }
+  /* ORBITAL LIGHT */
+  body.orbital.light {
+    --bg: #E8EFF4; --card: #fff; --inner: #EEF4F8;
+    --accent: #4A7A98; --accent-bright: #4A7A98; --accent-dim: #3A6480;
+    --accent-bg: rgba(74,122,152,0.07); --accent-border: rgba(74,122,152,0.12);
+    --text-bright: #1A2830; --text-primary: #2A3A44; --text-secondary: #5A7080;
+    --alert: #C06828; --alert-bright: #C06828; --alert-bg: rgba(192,104,40,0.08); --alert-border: rgba(192,104,40,0.15);
+    --border: rgba(26,40,48,0.07); --border-strong: rgba(26,40,48,0.11);
+    --success: #4A8A52; --warning: #9A8050; --danger: #A05050;
+    --inner-border: rgba(26,40,48,0.05);
+  }
+
+  /* ============================================ */
+  /* BASE STYLES                                  */
+  /* ============================================ */
+  body {
+    font-family: 'Geist', sans-serif;
+    padding: 40px 48px 80px;
+    background: var(--bg); color: var(--text-primary);
+    transition: background 0.3s, color 0.3s;
+  }
+
+  a { color: var(--accent-bright); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .back { font-size: 13px; margin-bottom: 24px; display: inline-block; }
+  h1 { font-size: 28px; font-weight: 600; color: var(--text-bright); margin-bottom: 8px; }
+  .subtitle { font-size: 15px; color: var(--text-secondary); margin-bottom: 16px; max-width: 680px; line-height: 1.6; }
+
+  /* ============================================ */
+  /* CONTROLS — colorway tabs + mode toggle       */
+  /* ============================================ */
+  .controls {
+    position: fixed; top: 20px; right: 24px; z-index: 100;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .control-group {
+    display: flex; gap: 0; border-radius: 6px; overflow: hidden;
+    font-family: 'Geist Mono', monospace; font-size: 12px;
+  }
+  .control-btn {
+    padding: 8px 16px; border: none; cursor: pointer;
+    font-family: inherit; font-size: inherit; transition: all 0.2s;
+    background: var(--inner); color: var(--text-secondary);
+  }
+  .control-btn.active {
+    background: var(--accent); color: #fff;
+  }
+  body.inkwell.light .control-btn { background: #ddd; color: #666; }
+  body.inkwell.light .control-btn.active { background: var(--accent); color: #fff; }
+  body.mercury.light .control-btn { background: #ddd; color: #666; }
+  body.mercury.light .control-btn.active { background: var(--accent); color: #fff; }
+  .control-sep {
+    width: 1px; height: 20px; background: var(--border-strong);
+  }
+
+  /* Swatches */
+  .swatches { display: flex; gap: 16px; margin-bottom: 40px; flex-wrap: wrap; }
+  .swatch { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 11px; font-family: 'Geist Mono', monospace; color: var(--text-secondary); }
+  .swatch-color { width: 72px; height: 48px; border-radius: 6px; border: 1px solid var(--border-strong); }
+
+  /* Rule banner */
+  .rule {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px 18px; border-radius: 8px; margin-bottom: 48px;
+    font-size: 13px; line-height: 1.5;
+    background: var(--accent-bg); border: 1px solid var(--accent-border); color: var(--text-secondary);
+  }
+  .rule-icon { color: var(--accent); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .rule strong { color: var(--text-bright); }
+
+  /* Specimens */
+  .specimens { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; }
+  .specimen { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 24px 28px; }
+  .specimen.full { grid-column: 1 / -1; }
+  .specimen-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+
+  /* Type scale */
+  .type-scale { display: flex; flex-direction: column; gap: 12px; }
+  .type-scale-row { display: flex; align-items: baseline; gap: 16px; }
+  .type-scale-size { font-size: 11px; color: var(--text-secondary); min-width: 48px; text-align: right; }
+  .type-scale-sample { color: var(--text-bright); }
+  .type-scale-sample.muted { color: var(--text-secondary); }
+
+  /* Activity feed */
+  .activity-feed { display: flex; flex-direction: column; gap: 0; }
+  .activity-line { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; }
+  .activity-icon { font-size: 14px; min-width: 18px; text-align: center; padding-top: 2px; }
+  .activity-icon.done { color: var(--success); }
+  .activity-icon.running { color: var(--accent-bright); }
+  .activity-icon.warn { color: var(--warning); }
+  .activity-content { flex: 1; font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--text-primary); line-height: 1.5; }
+  .activity-content .data-ref { color: var(--text-bright); font-weight: 500; }
+  .activity-elapsed { font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--text-secondary); white-space: nowrap; padding-top: 2px; }
+
+  /* Chat */
+  .chat-mock { display: flex; flex-direction: column; gap: 16px; }
+  .chat-msg { max-width: 90%; }
+  .chat-msg.assistant { align-self: flex-start; }
+  .chat-msg.user { align-self: flex-end; }
+  .chat-sender { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .chat-bubble { font-size: 14px; line-height: 1.6; padding: 14px 18px; border-radius: 10px; }
+  .chat-bubble.a-bg { background: var(--inner); border: 1px solid var(--inner-border); color: var(--text-primary); }
+  .chat-bubble.u-bg { background: var(--accent-bg); border: 1px solid var(--accent-border); color: var(--text-bright); }
+  .chat-bubble strong { color: var(--text-bright); font-weight: 600; }
+  .agent-data { font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--accent-bright); background: var(--accent-bg); padding: 1px 6px; border-radius: 4px; }
+  .chat-time { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+  /* Thinking block */
+  .thinking-block { background: var(--inner); border: 1px solid var(--inner-border); border-radius: 8px; overflow: hidden; }
+  .thinking-toggle { display: flex; align-items: center; gap: 8px; padding: 10px 16px; font-size: 13px; color: var(--text-secondary); cursor: pointer; border-bottom: 1px solid var(--inner-border); }
+  .thinking-body { padding: 16px; font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--text-primary); line-height: 1.7; }
+  .thinking-body .thought-step { margin-bottom: 12px; padding-left: 16px; border-left: 2px solid var(--border-strong); }
+  .thinking-body .thought-step:last-child { margin-bottom: 0; }
+  .thinking-body .thought-label { color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .thinking-body .thought-data { color: var(--text-bright); }
+  .thinking-body .thought-flag { color: var(--alert-bright); }
+
+  /* Tool call */
+  .tool-call { background: var(--inner); border: 1px solid var(--inner-border); border-radius: 8px; overflow: hidden; }
+  .tool-call-header { display: flex; align-items: center; gap: 8px; padding: 10px 16px; font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--text-secondary); background: var(--accent-bg); border-bottom: 1px solid var(--inner-border); }
+  .tool-call-name { color: var(--accent); font-weight: 500; }
+  .tool-call-body { padding: 16px; font-family: 'Geist Mono', monospace; font-size: 13px; line-height: 1.6; color: var(--text-primary); }
+  .kv-row { display: flex; gap: 12px; padding: 4px 0; }
+  .kv-key { color: var(--text-secondary); min-width: 120px; flex-shrink: 0; }
+  .kv-val { color: var(--text-bright); }
+  .kv-val.flag { color: var(--alert) !important; }
+  .kv-val.error { color: var(--danger) !important; }
+
+  /* Anomaly card */
+  .anomaly-card { background: var(--card); border: 2px solid var(--alert); border-radius: 8px; padding: 20px 24px; box-shadow: inset 0 0 20px var(--alert-bg), inset 0 0 40px var(--alert-bg), 0 0 16px var(--alert-bg); }
+  .anomaly-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .anomaly-icon { color: var(--alert); font-size: 16px; }
+  .anomaly-title { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+  .anomaly-body { font-size: 14px; color: var(--text-primary); line-height: 1.6; margin-bottom: 16px; }
+  .anomaly-evidence { font-family: 'Geist Mono', monospace; font-size: 13px; line-height: 1.6; color: var(--text-primary); background: var(--inner); border: 1px solid var(--inner-border); border-radius: 6px; padding: 14px 16px; }
+  .ev-row { display: flex; gap: 12px; padding: 3px 0; }
+  .ev-label { color: var(--text-secondary); min-width: 120px; }
+  .ev-value { color: var(--text-bright); }
+  .ev-value.hot { color: var(--alert) !important; font-weight: 500; }
+  .anomaly-actions { display: flex; gap: 10px; margin-top: 14px; }
+  .anomaly-btn { font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 6px; border: none; cursor: pointer; }
+  .anomaly-btn.primary { background: var(--alert); color: #fff; }
+  .anomaly-btn.secondary { background: var(--inner); color: var(--text-secondary); border: 1px solid var(--border); }
+
+  /* Action plan */
+  .plan-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .plan-title { font-size: 16px; font-weight: 600; color: var(--text-bright); }
+  .plan-status { font-family: 'Geist Mono', monospace; font-size: 12px; padding: 3px 10px; border-radius: 4px; background: var(--accent-bg); color: var(--accent-bright); }
+  .progress-bar { height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 4px; background: var(--inner); }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-dim), var(--accent-bright)); border-radius: 3px; }
+  .progress-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 12px; }
+  .plan-steps { display: flex; flex-direction: column; gap: 0; }
+  .plan-step { display: flex; align-items: flex-start; gap: 14px; padding: 10px 0; font-size: 14px; color: var(--text-primary); border-bottom: 1px solid var(--inner-border); }
+  .plan-step:last-child { border-bottom: none; }
+  .plan-step-num { font-size: 14px; color: var(--text-secondary); min-width: 20px; }
+  .plan-step-text { flex: 1; }
+  .plan-step-status { font-family: 'Geist Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 3px; white-space: nowrap; }
+  .plan-step-status.done { background: rgba(91,189,107,0.08); color: var(--success); }
+  .plan-step-status.active { background: var(--accent-bg); color: var(--accent-bright); }
+  .plan-step-status.gate { background: rgba(224,93,93,0.08); color: var(--danger); }
+  .plan-step-status.pending { color: var(--text-secondary); }
+  .plan-actions { display: flex; gap: 10px; margin-top: 14px; }
+  .plan-btn { font-size: 13px; font-weight: 500; padding: 8px 20px; border-radius: 6px; border: none; cursor: pointer; }
+  .plan-btn.approve { background: var(--accent); color: #fff; }
+  .plan-btn.decline { background: var(--inner); color: var(--text-secondary); border: 1px solid var(--border); }
+
+  /* Data table */
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border-strong); }
+  .data-table td { font-size: 13px; color: var(--text-primary); padding: 10px 12px; border-bottom: 1px solid var(--inner-border); }
+  .data-table .name { color: var(--text-bright); font-weight: 500; }
+  .data-table .num { font-variant-numeric: tabular-nums; text-align: right; }
+
+  /* ---- ACCENT EXPLORATION ---- */
+  .accent-section {
+    margin: 24px 0 8px;
+    padding: 28px 32px 32px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+  }
+  .accent-section .accent-title { font-family: 'Geist', sans-serif; font-size: 18px; font-weight: 600; color: #e0e0e0; margin-bottom: 4px; }
+  .accent-section .accent-sub { font-family: 'Geist Mono', monospace; font-size: 12px; color: #888; letter-spacing: 0.04em; }
+  .accent-section .accent-desc { font-size: 14px; color: #999; margin: 8px 0 24px; line-height: 1.5; }
+  .accent-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px;
+  }
+  .accent-card { display: flex; flex-direction: column; gap: 8px; }
+  .accent-swatch-row {
+    display: flex; gap: 3px; border-radius: 10px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .accent-swatch-half { flex: 1; aspect-ratio: 3/2; }
+  .accent-demo {
+    border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .accent-demo-btn {
+    padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer;
+    font-family: 'Geist', sans-serif; font-size: 13px; font-weight: 500;
+    color: #111; text-align: center;
+  }
+  .accent-demo-alert-btn {
+    padding: 8px 16px; border-radius: 6px; border: none;
+    font-family: 'Geist', sans-serif; font-size: 13px; font-weight: 500;
+    text-align: center;
+  }
+  .accent-demo-bar { height: 6px; border-radius: 3px; }
+  .accent-demo-bar-track { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.06); overflow: hidden; }
+  .accent-label { font-family: 'Geist Mono', monospace; font-size: 12px; color: #bbb; text-align: center; }
+  .accent-hex { font-family: 'Geist Mono', monospace; font-size: 11px; color: #888; text-align: center; }
+  .accent-tag {
+    font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: #888; text-align: center;
+  }
+
+  /* ---- LUNAR EXPLORATION ---- */
+  .lunar-section {
+    margin: 32px 0 8px;
+    padding: 28px 32px 32px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+  }
+  .lunar-section .lunar-section-title { color: #e0e0e0; }
+  .lunar-section .lunar-section-sub { color: #888; }
+  .lunar-section .lunar-section-desc { color: #999; }
+  .lunar-section .lunar-label { color: #bbb; }
+  .lunar-section .lunar-hex { color: #888; }
+  .lunar-section .lunar-context-label { color: #888; }
+  .lunar-section-header {
+    display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px;
+  }
+  .lunar-section-title {
+    font-family: 'Geist', sans-serif;
+    font-size: 18px; font-weight: 600; color: var(--text-bright);
+  }
+  .lunar-section-sub {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px; color: var(--text-secondary); letter-spacing: 0.04em;
+  }
+  .lunar-section-desc {
+    font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;
+  }
+  .lunar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .lunar-card {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .lunar-pair {
+    display: flex; width: 100%; gap: 3px; border-radius: 10px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .lunar-swatch {
+    flex: 1; aspect-ratio: 1/1;
+    transition: box-shadow 0.2s;
+  }
+  .lunar-swatch:hover {
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.2);
+  }
+  .lunar-swatch-base {
+    opacity: 0.85;
+  }
+  .lunar-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px; color: var(--text-secondary);
+    text-align: center; letter-spacing: 0.02em;
+  }
+  .lunar-hex {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px; color: var(--text-secondary); opacity: 0.7;
+    text-align: center;
+  }
+  .lunar-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    padding: 3px 8px; border-radius: 4px;
+    margin-top: 2px; display: inline-block;
+  }
+  .lunar-context {
+    display: flex; gap: 12px; margin-top: 20px; padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .lunar-context-swatch {
+    width: 100%; aspect-ratio: 5/2; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500;
+  }
+  .lunar-context-card {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .lunar-context-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px; color: var(--text-secondary); text-align: center;
+  }
+
+  @media (max-width: 1000px) {
+    .specimens { grid-template-columns: 1fr; }
+    .specimen.full { grid-column: 1; }
+    body { padding: 24px 24px 60px; }
+    .lunar-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body class="inkwell dark">
+
+<div class="controls">
+  <div class="control-group">
+    <button class="control-btn active" onclick="setColorway('inkwell')">Inkwell</button>
+    <button class="control-btn" onclick="setColorway('mercury')">Mercury</button>
+    <button class="control-btn" onclick="setColorway('orbital')">Orbital</button>
+  </div>
+  <div class="control-sep"></div>
+  <div class="control-group">
+    <button class="control-btn active" onclick="setMode('dark')">Dark</button>
+    <button class="control-btn" onclick="setMode('light')">Light</button>
+  </div>
+</div>
+
+<a href="font-mono-deep-dive.html" class="back">&larr; Back to deep dive</a> &nbsp;&middot;&nbsp; <a href="accent-compare.html" class="back">Sage vs Patina comparison &rarr;</a>
+
+<h1>Geist + Geist Mono</h1>
+<p class="subtitle">Same specimens, two colorways. Toggle Inkwell (warm teal) vs Mercury (cool indigo) and dark/light to compare all four combinations.</p>
+
+<div class="swatches" id="swatches"></div>
+
+<!-- LUNAR EXPLORATION -->
+<div class="lunar-section" id="lunarSection">
+  <div class="lunar-section-header">
+    <span class="lunar-section-title">Lunar Variations</span>
+    <span class="lunar-section-sub">inner surface · #2E3B3D baseline</span>
+  </div>
+  <p class="lunar-section-desc">
+    Exploring the inner/card surface color that sits on top of the card background. Used for input fields, nested containers, hover states.
+  </p>
+  <div class="lunar-grid" id="lunarGrid"></div>
+  <div class="lunar-context" id="lunarContext"></div>
+</div>
+
+<!-- ACCENT EXPLORATION -->
+<div class="accent-section" id="accentSection">
+  <div class="accent-title">Accent vs Alert — Separation Test</div>
+  <div class="accent-sub">Current Inkwell accent is too close to the alert orange</div>
+  <p class="accent-desc">Each column shows an accent candidate next to the alert color, then a mini UI demo: accent button, alert button, and progress bar on the card background. <a href="accent-compare.html" style="color:#A0C09E;">Full side-by-side comparison &rarr;</a></p>
+  <div class="accent-grid" id="accentGrid"></div>
+</div>
+
+<div class="rule">
+  <span class="rule-icon">&#9670;</span>
+  <span><strong>Mono = agent's work.</strong> Sans = everything else, including numbers in UI chrome. The font signals who produced it, not the data type.</span>
+</div>
+
+<div class="specimens">
+
+  <!-- Type scales -->
+  <div class="specimen">
+    <div class="specimen-label">Type Scale — Sans (human layer)</div>
+    <div class="type-scale">
+      <div class="type-scale-row"><span class="type-scale-size">32px</span><span class="type-scale-sample" style="font-size:32px;font-weight:600;">January Payroll</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">24px</span><span class="type-scale-sample" style="font-size:24px;font-weight:600;">Benefits Enrollment Q1</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">18px</span><span class="type-scale-sample" style="font-size:18px;font-weight:500;">Run payroll for 47 employees</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">14px</span><span class="type-scale-sample" style="font-size:14px;">Dr. Vance has 58 overtime hours this period vs. a 3-period average.</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">13px</span><span class="type-scale-sample muted" style="font-size:13px;">Completed 10:34 AM &middot; 2 of 8 steps</span></div>
+    </div>
+  </div>
+
+  <div class="specimen">
+    <div class="specimen-label">Type Scale — Numbers (sans, not mono)</div>
+    <div class="type-scale">
+      <div class="type-scale-row"><span class="type-scale-size">28px</span><span class="type-scale-sample" style="font-size:28px;font-weight:600;">$4,132.50</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">22px</span><span class="type-scale-sample" style="font-size:22px;font-weight:500;">82 hrs &nbsp; 47 ee</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">16px</span><span class="type-scale-sample" style="font-size:16px;">variance +383% &nbsp; threshold 150%</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">13px</span><span class="type-scale-sample muted" style="font-size:13px;">10:34:09 AM &nbsp; 2/8 steps &nbsp; ~10 min</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">13px</span><span class="type-scale-sample muted" style="font-size:13px;">Jan 1–31, 2026 &nbsp; Pay Period 01</span></div>
+    </div>
+  </div>
+
+  <!-- Activity feed -->
+  <div class="specimen full">
+    <div class="specimen-label">Activity Feed — agent narrating its work (mono)</div>
+    <div class="activity-feed">
+      <div class="activity-line">
+        <span class="activity-icon done">&#10003;</span>
+        <span class="activity-content">Pulling employee roster for Black Mesa &mdash; <span class="data-ref">47 active employees</span></span>
+        <span class="activity-elapsed">1.2s</span>
+      </div>
+      <div class="activity-line">
+        <span class="activity-icon done">&#10003;</span>
+        <span class="activity-content">Collecting hours from timesheet API &mdash; pay period <span class="data-ref">Jan 1&ndash;31</span></span>
+        <span class="activity-elapsed">3.4s</span>
+      </div>
+      <div class="activity-line">
+        <span class="activity-icon warn">&#9888;</span>
+        <span class="activity-content">Flagged <span class="data-ref">3 anomalies</span> &mdash; overtime variance, new HSA deduction, missing timesheet</span>
+        <span class="activity-elapsed">0.8s</span>
+      </div>
+      <div class="activity-line">
+        <span class="activity-icon running">&#9679;</span>
+        <span class="activity-content">Generating anomaly report for consultant review&hellip;</span>
+        <span class="activity-elapsed">&mdash;</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div class="specimen">
+    <div class="specimen-label">Chat — sans prose, mono for extracted data</div>
+    <div class="chat-mock">
+      <div class="chat-msg assistant">
+        <div class="chat-sender">Assistant</div>
+        <div class="chat-bubble a-bg">I found <strong>3 anomalies</strong> in this payroll run. The biggest is Dr. Eli Vance — <span class="agent-data">58 OT hrs</span> vs his <span class="agent-data">12 hr avg</span>. That's a <span class="agent-data">$4,132.50</span> difference in gross pay.</div>
+        <div class="chat-time">10:34 AM</div>
+      </div>
+      <div class="chat-msg user">
+        <div class="chat-sender">You</div>
+        <div class="chat-bubble u-bg">Is this a crunch period or should I flag it?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent thinking -->
+  <div class="specimen">
+    <div class="specimen-label">Agent Thinking — mono reasoning block</div>
+    <div class="thinking-block">
+      <div class="thinking-toggle"><span>&#9660;</span> Agent reasoning</div>
+      <div class="thinking-body">
+        <div class="thought-step">
+          <div class="thought-label">Comparing</div>
+          current OT = <span class="thought-data">58.0 hrs</span>, 3-period avg = <span class="thought-data">12.0 hrs</span>
+        </div>
+        <div class="thought-step">
+          <div class="thought-label">Calculating</div>
+          variance: <span class="thought-data">+383%</span> &mdash; threshold is 150%. Anomaly isolated to overtime.
+        </div>
+        <div class="thought-step">
+          <div class="thought-label">Conclusion</div>
+          <span class="thought-flag">Flagging. Gross impact $4,132.50 &mdash; requires consultant review.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tool call -->
+  <div class="specimen">
+    <div class="specimen-label">Tool Call Output — agent pulled this from BHR API</div>
+    <div class="tool-call">
+      <div class="tool-call-header">
+        <span class="tool-call-name">bamboohr.getEmployee</span>
+        <span>&rarr; 200 OK</span>
+      </div>
+      <div class="tool-call-body">
+        <div class="kv-row"><span class="kv-key">employee_id</span><span class="kv-val">4821</span></div>
+        <div class="kv-row"><span class="kv-key">name</span><span class="kv-val">Dr. Eli Vance</span></div>
+        <div class="kv-row"><span class="kv-key">hours_overtime</span><span class="kv-val flag">58.0</span></div>
+        <div class="kv-row"><span class="kv-key">gross_pay</span><span class="kv-val">$8,245.00</span></div>
+        <div class="kv-row"><span class="kv-key">prev_gross_pay</span><span class="kv-val">$4,112.50</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anomaly -->
+  <div class="specimen">
+    <div class="specimen-label">Anomaly — sans explanation, mono evidence</div>
+    <div class="anomaly-card">
+      <div class="anomaly-header">
+        <span class="anomaly-icon">&#9888;</span>
+        <span class="anomaly-title">Overtime anomaly — Dr. Eli Vance</span>
+      </div>
+      <div class="anomaly-body">58 overtime hours vs a 3-period average of 12. Could be a legitimate crunch period, but it's a $4,132.50 difference in gross pay.</div>
+      <div class="anomaly-evidence">
+        <div class="ev-row"><span class="ev-label">current_ot</span><span class="ev-value hot">58.0 hrs</span></div>
+        <div class="ev-row"><span class="ev-label">3_period_avg</span><span class="ev-value">12.0 hrs</span></div>
+        <div class="ev-row"><span class="ev-label">variance</span><span class="ev-value hot">+383%</span></div>
+        <div class="ev-row"><span class="ev-label">gross_impact</span><span class="ev-value hot">+$4,132.50</span></div>
+      </div>
+      <div class="anomaly-actions">
+        <button class="anomaly-btn primary">Acknowledge</button>
+        <button class="anomaly-btn secondary">Investigate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action plan -->
+  <div class="specimen">
+    <div class="specimen-label">Action Plan — sans steps, mono status badges</div>
+    <div>
+      <div class="plan-header">
+        <span class="plan-title">Run January Payroll</span>
+        <span class="plan-status">Running</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+      <div class="progress-label">Step 2 of 8</div>
+      <div class="plan-steps">
+        <div class="plan-step"><span class="plan-step-num">1</span><span class="plan-step-text">Create payroll run for Jan 1–31</span><span class="plan-step-status done">Completed</span></div>
+        <div class="plan-step"><span class="plan-step-num">2</span><span class="plan-step-text">Collect and validate employee hours</span><span class="plan-step-status active">Running</span></div>
+        <div class="plan-step"><span class="plan-step-num">3</span><span class="plan-step-text">Review against previous payroll</span><span class="plan-step-status pending">&mdash;</span></div>
+        <div class="plan-step"><span class="plan-step-num">5</span><span class="plan-step-text">Approve payroll run</span><span class="plan-step-status gate">Gate</span></div>
+      </div>
+      <div class="plan-actions">
+        <button class="plan-btn approve">Approve Plan</button>
+        <button class="plan-btn decline">Decline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data table -->
+  <div class="specimen">
+    <div class="specimen-label">Data Table — sans for UI, mono only in agent context</div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Employee</th><th>Dept</th><th class="num">Hours</th><th class="num">OT</th><th class="num">Gross</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="name">Dr. Eli Vance</td>
+          <td>Research</td>
+          <td class="num">80.0</td>
+          <td class="num" style="color:var(--danger);">58.0</td>
+          <td class="num">$8,245.00</td>
+        </tr>
+        <tr>
+          <td class="name">Barney Calhoun</td>
+          <td>Security</td>
+          <td class="num">80.0</td>
+          <td class="num">4.5</td>
+          <td class="num">$4,112.50</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+const palettes = {
+  inkwell: {
+    dark: [
+      { color: '#111617', label: 'Abyss' },
+      { color: '#1C2426', label: 'Inkwell' },
+      { color: '#2E3B3D', label: 'Lunar' },
+      { color: '#7A9A78', label: 'Sage' },
+      { color: '#D4875A', label: 'Alert' },
+      { color: '#F2F0EB', label: 'Cream' },
+    ],
+    light: [
+      { color: '#EBE8E0', label: 'Linen' },
+      { color: '#F7F5F1', label: 'Cream' },
+      { color: '#FFFFFF', label: 'White' },
+      { color: '#5A7A58', label: 'Sage' },
+      { color: '#B86E3A', label: 'Alert' },
+      { color: '#1C2426', label: 'Inkwell' },
+    ],
+  },
+  orbital: {
+    dark: [
+      { color: '#161C22', label: 'Deep Space' },
+      { color: '#1E2830', label: 'Horizon' },
+      { color: '#2A3640', label: 'Dusk' },
+      { color: '#8AAEC4', label: 'Powder' },
+      { color: '#E08850', label: 'Alert' },
+      { color: '#E8EFF4', label: 'Frost' },
+    ],
+    light: [
+      { color: '#E8EFF4', label: 'Sky Wash' },
+      { color: '#EEF4F8', label: 'Mist' },
+      { color: '#FFFFFF', label: 'White' },
+      { color: '#4A7A98', label: 'Powder' },
+      { color: '#C06828', label: 'Alert' },
+      { color: '#1A2830', label: 'Deep Space' },
+    ],
+  },
+  mercury: {
+    dark: [
+      { color: '#101214', label: 'Void' },
+      { color: '#191B1F', label: 'Slate' },
+      { color: '#222428', label: 'Graphite' },
+      { color: '#6878B8', label: 'Steel Blue' },
+      { color: '#E08850', label: 'Alert' },
+      { color: '#E8E9ED', label: 'Ice' },
+    ],
+    light: [
+      { color: '#F3F4F6', label: 'Frost' },
+      { color: '#ECEDF0', label: 'Mist' },
+      { color: '#FFFFFF', label: 'White' },
+      { color: '#506098', label: 'Steel Blue' },
+      { color: '#C06828', label: 'Alert' },
+      { color: '#1C1E24', label: 'Slate' },
+    ],
+  }
+};
+
+let currentColorway = 'inkwell';
+let currentMode = 'dark';
+
+function setColorway(cw) {
+  currentColorway = cw;
+  apply();
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  apply();
+}
+
+function apply() {
+  document.body.className = currentColorway + ' ' + currentMode;
+  // Update control buttons
+  document.querySelectorAll('.control-btn').forEach(btn => {
+    const text = btn.textContent.toLowerCase();
+    if (text === 'dark' || text === 'light') {
+      btn.classList.toggle('active', text === currentMode);
+    } else {
+      btn.classList.toggle('active', text === currentColorway);
+    }
+  });
+  // Update swatches
+  const sw = palettes[currentColorway][currentMode];
+  const container = document.getElementById('swatches');
+  container.innerHTML = sw.map(s =>
+    `<div class="swatch"><div class="swatch-color" style="background:${s.color};"></div> ${s.label} ${s.color}</div>`
+  ).join('');
+  renderLunar();
+  renderAccentExploration();
+}
+
+// Keyboard shortcuts: 1=inkwell, 2=mercury, d=dark, l=light
+document.addEventListener('keydown', e => {
+  if (e.key === '1') setColorway('inkwell');
+  if (e.key === '2') setColorway('mercury');
+  if (e.key === '3') setColorway('orbital');
+  if (e.key === 'd') setMode('dark');
+  if (e.key === 'l') setMode('light');
+});
+
+// ---- ACCENT EXPLORATION ----
+const accentCandidates = {
+  inkwell: {
+    dark: {
+      alert: '#D4875A',
+      card: '#1C2426',
+      current: { hex: '#A27B5B', label: 'Brulee (current)', tag: 'too close to alert' },
+      candidates: [
+        { hex: '#7A9A78', label: 'Sage', tag: 'earthy green' },
+        { hex: '#6B9E9A', label: 'Patina', tag: 'dusty teal' },
+        { hex: '#C4A55A', label: 'Brass', tag: 'warm gold' },
+        { hex: '#9A7A8E', label: 'Mauve', tag: 'warm rose' },
+      ],
+    },
+    light: {
+      alert: '#B86E3A',
+      card: '#FFFFFF',
+      current: { hex: '#A27B5B', label: 'Brulee (current)', tag: 'too close to alert' },
+      candidates: [
+        { hex: '#5A7A58', label: 'Sage', tag: 'earthy green' },
+        { hex: '#4A7A78', label: 'Patina', tag: 'dusty teal' },
+        { hex: '#9A8038', label: 'Brass', tag: 'warm gold' },
+        { hex: '#7A5A6E', label: 'Mauve', tag: 'warm rose' },
+      ],
+    },
+  },
+};
+
+function renderAccentExploration() {
+  const section = document.getElementById('accentSection');
+  const data = accentCandidates[currentColorway]?.[currentMode];
+  if (!data) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  const grid = document.getElementById('accentGrid');
+  const all = [data.current, ...data.candidates];
+
+  grid.innerHTML = all.map((c, i) => `
+    <div class="accent-card">
+      <div class="accent-swatch-row">
+        <div class="accent-swatch-half" style="background:${c.hex};" title="Accent: ${c.hex}"></div>
+        <div class="accent-swatch-half" style="background:${data.alert};" title="Alert: ${data.alert}"></div>
+      </div>
+      <div class="accent-label">${c.label}</div>
+      <div class="accent-hex">${c.hex}</div>
+      <div class="accent-tag">${c.tag}</div>
+      <div class="accent-demo" style="background:${data.card};">
+        <div class="accent-demo-btn" style="background:${c.hex};">Approve Plan</div>
+        <div class="accent-demo-alert-btn" style="background:rgba(0,0,0,0.15); color:${data.alert}; border: 1px solid ${data.alert}40;">⚠ Urgent</div>
+        <div class="accent-demo-bar-track">
+          <div class="accent-demo-bar" style="background:${c.hex}; width:35%;"></div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ---- LUNAR EXPLORATION ----
+const lunarVariations = {
+  inkwell: {
+    dark: {
+      base: { hex: '#2E3B3D', label: 'Lunar (base)' },
+      variants: [
+        { hex: '#3A4440', label: 'Warmer', tag: '+warm', desc: 'Shift green channel up, red slightly' },
+        { hex: '#2A3840', label: 'Cooler', tag: '+cool', desc: 'Push toward blue-slate' },
+        { hex: '#384848', label: 'Lighter', tag: '+light', desc: 'Lift all channels evenly' },
+        { hex: '#2E4540', label: 'More saturated', tag: '+sat', desc: 'Push green/teal, pull red down' },
+      ],
+      card: '#1C2426',
+      textOnInner: '#C8C2B4',
+    },
+    light: {
+      base: { hex: '#F7F5F1', label: 'Inner (base)' },
+      variants: [
+        { hex: '#F8F4EA', label: 'Warmer', tag: '+warm', desc: 'More cream/yellow' },
+        { hex: '#F2F4F6', label: 'Cooler', tag: '+cool', desc: 'Blue-gray undertone' },
+        { hex: '#FDFCFA', label: 'Lighter', tag: '+light', desc: 'Closer to white' },
+        { hex: '#F0F0E8', label: 'More saturated', tag: '+sat', desc: 'Push the warm tint' },
+      ],
+      card: '#FFFFFF',
+      textOnInner: '#6B7574',
+    },
+  },
+  mercury: {
+    dark: {
+      base: { hex: '#222428', label: 'Steel (base)' },
+      variants: [
+        { hex: '#282830', label: 'Warmer', tag: '+warm', desc: 'Slight purple warmth' },
+        { hex: '#1E2228', label: 'Cooler', tag: '+cool', desc: 'Push toward navy' },
+        { hex: '#2A2C32', label: 'Lighter', tag: '+light', desc: 'Lift evenly' },
+        { hex: '#222838', label: 'More saturated', tag: '+sat', desc: 'Push blue channel' },
+      ],
+      card: '#191B1F',
+      textOnInner: '#9DA0A8',
+    },
+    light: {
+      base: { hex: '#F4F5F7', label: 'Inner (base)' },
+      variants: [
+        { hex: '#F6F5F2', label: 'Warmer', tag: '+warm', desc: 'Cream touch' },
+        { hex: '#F0F2F6', label: 'Cooler', tag: '+cool', desc: 'Blue-gray' },
+        { hex: '#F9FAFB', label: 'Lighter', tag: '+light', desc: 'Near white' },
+        { hex: '#ECEEF4', label: 'More saturated', tag: '+sat', desc: 'Push blue tint' },
+      ],
+      card: '#FFFFFF',
+      textOnInner: '#6E7178',
+    },
+  },
+  orbital: {
+    dark: {
+      base: { hex: '#2A3640', label: 'Dusk (base)' },
+      variants: [
+        { hex: '#303840', label: 'Warmer', tag: '+warm', desc: 'Slight green-brown shift' },
+        { hex: '#243848', label: 'Cooler', tag: '+cool', desc: 'Push blue deeper' },
+        { hex: '#34424C', label: 'Lighter', tag: '+light', desc: 'Lift evenly' },
+        { hex: '#264048', label: 'More saturated', tag: '+sat', desc: 'Push teal channel' },
+      ],
+      card: '#1E2830',
+      textOnInner: '#9AABB8',
+    },
+    light: {
+      base: { hex: '#EEF4F8', label: 'Mist (base)' },
+      variants: [
+        { hex: '#F2F4F2', label: 'Warmer', tag: '+warm', desc: 'Slight sage' },
+        { hex: '#E8F0F8', label: 'Cooler', tag: '+cool', desc: 'More sky blue' },
+        { hex: '#F4F8FC', label: 'Lighter', tag: '+light', desc: 'Near white' },
+        { hex: '#E4F0F4', label: 'More saturated', tag: '+sat', desc: 'Push blue tint' },
+      ],
+      card: '#FFFFFF',
+      textOnInner: '#5A7080',
+    },
+  },
+};
+
+function renderLunar() {
+  const data = lunarVariations[currentColorway]?.[currentMode];
+  const section = document.getElementById('lunarSection');
+  if (!data) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  const grid = document.getElementById('lunarGrid');
+  const baseHex = data.base.hex;
+  grid.innerHTML = data.variants.map(v => `
+    <div class="lunar-card">
+      <div class="lunar-pair">
+        <div class="lunar-swatch lunar-swatch-base" style="background:${baseHex};" title="Base: ${baseHex}"></div>
+        <div class="lunar-swatch" style="background:${v.hex};" title="${v.label}: ${v.hex}"></div>
+      </div>
+      <div class="lunar-label">${v.label}</div>
+      <div class="lunar-hex">${baseHex} → ${v.hex}</div>
+      <span class="lunar-tag">${v.tag}</span>
+    </div>
+  `).join('');
+
+  // Context row: show each variant as a surface with text
+  const ctx = document.getElementById('lunarContext');
+  ctx.innerHTML = data.variants.map(v => `
+    <div class="lunar-context-card">
+      <div class="lunar-context-swatch" style="background:${v.hex}; color:${data.textOnInner}; border: 1px solid rgba(255,255,255,0.06);">
+        ${v.label}
+      </div>
+      <div class="lunar-context-label">${v.hex}</div>
+    </div>
+  `).join('');
+}
+
+// URL params: ?colorway=mercury&mode=light
+const params = new URLSearchParams(window.location.search);
+if (params.get('colorway')) currentColorway = params.get('colorway');
+if (params.get('mode')) currentMode = params.get('mode');
+
+apply();
+</script>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</body>
+</html>

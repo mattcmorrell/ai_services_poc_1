@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prometheus / Weyland Industries — Design References</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Geist', system-ui, sans-serif;
+    background: #101214;
+    color: #E8E9ED;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- HEADER ---- */
+  .header {
+    padding: 64px 48px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-bottom: 1px solid rgba(180,185,200,0.1);
+  }
+  .header-module {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: #6878B8;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .header h1 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    color: #E8E9ED;
+  }
+  .header h1 span {
+    font-weight: 300;
+    color: #9DA0A8;
+  }
+  .header-sub {
+    font-size: 15px;
+    color: #9DA0A8;
+    margin-top: 12px;
+    max-width: 640px;
+    line-height: 1.6;
+  }
+  .header-meta {
+    display: flex;
+    gap: 32px;
+    margin-top: 24px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: #6B6E78;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* ---- MAIN ---- */
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 48px 96px;
+  }
+
+  /* ---- REFERENCE CARD ---- */
+  .ref-card {
+    margin-top: 64px;
+    border: 1px solid rgba(180,185,200,0.07);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #191B1F;
+    transition: border-color 0.3s ease;
+  }
+  .ref-card:hover {
+    border-color: rgba(180,185,200,0.14);
+  }
+
+  .ref-card-image {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    background: #111317;
+  }
+  .ref-card-image img {
+    width: 100%;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .ref-card-image:hover img {
+    transform: scale(1.02);
+  }
+  .ref-card-image .zoom-hint {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #9DA0A8;
+    background: rgba(16,18,20,0.85);
+    backdrop-filter: blur(8px);
+    padding: 6px 12px;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .ref-card-image:hover .zoom-hint {
+    opacity: 1;
+  }
+
+  .ref-card-body {
+    padding: 32px 36px;
+  }
+
+  .ref-number {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6878B8;
+    margin-bottom: 8px;
+  }
+
+  .ref-title {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
+  }
+
+  .ref-note {
+    font-size: 15px;
+    line-height: 1.65;
+    color: #B0B3BC;
+    max-width: 720px;
+    margin-bottom: 20px;
+  }
+  .ref-note em {
+    font-style: normal;
+    color: #E8E9ED;
+    font-weight: 500;
+  }
+
+  .ref-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .ref-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #9DA0A8;
+    background: rgba(180,185,200,0.06);
+    border: 1px solid rgba(180,185,200,0.08);
+    padding: 5px 12px;
+    border-radius: 6px;
+  }
+
+  .ref-application {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(180,185,200,0.07);
+  }
+  .ref-application-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6878B8;
+    margin-bottom: 6px;
+  }
+  .ref-application p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #9DA0A8;
+  }
+
+  /* ---- LIGHTBOX ---- */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(10,12,14,0.92);
+    backdrop-filter: blur(20px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+  }
+  .lightbox.active { display: flex; }
+  .lightbox img {
+    max-width: 92vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 0 80px rgba(0,0,0,0.5);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: #9DA0A8;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border: 1px solid rgba(180,185,200,0.1);
+    border-radius: 6px;
+    background: rgba(16,18,20,0.6);
+    transition: border-color 0.2s;
+  }
+  .lightbox-close:hover { border-color: rgba(180,185,200,0.25); }
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 28px;
+    color: #9DA0A8;
+    cursor: pointer;
+    padding: 16px;
+    user-select: none;
+    transition: color 0.2s;
+  }
+  .lightbox-nav:hover { color: #E8E9ED; }
+  .lightbox-prev { left: 20px; }
+  .lightbox-next { right: 20px; }
+  .lightbox-caption {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: #9DA0A8;
+    letter-spacing: 0.04em;
+    text-align: center;
+    background: rgba(16,18,20,0.7);
+    padding: 8px 20px;
+    border-radius: 6px;
+  }
+
+  /* ---- FOOTER ---- */
+  .footer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 48px 64px;
+    border-top: 1px solid rgba(180,185,200,0.07);
+  }
+  .footer-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6878B8;
+    margin-bottom: 12px;
+  }
+  .footer-summary {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #9DA0A8;
+    max-width: 720px;
+  }
+  .footer-summary strong {
+    color: #B0B3BC;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-module">Reference Board 01</div>
+  <h1>PROMETHEUS <span>DESIGN REFERENCES</span></h1>
+  <p class="header-sub">
+    Transferable patterns from the Weyland Industries corporate site (jeeto.com/prometheus).
+    These inform the mission-control layer of the Panda Command visual direction — institutional confidence,
+    Swiss grid discipline, and restrained sci-fi detailing.
+  </p>
+  <div class="header-meta">
+    <span>Source: Prometheus / Weyland Industries</span>
+    <span>Collected: April 3, 2026</span>
+    <span>5 References</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- REF 21 -->
+  <div class="ref-card">
+    <div class="ref-card-image" onclick="openLightbox(0)">
+      <img src="prometheus/21-hero-mesh.png" alt="Constellation mesh hero with Weyland logo">
+      <div class="zoom-hint">Click to zoom</div>
+    </div>
+    <div class="ref-card-body">
+      <div class="ref-number">Ref 01</div>
+      <div class="ref-title">Hero / Thumbnail Treatment</div>
+      <div class="ref-note">
+        <em>Constellation mesh network</em> behind bold type, particle bokeh lights, thin ruled lines framing the composition.
+        The Weyland logo sits small and confident in the upper-left — swap for <em>PNDA\CMD</em> lockup.
+        Direct application: Figma file thumbnail, project hero card, or loading state.
+      </div>
+      <div class="ref-tags">
+        <span class="ref-tag">Constellation Mesh</span>
+        <span class="ref-tag">Bokeh Particles</span>
+        <span class="ref-tag">Ruled Lines</span>
+        <span class="ref-tag">Dark Mode</span>
+        <span class="ref-tag">Logo Lockup</span>
+      </div>
+      <div class="ref-application">
+        <div class="ref-application-label">Application</div>
+        <p>Figma file thumbnail with PNDA\CMD branding. Also: project hero card, loading/splash state, empty-state backgrounds.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- REF 22 -->
+  <div class="ref-card">
+    <div class="ref-card-image" onclick="openLightbox(1)">
+      <img src="prometheus/22-dashboard-stats.png" alt="Light mode dashboard with module numbering and stats">
+      <div class="zoom-hint">Click to zoom</div>
+    </div>
+    <div class="ref-card-body">
+      <div class="ref-number">Ref 02</div>
+      <div class="ref-title">Dashboard Stats + Module Numbering</div>
+      <div class="ref-note">
+        <em>MODULE 1.1</em> / <em>MODULE 1.2</em> section headers. Bold-keyword headlines
+        (<em>AVERAGE LIFE EXPECTANCY</em>). Massive stat numbers with tiny tracked-out labels underneath.
+        The area chart with muted blue fill and dual-line treatment is a clean data viz reference.
+        Two-column grid with ruled dividers — pure Swiss layout.
+      </div>
+      <div class="ref-tags">
+        <span class="ref-tag">Module Numbering</span>
+        <span class="ref-tag">Bold Keyword Headlines</span>
+        <span class="ref-tag">Stat Numbers</span>
+        <span class="ref-tag">Area Chart</span>
+        <span class="ref-tag">Light Mode</span>
+        <span class="ref-tag">Swiss Grid</span>
+      </div>
+      <div class="ref-application">
+        <div class="ref-application-label">Application</div>
+        <p>Dashboard stat cards, section headers (MODULE pattern maps to agent panels), chart styling. Light mode reference.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- REF 23 -->
+  <div class="ref-card">
+    <div class="ref-card-image" onclick="openLightbox(2)">
+      <img src="prometheus/23-stripe-texture.png" alt="Diagonal stripe texture behind element grid">
+      <div class="zoom-hint">Click to zoom</div>
+    </div>
+    <div class="ref-card-body">
+      <div class="ref-number">Ref 03</div>
+      <div class="ref-title">Diagonal Stripe Surface Texture</div>
+      <div class="ref-note">
+        <em>Diagonal stripe texture</em> behind the element grid — a subtle mechanical detail that reads as
+        "engineered surface" without being obvious. Carbon fiber / hazard stripe nod. The periodic-table-style
+        grid layout is a great dense-data pattern. Horizontal bar chart with multi-tone blue palette.
+      </div>
+      <div class="ref-tags">
+        <span class="ref-tag">Stripe Texture</span>
+        <span class="ref-tag">Engineered Surface</span>
+        <span class="ref-tag">Grid Layout</span>
+        <span class="ref-tag">Bar Chart</span>
+        <span class="ref-tag">Dark Mode</span>
+      </div>
+      <div class="ref-application">
+        <div class="ref-application-label">Application</div>
+        <p>Alternative to grain texture for agent-related panels or card backgrounds. The stripe pattern signals "machine space" —
+        could differentiate agent panels from human-space cards. Consider as a CSS repeating-linear-gradient.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- REF 24 -->
+  <div class="ref-card">
+    <div class="ref-card-image" onclick="openLightbox(3)">
+      <img src="prometheus/24-swiss-dashboard.png" alt="Swiss-style dashboard with name-value pairs and radial chart">
+      <div class="zoom-hint">Click to zoom</div>
+    </div>
+    <div class="ref-card-body">
+      <div class="ref-number">Ref 04</div>
+      <div class="ref-title">Swiss Dashboard + Key-Value Layout</div>
+      <div class="ref-note">
+        The Swiss core. Module numbering as section headers, bold-keyword headlines, tracked-out uppercase labels
+        above massive numbers, <em>ruled dividers as the only structural element</em> — no cards, no backgrounds,
+        just type and lines on a flat surface. Three-column name/value pairs at bottom (<em>KEY FINANCIALS</em>)
+        is the exact dashboard stat layout. Radial chart with segment labels radiating outward.
+      </div>
+      <div class="ref-tags">
+        <span class="ref-tag">Swiss Layout</span>
+        <span class="ref-tag">Name/Value Pairs</span>
+        <span class="ref-tag">Ruled Dividers</span>
+        <span class="ref-tag">Radial Chart</span>
+        <span class="ref-tag">Light Mode</span>
+        <span class="ref-tag">Typographic Hierarchy</span>
+      </div>
+      <div class="ref-application">
+        <div class="ref-application-label">Application</div>
+        <p>Most directly applicable to the dashboard. Three-column stat layout, module-numbered sections,
+        type-and-lines structure over card-based layouts. Primary light mode reference.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- REF 25 -->
+  <div class="ref-card">
+    <div class="ref-card-image" onclick="openLightbox(4)">
+      <img src="prometheus/25-fact-sheet-dark.png" alt="Dark mode fact sheet with label-value rows">
+      <div class="zoom-hint">Click to zoom</div>
+    </div>
+    <div class="ref-card-body">
+      <div class="ref-number">Ref 05</div>
+      <div class="ref-title">Dark Mode Fact Sheet</div>
+      <div class="ref-note">
+        Label-left, value-right, ruled rows, all caps, generous vertical spacing.
+        <em>Pure information design</em> — no cards, no icons, no color coding. Labels in a muted cool tone,
+        values in brighter white. The simplest possible data display, done with extreme confidence.
+      </div>
+      <div class="ref-tags">
+        <span class="ref-tag">Key-Value Table</span>
+        <span class="ref-tag">Ruled Rows</span>
+        <span class="ref-tag">Dark Mode</span>
+        <span class="ref-tag">Information Design</span>
+        <span class="ref-tag">All Caps</span>
+      </div>
+      <div class="ref-application">
+        <div class="ref-application-label">Application</div>
+        <p>Client overview panel, home tab metadata, or any key-value display in dark mode.
+        Could replace card-based client info with this ruled-row treatment for a more institutional feel.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-label">Design Brief Summary</div>
+  <p class="footer-summary">
+    These references inform the <strong>mission-control flavor</strong> layered on top of the Mercury-inspired base.
+    The transferable patterns: <strong>module numbering</strong> on section labels, <strong>bold-keyword headlines</strong>,
+    <strong>diagonal stripe textures</strong> as engineered surface treatments, <strong>Swiss grid layouts</strong> with ruled
+    dividers instead of cards, and <strong>key-value fact sheets</strong> for data presentation.
+    Every space reference must map to a real product concept — functional, not decorative.
+  </p>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-prev lightbox-nav" onclick="event.stopPropagation(); navLightbox(-1)">&larr;</div>
+  <img id="lb-img" src="" alt="">
+  <div class="lightbox-next lightbox-nav" onclick="event.stopPropagation(); navLightbox(1)">&rarr;</div>
+  <div class="lightbox-caption" id="lb-caption"></div>
+  <div class="lightbox-close" onclick="closeLightbox(event)">Esc</div>
+</div>
+
+<script>
+const refs = [
+  { src: 'prometheus/21-hero-mesh.png', caption: 'Ref 01 — Hero / Thumbnail Treatment' },
+  { src: 'prometheus/22-dashboard-stats.png', caption: 'Ref 02 — Dashboard Stats + Module Numbering' },
+  { src: 'prometheus/23-stripe-texture.png', caption: 'Ref 03 — Diagonal Stripe Surface Texture' },
+  { src: 'prometheus/24-swiss-dashboard.png', caption: 'Ref 04 — Swiss Dashboard + Key-Value Layout' },
+  { src: 'prometheus/25-fact-sheet-dark.png', caption: 'Ref 05 — Dark Mode Fact Sheet' },
+];
+
+let currentIdx = 0;
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lb-img');
+const lbCap = document.getElementById('lb-caption');
+
+function openLightbox(idx) {
+  currentIdx = idx;
+  lbImg.src = refs[idx].src;
+  lbCap.textContent = refs[idx].caption;
+  lb.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+  if (e.target === lbImg) return;
+  lb.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function navLightbox(dir) {
+  currentIdx = (currentIdx + dir + refs.length) % refs.length;
+  lbImg.src = refs[currentIdx].src;
+  lbCap.textContent = refs[currentIdx].caption;
+}
+
+document.addEventListener('keydown', function(e) {
+  if (!lb.classList.contains('active')) return;
+  if (e.key === 'Escape') { lb.classList.remove('active'); document.body.style.overflow = ''; }
+  if (e.key === 'ArrowLeft') navLightbox(-1);
+  if (e.key === 'ArrowRight') navLightbox(1);
+});
+</script>
+
+</body>
+</html>

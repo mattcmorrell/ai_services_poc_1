@@ -1,0 +1,422 @@
+{
+  "exported": "2026-04-06",
+  "source": "Figma file 8xXGbZXwpGKGl2adu9TK4J (AI-Services)",
+  "collection": "PanCom Palette",
+  "modes": [
+    { "id": "558:0", "name": "Inkwell Dark" },
+    { "id": "558:1", "name": "Inkwell Light" },
+    { "id": "558:2", "name": "Mercury Dark" },
+    { "id": "558:3", "name": "Mercury Light" },
+    { "id": "558:4", "name": "Orbital Dark" },
+    { "id": "558:5", "name": "Orbital Light" },
+    { "id": "572:0", "name": "Inkwell Warm Dark" },
+    { "id": "572:1", "name": "Inkwell Warm Light" },
+    { "id": "572:2", "name": "Inkwell Cool Dark" },
+    { "id": "572:3", "name": "Inkwell Cool Light" }
+  ],
+  "usageAudit": {
+    "used": ["bg", "card", "inner", "accent", "accent-bright", "text-bright", "text-primary", "text-secondary", "alert", "warning"],
+    "unused": ["accent-dim", "alert-bright", "success", "danger", "accent-bg", "accent-border", "alert-bg", "alert-border", "border", "border-strong", "inner-border"]
+  },
+  "variables": [
+    {
+      "name": "bg",
+      "id": "VariableID:558:3929",
+      "used": true,
+      "values": {
+        "Inkwell Dark": "#111617",
+        "Inkwell Light": "#EBE8E0",
+        "Mercury Dark": "#101214",
+        "Mercury Light": "#F3F4F6",
+        "Orbital Dark": "#161C22",
+        "Orbital Light": "#E8EFF4",
+        "Inkwell Warm Dark": "#151210",
+        "Inkwell Warm Light": "#F0EAE0",
+        "Inkwell Cool Dark": "#131618",
+        "Inkwell Cool Light": "#E6E8EA"
+      }
+    },
+    {
+      "name": "card",
+      "id": "VariableID:558:3930",
+      "used": true,
+      "values": {
+        "Inkwell Dark": "#1C2426",
+        "Inkwell Light": "#FFFFFF",
+        "Mercury Dark": "#191B1F",
+        "Mercury Light": "#FFFFFF",
+        "Orbital Dark": "#1E2830",
+        "Orbital Light": "#FFFFFF",
+        "Inkwell Warm Dark": "#231E1A",
+        "Inkwell Warm Light": "#FFFDF8",
+        "Inkwell Cool Dark": "#1C2028",
+        "Inkwell Cool Light": "#FFFFFF"
+      }
+    },
+    {
+      "name": "inner",
+      "id": "VariableID:558:3931",
+      "used": true,
+      "values": {
+        "Inkwell Dark": "#2E3B3D",
+        "Inkwell Light": "#F7F5F1",
+        "Mercury Dark": "#222428",
+        "Mercury Light": "#F4F5F7",
+        "Orbital Dark": "#2A3640",
+        "Orbital Light": "#EEF4F8",
+        "Inkwell Warm Dark": "#352E28",
+        "Inkwell Warm Light": "#F8F4EC",
+        "Inkwell Cool Dark": "#2A3038",
+        "Inkwell Cool Light": "#F0F1F3"
+      }
+    },
+    {
+      "name": "accent",
+      "id": "VariableID:558:3932",
+      "used": true,
+      "note": "In Figma this is the brand/action color. In code this maps to --primary (NOT --accent, which is shadcn's hover surface).",
+      "values": {
+        "Inkwell Dark": "#A27B5B",
+        "Inkwell Light": "#A27B5B",
+        "Mercury Dark": "#6878B8",
+        "Mercury Light": "#506098",
+        "Orbital Dark": "#8AAEC4",
+        "Orbital Light": "#4A7A98",
+        "Inkwell Warm Dark": "#B8845A",
+        "Inkwell Warm Light": "#B8845A",
+        "Inkwell Cool Dark": "#8A7A6A",
+        "Inkwell Cool Light": "#7A6E62"
+      }
+    },
+    {
+      "name": "accent-bright",
+      "id": "VariableID:558:3933",
+      "used": true,
+      "note": "No direct code equivalent. Used in Figma for highlighted accent states.",
+      "values": {
+        "Inkwell Dark": "#D4B48E",
+        "Inkwell Light": "#8A6A4E",
+        "Mercury Dark": "#8E9AD0",
+        "Mercury Light": "#506098",
+        "Orbital Dark": "#B0D0E0",
+        "Orbital Light": "#4A7A98",
+        "Inkwell Warm Dark": "#E0C090",
+        "Inkwell Warm Light": "#956840",
+        "Inkwell Cool Dark": "#B0A090",
+        "Inkwell Cool Light": "#7A6E62"
+      }
+    },
+    {
+      "name": "accent-dim",
+      "id": "VariableID:558:3934",
+      "used": false,
+      "note": "No direct code equivalent.",
+      "values": {
+        "Inkwell Dark": "#8A6A4E",
+        "Inkwell Light": "#8A6A4E",
+        "Mercury Dark": "#506098",
+        "Mercury Light": "#405080",
+        "Orbital Dark": "#6890A8",
+        "Orbital Light": "#3A6480",
+        "Inkwell Warm Dark": "#956840",
+        "Inkwell Warm Light": "#956840",
+        "Inkwell Cool Dark": "#706258",
+        "Inkwell Cool Light": "#605850"
+      }
+    },
+    {
+      "name": "text-bright",
+      "id": "VariableID:558:3935",
+      "used": true,
+      "note": "Maps to --foreground in code.",
+      "values": {
+        "Inkwell Dark": "#F2F0EB",
+        "Inkwell Light": "#1C2426",
+        "Mercury Dark": "#E8E9ED",
+        "Mercury Light": "#1C1E24",
+        "Orbital Dark": "#E8EFF4",
+        "Orbital Light": "#1A2830",
+        "Inkwell Warm Dark": "#F5F0E5",
+        "Inkwell Warm Light": "#1A1510",
+        "Inkwell Cool Dark": "#EAECF0",
+        "Inkwell Cool Light": "#181C20"
+      }
+    },
+    {
+      "name": "text-primary",
+      "id": "VariableID:558:3936",
+      "used": true,
+      "note": "Maps to --card-foreground in code.",
+      "values": {
+        "Inkwell Dark": "#F2F0EB",
+        "Inkwell Light": "#2E3B3D",
+        "Mercury Dark": "#E8E9ED",
+        "Mercury Light": "#3C3F48",
+        "Orbital Dark": "#E8EFF4",
+        "Orbital Light": "#2A3A44",
+        "Inkwell Warm Dark": "#F5F0E5",
+        "Inkwell Warm Light": "#2E2820",
+        "Inkwell Cool Dark": "#EAECF0",
+        "Inkwell Cool Light": "#2A3038"
+      }
+    },
+    {
+      "name": "text-secondary",
+      "id": "VariableID:558:3937",
+      "used": true,
+      "note": "Maps to --muted-foreground in code.",
+      "values": {
+        "Inkwell Dark": "#C8C2B4",
+        "Inkwell Light": "#6B7574",
+        "Mercury Dark": "#9DA0A8",
+        "Mercury Light": "#6E7178",
+        "Orbital Dark": "#9AABB8",
+        "Orbital Light": "#5A7080",
+        "Inkwell Warm Dark": "#C8BEA8",
+        "Inkwell Warm Light": "#7A7060",
+        "Inkwell Cool Dark": "#A0A4AA",
+        "Inkwell Cool Light": "#686E74"
+      }
+    },
+    {
+      "name": "alert",
+      "id": "VariableID:558:3938",
+      "used": true,
+      "note": "Maps to --destructive in code.",
+      "values": {
+        "Inkwell Dark": "#D4875A",
+        "Inkwell Light": "#B86E3A",
+        "Mercury Dark": "#E08850",
+        "Mercury Light": "#C06828",
+        "Orbital Dark": "#E08850",
+        "Orbital Light": "#C06828",
+        "Inkwell Warm Dark": "#D47848",
+        "Inkwell Warm Light": "#C06030",
+        "Inkwell Cool Dark": "#C88058",
+        "Inkwell Cool Light": "#A86840"
+      }
+    },
+    {
+      "name": "alert-bright",
+      "id": "VariableID:558:3939",
+      "used": false,
+      "note": "No direct code equivalent.",
+      "values": {
+        "Inkwell Dark": "#E8A070",
+        "Inkwell Light": "#B86E3A",
+        "Mercury Dark": "#F0A468",
+        "Mercury Light": "#C06828",
+        "Orbital Dark": "#F0A468",
+        "Orbital Light": "#C06828",
+        "Inkwell Warm Dark": "#E89468",
+        "Inkwell Warm Light": "#C06030",
+        "Inkwell Cool Dark": "#D89878",
+        "Inkwell Cool Light": "#A86840"
+      }
+    },
+    {
+      "name": "success",
+      "id": "VariableID:558:3940",
+      "used": false,
+      "note": "Maps to --color-success in code.",
+      "values": {
+        "Inkwell Dark": "#6ABA7A",
+        "Inkwell Light": "#3D8A4D",
+        "Mercury Dark": "#7BAA82",
+        "Mercury Light": "#4A7A52",
+        "Orbital Dark": "#7BAA82",
+        "Orbital Light": "#4A8A52",
+        "Inkwell Warm Dark": "#6ABA7A",
+        "Inkwell Warm Light": "#3D8A4D",
+        "Inkwell Cool Dark": "#6AAA78",
+        "Inkwell Cool Light": "#3D8A4D"
+      }
+    },
+    {
+      "name": "warning",
+      "id": "VariableID:558:3941",
+      "used": true,
+      "note": "Maps to --color-warning in code.",
+      "values": {
+        "Inkwell Dark": "#D4A456",
+        "Inkwell Light": "#A27B5B",
+        "Mercury Dark": "#C4A060",
+        "Mercury Light": "#9A8050",
+        "Orbital Dark": "#C4A060",
+        "Orbital Light": "#9A8050",
+        "Inkwell Warm Dark": "#D4A456",
+        "Inkwell Warm Light": "#A27B5B",
+        "Inkwell Cool Dark": "#C0A060",
+        "Inkwell Cool Light": "#8A7858"
+      }
+    },
+    {
+      "name": "danger",
+      "id": "VariableID:558:3942",
+      "used": false,
+      "note": "Maps to --color-danger in code.",
+      "values": {
+        "Inkwell Dark": "#C96B6B",
+        "Inkwell Light": "#A84444",
+        "Mercury Dark": "#C07070",
+        "Mercury Light": "#A05050",
+        "Orbital Dark": "#C07070",
+        "Orbital Light": "#A05050",
+        "Inkwell Warm Dark": "#C96B6B",
+        "Inkwell Warm Light": "#A84444",
+        "Inkwell Cool Dark": "#B87070",
+        "Inkwell Cool Light": "#984848"
+      }
+    },
+    {
+      "name": "accent-bg",
+      "id": "VariableID:558:3943",
+      "used": false,
+      "note": "Alpha token. Base color + opacity percentage.",
+      "values": {
+        "Inkwell Dark": "#A27B5B 12%",
+        "Inkwell Light": "#A27B5B 10%",
+        "Mercury Dark": "#6878B8 8%",
+        "Mercury Light": "#506098 7%",
+        "Orbital Dark": "#8AAEC4 8%",
+        "Orbital Light": "#4A7A98 7%",
+        "Inkwell Warm Dark": "#B8845A 12%",
+        "Inkwell Warm Light": "#B8845A 10%",
+        "Inkwell Cool Dark": "#8A7A6A 8%",
+        "Inkwell Cool Light": "#7A6E62 7%"
+      }
+    },
+    {
+      "name": "accent-border",
+      "id": "VariableID:558:3944",
+      "used": false,
+      "note": "Alpha token. Base color + opacity percentage.",
+      "values": {
+        "Inkwell Dark": "#A27B5B 20%",
+        "Inkwell Light": "#A27B5B 15%",
+        "Mercury Dark": "#6878B8 14%",
+        "Mercury Light": "#506098 12%",
+        "Orbital Dark": "#8AAEC4 15%",
+        "Orbital Light": "#4A7A98 12%",
+        "Inkwell Warm Dark": "#B8845A 20%",
+        "Inkwell Warm Light": "#B8845A 15%",
+        "Inkwell Cool Dark": "#8A7A6A 14%",
+        "Inkwell Cool Light": "#7A6E62 12%"
+      }
+    },
+    {
+      "name": "alert-bg",
+      "id": "VariableID:558:3945",
+      "used": false,
+      "note": "Alpha token. Base color + opacity percentage.",
+      "values": {
+        "Inkwell Dark": "#D4875A 10%",
+        "Inkwell Light": "#B86E3A 8%",
+        "Mercury Dark": "#E08850 12%",
+        "Mercury Light": "#C06828 8%",
+        "Orbital Dark": "#E08850 12%",
+        "Orbital Light": "#C06828 8%",
+        "Inkwell Warm Dark": "#D47848 10%",
+        "Inkwell Warm Light": "#C06030 8%",
+        "Inkwell Cool Dark": "#C88058 10%",
+        "Inkwell Cool Light": "#A86840 8%"
+      }
+    },
+    {
+      "name": "alert-border",
+      "id": "VariableID:558:3946",
+      "used": false,
+      "note": "Alpha token. Base color + opacity percentage.",
+      "values": {
+        "Inkwell Dark": "#D4875A 20%",
+        "Inkwell Light": "#B86E3A 15%",
+        "Mercury Dark": "#E08850 22%",
+        "Mercury Light": "#C06828 15%",
+        "Orbital Dark": "#E08850 22%",
+        "Orbital Light": "#C06828 15%",
+        "Inkwell Warm Dark": "#D47848 20%",
+        "Inkwell Warm Light": "#C06030 15%",
+        "Inkwell Cool Dark": "#C88058 18%",
+        "Inkwell Cool Light": "#A86840 15%"
+      }
+    },
+    {
+      "name": "border",
+      "id": "VariableID:558:3947",
+      "used": false,
+      "note": "Alpha token. Maps to --border in code. Base color + opacity percentage.",
+      "values": {
+        "Inkwell Dark": "#DCD7C9 8%",
+        "Inkwell Light": "#2C3639 8%",
+        "Mercury Dark": "#B4B9C8 7%",
+        "Mercury Light": "#1E2332 7%",
+        "Orbital Dark": "#C4D4DC 8%",
+        "Orbital Light": "#1A2830 7%",
+        "Inkwell Warm Dark": "#D2C8B4 8%",
+        "Inkwell Warm Light": "#32281E 8%",
+        "Inkwell Cool Dark": "#B4B9C3 7%",
+        "Inkwell Cool Light": "#282D37 8%"
+      }
+    },
+    {
+      "name": "border-strong",
+      "id": "VariableID:558:3948",
+      "used": false,
+      "note": "Alpha token. Maps to --input in code. Base color + opacity percentage.",
+      "values": {
+        "Inkwell Dark": "#DCD7C9 12%",
+        "Inkwell Light": "#2C3639 12%",
+        "Mercury Dark": "#B4B9C8 11%",
+        "Mercury Light": "#1E2332 11%",
+        "Orbital Dark": "#C4D4DC 12%",
+        "Orbital Light": "#1A2830 11%",
+        "Inkwell Warm Dark": "#D2C8B4 12%",
+        "Inkwell Warm Light": "#32281E 12%",
+        "Inkwell Cool Dark": "#B4B9C3 11%",
+        "Inkwell Cool Light": "#282D37 12%"
+      }
+    },
+    {
+      "name": "inner-border",
+      "id": "VariableID:558:3949",
+      "used": false,
+      "note": "Alpha token. Maps to --border-subtle in code. Base color + opacity percentage.",
+      "values": {
+        "Inkwell Dark": "#DCD7C9 6%",
+        "Inkwell Light": "#2C3639 6%",
+        "Mercury Dark": "#B4B9C8 5%",
+        "Mercury Light": "#1E2332 5%",
+        "Orbital Dark": "#C4D4DC 6%",
+        "Orbital Light": "#1A2830 5%",
+        "Inkwell Warm Dark": "#D2C8B4 6%",
+        "Inkwell Warm Light": "#32281E 6%",
+        "Inkwell Cool Dark": "#B4B9C3 5%",
+        "Inkwell Cool Light": "#282D37 5%"
+      }
+    }
+  ],
+  "namingMap": {
+    "_note": "Figma name → Code CSS variable name. Use this to reinstate or realign.",
+    "bg": "--background",
+    "card": "--card",
+    "inner": "--secondary / --muted",
+    "accent": "--primary (NOT --accent, which is shadcn hover surface)",
+    "accent-bright": "(no code equivalent)",
+    "accent-dim": "(no code equivalent)",
+    "text-bright": "--foreground",
+    "text-primary": "--card-foreground",
+    "text-secondary": "--muted-foreground",
+    "alert": "--destructive",
+    "alert-bright": "(no code equivalent)",
+    "success": "--color-success",
+    "warning": "--color-warning",
+    "danger": "--color-danger",
+    "accent-bg": "(no direct code equivalent)",
+    "accent-border": "(no direct code equivalent)",
+    "alert-bg": "(no direct code equivalent)",
+    "alert-border": "(no direct code equivalent)",
+    "border": "--border",
+    "border-strong": "--input",
+    "inner-border": "--border-subtle"
+  }
+}

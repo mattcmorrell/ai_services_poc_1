@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, RotateCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowClockwise } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 
 interface BambooHRViewProps {
@@ -19,7 +19,7 @@ export function BambooHRView({ stepTitle }: BambooHRViewProps) {
           <ArrowRight className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-600 dark:text-stone-400">
-          <RotateCw className="h-4 w-4" />
+          <ArrowClockwise className="h-4 w-4" />
         </Button>
         <div className="flex-1 rounded-full bg-stone-100 dark:bg-stone-700 px-4 py-1.5 text-sm text-stone-600 dark:text-stone-300">
           www.bamboohr.com/payroll
@@ -34,7 +34,7 @@ export function BambooHRView({ stepTitle }: BambooHRViewProps) {
             <div className="flex h-8 w-8 items-center justify-center rounded bg-green-600 text-white font-bold text-sm">
               B
             </div>
-            <span className="text-lg font-semibold text-green-700">bambooHR</span>
+            <span className="text-[18px] font-medium text-green-700">bambooHR</span>
           </div>
           <div className="flex items-center gap-4">
             <input
@@ -52,7 +52,7 @@ export function BambooHRView({ stepTitle }: BambooHRViewProps) {
 
         {/* Payroll Title */}
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-stone-800">Payroll</h1>
+          <h1 className="text-[32px] font-bold text-stone-800">Payroll</h1>
           <div className="flex items-center gap-2">
             <Button variant="outline" className="text-sm">Open TRAXPayroll</Button>
             <Button className="bg-green-600 hover:bg-green-700 text-sm">+ New off-cycle payroll</Button>
@@ -68,7 +68,7 @@ export function BambooHRView({ stepTitle }: BambooHRViewProps) {
                 i === 1 ? "border-green-600 bg-green-50" : "border-stone-200"
               }`}
             >
-              <span className={`text-xl font-bold ${i === 1 ? "text-green-600" : "text-stone-700"}`}>
+              <span className={`text-[22px] font-medium ${i === 1 ? "text-green-600" : "text-stone-700"}`}>
                 {day}
               </span>
               <span className="text-xs text-stone-500">
@@ -86,28 +86,28 @@ export function BambooHRView({ stepTitle }: BambooHRViewProps) {
             <div className="rounded-lg border border-stone-200 p-4">
               <div className="mb-4 flex items-center gap-2">
                 <span className="text-sm text-stone-500">$</span>
-                <span className="text-lg font-semibold">January 26 Payroll</span>
+                <span className="text-[18px] font-medium">January 26 Payroll</span>
               </div>
               
               <div className="mb-4 flex items-center gap-6">
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-full bg-stone-200" />
                   <div>
-                    <div className="text-lg font-bold">88</div>
+                    <div className="text-[22px] font-medium">88</div>
                     <div className="text-xs text-stone-500">People being paid</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">$</div>
                   <div>
-                    <div className="text-lg font-bold">$1,234.00</div>
+                    <div className="text-[22px] font-medium">$1,234.00</div>
                     <div className="text-xs text-stone-500">Extra pay</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">✓</div>
                   <div>
-                    <div className="text-lg font-bold">113</div>
+                    <div className="text-[22px] font-medium">113</div>
                     <div className="text-xs text-stone-500">Timesheets approved</div>
                   </div>
                 </div>

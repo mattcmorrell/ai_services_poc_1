@@ -2,51 +2,9 @@
 
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Sidebar } from "@/components/sidebar";
-import { ChatListPanel as ChatListPanelOriginal } from "@/components/chat-list-panel";
-import { ChatView as ChatViewOriginal } from "@/components/chat-view";
-import { DashboardView as DashboardViewOriginal } from "@/components/dashboard/dashboard-view";
-import { ChatListPanel as ChatListPanelV1 } from "@/components/chat-list-panel-v1";
-import { ChatView as ChatViewV1 } from "@/components/chat-view-v1";
-import { DashboardView as DashboardViewV1 } from "@/components/dashboard/dashboard-view-v1";
-import { ChatListPanel as ChatListPanelV2 } from "@/components/chat-list-panel-v2";
-import { ChatView as ChatViewV2 } from "@/components/chat-view-v2";
-import { DashboardView as DashboardViewV2 } from "@/components/dashboard/dashboard-view-v2";
-import { ChatListPanel as ChatListPanelV3 } from "@/components/chat-list-panel-v3";
-import { ChatView as ChatViewV3 } from "@/components/chat-view-v3";
-import { DashboardView as DashboardViewV3 } from "@/components/dashboard/dashboard-view-v3";
-import { ChatListPanel as ChatListPanelV4 } from "@/components/chat-list-panel-v4";
-import { ChatView as ChatViewV4 } from "@/components/chat-view-v4";
-import { DashboardView as DashboardViewV4 } from "@/components/dashboard/dashboard-view-v4";
-import { ChatListPanel as ChatListPanelV5 } from "@/components/chat-list-panel-v5";
-import { ChatView as ChatViewV5 } from "@/components/chat-view-v5";
-import { DashboardView as DashboardViewV5 } from "@/components/dashboard/dashboard-view-v5";
-import { ChatListPanel as ChatListPanelV6 } from "@/components/chat-list-panel-v6";
-import { ChatView as ChatViewV6 } from "@/components/chat-view-v6";
-import { DashboardView as DashboardViewV6 } from "@/components/dashboard/dashboard-view-v6";
-import { ChatListPanel as ChatListPanelV7 } from "@/components/chat-list-panel-v7";
-import { ChatView as ChatViewV7 } from "@/components/chat-view-v7";
-import { DashboardView as DashboardViewV7 } from "@/components/dashboard/dashboard-view-v7";
-import { ChatListPanel as ChatListPanelV8 } from "@/components/chat-list-panel-v8";
-import { ChatView as ChatViewV8 } from "@/components/chat-view-v8";
-import { DashboardView as DashboardViewV8 } from "@/components/dashboard/dashboard-view-v8";
-import { ChatListPanel as ChatListPanelV9 } from "@/components/chat-list-panel-v9";
-import { ChatView as ChatViewV9 } from "@/components/chat-view-v9";
-import { DashboardView as DashboardViewV9 } from "@/components/dashboard/dashboard-view-v9";
-import { ChatListPanel as ChatListPanelV10 } from "@/components/chat-list-panel-v10";
-import { ChatView as ChatViewV10 } from "@/components/chat-view-v10";
-import { DashboardView as DashboardViewV10 } from "@/components/dashboard/dashboard-view-v10";
-import { ChatListPanel as ChatListPanelV11 } from "@/components/chat-list-panel-v11";
-import { ChatView as ChatViewV11 } from "@/components/chat-view-v11";
-import { DashboardView as DashboardViewV11 } from "@/components/dashboard/dashboard-view-v11";
-import { ChatListPanel as ChatListPanelV12 } from "@/components/chat-list-panel-v12";
-import { ChatView as ChatViewV12 } from "@/components/chat-view-v12";
-import { DashboardView as DashboardViewV12 } from "@/components/dashboard/dashboard-view-v12";
-import { ChatListPanel as ChatListPanelV13 } from "@/components/chat-list-panel-v13";
-import { ChatView as ChatViewV13 } from "@/components/chat-view-v13";
-import { DashboardView as DashboardViewV13 } from "@/components/dashboard/dashboard-view-v13";
-import { ChatListPanel as ChatListPanelV14 } from "@/components/chat-list-panel-v13";
-import { ChatView as ChatViewV14 } from "@/components/chat-view-v13";
-import { DashboardView as DashboardViewV14 } from "@/components/dashboard/dashboard-view-v13";
+import { ChatListPanel } from "@/components/chat-list-panel";
+import { ChatView } from "@/components/chat-view";
+import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { AgentsView } from "@/components/agents/agents-view";
 import { ClientSelectDialog } from "@/components/agents/client-select-dialog";
 import { WorkflowPanel } from "@/components/workflow/workflow-panel";
@@ -60,34 +18,9 @@ import { Agent } from "@/types/agent";
 import { ClientsView } from "@/components/clients/clients-view";
 import { useStreamingChatSession } from "@/hooks/use-streaming-chat-session";
 
-const VARIANTS = ["original", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14"] as const;
-type Variant = (typeof VARIANTS)[number];
-
-const variantMap = {
-  original: { DashboardView: DashboardViewOriginal, ChatListPanel: ChatListPanelOriginal, ChatView: ChatViewOriginal },
-  v1: { DashboardView: DashboardViewV1, ChatListPanel: ChatListPanelV1, ChatView: ChatViewV1 },
-  v2: { DashboardView: DashboardViewV2, ChatListPanel: ChatListPanelV2, ChatView: ChatViewV2 },
-  v3: { DashboardView: DashboardViewV3, ChatListPanel: ChatListPanelV3, ChatView: ChatViewV3 },
-  v4: { DashboardView: DashboardViewV4, ChatListPanel: ChatListPanelV4, ChatView: ChatViewV4 },
-  v5: { DashboardView: DashboardViewV5, ChatListPanel: ChatListPanelV5, ChatView: ChatViewV5 },
-  v6: { DashboardView: DashboardViewV6, ChatListPanel: ChatListPanelV6, ChatView: ChatViewV6 },
-  v7: { DashboardView: DashboardViewV7, ChatListPanel: ChatListPanelV7, ChatView: ChatViewV7 },
-  v8: { DashboardView: DashboardViewV8, ChatListPanel: ChatListPanelV8, ChatView: ChatViewV8 },
-  v9: { DashboardView: DashboardViewV9, ChatListPanel: ChatListPanelV9, ChatView: ChatViewV9 },
-  v10: { DashboardView: DashboardViewV10, ChatListPanel: ChatListPanelV10, ChatView: ChatViewV10 },
-  v11: { DashboardView: DashboardViewV11, ChatListPanel: ChatListPanelV11, ChatView: ChatViewV11 },
-  v12: { DashboardView: DashboardViewV12, ChatListPanel: ChatListPanelV12, ChatView: ChatViewV12 },
-  v13: { DashboardView: DashboardViewV13, ChatListPanel: ChatListPanelV13, ChatView: ChatViewV13 },
-  v14: { DashboardView: DashboardViewV14, ChatListPanel: ChatListPanelV14, ChatView: ChatViewV14 },
-};
-
 export default function Home() {
-  const [designVariant, setDesignVariant] = useState<Variant>("original");
-  const { DashboardView, ChatListPanel, ChatView } = variantMap[designVariant];
-
   const [activeView, setActiveView] = useState("dashboard");
-  const [chatPanelMode, setChatPanelMode] = useState<"recent" | "clients">("recent");
-  const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
+const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
   const [chats, setChats] = useState<Chat[]>(mockChats);
   // Loading state is now derived from streamingSession.loadingChatId
   const [agents, setAgents] = useState<Agent[]>(mockAgents);
@@ -718,7 +651,6 @@ export default function Home() {
       handleNewChat(clientId);
     }
     setActiveView("chats");
-    setChatPanelMode("recent");
   };
 
   // Pending message from dashboard — sent via streaming hook after chat becomes active
@@ -750,7 +682,6 @@ export default function Home() {
       pendingDashboardMessageRef.current = message;
       setSelectedChatId(newChatId);
       setActiveView("chats");
-      setChatPanelMode("recent");
     },
     []
   );
@@ -813,7 +744,6 @@ export default function Home() {
     setClientSelectOpen(false);
     setSelectedAgentForClient(null);
     setActiveView("chats");
-    setChatPanelMode("recent");
   };
 
   const handleToggleFavorite = (agentId: string) => {
@@ -846,17 +776,13 @@ export default function Home() {
 
     if (activeView === "chats") {
       return (
-        <>
-          {/* Recent Chats mode */}
-          <div className={chatPanelMode === "recent" ? "flex flex-1 overflow-hidden" : "hidden"}>
+        <div className="flex flex-1 overflow-hidden">
             <ChatListPanel
               clients={mockClients}
               chats={chats}
               selectedChatId={selectedChatId}
               onSelectChat={setSelectedChatId}
               onNewChat={handleNewChat}
-              viewMode={chatPanelMode}
-              onViewModeChange={setChatPanelMode}
             />
             {selectedChat ? (
               <ChatView
@@ -890,7 +816,7 @@ export default function Home() {
                 Select a chat to start messaging
               </div>
             )}
-            {selectedArtifact && chatPanelMode === "recent" && (
+            {selectedArtifact && (
               <ArtifactPanel
                 artifact={selectedArtifact}
                 onClose={() => setSelectedArtifactId(null)}
@@ -912,25 +838,23 @@ export default function Home() {
                 onClose={() => setWorkflowPanelOpen(false)}
               />
             )}
-          </div>
+        </div>
+      );
+    }
 
-          {/* Clients mode */}
-          <div className={chatPanelMode === "clients" ? "flex flex-1 overflow-hidden" : "hidden"}>
-            <ClientsView
-              clients={mockClients}
-              chats={chats}
-              onSendMessage={handleSendMessageForChat}
-              onApprove={handleApproveForChat}
-              onDecline={handleDeclineForChat}
-              onNewChat={handleNewChat}
-              onWorkflowClick={handleWorkflowClick}
-              onArtifactClick={setSelectedArtifactId}
-              loadingChatId={streamingSession.loadingChatId}
-              chatPanelMode={chatPanelMode}
-              onChatPanelModeChange={setChatPanelMode}
-            />
-          </div>
-        </>
+    if (activeView === "clients") {
+      return (
+        <ClientsView
+          clients={mockClients}
+          chats={chats}
+          onSendMessage={handleSendMessageForChat}
+          onApprove={handleApproveForChat}
+          onDecline={handleDeclineForChat}
+          onNewChat={handleNewChat}
+          onWorkflowClick={handleWorkflowClick}
+          onArtifactClick={setSelectedArtifactId}
+          loadingChatId={streamingSession.loadingChatId}
+        />
       );
     }
 
@@ -962,25 +886,6 @@ export default function Home() {
         clients={mockClients}
         onSelectClient={handleClientSelectedForAgent}
       />
-
-      {/* Design variant toggle */}
-      <div className="fixed bottom-4 right-4 z-[100] flex flex-col items-end gap-2">
-        <div className="flex items-center gap-1 rounded-full border border-[oklch(1_0_0_/_0.1)] bg-[oklch(0.15_0_0_/_0.9)] px-1.5 py-1 shadow-2xl backdrop-blur-md">
-          {VARIANTS.map((v) => (
-            <button
-              key={v}
-              onClick={() => setDesignVariant(v)}
-              className={`rounded-full px-3 py-1 text-[11px] font-medium tracking-wide transition-all ${
-                designVariant === v
-                  ? "bg-[oklch(0.7_0.15_65)] text-[oklch(0.1_0_0)] shadow-sm"
-                  : "text-[oklch(0.55_0_0)] hover:text-[oklch(0.8_0_0)]"
-              }`}
-            >
-              {v === "original" ? "OG" : v.toUpperCase()}
-            </button>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

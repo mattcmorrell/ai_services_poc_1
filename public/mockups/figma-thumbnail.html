@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PNDA\CMD — Figma Thumbnail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0e1012;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .frame {
+    width: 1920px;
+    height: 1080px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(
+      155deg,
+      #0e1012 0%,
+      #141820 30%,
+      #181e28 50%,
+      #141a22 70%,
+      #0e1012 100%
+    );
+  }
+
+  /* Constellation mesh */
+  canvas#mesh {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+  }
+
+  /* Grain overlay */
+  canvas#grain {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  /* Ruled lines */
+  .rule-top, .rule-bottom {
+    position: absolute;
+    left: 120px;
+    right: 120px;
+    height: 1px;
+    background: rgba(138,174,196,0.15);
+  }
+  .rule-top { top: 400px; }
+  .rule-bottom { bottom: 340px; }
+
+  /* Content */
+  .content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 140px;
+    z-index: 10;
+  }
+
+  /* Logo lockup — top left */
+  .logo {
+    position: absolute;
+    top: 72px;
+    left: 140px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo-mark {
+    font-family: 'Geist Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: rgba(138,174,196,0.7);
+  }
+  .logo-version {
+    font-family: 'Geist Mono', monospace;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    color: rgba(138,174,196,0.35);
+  }
+
+  /* Module tag */
+  .module-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(138,174,196,0.4);
+    margin-bottom: 28px;
+  }
+
+  /* Headline */
+  .headline {
+    font-family: 'Geist', system-ui, sans-serif;
+    font-size: 96px;
+    font-weight: 800;
+    line-height: 1.0;
+    color: #E8EFF4;
+    max-width: 1100px;
+  }
+  .headline span {
+    font-weight: 300;
+    color: rgba(232,239,244,0.5);
+  }
+
+  /* Subtitle */
+  .subtitle {
+    font-family: 'Geist', system-ui, sans-serif;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(180,200,215,0.45);
+    margin-top: 32px;
+  }
+
+  /* Bottom meta */
+  .bottom-meta {
+    position: absolute;
+    bottom: 72px;
+    left: 140px;
+    right: 140px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+  }
+  .bottom-meta-left, .bottom-meta-right {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(138,174,196,0.25);
+  }
+
+  /* ---- VERSION TOGGLE ---- */
+  .version-toggle {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    gap: 2px;
+    background: rgba(14,16,18,0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(138,174,196,0.12);
+    border-radius: 8px;
+    padding: 4px;
+  }
+  .version-btn {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(138,174,196,0.5);
+    background: none;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .version-btn:hover {
+    color: rgba(138,174,196,0.8);
+    background: rgba(138,174,196,0.06);
+  }
+  .version-btn.active {
+    color: #E8EFF4;
+    background: rgba(138,174,196,0.12);
+  }
+</style>
+</head>
+<body>
+
+<div class="frame">
+  <canvas id="mesh" width="1920" height="1080"></canvas>
+  <canvas id="grain" width="1920" height="1080"></canvas>
+
+  <div class="rule-top"></div>
+  <div class="rule-bottom"></div>
+
+  <div class="logo">
+    <div class="logo-mark">PNDA\CMD</div>
+    <div class="logo-version">1.0</div>
+  </div>
+
+  <div class="content">
+    <div class="module-tag" id="moduleTag">Panda Command</div>
+    <div class="headline" id="headline">PandaCommand</div>
+    <div class="subtitle" id="subtitle">AI-powered operations for BambooHR consultants.</div>
+  </div>
+
+  <div class="bottom-meta">
+    <div class="bottom-meta-left">BambooHR AI Services</div>
+    <div class="bottom-meta-right">2026</div>
+  </div>
+</div>
+
+<!-- VERSION TOGGLE -->
+<div class="version-toggle" id="versionToggle">
+  <!-- buttons injected by JS -->
+</div>
+
+<script>
+// ---- VERSIONS ----
+const versions = [
+  {
+    label: 'PandaCommand',
+    headline: 'PandaCommand',
+    headlineStyle: { letterSpacing: '-0.05em', fontSize: '96px', fontWeight: '800' },
+    moduleTag: 'Panda Command',
+    subtitle: 'AI-powered operations for BambooHR consultants.',
+  },
+  {
+    label: 'Mission Control',
+    headline: 'MISSION CONTROL <span>FOR HR</span>',
+    headlineStyle: { letterSpacing: '-0.02em', fontSize: '96px', fontWeight: '800' },
+    moduleTag: 'Panda Command',
+    subtitle: 'AI-powered operations for BambooHR consultants.',
+  },
+  {
+    label: 'PNDA\\CMD',
+    headline: 'PNDA\\CMD',
+    headlineStyle: { letterSpacing: '0.08em', fontSize: '110px', fontWeight: '700', fontFamily: "'Geist Mono', monospace" },
+    moduleTag: 'Module 01',
+    subtitle: 'Mission control for BambooHR consultants.',
+  },
+  {
+    label: 'Panda Command (spaced)',
+    headline: 'Panda Command',
+    headlineStyle: { letterSpacing: '0.01em', fontSize: '96px', fontWeight: '800' },
+    moduleTag: 'AI Services',
+    subtitle: 'AI-powered operations for BambooHR consultants.',
+  },
+  {
+    label: 'PanCom',
+    headline: 'PanCom',
+    headlineStyle: { letterSpacing: '-0.04em', fontSize: '120px', fontWeight: '800' },
+    moduleTag: 'Panda Command',
+    subtitle: 'Command your workflow.',
+  },
+  {
+    label: 'PANDA COMMAND',
+    headline: 'PANDA COMMAND',
+    headlineStyle: { letterSpacing: '0.12em', fontSize: '88px', fontWeight: '700' },
+    moduleTag: 'AI Services',
+    subtitle: 'Mission control for BambooHR consultants.',
+  },
+];
+
+const headlineEl = document.getElementById('headline');
+const moduleEl = document.getElementById('moduleTag');
+const subtitleEl = document.getElementById('subtitle');
+const toggleEl = document.getElementById('versionToggle');
+
+// Build buttons
+versions.forEach((v, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'version-btn' + (i === 0 ? ' active' : '');
+  btn.textContent = v.label;
+  btn.onclick = () => setVersion(i);
+  toggleEl.appendChild(btn);
+});
+
+// Number key shortcuts
+document.addEventListener('keydown', (e) => {
+  const idx = parseInt(e.key) - 1;
+  if (idx >= 0 && idx < versions.length) setVersion(idx);
+});
+
+function setVersion(idx) {
+  const v = versions[idx];
+  headlineEl.innerHTML = v.headline;
+
+  // Reset styles then apply
+  headlineEl.style.letterSpacing = v.headlineStyle.letterSpacing || '';
+  headlineEl.style.fontSize = v.headlineStyle.fontSize || '';
+  headlineEl.style.fontWeight = v.headlineStyle.fontWeight || '';
+  headlineEl.style.fontFamily = v.headlineStyle.fontFamily || "'Geist', system-ui, sans-serif";
+
+  moduleEl.textContent = v.moduleTag;
+  subtitleEl.textContent = v.subtitle;
+
+  // Update active button
+  toggleEl.querySelectorAll('.version-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === idx);
+  });
+}
+
+// ---- CONSTELLATION MESH ----
+const meshCanvas = document.getElementById('mesh');
+const ctx = meshCanvas.getContext('2d');
+const W = 1920, H = 1080;
+
+const nodes = [];
+const NODE_COUNT = 120;
+const BOKEH_COUNT = 35;
+
+let seed = 42;
+function rand() {
+  seed = (seed * 16807 + 0) % 2147483647;
+  return (seed - 1) / 2147483646;
+}
+
+for (let i = 0; i < NODE_COUNT; i++) {
+  const x = W * 0.25 + rand() * W * 0.72;
+  const y = H * 0.08 + rand() * H * 0.84;
+  const size = 1.2 + rand() * 2.2;
+  const brightness = 0.15 + rand() * 0.45;
+  nodes.push({ x, y, size, brightness });
+}
+
+const CONNECTION_DIST = 180;
+ctx.lineWidth = 0.5;
+
+for (let i = 0; i < nodes.length; i++) {
+  for (let j = i + 1; j < nodes.length; j++) {
+    const dx = nodes[i].x - nodes[j].x;
+    const dy = nodes[i].y - nodes[j].y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < CONNECTION_DIST) {
+      const alpha = (1 - dist / CONNECTION_DIST) * 0.12;
+      ctx.strokeStyle = `rgba(138,174,196,${alpha})`;
+      ctx.beginPath();
+      ctx.moveTo(nodes[i].x, nodes[i].y);
+      ctx.lineTo(nodes[j].x, nodes[j].y);
+      ctx.stroke();
+    }
+  }
+}
+
+for (const n of nodes) {
+  ctx.beginPath();
+  ctx.arc(n.x, n.y, n.size, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(138,174,196,${n.brightness})`;
+  ctx.fill();
+}
+
+for (let i = 0; i < nodes.length; i++) {
+  for (let j = i + 1; j < nodes.length; j++) {
+    const d1 = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
+    if (d1 > CONNECTION_DIST) continue;
+    for (let k = j + 1; k < nodes.length; k++) {
+      const d2 = Math.hypot(nodes[i].x - nodes[k].x, nodes[i].y - nodes[k].y);
+      const d3 = Math.hypot(nodes[j].x - nodes[k].x, nodes[j].y - nodes[k].y);
+      if (d2 < CONNECTION_DIST && d3 < CONNECTION_DIST) {
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.lineTo(nodes[k].x, nodes[k].y);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(138,174,196,0.015)';
+        ctx.fill();
+      }
+    }
+  }
+}
+
+for (let i = 0; i < BOKEH_COUNT; i++) {
+  const x = rand() * W;
+  const y = rand() * H;
+  const radius = 2 + rand() * 18;
+  const alpha = 0.02 + rand() * 0.08;
+
+  const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+  grad.addColorStop(0, `rgba(200,220,235,${alpha * 3})`);
+  grad.addColorStop(0.4, `rgba(180,200,220,${alpha})`);
+  grad.addColorStop(1, 'rgba(180,200,220,0)');
+
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = grad;
+  ctx.fill();
+}
+
+for (let i = 0; i < 8; i++) {
+  const x = W * 0.3 + rand() * W * 0.6;
+  const y = H * 0.1 + rand() * H * 0.8;
+  const grad = ctx.createRadialGradient(x, y, 0, x, y, 30);
+  grad.addColorStop(0, 'rgba(220,235,245,0.25)');
+  grad.addColorStop(0.15, 'rgba(200,220,235,0.06)');
+  grad.addColorStop(1, 'rgba(200,220,235,0)');
+  ctx.beginPath();
+  ctx.arc(x, y, 30, 0, Math.PI * 2);
+  ctx.fillStyle = grad;
+  ctx.fill();
+}
+
+const grainCanvas = document.getElementById('grain');
+const gctx = grainCanvas.getContext('2d');
+const imageData = gctx.createImageData(W, H);
+const data = imageData.data;
+for (let i = 0; i < data.length; i += 4) {
+  const v = Math.floor(rand() * 255);
+  data[i] = v;
+  data[i + 1] = v;
+  data[i + 2] = v;
+  data[i + 3] = 255;
+}
+gctx.putImageData(imageData, 0, 0);
+</script>
+
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</body>
+</html>

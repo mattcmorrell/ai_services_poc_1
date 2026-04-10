@@ -3,27 +3,27 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
   Plus,
-  Mic,
+  Microphone,
   X,
-  Search,
-  Settings,
-  Banknote,
-  BookOpen,
-  Palmtree,
-  TrendingUp,
+  MagnifyingGlass,
+  Gear,
+  CurrencyDollar,
+  BookOpenText,
+  TreePalm,
+  TrendUp,
   Users,
   Calculator,
-  Sparkles,
+  Sparkle,
   Heart,
   Clock,
-  Smile,
+  Smiley,
   Wrench,
-  Bot,
-  Presentation,
+  Robot,
+  ProjectorScreen,
   Pizza,
   GraduationCap,
-  PartyPopper,
-} from "lucide-react";
+  Confetti,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Client } from "@/types/chat";
@@ -38,22 +38,22 @@ interface DashboardInputProps {
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  banknote: Banknote,
-  "book-open": BookOpen,
-  "palm-tree": Palmtree,
-  "trending-up": TrendingUp,
+  banknote: CurrencyDollar,
+  "book-open": BookOpenText,
+  "palm-tree": TreePalm,
+  "trending-up": TrendUp,
   users: Users,
   calculator: Calculator,
-  sparkles: Sparkles,
+  sparkles: Sparkle,
   heart: Heart,
   clock: Clock,
-  smile: Smile,
+  smile: Smiley,
   wrench: Wrench,
-  bot: Bot,
-  presentation: Presentation,
+  bot: Robot,
+  presentation: ProjectorScreen,
   pizza: Pizza,
   "graduation-cap": GraduationCap,
-  "party-popper": PartyPopper,
+  "party-popper": Confetti,
 };
 
 export function DashboardInput({ clients, agents, onSend, onAgentSelected }: DashboardInputProps) {
@@ -328,7 +328,7 @@ export function DashboardInput({ clients, agents, onSend, onAgentSelected }: Das
             className="h-8 gap-1.5 px-2"
             onClick={() => setIsAgentModalOpen(true)}
           >
-            <Settings className="h-4 w-4" />
+            <Gear className="h-4 w-4" />
             <span className="text-sm">Tools</span>
           </Button>
           <div className="ml-auto">
@@ -346,7 +346,7 @@ export function DashboardInput({ clients, agents, onSend, onAgentSelected }: Das
               }}
               title="Open Customer Interview"
             >
-              <Mic className="h-4 w-4" />
+              <Microphone className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -367,10 +367,10 @@ export function DashboardInput({ clients, agents, onSend, onAgentSelected }: Das
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-border px-6 py-4">
-              <h2 className="text-lg font-semibold">Select an Agent</h2>
+              <h2 className="text-[18px] font-medium">Select an Agent</h2>
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     value={agentSearchQuery}
                     onChange={(e) => setAgentSearchQuery(e.target.value)}
@@ -395,7 +395,7 @@ export function DashboardInput({ clients, agents, onSend, onAgentSelected }: Das
             <div className="overflow-y-auto p-6 max-h-[60vh]">
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {filteredAgents.map((agent) => {
-                  const IconComponent = iconMap[agent.icon] || Bot;
+                  const IconComponent = iconMap[agent.icon] || Robot;
                   return (
                     <button
                       key={agent.id}

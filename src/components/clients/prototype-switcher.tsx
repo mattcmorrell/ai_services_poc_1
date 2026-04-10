@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, FlaskConical, Archive } from "lucide-react";
+import { CaretDown, CaretUp, Flask, Archive } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 export interface ApproachConfig {
@@ -60,7 +60,7 @@ export function PrototypeSwitcher({
     >
       <div className="flex items-center gap-2">
         <span className={cn(
-          "flex h-5 w-5 items-center justify-center rounded text-[10px] font-bold",
+          "flex h-6 w-6 items-center justify-center rounded text-[11px] font-medium",
           dimmed ? "bg-muted/50" : "bg-muted"
         )}>
           {approach.id}
@@ -70,7 +70,7 @@ export function PrototypeSwitcher({
         </span>
         {approach.status && STATUS_LABELS[approach.status] && (
           <span className={cn(
-            "rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-none",
+            "rounded px-1.5 py-0.5 text-[11px] font-medium uppercase leading-none",
             STATUS_LABELS[approach.status].color
           )}>
             {STATUS_LABELS[approach.status].label}
@@ -93,12 +93,12 @@ export function PrototypeSwitcher({
             className="flex w-full items-center justify-between border-b border-border px-4 py-2.5"
           >
             <div className="flex items-center gap-2">
-              <FlaskConical className="h-3.5 w-3.5 text-primary" />
+              <Flask className="h-3.5 w-3.5 text-primary" />
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Prototype Switcher
               </span>
             </div>
-            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+            <CaretDown className="h-3.5 w-3.5 text-muted-foreground" />
           </button>
 
           {/* Active approaches */}
@@ -117,7 +117,7 @@ export function PrototypeSwitcher({
                 <span className="text-[11px] font-medium text-muted-foreground/60">
                   Archived ({archivedApproaches.length})
                 </span>
-                <ChevronDown className={cn(
+                <CaretDown className={cn(
                   "ml-auto h-3 w-3 text-muted-foreground/40 transition-transform",
                   showArchived && "rotate-180"
                 )} />
@@ -133,7 +133,7 @@ export function PrototypeSwitcher({
           {/* Version selector */}
           {maxVersion > 1 && (
             <div className="border-t border-border px-4 py-2.5">
-              <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                 Version
               </span>
               <div className="flex gap-1">
@@ -161,19 +161,19 @@ export function PrototypeSwitcher({
           onClick={() => setExpanded(true)}
           className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 shadow-lg transition-colors hover:bg-accent"
         >
-          <FlaskConical className="h-3.5 w-3.5 text-primary" />
+          <Flask className="h-3.5 w-3.5 text-primary" />
           <span className="text-xs font-medium">
             {current?.label} v{currentVersion}
           </span>
           {isArchived && current?.status && STATUS_LABELS[current.status] && (
             <span className={cn(
-              "rounded px-1 py-0.5 text-[8px] font-semibold uppercase leading-none",
+              "rounded px-1.5 py-0.5 text-[11px] font-medium uppercase leading-none",
               STATUS_LABELS[current.status].color
             )}>
               {STATUS_LABELS[current.status].label}
             </span>
           )}
-          <ChevronUp className="h-3 w-3 text-muted-foreground" />
+          <CaretUp className="h-3 w-3 text-muted-foreground" />
         </button>
       )}
     </div>

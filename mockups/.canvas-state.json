@@ -1,0 +1,123 @@
+{
+  "viewport": {
+    "x": 104.13902392106426,
+    "y": -1348.488281255889,
+    "zoom": 0.5117535968115587
+  },
+  "cards": {
+    "nav-toggle-v2.html": {
+      "x": 60,
+      "y": 60
+    },
+    "nav-toggle-v3.html": {
+      "x": 520,
+      "y": 60
+    },
+    "nav-toggle-v4.html": {
+      "x": 980,
+      "y": 60
+    },
+    "approval-flow.html": {
+      "x": 60,
+      "y": 439
+    },
+    "calendar-integration.html": {
+      "x": 520,
+      "y": 439
+    },
+    "client-home-A-activity-feed.html": {
+      "x": 60,
+      "y": 778
+    },
+    "client-home-B-dashboard-grid.html": {
+      "x": 520,
+      "y": 778
+    },
+    "client-home-C-two-pane.html": {
+      "x": 60,
+      "y": 1117
+    },
+    "client-home-D-tabbed.html": {
+      "x": 520,
+      "y": 1117
+    },
+    "client-home-E-command-center.html": {
+      "x": 60,
+      "y": 1456
+    },
+    "client-home-mockups.html": {
+      "x": 520,
+      "y": 1456
+    },
+    "client-home-v2-A.html": {
+      "x": 60,
+      "y": 1795
+    },
+    "client-home-v2-B.html": {
+      "x": 520,
+      "y": 1795
+    },
+    "client-home-v2-C.html": {
+      "x": 60,
+      "y": 2134
+    },
+    "dashboard-chat-input.html": {
+      "x": 520,
+      "y": 2134
+    },
+    "mockup-01-card-grid.html": {
+      "x": 60,
+      "y": 2473
+    },
+    "mockup-02-dropdown.html": {
+      "x": 520,
+      "y": 2473
+    },
+    "mockup-03-sidebar.html": {
+      "x": 60,
+      "y": 2812
+    },
+    "mockup-04-breadcrumb.html": {
+      "x": 520,
+      "y": 2812
+    },
+    "mockup-05-command-palette.html": {
+      "x": 60,
+      "y": 3151
+    },
+    "mockup-06-floating-pill.html": {
+      "x": 520,
+      "y": 3151
+    },
+    "mockup-07-tab-groups.html": {
+      "x": 60,
+      "y": 3490
+    },
+    "mockup-08-sliding-drawer.html": {
+      "x": 520,
+      "y": 3490
+    },
+    "mockup-09-recent-favorites.html": {
+      "x": 60,
+      "y": 3829
+    },
+    "mockup-10-avatar-row.html": {
+      "x": 520,
+      "y": 3829
+    },
+    "nav-layouts.html": {
+      "x": 60,
+      "y": 4168
+    },
+    "nav-toggle.html": {
+      "x": 520,
+      "y": 4168
+    },
+    "system-architecture.html": {
+      "x": 60,
+      "y": 4507
+    }
+  },
+  "comments": [],
+  "annotations": {}
+}

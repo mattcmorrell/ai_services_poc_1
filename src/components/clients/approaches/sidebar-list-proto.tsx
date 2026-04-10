@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
-import { Search, MessageSquare, ChevronLeft, ChevronRight, X, Bot, Clock } from "lucide-react";
+import { MagnifyingGlass, ChatDots, CaretLeft, CaretRight, X, Robot, Clock } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { getAvatarStyle } from "@/lib/avatar-colors";
 import type { Client, Chat } from "@/types/chat";
 
 interface ApproachProps {
@@ -13,28 +14,6 @@ interface ApproachProps {
   children: React.ReactNode;
   tabBar?: React.ReactNode;
   version: number;
-}
-
-// Deterministic color palette for client initials
-const AVATAR_COLORS = [
-  "bg-blue-600",
-  "bg-emerald-600",
-  "bg-violet-600",
-  "bg-amber-600",
-  "bg-rose-600",
-  "bg-cyan-600",
-  "bg-indigo-600",
-  "bg-teal-600",
-  "bg-orange-600",
-  "bg-pink-600",
-];
-
-function getAvatarColor(clientId: string): string {
-  let hash = 0;
-  for (let i = 0; i < clientId.length; i++) {
-    hash = clientId.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
 function getInitials(name: string): string {
@@ -164,7 +143,7 @@ export function SidebarListProto({
                 )}
                 aria-label="Search clients"
               >
-                <Search className="h-3.5 w-3.5" />
+                <MagnifyingGlass className="h-3.5 w-3.5" />
               </button>
             </div>
 
@@ -187,10 +166,8 @@ export function SidebarListProto({
                     )}
                   >
                     <div
-                      className={cn(
-                        "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white",
-                        getAvatarColor(client.id)
-                      )}
+                      className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+                      style={getAvatarStyle(client.id)}
                     >
                       {getInitials(client.name)}
                     </div>
@@ -212,7 +189,7 @@ export function SidebarListProto({
                           <span
                             className={cn(
                               "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
-                              "rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground"
+                              "rounded-full bg-primary px-1.5 text-[11px] font-medium leading-none text-primary-foreground"
                             )}
                           >
                             {client.unreadCount}
@@ -221,7 +198,7 @@ export function SidebarListProto({
                       </div>
 
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <MessageSquare className="h-3 w-3" />
+                        <ChatDots className="h-3 w-3" />
                         {chatCount} {chatCount === 1 ? "chat" : "chats"}
                       </span>
                     </div>
@@ -281,7 +258,7 @@ export function SidebarListProto({
                 {searchOpen ? (
                   <X className="h-3.5 w-3.5" />
                 ) : (
-                  <Search className="h-3.5 w-3.5" />
+                  <MagnifyingGlass className="h-3.5 w-3.5" />
                 )}
               </button>
             )}
@@ -297,9 +274,9 @@ export function SidebarListProto({
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {collapsed ? (
-                <ChevronRight className="h-3.5 w-3.5" />
+                <CaretRight className="h-3.5 w-3.5" />
               ) : (
-                <ChevronLeft className="h-3.5 w-3.5" />
+                <CaretLeft className="h-3.5 w-3.5" />
               )}
             </button>
           </div>
@@ -314,7 +291,7 @@ export function SidebarListProto({
             )}
           >
             <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-              <Search className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
+              <MagnifyingGlass className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -368,10 +345,8 @@ export function SidebarListProto({
                   )}
                   <div className="relative">
                     <div
-                      className={cn(
-                        "flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white",
-                        getAvatarColor(client.id)
-                      )}
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white"
+                      style={getAvatarStyle(client.id)}
                     >
                       {getInitials(client.name)}
                     </div>
@@ -380,8 +355,8 @@ export function SidebarListProto({
                     {client.unreadCount > 0 && (
                       <span
                         className={cn(
-                          "absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center",
-                          "rounded-full bg-primary px-1 text-[9px] font-semibold leading-none text-primary-foreground"
+                          "absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center",
+                          "rounded-full bg-primary px-1 text-[11px] font-medium leading-none text-primary-foreground"
                         )}
                       >
                         {client.unreadCount}
@@ -410,10 +385,8 @@ export function SidebarListProto({
               >
                 {/* Colored initial circle */}
                 <div
-                  className={cn(
-                    "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white",
-                    getAvatarColor(client.id)
-                  )}
+                  className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+                  style={getAvatarStyle(client.id)}
                 >
                   {getInitials(client.name)}
                 </div>
@@ -447,14 +420,14 @@ export function SidebarListProto({
                     {isV4 ? (
                       <div className="flex items-center gap-1">
                         {unreadChats > 0 && (
-                          <span className="flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-primary">
-                            <MessageSquare className="h-2.5 w-2.5" />
+                          <span className="flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[11px] font-medium leading-none text-primary">
+                            <ChatDots className="h-2.5 w-2.5" />
                             {unreadChats}
                           </span>
                         )}
                         {agentUpdates > 0 && (
-                          <span className="flex items-center gap-0.5 rounded-full bg-violet-500/15 px-1.5 py-0.5 text-[9px] font-medium leading-none text-violet-400">
-                            <Bot className="h-2.5 w-2.5" />
+                          <span className="flex items-center gap-0.5 rounded-full bg-violet-500/15 px-1.5 py-0.5 text-[11px] font-medium leading-none text-violet-400">
+                            <Robot className="h-2.5 w-2.5" />
                             {agentUpdates}
                           </span>
                         )}
@@ -464,7 +437,7 @@ export function SidebarListProto({
                         <span
                           className={cn(
                             "flex h-5 min-w-5 flex-shrink-0 items-center justify-center",
-                            "rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-none text-primary-foreground"
+                            "rounded-full bg-primary px-1.5 text-[11px] font-medium leading-none text-primary-foreground"
                           )}
                         >
                           {client.unreadCount}
@@ -480,7 +453,7 @@ export function SidebarListProto({
                     </span>
                   ) : (
                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <MessageSquare className="h-3 w-3" />
+                      <ChatDots className="h-3 w-3" />
                       {chatCount} {chatCount === 1 ? "chat" : "chats"}
                     </span>
                   )}

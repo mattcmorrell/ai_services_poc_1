@@ -2,7 +2,7 @@
 
 import { memo, useState } from "react";
 import { Handle, Position } from "@xyflow/react";
-import { Pencil, ChevronDown, ChevronUp, ArrowUp } from "lucide-react";
+import { PencilSimple, CaretDown, CaretUp, ArrowUp } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { WorkflowStep } from "@/types/workflow";
@@ -53,9 +53,9 @@ function WorkflowStepNode({ data }: WorkflowStepNodeProps) {
             {stepNumber}. {step.title}
           </h3>
           {isExpanded ? (
-            <ChevronUp className="h-4 w-4 text-stone-500 dark:text-stone-400" />
+            <CaretUp className="h-4 w-4 text-stone-500 dark:text-stone-400" />
           ) : (
-            <ChevronDown className="h-4 w-4 text-stone-500 dark:text-stone-400" />
+            <CaretDown className="h-4 w-4 text-stone-500 dark:text-stone-400" />
           )}
         </div>
 
@@ -67,7 +67,7 @@ function WorkflowStepNode({ data }: WorkflowStepNodeProps) {
             }}
             className="flex items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 underline"
           >
-            <Pencil className="h-3 w-3" />
+            <PencilSimple className="h-3 w-3" />
             Edit
           </button>
           <button
@@ -77,7 +77,7 @@ function WorkflowStepNode({ data }: WorkflowStepNodeProps) {
             }}
             className="flex items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100"
           >
-            <span className="w-3 h-3 rounded-full bg-green-600 flex items-center justify-center text-white text-[8px] font-bold">B</span>
+            <span className="w-4 h-4 rounded-full bg-green-600 flex items-center justify-center text-white text-[11px] font-medium">B</span>
             <span className="underline">Open in BambooHR</span>
           </button>
         </div>

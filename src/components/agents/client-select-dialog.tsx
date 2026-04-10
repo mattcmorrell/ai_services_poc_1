@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2 } from "lucide-react";
+import { Buildings } from "@phosphor-icons/react";
 import {
   Dialog,
   DialogContent,
@@ -47,7 +47,7 @@ export function ClientSelectDialog({
                 className="flex w-full items-center gap-3 rounded-lg border border-border bg-card p-3 text-left transition-colors hover:bg-accent"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted">
-                  <Building2 className="h-5 w-5" />
+                  <Buildings className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="font-medium">{client.name}</div>

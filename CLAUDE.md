@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⛔ Before finishing ANY HTML, CSS, or styled output — STOP AND CHECK:
+
+- [ ] No text color below `#999` on dark backgrounds (#1a–#2a range)
+- [ ] No text color lighter than `#666` on light backgrounds (#f0+)
+- [ ] No `font-size` below `11px` anywhere. 13px floor for body text.
+- [ ] No `opacity` below `0.6` on any text element
+- [ ] "Muted" text is still clearly readable at a glance — not ghostly
+- [ ] Body text defaults to 14px, not 13px (13px is compact exception only)
+- [ ] Stat values / hero numbers are 16px+
+
+**This is the #1 recurring issue. Grep your output for color declarations and font-size values before you're done. Every time.**
+
 ## Project Overview
 
 AI Services POC - A Next.js 16 single-page application for BambooHR consultants to manage client HR tasks through AI-powered agents. Features a chat interface with action plans (require approval), artifacts (code/tables/documents), clarifying questions, and workflow visualization.

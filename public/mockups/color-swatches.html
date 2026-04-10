@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Swatches</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Geist', system-ui, -apple-system, sans-serif;
+    background: #111;
+    color: #ccc;
+    padding: 24px;
+    min-height: 100vh;
+  }
+  h1 { font-size: 14px; font-weight: 400; letter-spacing: 0.15em; text-transform: uppercase; color: #a0a0a0; margin-bottom: 24px; }
+  .group { margin-bottom: 32px; }
+  .group-title { font-size: 14px; font-weight: 600; color: #ccc; margin-bottom: 12px; letter-spacing: 0.05em; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 12px; }
+  .swatch {
+    width: 120px;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .swatch:hover { transform: scale(1.05); }
+  .swatch-color {
+    width: 120px;
+    height: 80px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 6px;
+  }
+  .swatch-hex { font-family: 'Geist Mono', 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #b0b0b0; }
+  .swatch-note { font-size: 12px; color: #999; margin-top: 2px; line-height: 1.3; }
+  .copied {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background: #333;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .copied.show { opacity: 1; }
+
+  /* Grain demo */
+  .grain-section { margin-top: 48px; border-top: 1px solid #2a2a2a; padding-top: 32px; }
+  .grain-section h2 { font-size: 14px; font-weight: 400; letter-spacing: 0.15em; text-transform: uppercase; color: #a0a0a0; margin-bottom: 8px; }
+  .grain-section p { font-size: 13px; color: #999; margin-bottom: 20px; }
+  .grain-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .grain-card {
+    height: 180px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 16px;
+  }
+  .grain-card .label { font-size: 13px; color: #ccc; font-weight: 500; position: relative; z-index: 1; }
+  .grain-card .sublabel { font-size: 12px; color: #999; margin-top: 2px; position: relative; z-index: 1; }
+
+  /* The grain overlay — canvas-generated noise as pseudo-element */
+  .has-grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background-image: var(--noise-url);
+    background-size: 256px 256px;
+    background-repeat: repeat;
+    mix-blend-mode: overlay;
+  }
+  .grain-02::after { opacity: 0.02; }
+  .grain-03::after { opacity: 0.03; }
+  .grain-05::after { opacity: 0.05; }
+  .grain-08::after { opacity: 0.08; }
+  .grain-12::after { opacity: 0.12; }
+  .grain-20::after { opacity: 0.20; }
+
+  /* Comparison row */
+  .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .compare-card {
+    height: 240px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    overflow: hidden;
+    padding: 24px;
+  }
+  .compare-card .card-title { font-size: 18px; font-weight: 600; color: #e4e4e7; margin-bottom: 8px; position: relative; z-index: 1; }
+  .compare-card .card-body { font-size: 14px; color: #b0b0b0; line-height: 1.5; position: relative; z-index: 1; }
+  .compare-card .card-meta { font-size: 13px; color: #999; margin-top: 16px; position: relative; z-index: 1; }
+
+  /* Opacity slider */
+  .slider-section { margin-top: 24px; }
+  .slider-section label { font-size: 13px; color: #b0b0b0; display: flex; align-items: center; gap: 12px; }
+  .slider-section input[type="range"] { width: 300px; accent-color: #6366f1; }
+  .slider-value { font-family: 'Geist Mono', 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #ccc; min-width: 40px; }
+  .playground-card {
+    margin-top: 16px;
+    height: 200px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .playground-card .inner { position: relative; z-index: 1; text-align: center; }
+  .playground-card .inner .big { font-size: 36px; font-weight: 600; color: #e4e4e7; }
+  .playground-card .inner .sub { font-size: 14px; color: #b0b0b0; margin-top: 4px; }
+  .playground-grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background-image: var(--noise-url);
+    background-size: 256px 256px;
+    background-repeat: repeat;
+    mix-blend-mode: overlay;
+  }
+
+  /* Color picker for playground */
+  .controls { display: flex; gap: 24px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  .color-pick { display: flex; align-items: center; gap: 8px; }
+  .color-pick label { font-size: 13px; color: #b0b0b0; }
+  .color-pick input[type="color"] { width: 32px; height: 32px; border: 1px solid #333; border-radius: 6px; background: none; cursor: pointer; }
+  select {
+    font-size: 13px;
+    background: #222;
+    color: #ccc;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+</style>
+</head>
+<body>
+<h1>Color Swatches</h1>
+<div id="groups"></div>
+
+<!-- Grain Demo Section -->
+<div class="grain-section">
+  <h2>Grain / Texture Demo</h2>
+  <p>SVG fractal noise overlay at different opacities. All on the warm dark base (#1c1a1e).</p>
+
+  <div class="grain-grid">
+    <div class="grain-card" style="background: #1c1a1e;">
+      <div class="label">No grain</div>
+      <div class="sublabel">Flat surface</div>
+    </div>
+    <div class="grain-card has-grain grain-02" style="background: #1c1a1e;">
+      <div class="label">2% opacity</div>
+      <div class="sublabel">Barely there</div>
+    </div>
+    <div class="grain-card has-grain grain-03" style="background: #1c1a1e;">
+      <div class="label">3% opacity</div>
+      <div class="sublabel">Sweet spot</div>
+    </div>
+    <div class="grain-card has-grain grain-05" style="background: #1c1a1e;">
+      <div class="label">5% opacity</div>
+      <div class="sublabel">Visible texture</div>
+    </div>
+  </div>
+
+  <div class="grain-grid">
+    <div class="grain-card has-grain grain-08" style="background: #1c1a1e;">
+      <div class="label">8% opacity</div>
+      <div class="sublabel">Getting heavy</div>
+    </div>
+    <div class="grain-card has-grain grain-12" style="background: #1c1a1e;">
+      <div class="label">12% opacity</div>
+      <div class="sublabel">Dribbble 2022</div>
+    </div>
+    <div class="grain-card has-grain grain-20" style="background: #1c1a1e;">
+      <div class="label">20% opacity</div>
+      <div class="sublabel">Way too much</div>
+    </div>
+    <div class="grain-card" style="background: #1a1c2e;">
+      <div class="label" style="color: #999;">Cool slate for comparison</div>
+      <div class="sublabel">No grain, #1a1c2e</div>
+    </div>
+  </div>
+
+  <p style="margin-top: 24px;">Side by side — realistic card with content:</p>
+
+  <div class="compare-row">
+    <div class="compare-card" style="background: #1c1a1e;">
+      <div class="card-title">Without Grain</div>
+      <div class="card-body">Pulling payroll data from BambooHR for Acme Corp. Validating employee records against last pay period.</div>
+      <div class="card-meta">3 of 7 steps complete · 2m elapsed</div>
+    </div>
+    <div class="compare-card has-grain grain-03" style="background: #1c1a1e;">
+      <div class="card-title">With Grain (3%)</div>
+      <div class="card-body">Pulling payroll data from BambooHR for Acme Corp. Validating employee records against last pay period.</div>
+      <div class="card-meta">3 of 7 steps complete · 2m elapsed</div>
+    </div>
+  </div>
+
+  <div class="compare-row">
+    <div class="compare-card" style="background: #1a1c2e;">
+      <div class="card-title">Cool Slate — No Grain</div>
+      <div class="card-body">Mercury's original palette. Clean but can feel sterile and digital.</div>
+      <div class="card-meta">For comparison</div>
+    </div>
+    <div class="compare-card has-grain grain-03" style="background: #1e1c22;">
+      <div class="card-title">Warm Dark + Grain</div>
+      <div class="card-body">The warm base plus subtle texture. Feels tactile — like matte paper instead of a screen.</div>
+      <div class="card-meta">Recommended direction</div>
+    </div>
+  </div>
+
+  <!-- Interactive playground -->
+  <p style="margin-top: 32px;">Playground — drag to adjust:</p>
+  <div class="controls">
+    <div class="slider-section">
+      <label>
+        Grain opacity:
+        <input type="range" id="grain-slider" min="0" max="25" value="3" step="0.5">
+        <span class="slider-value" id="grain-value">3%</span>
+      </label>
+    </div>
+    <div class="color-pick">
+      <label>Base:</label>
+      <input type="color" id="base-color" value="#1c1a1e">
+    </div>
+    <div>
+      <select id="blend-mode">
+        <option value="overlay" selected>overlay</option>
+        <option value="soft-light">soft-light</option>
+        <option value="hard-light">hard-light</option>
+        <option value="screen">screen</option>
+      </select>
+    </div>
+  </div>
+  <div class="playground-card" id="playground" style="background: #1c1a1e;">
+    <div class="inner">
+      <div class="big">$2,023,267.12</div>
+      <div class="sub">Ops / Payroll · Last 30 days</div>
+    </div>
+    <div class="playground-grain" id="playground-grain" style="opacity: 0.03;"></div>
+  </div>
+</div>
+
+<!-- Warm Gradient Explorations (Cristache-inspired) -->
+<div class="grain-section">
+  <h2>Warm Gradient Explorations</h2>
+  <p>Ambient gradients inspired by the Cristache palettes — warm amber/terracotta sunrise feel. Light and dark variants.</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+    <!-- Light: cream → amber -->
+    <div style="
+      height: 320px; border-radius: 12px; overflow: hidden;
+      background: linear-gradient(180deg, #EDE6D8 0%, #e8ddd0 35%, #d4a87a 70%, #c4845a 100%);
+    ">
+      <div style="padding: 20px; font-size: 13px; color: #5a4a3a;">Light — Cream to Amber</div>
+    </div>
+    <!-- Dark: slate-blue → amber -->
+    <div style="
+      height: 320px; border-radius: 12px; overflow: hidden;
+      background: linear-gradient(180deg, #2a3040 0%, #3a3545 35%, #8a6040 70%, #c4845a 100%);
+    ">
+      <div style="padding: 20px; font-size: 13px; color: #a0a0a0;">Dark — Slate to Amber</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+    <!-- Light: soft fog → terracotta -->
+    <div style="
+      height: 320px; border-radius: 12px; overflow: hidden;
+      background: linear-gradient(175deg, #f0ebe3 0%, #e6ddd2 30%, #d9b896 55%, #c08050 80%, #b06a40 100%);
+    ">
+      <div style="padding: 20px; font-size: 13px; color: #5a4a3a;">Light — Fog to Terracotta</div>
+    </div>
+    <!-- Dark: deep blue → terracotta -->
+    <div style="
+      height: 320px; border-radius: 12px; overflow: hidden;
+      background: linear-gradient(175deg, #1e2a38 0%, #2a3040 30%, #5a4535 55%, #c08050 80%, #b06a40 100%);
+    ">
+      <div style="padding: 20px; font-size: 13px; color: #a0a0a0;">Dark — Navy to Terracotta</div>
+    </div>
+  </div>
+
+  <!-- Mesh versions (more organic) -->
+  <p style="margin-bottom: 16px;">Mesh versions — radial blobs instead of linear sweeps:</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+    <!-- Light mesh: cream base, amber glow bottom -->
+    <div style="
+      height: 320px; border-radius: 12px; overflow: hidden;
+      background:
+        radial-gradient(ellipse 100% 60% at 50% 110%, rgba(196, 132, 90, 0.6) 0%, transparent 70%),
+        radial-gradient(ellipse 80% 50% at 70% 90%, rgba(210, 160, 100, 0.4) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 30% 95%, rgba(176, 106, 64, 0.3) 0%, transparent 55%),
+        linear-gradient(180deg, #EDE6D8 0%, #e5dcd0 100%);
+    ">
+      <div style="padding: 20px; font-size: 13px; color: #5a4a3a;">Light Mesh — Amber Horizon</div>
+    </div>
+    <!-- Dark mesh: slate base, amber glow bottom -->
+    <div style="
+      height: 320px; border-radius: 12px; overflow: hidden;
+      background:
+        radial-gradient(ellipse 100% 60% at 50% 110%, rgba(196, 132, 90, 0.45) 0%, transparent 70%),
+        radial-gradient(ellipse 80% 50% at 70% 90%, rgba(210, 160, 100, 0.3) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 30% 95%, rgba(176, 106, 64, 0.2) 0%, transparent 55%),
+        linear-gradient(180deg, #262e3a 0%, #2a3040 100%);
+    ">
+      <div style="padding: 20px; font-size: 13px; color: #a0a0a0;">Dark Mesh — Amber Horizon</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+    <!-- Light mesh: cream base, terracotta corner -->
+    <div style="
+      height: 320px; border-radius: 12px; overflow: hidden;
+      background:
+        radial-gradient(ellipse 70% 60% at 85% 95%, rgba(176, 106, 64, 0.5) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 60% 80%, rgba(200, 145, 85, 0.25) 0%, transparent 55%),
+        radial-gradient(ellipse 90% 40% at 50% 105%, rgba(210, 170, 120, 0.3) 0%, transparent 60%),
+        linear-gradient(160deg, #f0ebe3 0%, #e8e0d5 100%);
+    ">
+      <div style="padding: 20px; font-size: 13px; color: #5a4a3a;">Light Mesh — Terracotta Corner</div>
+    </div>
+    <!-- Dark mesh: deep blue-gray, terracotta corner -->
+    <div style="
+      height: 320px; border-radius: 12px; overflow: hidden;
+      background:
+        radial-gradient(ellipse 70% 60% at 85% 95%, rgba(176, 106, 64, 0.35) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 60% 80%, rgba(200, 145, 85, 0.18) 0%, transparent 55%),
+        radial-gradient(ellipse 90% 40% at 50% 105%, rgba(210, 170, 120, 0.15) 0%, transparent 60%),
+        linear-gradient(160deg, #222a35 0%, #2a3040 100%);
+    ">
+      <div style="padding: 20px; font-size: 13px; color: #a0a0a0;">Dark Mesh — Terracotta Corner</div>
+    </div>
+  </div>
+
+  <!-- Full-width dashboard with warm gradient -->
+  <p style="margin-top: 24px; margin-bottom: 16px;">Dashboard mock — dark mode with warm amber horizon:</p>
+  <div style="
+    height: 500px; border-radius: 12px; position: relative; overflow: hidden; padding: 32px;
+    background:
+      radial-gradient(ellipse 100% 55% at 50% 110%, rgba(196, 132, 90, 0.35) 0%, transparent 70%),
+      radial-gradient(ellipse 70% 45% at 70% 90%, rgba(210, 160, 100, 0.2) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 35% at 25% 95%, rgba(176, 106, 64, 0.15) 0%, transparent 55%),
+      linear-gradient(180deg, #262e3a 0%, #2a3040 100%);
+  ">
+    <div style="font-size: 24px; font-weight: 600; color: #EDE6D8; margin-bottom: 4px;">Good morning, Sarah</div>
+    <div style="font-size: 14px; color: #a0a0a0; margin-bottom: 28px;">Wednesday, April 2 · 3 plans running across 2 clients</div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+      <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.07);">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Active Clients</div>
+        <div style="font-size: 32px; font-weight: 600; color: #EDE6D8;">24</div>
+        <div style="font-size: 13px; color: #c4985a; margin-top: 8px;">3 need attention</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.07);">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Plans Running</div>
+        <div style="font-size: 32px; font-weight: 600; color: #EDE6D8;">7</div>
+        <div style="font-size: 13px; color: #FFB162; margin-top: 8px;">1 awaiting approval</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.07);">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Completed This Week</div>
+        <div style="font-size: 32px; font-weight: 600; color: #EDE6D8;">13</div>
+        <div style="font-size: 13px; color: #a0a0a0; margin-top: 8px;">across 8 clients</div>
+      </div>
+    </div>
+  </div>
+
+  <p style="margin-top: 24px; margin-bottom: 16px;">Dashboard mock — light mode with warm amber horizon:</p>
+  <div style="
+    height: 500px; border-radius: 12px; position: relative; overflow: hidden; padding: 32px;
+    background:
+      radial-gradient(ellipse 100% 55% at 50% 110%, rgba(196, 132, 90, 0.4) 0%, transparent 70%),
+      radial-gradient(ellipse 70% 45% at 70% 90%, rgba(210, 160, 100, 0.25) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 35% at 25% 95%, rgba(176, 106, 64, 0.15) 0%, transparent 55%),
+      linear-gradient(180deg, #EDE6D8 0%, #e5dcd0 100%);
+    border: 1px solid rgba(0,0,0,0.08);
+  ">
+    <div style="font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Good morning, Sarah</div>
+    <div style="font-size: 14px; color: #666; margin-bottom: 28px;">Wednesday, April 2 · 3 plans running across 2 clients</div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+      <div style="background: rgba(255,255,255,0.75); border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06);">
+        <div style="font-size: 13px; color: #7a7568; margin-bottom: 4px;">Active Clients</div>
+        <div style="font-size: 32px; font-weight: 600; color: #1a1a1a;">24</div>
+        <div style="font-size: 13px; color: #A35139; margin-top: 8px;">3 need attention</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.75); border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06);">
+        <div style="font-size: 13px; color: #7a7568; margin-bottom: 4px;">Plans Running</div>
+        <div style="font-size: 32px; font-weight: 600; color: #1a1a1a;">7</div>
+        <div style="font-size: 13px; color: #b06a40; margin-top: 8px;">1 awaiting approval</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.75); border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06);">
+        <div style="font-size: 13px; color: #7a7568; margin-bottom: 4px;">Completed This Week</div>
+        <div style="font-size: 32px; font-weight: 600; color: #1a1a1a;">13</div>
+        <div style="font-size: 13px; color: #666; margin-top: 8px;">across 8 clients</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Intensity-Balanced Palette Strips -->
+<div class="grain-section">
+  <h2>Intensity-Balanced Palettes</h2>
+  <p>Each source palette rebalanced into a smooth dark → light ramp with accent placement.</p>
+
+  <!-- Palette 1: Inkwell -->
+  <div style="margin-bottom: 28px;">
+    <div style="font-size: 14px; font-weight: 600; color: #ccc; margin-bottom: 8px;">Palette 1 — Inkwell</div>
+    <div style="font-size: 13px; color: #999; margin-bottom: 10px;">Moody teal-grays + warm caramel. Masculine, architectural.</div>
+    <div style="display: flex; height: 80px; border-radius: 10px; overflow: hidden; margin-bottom: 4px;">
+      <div style="flex: 1; background: #2C3639;"></div>
+      <div style="flex: 1; background: #3F4E4F;"></div>
+      <div style="flex: 1; background: #6B7F7E;"></div>
+      <div style="flex: 1; background: #A27B5D;"></div>
+      <div style="flex: 1; background: #C4AA8B;"></div>
+      <div style="flex: 1; background: #DCD7C9;"></div>
+    </div>
+    <div style="display: flex; font-size: 11px; color: #999;">
+      <div style="flex: 1; text-align: center;">Inkwell</div>
+      <div style="flex: 1; text-align: center;">Lunar Eclipse</div>
+      <div style="flex: 1; text-align: center;">Lifted</div>
+      <div style="flex: 1; text-align: center;">Creme Brulee</div>
+      <div style="flex: 1; text-align: center;">Soft Warm</div>
+      <div style="flex: 1; text-align: center;">Au Lait</div>
+    </div>
+  </div>
+
+  <!-- Palette 2: Matcha -->
+  <div style="margin-bottom: 28px;">
+    <div style="font-size: 14px; font-weight: 600; color: #ccc; margin-bottom: 8px;">Palette 2 — Matcha</div>
+    <div style="font-size: 13px; color: #999; margin-bottom: 10px;">Deep forest → sage → warm almond. Natural, grounded, the most range.</div>
+    <div style="display: flex; height: 80px; border-radius: 10px; overflow: hidden; margin-bottom: 4px;">
+      <div style="flex: 1; background: #1A3638;"></div>
+      <div style="flex: 1; background: #405340;"></div>
+      <div style="flex: 1; background: #677D6A;"></div>
+      <div style="flex: 1; background: #96A894;"></div>
+      <div style="flex: 1; background: #D6BD98;"></div>
+      <div style="flex: 1; background: #EDE6D8;"></div>
+    </div>
+    <div style="display: flex; font-size: 11px; color: #999;">
+      <div style="flex: 1; text-align: center;">Eclipse</div>
+      <div style="flex: 1; text-align: center;">Forest Roast</div>
+      <div style="flex: 1; text-align: center;">Matcha Brew</div>
+      <div style="flex: 1; text-align: center;">Lifted</div>
+      <div style="flex: 1; text-align: center;">Almond</div>
+      <div style="flex: 1; text-align: center;">Light Base</div>
+    </div>
+  </div>
+
+  <!-- Palette 3: Anchorfish -->
+  <div style="margin-bottom: 28px;">
+    <div style="font-size: 14px; font-weight: 600; color: #ccc; margin-bottom: 8px;">Palette 3 — Anchorfish</div>
+    <div style="font-size: 13px; color: #999; margin-bottom: 10px;">Deep navy + cream neutrals + bold warm accents. Most contrast, most punch.</div>
+    <div style="display: flex; height: 80px; border-radius: 10px; overflow: hidden; margin-bottom: 4px;">
+      <div style="flex: 1; background: #1B2632;"></div>
+      <div style="flex: 1; background: #2C3B4D;"></div>
+      <div style="flex: 1; background: #A35139;"></div>
+      <div style="flex: 1; background: #C9C1B1;"></div>
+      <div style="flex: 1; background: #FFB162;"></div>
+      <div style="flex: 1; background: #EEE9DF;"></div>
+    </div>
+    <div style="display: flex; font-size: 11px; color: #999;">
+      <div style="flex: 1; text-align: center;">Abyssal</div>
+      <div style="flex: 1; text-align: center;">Blue Fantastic</div>
+      <div style="flex: 1; text-align: center;">Truffle</div>
+      <div style="flex: 1; text-align: center;">Oatmeal</div>
+      <div style="flex: 1; text-align: center;">Burning Flame</div>
+      <div style="flex: 1; text-align: center;">Palladian</div>
+    </div>
+  </div>
+
+  <!-- All three as thin strips for direct comparison -->
+  <div style="margin-top: 32px;">
+    <div style="font-size: 14px; font-weight: 600; color: #ccc; margin-bottom: 12px;">Side by side — thin strips</div>
+    <div style="display: flex; height: 40px; border-radius: 8px; overflow: hidden; margin-bottom: 6px;">
+      <div style="flex: 1; background: #2C3639;"></div>
+      <div style="flex: 1; background: #3F4E4F;"></div>
+      <div style="flex: 1; background: #6B7F7E;"></div>
+      <div style="flex: 1; background: #A27B5D;"></div>
+      <div style="flex: 1; background: #C4AA8B;"></div>
+      <div style="flex: 1; background: #DCD7C9;"></div>
+    </div>
+    <div style="display: flex; height: 40px; border-radius: 8px; overflow: hidden; margin-bottom: 6px;">
+      <div style="flex: 1; background: #1A3638;"></div>
+      <div style="flex: 1; background: #405340;"></div>
+      <div style="flex: 1; background: #677D6A;"></div>
+      <div style="flex: 1; background: #96A894;"></div>
+      <div style="flex: 1; background: #D6BD98;"></div>
+      <div style="flex: 1; background: #EDE6D8;"></div>
+    </div>
+    <div style="display: flex; height: 40px; border-radius: 8px; overflow: hidden; margin-bottom: 6px;">
+      <div style="flex: 1; background: #1B2632;"></div>
+      <div style="flex: 1; background: #2C3B4D;"></div>
+      <div style="flex: 1; background: #A35139;"></div>
+      <div style="flex: 1; background: #C9C1B1;"></div>
+      <div style="flex: 1; background: #FFB162;"></div>
+      <div style="flex: 1; background: #EEE9DF;"></div>
+    </div>
+    <div style="display: flex; font-size: 11px; color: #999; margin-top: 4px;">
+      <div style="flex: 1; text-align: center;">Dark base</div>
+      <div style="flex: 1; text-align: center;">Mid dark</div>
+      <div style="flex: 1; text-align: center;">Mid tone</div>
+      <div style="flex: 1; text-align: center;">Mid light</div>
+      <div style="flex: 1; text-align: center;">Warm accent</div>
+      <div style="flex: 1; text-align: center;">Light base</div>
+    </div>
+  </div>
+</div>
+
+<!-- Palette Comparison: Same UI, Two Palettes -->
+<div class="grain-section">
+  <h2>Palette Comparison — Dark Mode</h2>
+  <p>Same dashboard layout, Mercury vs. Earthy palette.</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px;">
+    <!-- Mercury dark -->
+    <div style="
+      border-radius: 12px; overflow: hidden; padding: 28px;
+      background: #1c1a1e;
+      border: 1px solid rgba(255,255,255,0.06);
+    ">
+      <div style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #818cf8; margin-bottom: 16px;">Palette A — Mercury</div>
+      <div style="font-size: 22px; font-weight: 600; color: #e4e4e7; margin-bottom: 4px;">Good morning, Sarah</div>
+      <div style="font-size: 14px; color: #a1a1aa; margin-bottom: 24px;">3 plans running across 2 clients</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 16px; border: 1px solid rgba(255,255,255,0.07);">
+          <div style="font-size: 13px; color: #a1a1aa; margin-bottom: 4px;">Active Clients</div>
+          <div style="font-size: 28px; font-weight: 600; color: #e4e4e7;">24</div>
+          <div style="font-size: 13px; color: #6ee7b7; margin-top: 6px;">3 need attention</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 16px; border: 1px solid rgba(255,255,255,0.07);">
+          <div style="font-size: 13px; color: #a1a1aa; margin-bottom: 4px;">Plans Running</div>
+          <div style="font-size: 28px; font-weight: 600; color: #e4e4e7;">7</div>
+          <div style="font-size: 13px; color: #fbbf24; margin-top: 6px;">1 awaiting approval</div>
+        </div>
+      </div>
+      <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.07); font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #a1a1aa;">
+        <span style="color: #818cf8;">●</span> Pulling payroll data for Acme Corp...
+      </div>
+    </div>
+
+    <!-- Earthy dark -->
+    <div style="
+      border-radius: 12px; overflow: hidden; padding: 28px;
+      background: #1A3638;
+      border: 1px solid rgba(255,255,255,0.06);
+    ">
+      <div style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #8FA88B; margin-bottom: 16px;">Palette B — Earthy</div>
+      <div style="font-size: 22px; font-weight: 600; color: #EEE9DF; margin-bottom: 4px;">Good morning, Sarah</div>
+      <div style="font-size: 14px; color: #a0a89a; margin-bottom: 24px;">3 plans running across 2 clients</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 16px; border: 1px solid rgba(255,255,255,0.07);">
+          <div style="font-size: 13px; color: #a0a89a; margin-bottom: 4px;">Active Clients</div>
+          <div style="font-size: 28px; font-weight: 600; color: #EEE9DF;">24</div>
+          <div style="font-size: 13px; color: #8FA88B; margin-top: 6px;">3 need attention</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 16px; border: 1px solid rgba(255,255,255,0.07);">
+          <div style="font-size: 13px; color: #a0a89a; margin-bottom: 4px;">Plans Running</div>
+          <div style="font-size: 28px; font-weight: 600; color: #EEE9DF;">7</div>
+          <div style="font-size: 13px; color: #FFB162; margin-top: 6px;">1 awaiting approval</div>
+        </div>
+      </div>
+      <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.07); font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #a0a89a;">
+        <span style="color: #8FA88B;">●</span> Pulling payroll data for Acme Corp...
+      </div>
+    </div>
+  </div>
+
+  <h2 style="margin-top: 32px;">Palette Comparison — Light Mode</h2>
+  <p>Same dashboard, light treatment.</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px;">
+    <!-- Mercury light -->
+    <div style="
+      border-radius: 12px; overflow: hidden; padding: 28px;
+      background:
+        radial-gradient(ellipse 90% 80% at 95% 100%, rgba(160, 200, 165, 0.3) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 60% 85%, rgba(145, 190, 155, 0.15) 0%, transparent 55%),
+        #f5f3f0;
+      border: 1px solid rgba(0,0,0,0.08);
+    ">
+      <div style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #6366f1; margin-bottom: 16px;">Palette A — Mercury</div>
+      <div style="font-size: 22px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Good morning, Sarah</div>
+      <div style="font-size: 14px; color: #666; margin-bottom: 24px;">3 plans running across 2 clients</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div style="background: rgba(255,255,255,0.82); border-radius: 10px; padding: 16px; border: 1px solid rgba(0,0,0,0.06);">
+          <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Active Clients</div>
+          <div style="font-size: 28px; font-weight: 600; color: #1a1a1a;">24</div>
+          <div style="font-size: 13px; color: #16a34a; margin-top: 6px;">3 need attention</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.82); border-radius: 10px; padding: 16px; border: 1px solid rgba(0,0,0,0.06);">
+          <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Plans Running</div>
+          <div style="font-size: 28px; font-weight: 600; color: #1a1a1a;">7</div>
+          <div style="font-size: 13px; color: #b45309; margin-top: 6px;">1 awaiting approval</div>
+        </div>
+      </div>
+      <div style="background: rgba(255,255,255,0.82); border-radius: 10px; padding: 14px 16px; border: 1px solid rgba(0,0,0,0.06); font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #666;">
+        <span style="color: #6366f1;">●</span> Pulling payroll data for Acme Corp...
+      </div>
+    </div>
+
+    <!-- Earthy light -->
+    <div style="
+      border-radius: 12px; overflow: hidden; padding: 28px;
+      background:
+        radial-gradient(ellipse 85% 75% at 92% 98%, rgba(130, 175, 135, 0.25) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 55% 85%, rgba(120, 165, 130, 0.12) 0%, transparent 55%),
+        #EEE9DF;
+      border: 1px solid rgba(0,0,0,0.08);
+    ">
+      <div style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #405340; margin-bottom: 16px;">Palette B — Earthy</div>
+      <div style="font-size: 22px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Good morning, Sarah</div>
+      <div style="font-size: 14px; color: #5a5545; margin-bottom: 24px;">3 plans running across 2 clients</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div style="background: rgba(255,255,255,0.75); border-radius: 10px; padding: 16px; border: 1px solid rgba(0,0,0,0.06);">
+          <div style="font-size: 13px; color: #7a7568; margin-bottom: 4px;">Active Clients</div>
+          <div style="font-size: 28px; font-weight: 600; color: #1a1a1a;">24</div>
+          <div style="font-size: 13px; color: #405340; margin-top: 6px;">3 need attention</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.75); border-radius: 10px; padding: 16px; border: 1px solid rgba(0,0,0,0.06);">
+          <div style="font-size: 13px; color: #7a7568; margin-bottom: 4px;">Plans Running</div>
+          <div style="font-size: 28px; font-weight: 600; color: #1a1a1a;">7</div>
+          <div style="font-size: 13px; color: #A35139; margin-top: 6px;">1 awaiting approval</div>
+        </div>
+      </div>
+      <div style="background: rgba(255,255,255,0.75); border-radius: 10px; padding: 14px 16px; border: 1px solid rgba(0,0,0,0.06); font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #5a5545;">
+        <span style="color: #677D6A;">●</span> Pulling payroll data for Acme Corp...
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dark Mode Mesh Gradient Backgrounds -->
+<div class="grain-section" id="dark-gradient-section">
+  <h2>Dark Mode — Mesh Gradient Backgrounds</h2>
+  <p>Warm dark base with subtle color washes. Cards sit on top as elevated surfaces.</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+    <!-- A: Indigo wash bottom-right -->
+    <div style="
+      height: 400px; border-radius: 12px; position: relative; overflow: hidden; padding: 28px;
+      background:
+        radial-gradient(ellipse 80% 70% at 90% 95%, rgba(99, 102, 241, 0.15) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 65% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 55%),
+        #1c1a1e;
+    ">
+      <div style="font-size: 14px; font-weight: 600; color: #e4e4e7; margin-bottom: 4px;">A — Indigo Wash</div>
+      <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 24px;">Agent color bleeding into the background. Cool, techy.</div>
+      <div style="background: rgba(255,255,255,0.06); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Active Clients</div>
+        <div style="font-size: 28px; font-weight: 600; color: #e4e4e7;">24</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.06); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.08);">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Plans Running</div>
+        <div style="font-size: 28px; font-weight: 600; color: #e4e4e7;">7</div>
+      </div>
+    </div>
+
+    <!-- B: Warm purple + indigo -->
+    <div style="
+      height: 400px; border-radius: 12px; position: relative; overflow: hidden; padding: 28px;
+      background:
+        radial-gradient(ellipse 85% 70% at 90% 95%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 15% 85%, rgba(140, 100, 160, 0.1) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 35% at 50% 50%, rgba(80, 70, 100, 0.06) 0%, transparent 50%),
+        #1c1a1e;
+    ">
+      <div style="font-size: 14px; font-weight: 600; color: #e4e4e7; margin-bottom: 4px;">B — Indigo + Warm Purple</div>
+      <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 24px;">Indigo bottom-right, warm plum bottom-left. More depth.</div>
+      <div style="background: rgba(255,255,255,0.06); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Active Clients</div>
+        <div style="font-size: 28px; font-weight: 600; color: #e4e4e7;">24</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.06); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.08);">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Plans Running</div>
+        <div style="font-size: 28px; font-weight: 600; color: #e4e4e7;">7</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+    <!-- C: Sage on dark (mirrors light mode) -->
+    <div style="
+      height: 400px; border-radius: 12px; position: relative; overflow: hidden; padding: 28px;
+      background:
+        radial-gradient(ellipse 85% 75% at 92% 98%, rgba(130, 175, 135, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 55% 85%, rgba(120, 165, 130, 0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 30% at 80% 55%, rgba(140, 180, 145, 0.05) 0%, transparent 50%),
+        #1c1a1e;
+    ">
+      <div style="font-size: 14px; font-weight: 600; color: #e4e4e7; margin-bottom: 4px;">C — Dark Sage</div>
+      <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 24px;">Same sage as light mode, adapted for dark. Organic, calm.</div>
+      <div style="background: rgba(255,255,255,0.06); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Active Clients</div>
+        <div style="font-size: 28px; font-weight: 600; color: #e4e4e7;">24</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.06); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.08);">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Plans Running</div>
+        <div style="font-size: 28px; font-weight: 600; color: #e4e4e7;">7</div>
+      </div>
+    </div>
+
+    <!-- D: Amber glow (warm human) -->
+    <div style="
+      height: 400px; border-radius: 12px; position: relative; overflow: hidden; padding: 28px;
+      background:
+        radial-gradient(ellipse 70% 60% at 85% 90%, rgba(200, 160, 100, 0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 20% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 55%),
+        radial-gradient(ellipse 45% 35% at 60% 40%, rgba(160, 130, 100, 0.04) 0%, transparent 50%),
+        #1c1a1e;
+    ">
+      <div style="font-size: 14px; font-weight: 600; color: #e4e4e7; margin-bottom: 4px;">D — Amber + Indigo</div>
+      <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 24px;">Warm amber glow bottom-right, cool indigo bottom-left. Dual voice.</div>
+      <div style="background: rgba(255,255,255,0.06); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Active Clients</div>
+        <div style="font-size: 28px; font-weight: 600; color: #e4e4e7;">24</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.06); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.08);">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Plans Running</div>
+        <div style="font-size: 28px; font-weight: 600; color: #e4e4e7;">7</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-width dark dashboard -->
+  <p style="margin-top: 24px; margin-bottom: 16px;">Full-width dark dashboard:</p>
+  <div style="
+    height: 500px; border-radius: 12px; position: relative; overflow: hidden; padding: 32px;
+    background:
+      radial-gradient(ellipse 85% 70% at 90% 95%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 15% 85%, rgba(140, 100, 160, 0.1) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 35% at 50% 50%, rgba(80, 70, 100, 0.06) 0%, transparent 50%),
+      #1c1a1e;
+  ">
+    <div style="font-size: 24px; font-weight: 600; color: #e4e4e7; margin-bottom: 4px;">Good morning, Sarah</div>
+    <div style="font-size: 14px; color: #a0a0a0; margin-bottom: 28px;">Wednesday, April 2 · 3 plans running across 2 clients</div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+      <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.07);">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Active Clients</div>
+        <div style="font-size: 32px; font-weight: 600; color: #e4e4e7;">24</div>
+        <div style="font-size: 13px; color: #6ee7b7; margin-top: 8px;">3 need attention</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.07);">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Plans Running</div>
+        <div style="font-size: 32px; font-weight: 600; color: #e4e4e7;">7</div>
+        <div style="font-size: 13px; color: #fbbf24; margin-top: 8px;">1 awaiting approval</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.07);">
+        <div style="font-size: 13px; color: #a0a0a0; margin-bottom: 4px;">Completed This Week</div>
+        <div style="font-size: 32px; font-weight: 600; color: #e4e4e7;">13</div>
+        <div style="font-size: 13px; color: #a0a0a0; margin-top: 8px;">across 8 clients</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Light Mode Mesh Gradient Backgrounds -->
+<!-- Light Mode Mesh Gradient Backgrounds -->
+<div class="grain-section" id="gradient-section">
+  <h2>Light Mode — Mesh Gradient Backgrounds</h2>
+  <p>Cream/white at top-left, sage green wash at bottom-right. Layered radial gradients to simulate a mesh.</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+    <!-- Option A: Very subtle -->
+    <div style="
+      height: 400px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.08);
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 80% 70% at 90% 95%, rgba(180, 210, 180, 0.25) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 70% 80%, rgba(160, 195, 165, 0.15) 0%, transparent 60%),
+        linear-gradient(165deg, #f5f3f0 0%, #f2f0ed 100%);
+      padding: 28px;
+    ">
+      <div style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px;">A — Whisper</div>
+      <div style="font-size: 13px; color: #666; margin-bottom: 24px;">Barely there. Sage only in the far corner.</div>
+      <div style="background: white; border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06); margin-bottom: 12px;">
+        <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Active Clients</div>
+        <div style="font-size: 28px; font-weight: 600; color: #1a1a1a;">24</div>
+      </div>
+      <div style="background: white; border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06);">
+        <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Plans Running</div>
+        <div style="font-size: 28px; font-weight: 600; color: #1a1a1a;">7</div>
+      </div>
+    </div>
+
+    <!-- Option B: More visible mesh -->
+    <div style="
+      height: 400px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.08);
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 90% 80% at 95% 100%, rgba(160, 200, 165, 0.35) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 60% 85%, rgba(145, 190, 155, 0.2) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 30% at 80% 60%, rgba(170, 205, 175, 0.1) 0%, transparent 50%),
+        linear-gradient(165deg, #f5f3f0 0%, #f0eee8 100%);
+      padding: 28px;
+    ">
+      <div style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px;">B — Soft Sage</div>
+      <div style="font-size: 13px; color: #666; margin-bottom: 24px;">Visible but gentle. Multiple overlapping radials.</div>
+      <div style="background: rgba(255,255,255,0.85); border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06); margin-bottom: 12px;">
+        <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Active Clients</div>
+        <div style="font-size: 28px; font-weight: 600; color: #1a1a1a;">24</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.85); border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06);">
+        <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Plans Running</div>
+        <div style="font-size: 28px; font-weight: 600; color: #1a1a1a;">7</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+    <!-- Option C: Warmer, more green -->
+    <div style="
+      height: 400px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.08);
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 85% 75% at 92% 98%, rgba(140, 185, 145, 0.4) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 55% 90%, rgba(155, 195, 155, 0.22) 0%, transparent 55%),
+        radial-gradient(ellipse 45% 35% at 85% 55%, rgba(165, 200, 170, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 30% 25% at 30% 70%, rgba(180, 205, 180, 0.08) 0%, transparent 45%),
+        linear-gradient(150deg, #f5f2ed 0%, #efece6 100%);
+      padding: 28px;
+    ">
+      <div style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px;">C — Garden</div>
+      <div style="font-size: 13px; color: #666; margin-bottom: 24px;">Stronger presence. Green drifts further from the corner.</div>
+      <div style="background: rgba(255,255,255,0.8); border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06); margin-bottom: 12px;">
+        <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Active Clients</div>
+        <div style="font-size: 28px; font-weight: 600; color: #1a1a1a;">24</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.8); border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06);">
+        <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Plans Running</div>
+        <div style="font-size: 28px; font-weight: 600; color: #1a1a1a;">7</div>
+      </div>
+    </div>
+
+    <!-- Option D: Sage + hint of warm blush -->
+    <div style="
+      height: 400px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.08);
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 80% 70% at 90% 95%, rgba(150, 195, 155, 0.35) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 65% 80%, rgba(145, 185, 150, 0.18) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 35% at 15% 85%, rgba(210, 180, 170, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 35% 30% at 80% 50%, rgba(170, 200, 175, 0.08) 0%, transparent 45%),
+        linear-gradient(150deg, #f5f2ed 0%, #f0ede6 100%);
+      padding: 28px;
+    ">
+      <div style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px;">D — Sage + Blush</div>
+      <div style="font-size: 13px; color: #666; margin-bottom: 24px;">Sage bottom-right, warm blush hint bottom-left. More depth.</div>
+      <div style="background: rgba(255,255,255,0.8); border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06); margin-bottom: 12px;">
+        <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Active Clients</div>
+        <div style="font-size: 28px; font-weight: 600; color: #1a1a1a;">24</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.8); border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06);">
+        <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Plans Running</div>
+        <div style="font-size: 28px; font-weight: 600; color: #1a1a1a;">7</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-width "what it would actually feel like" -->
+  <p style="margin-top: 24px; margin-bottom: 16px;">Full-width — what it feels like as a dashboard background:</p>
+  <div id="fullwidth-demo" style="
+    height: 500px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+    padding: 32px;
+    background:
+      radial-gradient(ellipse 90% 80% at 95% 100%, rgba(160, 200, 165, 0.35) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 60% 85%, rgba(145, 190, 155, 0.2) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 30% at 80% 60%, rgba(170, 205, 175, 0.1) 0%, transparent 50%),
+      linear-gradient(165deg, #f5f3f0 0%, #f0eee8 100%);
+  ">
+    <div style="font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Good morning, Sarah</div>
+    <div style="font-size: 14px; color: #666; margin-bottom: 28px;">Wednesday, April 2 · 3 plans running across 2 clients</div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+      <div style="background: rgba(255,255,255,0.82); border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06);">
+        <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Active Clients</div>
+        <div style="font-size: 32px; font-weight: 600; color: #1a1a1a;">24</div>
+        <div style="font-size: 13px; color: #22863a; margin-top: 8px;">3 need attention</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.82); border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06);">
+        <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Plans Running</div>
+        <div style="font-size: 32px; font-weight: 600; color: #1a1a1a;">7</div>
+        <div style="font-size: 13px; color: #b45309; margin-top: 8px;">1 awaiting approval</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.82); border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06);">
+        <div style="font-size: 13px; color: #888; margin-bottom: 4px;">Completed This Week</div>
+        <div style="font-size: 32px; font-weight: 600; color: #1a1a1a;">13</div>
+        <div style="font-size: 13px; color: #666; margin-top: 8px;">across 8 clients</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="copied" id="copied">Copied!</div>
+
+<script>
+// Generate noise texture via canvas — reliable cross-browser
+(function generateNoise() {
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const imageData = ctx.createImageData(size, size);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const v = Math.random() * 255;
+    data[i] = v;
+    data[i + 1] = v;
+    data[i + 2] = v;
+    data[i + 3] = 255;
+  }
+  ctx.putImageData(imageData, 0, 0);
+  document.documentElement.style.setProperty('--noise-url', `url(${canvas.toDataURL('image/png')})`);
+})();
+
+const DEFAULT_DATA = {
+  "── PALETTE A: Mercury (Cool) ──": [],
+  "Dark Bases (Mercury)": [
+    { hex: "#1a1c2e", note: "Mercury cool slate" },
+    { hex: "#1c1a1e", note: "Warm dark — hint of purple" },
+    { hex: "#1e1c22", note: "Warm dark — slightly lighter" },
+    { hex: "#1e2030", note: "Mercury elevated dark" }
+  ],
+  "Accents (Mercury)": [
+    { hex: "#6366f1", note: "Indigo — agent/system" },
+    { hex: "#818cf8", note: "Lighter indigo — links" },
+    { hex: "#4f46e5", note: "Deeper indigo — buttons" },
+    { hex: "#f59e0b", note: "Amber — human warmth" },
+    { hex: "#fbbf24", note: "Gold — success" }
+  ],
+  "Light Bases (Mercury)": [
+    { hex: "#fafaf9", note: "Cool off-white" },
+    { hex: "#f5f3f0", note: "Warm off-white" },
+    { hex: "#f0eeeb", note: "Warmer cream" }
+  ],
+
+  "── PALETTE B: Earthy (Warm) ──": [],
+  "Dark Bases (Earthy)": [
+    { hex: "#1A3638", note: "Eclipse — deep teal green" },
+    { hex: "#1e2e2f", note: "Lighter eclipse" },
+    { hex: "#243436", note: "Elevated teal" },
+    { hex: "#2C3639", note: "Mercury-dark-weight teal" }
+  ],
+  "Greens (Earthy)": [
+    { hex: "#405340", note: "Forest Roast — deep sage" },
+    { hex: "#677D6A", note: "Matcha Brew — mid sage" },
+    { hex: "#8FA88B", note: "Light sage — active states" },
+    { hex: "#3F4E4F", note: "Inkwell — dark muted sage" }
+  ],
+  "Warm Neutrals (Earthy)": [
+    { hex: "#D6BD98", note: "Almond — warm beige" },
+    { hex: "#C9C1B1", note: "Oatmeal — warm gray" },
+    { hex: "#EEE9DF", note: "Palladian — warm off-white" },
+    { hex: "#E0D7C9", note: "Au Lait — cream" }
+  ],
+  "Warm Accents (Earthy)": [
+    { hex: "#FFB162", note: "Burning Flame — amber gold" },
+    { hex: "#A27B5D", note: "Creme Brulee — warm brown" },
+    { hex: "#A35139", note: "Truffle Trouble — terracotta" },
+    { hex: "#D4956A", note: "Copper — warm mid-tone" }
+  ],
+  "Deep Anchors (Earthy)": [
+    { hex: "#1B2632", note: "Abyssal blue — deep navy-teal" },
+    { hex: "#2C3B4D", note: "Blue Fantastic — muted blue" },
+    { hex: "#1A3638", note: "Eclipse — dark teal (same as base)" }
+  ],
+
+  "── PALETTE 1: Inkwell (from left image) ──": [],
+  "P1 — Dark to Light": [
+    { hex: "#2C3639", note: "Inkwell — dark base" },
+    { hex: "#3F4E4F", note: "Lunar Eclipse — mid dark" },
+    { hex: "#6B7F7E", note: "Lifted eclipse — mid tone" },
+    { hex: "#A27B5D", note: "Creme Brulee — warm accent" },
+    { hex: "#C4AA8B", note: "Lifted brulee — soft warm" },
+    { hex: "#DCD7C9", note: "Au Lait — light base" }
+  ],
+
+  "── PALETTE 2: Matcha (from middle image) ──": [],
+  "P2 — Dark to Light": [
+    { hex: "#1A3638", note: "Eclipse — dark base" },
+    { hex: "#405340", note: "Forest Roast — deep sage" },
+    { hex: "#677D6A", note: "Matcha Brew — mid sage" },
+    { hex: "#96A894", note: "Lifted matcha — soft green" },
+    { hex: "#D6BD98", note: "Almond — warm neutral" },
+    { hex: "#EDE6D8", note: "Lifted almond — light base" }
+  ],
+
+  "── PALETTE 3: Anchorfish (from right image) ──": [],
+  "P3 — Dark to Light": [
+    { hex: "#1B2632", note: "Abyssal blue — dark base" },
+    { hex: "#2C3B4D", note: "Blue Fantastic — mid dark" },
+    { hex: "#A35139", note: "Truffle Trouble — terracotta accent" },
+    { hex: "#C9C1B1", note: "Oatmeal — warm mid neutral" },
+    { hex: "#FFB162", note: "Burning Flame — amber accent" },
+    { hex: "#EEE9DF", note: "Palladian — light base" }
+  ],
+
+  "── TEXT HIERARCHY ──": [],
+  "Text on Dark": [
+    { hex: "#ffffff", note: "Primary text" },
+    { hex: "#e4e4e7", note: "Strong text" },
+    { hex: "#a1a1aa", note: "Secondary text" },
+    { hex: "#999999", note: "Muted (floor — never below)" }
+  ],
+  "Text on Light": [
+    { hex: "#1a1a1a", note: "Primary text" },
+    { hex: "#333333", note: "Strong text" },
+    { hex: "#666666", note: "Secondary (floor on light)" },
+    { hex: "#888888", note: "Muted labels" }
+  ]
+};
+
+function render(data) {
+  const container = document.getElementById('groups');
+  container.innerHTML = '';
+  for (const [title, swatches] of Object.entries(data)) {
+    const group = document.createElement('div');
+    group.className = 'group';
+    group.innerHTML = `<div class="group-title">${title}</div><div class="swatches">${
+      swatches.map(s => `
+        <div class="swatch" onclick="copy('${s.hex}')">
+          <div class="swatch-color" style="background:${s.hex}"></div>
+          <div class="swatch-hex">${s.hex}</div>
+          <div class="swatch-note">${s.note || ''}</div>
+        </div>
+      `).join('')
+    }</div>`;
+    container.appendChild(group);
+  }
+}
+
+function copy(hex) {
+  navigator.clipboard.writeText(hex);
+  const el = document.getElementById('copied');
+  el.textContent = `Copied ${hex}`;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1200);
+}
+
+// Grain playground controls
+const slider = document.getElementById('grain-slider');
+const sliderVal = document.getElementById('grain-value');
+const grainEl = document.getElementById('playground-grain');
+const playground = document.getElementById('playground');
+const baseColor = document.getElementById('base-color');
+const blendMode = document.getElementById('blend-mode');
+
+slider.addEventListener('input', () => {
+  const v = slider.value;
+  sliderVal.textContent = v + '%';
+  grainEl.style.opacity = v / 100;
+});
+
+baseColor.addEventListener('input', () => {
+  playground.style.background = baseColor.value;
+});
+
+blendMode.addEventListener('change', () => {
+  grainEl.style.mixBlendMode = blendMode.value;
+});
+
+// Init
+const params = new URLSearchParams(window.location.search);
+const dataParam = params.get('data');
+if (dataParam) {
+  try { render(JSON.parse(atob(dataParam))); } catch(e) { render(DEFAULT_DATA); }
+} else {
+  render(DEFAULT_DATA);
+}
+
+window.addEventListener('message', (e) => {
+  try {
+    const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+    if (data.swatches) render(data.swatches);
+  } catch(e) {}
+});
+</script>
+</body>
+</html>

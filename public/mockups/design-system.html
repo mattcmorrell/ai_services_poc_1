@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en" class="mercury dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PNDA\CMD — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================ */
+/* THEME VARIABLES (mirrored from globals.css)  */
+/* ============================================ */
+.mercury.dark {
+  --background: #101214; --foreground: #E8E9ED;
+  --card: #1D2024; --card-foreground: #E8E9ED; /* was #191B1F */
+  --popover: var(--card); --popover-foreground: var(--card-foreground);
+  --primary: #6878B8; --primary-foreground: #E8E9ED;
+  --secondary: #282A30; --secondary-foreground: #E8E9ED; /* was #222428 */
+  --muted: #282A30; --muted-foreground: #9DA0A8; /* was #222428 */
+  --accent: #282A30; --accent-foreground: #E8E9ED; /* was #222428 */
+  --destructive: #E08850;
+  --border: rgba(180,185,200,0.07); --input: rgba(180,185,200,0.11); --ring: #6878B8;
+  --color-success: #7EBE85; --color-success-muted: rgba(126,190,133,0.18);
+  --color-warning: #D4AA55; --color-warning-muted: rgba(212,170,85,0.18);
+  --color-danger: #D47070; --color-danger-muted: rgba(212,112,112,0.18);
+  --color-info: #8E9EE0; --color-info-muted: rgba(142,158,224,0.18);
+  --avatar-1:#5B78B8; --avatar-2:#7BAA82; --avatar-3:#9B7AB8; --avatar-4:#C4A060; --avatar-5:#B87A7A;
+  --avatar-6:#5BAAAA; --avatar-7:#8E9AD0; --avatar-8:#6B9A7A; --avatar-9:#D08860; --avatar-10:#B87AA0;
+  --sidebar: #101214; --sidebar-foreground: #E8E9ED;
+}
+.mercury.light {
+  --background: #ECEEF3; --foreground: #1C1E24;
+  --card: #FFFFFF; --card-foreground: #3C3F48;
+  --popover: var(--card); --popover-foreground: var(--card-foreground);
+  --primary: #506098; --primary-foreground: #FFFFFF;
+  --secondary: #F5F6FA; --secondary-foreground: #3C3F48;
+  --muted: #F5F6FA; --muted-foreground: #6E7178;
+  --accent: #F5F6FA; --accent-foreground: #3C3F48;
+  --destructive: #C06828;
+  --border: rgba(30,35,50,0.08); --input: rgba(30,35,50,0.12); --ring: #506098;
+  --color-success: #3E8548; --color-success-muted: rgba(62,133,72,0.15);
+  --color-warning: #A88545; --color-warning-muted: rgba(168,133,69,0.15);
+  --color-danger: #B54545; --color-danger-muted: rgba(181,69,69,0.15);
+  --color-info: #4558A5; --color-info-muted: rgba(69,88,165,0.15);
+  --avatar-1:#3B5888; --avatar-2:#4A7A52; --avatar-3:#7B5A98; --avatar-4:#8A7040; --avatar-5:#985A5A;
+  --avatar-6:#3B8A8A; --avatar-7:#506098; --avatar-8:#4B7A5A; --avatar-9:#A06828; --avatar-10:#985A80;
+  --sidebar: #ECEDF0; --sidebar-foreground: #1C1E24;
+}
+.inkwell.dark {
+  --background: #111617; --foreground: #F2F0EB;
+  --card: #1C2426; --card-foreground: #F2F0EB;
+  --popover: var(--card); --popover-foreground: var(--card-foreground);
+  --primary: #7A9A78; --primary-foreground: #F2F0EB;
+  --secondary: #2E3B3D; --secondary-foreground: #F2F0EB;
+  --muted: #2E3B3D; --muted-foreground: #C8C2B4;
+  --accent: #2E3B3D; --accent-foreground: #F2F0EB;
+  --destructive: #D4875A;
+  --border: rgba(220,215,201,0.08); --input: rgba(220,215,201,0.12); --ring: #7A9A78;
+  --color-success: #34D058; --color-success-muted: rgba(52,208,88,0.20);
+  --color-warning: #E0AA48; --color-warning-muted: rgba(224,170,72,0.18);
+  --color-danger: #DA6565; --color-danger-muted: rgba(218,101,101,0.18);
+  --color-info: #A0D09A; --color-info-muted: rgba(160,208,154,0.18);
+  --avatar-1:#5B8DB8; --avatar-2:#6BAA6B; --avatar-3:#9B7AB8; --avatar-4:#C4965A; --avatar-5:#B87A7A;
+  --avatar-6:#5BAAAA; --avatar-7:#7A7AB8; --avatar-8:#6B9A7A; --avatar-9:#C4805A; --avatar-10:#B87AA0;
+  --sidebar: #111617; --sidebar-foreground: #F2F0EB;
+}
+.inkwell.light {
+  --background: #EBE8E0; --foreground: #1C2426;
+  --card: #FFFFFF; --card-foreground: #2E3B3D;
+  --popover: var(--card); --popover-foreground: var(--card-foreground);
+  --primary: #5A7A58; --primary-foreground: #FFFFFF;
+  --secondary: #F7F5F1; --secondary-foreground: #2E3B3D;
+  --muted: #F7F5F1; --muted-foreground: #6B7574;
+  --accent: #F7F5F1; --accent-foreground: #2E3B3D;
+  --destructive: #B86E3A;
+  --border: rgba(44,54,57,0.1); --input: rgba(44,54,57,0.14); --ring: #5A7A58;
+  --color-success: #359545; --color-success-muted: rgba(53,149,69,0.15);
+  --color-warning: #B07548; --color-warning-muted: rgba(176,117,72,0.15);
+  --color-danger: #BE3C3C; --color-danger-muted: rgba(190,60,60,0.15);
+  --color-info: #4A8848; --color-info-muted: rgba(74,136,72,0.15);
+  --avatar-1:#3B6D98; --avatar-2:#4B8A4B; --avatar-3:#7B5A98; --avatar-4:#A47640; --avatar-5:#985A5A;
+  --avatar-6:#3B8A8A; --avatar-7:#5A5A98; --avatar-8:#4B7A5A; --avatar-9:#A4603A; --avatar-10:#985A80;
+  --sidebar: #E4E1D8; --sidebar-foreground: #1C2426;
+}
+.orbital.dark {
+  --background: #161C22; --foreground: #E8EFF4;
+  --card: #1E2830; --card-foreground: #E8EFF4;
+  --popover: var(--card); --popover-foreground: var(--card-foreground);
+  --primary: #8AAEC4; --primary-foreground: #E8EFF4;
+  --secondary: #2A3640; --secondary-foreground: #E8EFF4;
+  --muted: #2A3640; --muted-foreground: #9AABB8;
+  --accent: #2A3640; --accent-foreground: #E8EFF4;
+  --destructive: #E08850;
+  --border: rgba(196,212,220,0.08); --input: rgba(196,212,220,0.12); --ring: #8AAEC4;
+  --color-success: #55D870; --color-success-muted: rgba(85,216,112,0.20);
+  --color-warning: #D4AA55; --color-warning-muted: rgba(212,170,85,0.18);
+  --color-danger: #D47070; --color-danger-muted: rgba(212,112,112,0.18);
+  --color-info: #A8D8F0; --color-info-muted: rgba(168,216,240,0.18);
+  --avatar-1:#5B8DB8; --avatar-2:#7BAA82; --avatar-3:#9B7AB8; --avatar-4:#C4A060; --avatar-5:#B87A7A;
+  --avatar-6:#6BBABA; --avatar-7:#8AAEC4; --avatar-8:#6B9A7A; --avatar-9:#D08860; --avatar-10:#B87AA0;
+  --sidebar: #161C22; --sidebar-foreground: #E8EFF4;
+}
+.orbital.light {
+  --background: #E0EAF2; --foreground: #1A2830;
+  --card: #FFFFFF; --card-foreground: #2A3A44;
+  --popover: var(--card); --popover-foreground: var(--card-foreground);
+  --primary: #4A7A98; --primary-foreground: #FFFFFF;
+  --secondary: #F0F2F5; --secondary-foreground: #2A3A44;
+  --muted: #F0F2F5; --muted-foreground: #5A7080;
+  --accent: #F0F2F5; --accent-foreground: #2A3A44;
+  --destructive: #C06828;
+  --border: rgba(26,40,48,0.08); --input: rgba(26,40,48,0.12); --ring: #4A7A98;
+  --color-success: #3E9548; --color-success-muted: rgba(62,149,72,0.15);
+  --color-warning: #A88545; --color-warning-muted: rgba(168,133,69,0.15);
+  --color-danger: #B54545; --color-danger-muted: rgba(181,69,69,0.15);
+  --color-info: #3E78A8; --color-info-muted: rgba(62,120,168,0.15);
+  --avatar-1:#3B6D98; --avatar-2:#4A8A52; --avatar-3:#7B5A98; --avatar-4:#8A7040; --avatar-5:#985A5A;
+  --avatar-6:#3B8A8A; --avatar-7:#4A7A98; --avatar-8:#4B7A5A; --avatar-9:#A06828; --avatar-10:#985A80;
+  --sidebar: #DDE6ED; --sidebar-foreground: #1A2830;
+}
+
+/* ============================================ */
+/* BASE STYLES                                  */
+/* ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Geist', system-ui, sans-serif;
+  background: var(--background); color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ============================================ */
+/* LAYOUT                                       */
+/* ============================================ */
+.page { max-width: 1200px; margin: 0 auto; padding: 48px 48px 120px; }
+
+.section { margin-bottom: 64px; }
+.section-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--primary);
+  margin-bottom: 6px;
+}
+.section-title {
+  font-size: 24px; font-weight: 700; color: var(--foreground);
+  letter-spacing: -0.01em; margin-bottom: 8px;
+}
+.section-desc {
+  font-size: 14px; color: var(--muted-foreground); line-height: 1.6;
+  max-width: 640px; margin-bottom: 28px;
+}
+.section-rule {
+  height: 1px; background: var(--border); margin-bottom: 28px;
+}
+
+/* ============================================ */
+/* HEADER                                       */
+/* ============================================ */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 56px; padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+.header-left {}
+.header-logo {
+  font-family: 'Geist Mono', monospace;
+  font-size: 18px; font-weight: 600; letter-spacing: 0.1em;
+  color: var(--primary); margin-bottom: 4px;
+}
+.header-title {
+  font-size: 32px; font-weight: 800; letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+.header-sub {
+  font-size: 14px; color: var(--muted-foreground); margin-top: 4px;
+}
+
+/* Theme switcher */
+.theme-bar-wrap {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 48px;
+  display: flex; justify-content: flex-end;
+  margin: -48px -48px 32px;
+  width: calc(100% + 96px);
+  backdrop-filter: blur(12px);
+}
+.theme-bar {
+  display: flex; gap: 6px; align-items: center;
+}
+.theme-group {
+  display: flex; gap: 2px; border-radius: 8px; overflow: hidden;
+  background: var(--secondary); border: 1px solid var(--border);
+}
+.theme-btn {
+  font-family: 'Geist Mono', monospace; font-size: 12px;
+  padding: 7px 14px; border: none; cursor: pointer;
+  background: transparent; color: var(--muted-foreground);
+  transition: all 0.2s;
+}
+.theme-btn:hover { color: var(--foreground); background: var(--accent); }
+.theme-btn.active { color: var(--primary-foreground); background: var(--primary); }
+.theme-sep { width: 1px; height: 20px; background: var(--border); margin: 0 6px; }
+
+/* ============================================ */
+/* COLOR SWATCHES                               */
+/* ============================================ */
+.swatch-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+.swatch-card { display: flex; flex-direction: column; gap: 6px; }
+.swatch-color {
+  height: 56px; border-radius: 10px;
+  border: 1px solid var(--border);
+  transition: background 0.3s;
+}
+.swatch-name {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: var(--foreground); font-weight: 500;
+}
+.swatch-var {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.swatch-row {
+  display: flex; gap: 8px; margin-bottom: 20px;
+}
+.swatch-row-label {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: var(--muted-foreground); letter-spacing: 0.06em;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+
+/* ============================================ */
+/* TYPE SCALE                                   */
+/* ============================================ */
+.type-row {
+  display: flex; align-items: baseline; gap: 16px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.type-size {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: var(--muted-foreground); width: 48px; flex-shrink: 0;
+  text-align: right;
+}
+.type-weight {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: var(--muted-foreground); width: 32px; flex-shrink: 0;
+}
+.type-token {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: var(--primary); width: 108px; flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+.type-sample { color: var(--foreground); flex: 1; }
+
+/* ============================================ */
+/* COMPONENT SPECIMENS                          */
+/* ============================================ */
+.specimens {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+.specimen {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px; overflow: hidden;
+}
+.specimen.full { grid-column: 1 / -1; }
+.specimen-label {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: var(--muted-foreground); letter-spacing: 0.06em;
+  text-transform: uppercase; margin-bottom: 16px;
+}
+
+/* Buttons */
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn {
+  font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500;
+  padding: 8px 20px; border-radius: 8px; border: none; cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primary { background: var(--primary); color: var(--primary-foreground); }
+.btn-secondary { background: var(--secondary); color: var(--foreground); border: 1px solid var(--border); }
+.btn-destructive { background: var(--destructive); color: #fff; }
+.btn-ghost { background: transparent; color: var(--muted-foreground); }
+.btn-ghost:hover { background: var(--accent); color: var(--accent-foreground); }
+
+/* Badges */
+.badge {
+  font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px; border-radius: 20px;
+}
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+.badge-success { background: var(--color-success-muted); color: var(--color-success); }
+.badge-success .badge-dot { background: var(--color-success); }
+.badge-info { background: var(--color-info-muted); color: var(--color-info); }
+.badge-info .badge-dot { background: var(--color-info); }
+.badge-warning { background: var(--color-warning-muted); color: var(--color-warning); }
+.badge-warning .badge-dot { background: var(--color-warning); }
+.badge-danger { background: var(--color-danger-muted); color: var(--color-danger); }
+.badge-danger .badge-dot { background: var(--color-danger); }
+.badge-stopped { background: color-mix(in srgb, var(--color-danger) 8%, transparent); color: color-mix(in srgb, var(--color-danger) 50%, var(--muted-foreground)); }
+.badge-stopped .badge-dot { background: color-mix(in srgb, var(--color-danger) 40%, var(--muted-foreground)); }
+.badge-muted { background: var(--muted); color: var(--muted-foreground); }
+.badge-muted .badge-dot { background: var(--muted-foreground); }
+
+/* Alert pills */
+.alert-pill {
+  font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 4px;
+}
+.alert-pill-urgent {
+  background: color-mix(in srgb, var(--destructive) 12%, transparent); color: var(--destructive);
+}
+.alert-pill-attention {
+  background: var(--color-warning-muted); color: var(--color-warning);
+}
+
+/* Activity feed */
+.feed-line {
+  font-family: 'Geist Mono', monospace; font-size: 13px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 0; color: var(--muted-foreground);
+}
+.feed-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.feed-active { color: var(--foreground); }
+
+/* Action plan */
+.plan-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.plan-title { font-size: 16px; font-weight: 600; color: var(--foreground); }
+.plan-progress-track {
+  height: 6px; border-radius: 3px; background: var(--secondary);
+  overflow: hidden; margin-bottom: 6px;
+}
+.plan-progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 70%, var(--background)), var(--primary)); transition: width 0.5s; }
+.plan-progress-label {
+  font-family: 'Geist Mono', monospace; font-size: 12px;
+  color: var(--muted-foreground); margin-bottom: 16px;
+}
+.plan-step {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+}
+.plan-step:last-child { border-bottom: none; }
+.step-indicator {
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500; flex-shrink: 0;
+}
+.step-done { background: var(--color-success-muted); color: var(--color-success); }
+.step-active { background: var(--color-info-muted); color: var(--color-info); }
+.step-pending { background: var(--secondary); color: var(--muted-foreground); }
+.step-text { flex: 1; font-size: 14px; }
+.step-text-done { color: var(--muted-foreground); text-decoration: line-through; }
+.step-text-active { color: var(--foreground); font-weight: 500; }
+.step-text-pending { color: var(--muted-foreground); }
+.step-badge { flex-shrink: 0; }
+
+/* Anomaly card */
+.anomaly-card {
+  background: var(--card); border-radius: 12px; padding: 20px 24px;
+  border: 2px solid var(--destructive);
+  box-shadow:
+    inset 0 0 20px var(--color-danger-muted),
+    inset 0 0 40px var(--color-danger-muted),
+    0 0 16px var(--color-danger-muted);
+}
+.anomaly-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.anomaly-icon { font-size: 16px; color: var(--destructive); }
+.anomaly-title { font-size: 14px; font-weight: 600; color: var(--foreground); }
+.anomaly-body { font-size: 14px; color: var(--card-foreground); line-height: 1.6; margin-bottom: 16px; }
+.anomaly-evidence {
+  font-family: 'Geist Mono', monospace; font-size: 13px; line-height: 1.6;
+  background: var(--muted); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px;
+  border: 1px solid var(--border);
+}
+.btn-destructive-fill { background: var(--destructive); color: #fff; }
+.btn-muted-outline { background: var(--muted); color: var(--muted-foreground); border: 1px solid var(--border); }
+.ev-row { display: flex; justify-content: space-between; padding: 3px 0; }
+.ev-label { color: var(--muted-foreground); }
+.ev-value { color: var(--foreground); }
+.ev-hot { color: var(--destructive); }
+
+/* Avatar row */
+.avatar-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; color: #fff;
+  flex-shrink: 0;
+}
+
+/* Card / Surface demo */
+.surface-stack {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.surface-demo {
+  padding: 16px 20px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.surface-label {
+  font-family: 'Geist Mono', monospace; font-size: 12px;
+}
+
+/* Dashboard card */
+.dash-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+}
+.dash-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px; border-bottom: 1px solid var(--border);
+}
+.dash-card-header-left {
+  display: flex; align-items: center; gap: 8px;
+}
+.dash-card-header-icon { color: var(--muted-foreground); }
+.dash-card-header-title {
+  font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--foreground);
+}
+.dash-card-header-meta {
+  font-family: 'Geist Mono', monospace; font-size: 12px;
+  color: var(--muted-foreground);
+}
+.dash-card-header-link {
+  font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--primary); text-decoration: none;
+  display: flex; align-items: center; gap: 4px;
+}
+.dash-card-header-link:hover { opacity: 0.8; }
+.dash-card-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 20px; font-size: 14px;
+  position: relative;
+}
+.dash-card-row + .dash-card-row::after {
+  content: ''; position: absolute; top: 0; left: 20px; right: 20px;
+  height: 1px; background: var(--border);
+}
+.dash-card-row-primary { color: var(--foreground); font-weight: 500; }
+.dash-card-row-secondary { color: var(--muted-foreground); font-size: 12px; }
+.dash-card-empty {
+  padding: 24px 20px; text-align: center;
+  font-size: 13px; color: var(--muted-foreground);
+}
+
+/* Attention item */
+.attention-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 16px 20px; position: relative;
+}
+.attention-item + .attention-item::after {
+  content: ''; position: absolute; top: 0; left: 20px; right: 20px;
+  height: 1px; background: var(--border);
+}
+.attention-sev {
+  font-family: 'Geist', sans-serif; font-size: 12px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 4px;
+  flex-shrink: 0; margin-top: 2px;
+}
+.attention-sev-blocking {
+  background: var(--color-warning-muted); color: var(--color-warning);
+}
+.attention-sev-error {
+  background: color-mix(in srgb, var(--destructive) 12%, transparent);
+  color: var(--destructive);
+}
+.attention-sev-review {
+  background: var(--color-info-muted); color: var(--color-info);
+}
+.attention-body { flex: 1; min-width: 0; }
+.attention-title { font-size: 14px; font-weight: 500; color: var(--foreground); }
+.attention-desc { font-size: 13px; color: var(--muted-foreground); margin-top: 2px; }
+.attention-actions {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+
+/* Mini plan row */
+.mini-plan { padding: 12px 20px; position: relative; }
+.mini-plan + .mini-plan::after {
+  content: ''; position: absolute; top: 0; left: 20px; right: 20px;
+  height: 1px; background: var(--border);
+}
+.mini-plan-top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-bottom: 6px;
+}
+.mini-plan-title { font-size: 14px; font-weight: 500; color: var(--foreground); }
+.mini-plan-bottom { display: flex; align-items: center; gap: 8px; }
+.mini-plan-steps {
+  font-family: 'Geist Mono', monospace; font-size: 12px;
+  color: var(--muted-foreground); flex-shrink: 0;
+}
+.mini-plan-bar {
+  flex: 1; height: 6px; border-radius: 3px;
+  background: var(--secondary); overflow: hidden;
+}
+.mini-plan-bar-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 70%, var(--background)), var(--primary));
+  transition: width 0.5s;
+}
+.mini-plan-bar-paused .mini-plan-bar-fill {
+  background: var(--muted-foreground); opacity: 0.4;
+}
+
+/* Chat bubble */
+.chat-bubble {
+  padding: 14px 18px; border-radius: 12px;
+  font-size: 14px; line-height: 1.6; max-width: 480px;
+}
+.chat-user {
+  background: var(--muted); color: var(--foreground);
+  border-bottom-right-radius: 4px; margin-left: auto;
+  display: inline-block;
+}
+.chat-agent {
+  color: var(--card-foreground);
+  border: none; background: none;
+  padding: 0;
+}
+.chat-meta {
+  font-family: 'Geist Mono', monospace; font-size: 12px;
+  color: var(--muted-foreground); margin-bottom: 6px;
+}
+.inline-data {
+  font-family: 'Geist', sans-serif;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--color-info-muted);
+  padding: 1px 6px; border-radius: 3px;
+}
+
+/* Chat input */
+.chat-input-wrap {
+  border-radius: 12px; border: 1px solid var(--border);
+  background: var(--card); padding: 14px 16px; max-width: 560px;
+}
+.chat-input-textarea {
+  width: 100%; border: none; outline: none; resize: none;
+  font-family: 'Geist', sans-serif; font-size: 14px;
+  color: var(--foreground); background: transparent;
+  line-height: 20px;
+}
+.chat-input-textarea::placeholder { color: var(--muted-foreground); }
+.chat-input-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 10px;
+}
+.chat-input-btn {
+  width: 32px; height: 32px; border-radius: 8px; border: none;
+  background: transparent; color: var(--muted-foreground);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s;
+}
+.chat-input-btn:hover { background: var(--accent); color: var(--accent-foreground); }
+.chat-input-tools-btn {
+  height: 32px; border-radius: 8px; border: none;
+  background: transparent; color: var(--muted-foreground);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 10px; cursor: pointer; transition: all 0.15s;
+  font-family: 'Geist', sans-serif; font-size: 13px;
+}
+.chat-input-tools-btn:hover { background: var(--accent); color: var(--accent-foreground); }
+.chat-input-send {
+  width: 32px; height: 32px; border-radius: 8px; border: none;
+  background: var(--primary); color: var(--primary-foreground);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s;
+}
+.chat-input-send:hover { opacity: 0.85; }
+
+/* Spacing demo */
+.space-row { display: flex; align-items: center; gap: 12px; padding: 4px 0; }
+.space-box { background: var(--primary); border-radius: 4px; opacity: 0.3; height: 20px; }
+.space-label {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: var(--muted-foreground); width: 48px; flex-shrink: 0;
+  text-align: right;
+}
+
+/* Radius demo */
+.radius-row { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; }
+.radius-box {
+  width: 64px; height: 64px; background: var(--secondary);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+/* Nav */
+@media (min-width: 1400px) {
+  .nav {
+    position: fixed; top: 16px; left: 16px; z-index: 50;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .nav a {
+    font-family: 'Geist Mono', monospace; font-size: 11px;
+    color: var(--muted-foreground); text-decoration: none;
+    padding: 4px 10px; border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .nav a:hover { color: var(--foreground); background: var(--accent); }
+}
+@media (max-width: 1399px) {
+  .nav { display: none; }
+}
+@media (max-width: 900px) {
+  .specimens { grid-template-columns: 1fr; }
+  .page { padding: 24px 24px 80px; }
+  .theme-bar-wrap { padding: 12px 24px; margin: -24px -24px 24px; width: calc(100% + 48px); }
+}
+</style>
+</head>
+<body>
+
+<!-- Side nav -->
+<nav class="nav">
+  <a href="#colors">Colors</a>
+  <a href="#typography">Type</a>
+  <a href="#components">Components</a>
+  <a href="#patterns">Patterns</a>
+</nav>
+
+<div class="page">
+
+<!-- STICKY THEME BAR -->
+<div class="theme-bar-wrap">
+  <div class="theme-bar">
+    <div class="theme-group" id="colorwayGroup">
+      <button class="theme-btn active" onclick="setColorway('mercury')">Mercury</button>
+      <button class="theme-btn" onclick="setColorway('inkwell')">Inkwell</button>
+      <button class="theme-btn" onclick="setColorway('orbital')">Orbital</button>
+    </div>
+    <div class="theme-sep"></div>
+    <div class="theme-group" id="modeGroup">
+      <button class="theme-btn active" onclick="setMode('dark')">Dark</button>
+      <button class="theme-btn" onclick="setMode('light')">Light</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">PNDA\CMD</div>
+    <div class="header-title">Design System</div>
+    <div class="header-sub">Tokens, typography, and component reference. Everything themes live.</div>
+  </div>
+</div>
+
+<!-- =============================== -->
+<!-- SECTION: COLORS                 -->
+<!-- =============================== -->
+<div class="section" id="colors">
+  <div class="section-label">01 &middot; Tokens</div>
+  <div class="section-title">Color Palette</div>
+  <div class="section-desc">All colors are CSS custom properties. Switch themes above to see values change in real time.</div>
+  <div class="section-rule"></div>
+
+  <div class="swatch-row-label">Core Surfaces</div>
+  <div class="swatch-grid" style="margin-bottom:28px">
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--background)"></div><div class="swatch-name">Background</div><div class="swatch-var">--background</div></div>
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--card)"></div><div class="swatch-name">Card</div><div class="swatch-var">--card</div></div>
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--muted)"></div><div class="swatch-name">Muted / Inner</div><div class="swatch-var">--muted (= --secondary)</div></div>
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--sidebar)"></div><div class="swatch-name">Sidebar</div><div class="swatch-var">--sidebar</div></div>
+  </div>
+
+  <div class="swatch-row-label">Interactive</div>
+  <div class="swatch-grid" style="margin-bottom:28px">
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--primary)"></div><div class="swatch-name">Primary</div><div class="swatch-var">--primary</div></div>
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--destructive)"></div><div class="swatch-name">Destructive</div><div class="swatch-var">--destructive</div></div>
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--border)"></div><div class="swatch-name">Border</div><div class="swatch-var">--border</div></div>
+  </div>
+
+  <div class="swatch-row-label">Semantic Status</div>
+  <div class="swatch-grid" style="margin-bottom:28px">
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--color-success)"></div><div class="swatch-name">Success</div><div class="swatch-var">--color-success</div></div>
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--color-warning)"></div><div class="swatch-name">Warning</div><div class="swatch-var">--color-warning</div></div>
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--color-danger)"></div><div class="swatch-name">Danger</div><div class="swatch-var">--color-danger</div></div>
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--color-info)"></div><div class="swatch-name">Info</div><div class="swatch-var">--color-info</div></div>
+  </div>
+
+  <div class="swatch-row-label">Text Hierarchy</div>
+  <div class="swatch-grid" style="margin-bottom:28px">
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--foreground)"></div><div class="swatch-name">Foreground</div><div class="swatch-var">--foreground</div></div>
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--card-foreground)"></div><div class="swatch-name">Card Foreground</div><div class="swatch-var">--card-foreground</div></div>
+    <div class="swatch-card"><div class="swatch-color" style="background:var(--muted-foreground)"></div><div class="swatch-name">Muted Foreground</div><div class="swatch-var">--muted-foreground</div></div>
+  </div>
+
+  <div class="swatch-row-label">Avatar Palette (10)</div>
+  <div class="avatar-row" style="margin-bottom: 8px">
+    <div class="avatar" style="background:var(--avatar-1)">AB</div>
+    <div class="avatar" style="background:var(--avatar-2)">CD</div>
+    <div class="avatar" style="background:var(--avatar-3)">EF</div>
+    <div class="avatar" style="background:var(--avatar-4)">GH</div>
+    <div class="avatar" style="background:var(--avatar-5)">IJ</div>
+    <div class="avatar" style="background:var(--avatar-6)">KL</div>
+    <div class="avatar" style="background:var(--avatar-7)">MN</div>
+    <div class="avatar" style="background:var(--avatar-8)">OP</div>
+    <div class="avatar" style="background:var(--avatar-9)">QR</div>
+    <div class="avatar" style="background:var(--avatar-10)">ST</div>
+  </div>
+  <div style="font-family:'Geist Mono',monospace; font-size:11px; color:var(--muted-foreground)">--avatar-1 through --avatar-10</div>
+
+  <div style="margin-top:32px; padding-top:20px; border-top:1px solid var(--border)">
+    <div style="font-family:'Geist Mono',monospace; font-size:11px; color:var(--muted-foreground); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:8px">System Tokens</div>
+    <div style="display:flex; gap:24px; font-family:'Geist Mono',monospace; font-size:12px; color:var(--muted-foreground)">
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--ring);vertical-align:middle;margin-right:6px"></span>--ring <span style="color:var(--muted-foreground)">(focus outlines)</span></span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--input);vertical-align:middle;margin-right:6px"></span>--input <span style="color:var(--muted-foreground)">(input borders)</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== -->
+<!-- SECTION: TYPOGRAPHY             -->
+<!-- =============================== -->
+<div class="section" id="typography">
+  <div class="section-label">02 &middot; Typography</div>
+  <div class="section-title">Geist Sans + Geist Mono</div>
+  <div class="section-desc">
+    Sans = human layer (headings, nav, buttons, chat, labels).
+    Mono = agent layer (activity feed, status badges, thinking blocks, tool output).
+    The font signals <em>who produced this</em>, not the data type.
+  </div>
+  <div class="section-rule"></div>
+
+  <div class="swatch-row-label">Geist Sans — Human Layer</div>
+  <div style="margin-bottom:28px">
+    <div class="type-row"><span class="type-size">32px</span><span class="type-weight">700</span><span class="type-token">.type-page-title</span><span class="type-sample" style="font-size:32px;font-weight:700">January Payroll</span></div>
+    <div class="type-row"><span class="type-size">24px</span><span class="type-weight">600</span><span class="type-token">.type-section-title</span><span class="type-sample" style="font-size:24px;font-weight:600">Benefits Enrollment Q1</span></div>
+    <div class="type-row"><span class="type-size">18px</span><span class="type-weight">500</span><span class="type-token">.type-subhead</span><span class="type-sample" style="font-size:18px;font-weight:500">Run payroll for 47 employees</span></div>
+    <div class="type-row"><span class="type-size">14px</span><span class="type-weight">400</span><span class="type-token">.type-body</span><span class="type-sample" style="font-size:14px">Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12.</span></div>
+    <div class="type-row"><span class="type-size">13px</span><span class="type-weight">400</span><span class="type-token">.type-meta</span><span class="type-sample" style="font-size:13px;color:var(--muted-foreground)">Completed 10:34 AM &middot; 2 of 8 steps</span></div>
+    <div class="type-row"><span class="type-size">12px</span><span class="type-weight">500</span><span class="type-token">.type-label</span><span class="type-sample" style="font-size:12px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted-foreground)">Section Label</span></div>
+  </div>
+
+  <div class="swatch-row-label">Geist Mono — Agent Layer</div>
+  <div style="margin-bottom:28px">
+    <div class="type-row"><span class="type-size">14px</span><span class="type-weight">400</span><span class="type-token">.type-feed</span><span class="type-sample" style="font-family:'Geist Mono',monospace;font-size:14px">Pulling payroll data from BambooHR...</span></div>
+    <div class="type-row"><span class="type-size">13px</span><span class="type-weight">400</span><span class="type-token">.type-data</span><span class="type-sample" style="font-family:'Geist Mono',monospace;font-size:13px">current_ot: 58.0 hrs &middot; variance: +383%</span></div>
+    <div class="type-row"><span class="type-size">12px</span><span class="type-weight">500</span><span class="type-token">.type-status</span><span class="type-sample" style="font-family:'Geist Mono',monospace;font-size:12px;font-weight:500">Running &middot; Done &middot; Gate &middot; Paused</span></div>
+    <div class="type-row"><span class="type-size">11px</span><span class="type-weight">500</span><span class="type-token">.type-module</span><span class="type-sample" style="font-family:'Geist Mono',monospace;font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary)">Module 01 &middot; Agent Status</span></div>
+  </div>
+
+  <div class="swatch-row-label">Numbers — Sans in UI Chrome</div>
+  <div>
+    <div class="type-row"><span class="type-size">28px</span><span class="type-weight">600</span><span class="type-token">.type-stat-lg</span><span class="type-sample" style="font-size:28px;font-weight:600">$4,132.50</span></div>
+    <div class="type-row"><span class="type-size">22px</span><span class="type-weight">500</span><span class="type-token">.type-stat-md</span><span class="type-sample" style="font-size:22px;font-weight:500">82 hrs &nbsp; 47 ee</span></div>
+    <div class="type-row"><span class="type-size">14px</span><span class="type-weight">400</span><span class="type-token">.type-stat-sm</span><span class="type-sample" style="font-size:14px">variance +383% &nbsp; threshold 150%</span></div>
+  </div>
+</div>
+
+<!-- =============================== -->
+<!-- SECTION: COMPONENTS             -->
+<!-- =============================== -->
+<div class="section" id="components">
+  <div class="section-label">03 &middot; Components</div>
+  <div class="section-title">UI Specimens</div>
+  <div class="section-desc">Core interactive elements and data display patterns. All use CSS variable tokens — no hardcoded colors.</div>
+  <div class="section-rule"></div>
+
+  <div class="specimens">
+
+    <!-- Buttons -->
+    <div class="specimen">
+      <div class="specimen-label">Buttons</div>
+      <div class="btn-row" style="margin-bottom:14px">
+        <button class="btn btn-primary">Primary</button>
+        <button class="btn btn-secondary">Secondary</button>
+        <button class="btn btn-destructive">Destructive</button>
+        <button class="btn btn-ghost">Ghost</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" style="font-size:13px;padding:6px 14px;border-radius:6px">Small</button>
+        <button class="btn btn-secondary" style="font-size:13px;padding:6px 14px;border-radius:6px">Small</button>
+      </div>
+    </div>
+
+    <!-- Badges & Pills -->
+    <div class="specimen">
+      <div class="specimen-label">Status Badges (mono) — agent-produced states</div>
+      <div class="btn-row" style="gap:8px;margin-bottom:8px">
+        <span class="badge badge-success"><span class="badge-dot"></span>Done</span>
+        <span class="badge badge-info"><span class="badge-dot"></span>Running</span>
+        <span class="badge badge-warning"><span class="badge-dot"></span>Paused</span>
+        <span class="badge badge-muted"><span class="badge-dot"></span>Pending</span>
+        <span class="badge badge-stopped"><span class="badge-dot"></span>Stopped</span>
+        <span class="badge badge-stopped"><span class="badge-dot"></span>Declined</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted-foreground);margin-bottom:20px;line-height:1.6">
+        Danger reserved for "act now." Stopped/Declined use desaturated red — ended negatively but resolved. Pending is neutral.
+      </div>
+
+      <div class="specimen-label">Alert Pills (sans) — human-facing urgency</div>
+      <div class="btn-row" style="gap:8px;margin-bottom:8px">
+        <span class="alert-pill alert-pill-urgent">&#9888; Urgent</span>
+        <span class="alert-pill alert-pill-attention">&#9679; Needs attention</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted-foreground);line-height:1.6">
+        Urgent owns the full danger/destructive color. Needs attention uses warning. These are UI labels (sans), not agent states (mono).
+      </div>
+    </div>
+
+    <!-- Surfaces -->
+    <div class="specimen">
+      <div class="specimen-label">Surface Hierarchy</div>
+      <div class="surface-stack">
+        <div class="surface-demo" style="background:var(--background);border:1px solid var(--border)">
+          <span class="surface-label" style="color:var(--foreground)">Background</span>
+          <span class="surface-label" style="color:var(--muted-foreground)">--background</span>
+        </div>
+        <div class="surface-demo" style="background:var(--card);border:1px solid var(--border)">
+          <span class="surface-label" style="color:var(--card-foreground)">Card</span>
+          <span class="surface-label" style="color:var(--muted-foreground)">--card</span>
+        </div>
+        <div class="surface-demo" style="background:var(--muted);border:1px solid var(--border)">
+          <span class="surface-label" style="color:var(--foreground)">Muted / Inner</span>
+          <span class="surface-label" style="color:var(--muted-foreground)">--muted</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Feed -->
+    <div class="specimen">
+      <div class="specimen-label">Activity Feed (mono — agent voice)</div>
+      <div class="feed-line"><span class="feed-dot" style="background:var(--color-success)"></span>Pulled payroll data from BambooHR</div>
+      <div class="feed-line"><span class="feed-dot" style="background:var(--color-success)"></span>Validated 47 employee records</div>
+      <div class="feed-line feed-active"><span class="feed-dot" style="background:var(--color-info);animation:pulse 1.5s infinite"></span>Checking overtime thresholds...</div>
+      <div class="feed-line"><span class="feed-dot" style="background:var(--text-tertiary-alpha)"></span>Review against previous payroll</div>
+      <style>@keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.4 } }</style>
+    </div>
+
+    <!-- Action Plan -->
+    <div class="specimen full">
+      <div class="specimen-label">Action Plan Card</div>
+      <div class="plan-header">
+        <span class="plan-title">Run January Payroll</span>
+        <span class="badge badge-info"><span class="badge-dot" style="animation:pulse 1.5s infinite"></span>Running</span>
+      </div>
+      <div class="plan-progress-track"><div class="plan-progress-fill" style="width:25%"></div></div>
+      <div class="plan-progress-label">Step 2 of 8</div>
+      <div class="plan-step">
+        <div class="step-indicator step-done">&#10003;</div>
+        <span class="step-text step-text-done">Create payroll run for Jan 1-31</span>
+        <span class="badge badge-success step-badge"><span class="badge-dot"></span>Done</span>
+      </div>
+      <div class="plan-step">
+        <div class="step-indicator step-active" style="font-size:11px">&#9679;</div>
+        <span class="step-text step-text-active">Collect and validate employee hours</span>
+        <span class="badge badge-info step-badge"><span class="badge-dot" style="animation:pulse 1.5s infinite"></span>Running</span>
+      </div>
+      <div class="plan-step">
+        <div class="step-indicator step-pending">3</div>
+        <span class="step-text step-text-pending">Review against previous payroll</span>
+        <span style="color:var(--text-tertiary-alpha);font-family:'Geist Mono',monospace;font-size:12px">&mdash;</span>
+      </div>
+      <div class="plan-step">
+        <div class="step-indicator step-pending">4</div>
+        <span class="step-text step-text-pending">Approve payroll run</span>
+        <span class="badge badge-danger step-badge"><span class="badge-dot"></span>Gate</span>
+      </div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn btn-primary">Approve Plan</button>
+        <button class="btn btn-secondary">Decline</button>
+      </div>
+    </div>
+
+    <!-- Anomaly Card -->
+    <div class="specimen full">
+      <div class="specimen-label">Anomaly Card — sans explanation, mono evidence</div>
+      <div class="anomaly-card">
+        <div class="anomaly-header">
+          <span class="anomaly-icon">&#9888;</span>
+          <span class="anomaly-title">Overtime anomaly — Dr. Eli Vance</span>
+        </div>
+        <div class="anomaly-body">58 overtime hours vs a 3-period average of 12. Could be a legitimate crunch period, but it's a $4,132.50 difference in gross pay.</div>
+        <div class="anomaly-evidence">
+          <div class="ev-row"><span class="ev-label">current_ot</span><span class="ev-value ev-hot">58.0 hrs</span></div>
+          <div class="ev-row"><span class="ev-label">3_period_avg</span><span class="ev-value">12.0 hrs</span></div>
+          <div class="ev-row"><span class="ev-label">variance</span><span class="ev-value ev-hot">+383%</span></div>
+          <div class="ev-row"><span class="ev-label">gross_impact</span><span class="ev-value ev-hot">+$4,132.50</span></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-destructive-fill">Acknowledge</button>
+          <button class="btn btn-muted-outline">Investigate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="specimen full">
+      <div class="specimen-label">Dashboard Card — header with label + optional link/meta, list rows</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
+
+        <!-- List card with link -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-header-left">
+              <svg class="dash-card-header-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span class="dash-card-header-title">Recent Chats</span>
+            </div>
+            <a class="dash-card-header-link" href="#">All chats &rarr;</a>
+          </div>
+          <div class="dash-card-row">
+            <span class="dash-card-row-primary" style="display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:var(--primary)"></span>Portal Gun Safety Training</span>
+            <span class="dash-card-row-secondary">35m ago</span>
+          </div>
+          <div class="dash-card-row">
+            <span class="dash-card-row-primary" style="padding-left:14px">GLaDOS Maintenance</span>
+            <span class="dash-card-row-secondary">3h ago</span>
+          </div>
+        </div>
+
+        <!-- Plan card with meta count -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-header-left">
+              <svg class="dash-card-header-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+              <span class="dash-card-header-title">Active Plans</span>
+            </div>
+            <span class="dash-card-header-meta">3 plans</span>
+          </div>
+          <div class="mini-plan">
+            <div class="mini-plan-top">
+              <span class="mini-plan-title">Q1 Payroll Processing</span>
+              <span class="badge badge-info"><span class="badge-dot" style="animation:pulse 1.5s infinite"></span>Running</span>
+            </div>
+            <div class="mini-plan-bottom">
+              <span class="mini-plan-steps">4 / 6 steps</span>
+              <div class="mini-plan-bar"><div class="mini-plan-bar-fill" style="width:67%"></div></div>
+            </div>
+          </div>
+          <div class="mini-plan">
+            <div class="mini-plan-top">
+              <span class="mini-plan-title">New Hire Onboarding</span>
+              <span class="badge badge-info"><span class="badge-dot" style="animation:pulse 1.5s infinite"></span>Running</span>
+            </div>
+            <div class="mini-plan-bottom">
+              <span class="mini-plan-steps">2 / 5 steps</span>
+              <div class="mini-plan-bar"><div class="mini-plan-bar-fill" style="width:40%"></div></div>
+            </div>
+          </div>
+          <div class="mini-plan">
+            <div class="mini-plan-top">
+              <span class="mini-plan-title">Benefits Enrollment Setup</span>
+              <span class="badge badge-muted"><span class="badge-dot"></span>Pending</span>
+            </div>
+            <div class="mini-plan-bottom">
+              <span class="mini-plan-steps">1 / 4 steps</span>
+              <div class="mini-plan-bar mini-plan-bar-paused"><div class="mini-plan-bar-fill" style="width:25%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attention Card -->
+    <div class="specimen full">
+      <div class="specimen-label">Attention Card — severity pills (sans), action buttons, viewer attribution</div>
+      <div class="dash-card" style="max-width:720px">
+        <div class="dash-card-header">
+          <div class="dash-card-header-left">
+            <span style="color:var(--color-warning)">&#9888;</span>
+            <span class="dash-card-header-title">Needs Attention</span>
+            <span class="badge badge-muted" style="font-size:11px;padding:2px 8px"><span class="badge-dot"></span>3</span>
+          </div>
+        </div>
+        <div class="attention-item">
+          <span class="attention-sev attention-sev-blocking"><span style="width:6px;height:6px;border-radius:50%;background:currentColor"></span>Blocking</span>
+          <div class="attention-body">
+            <div class="attention-title">Payroll Runner needs approval</div>
+            <div class="attention-desc">Q1 payroll calculation for 312 employees is ready and waiting for your sign-off.</div>
+          </div>
+          <div class="attention-actions">
+            <button class="btn btn-secondary" style="font-size:13px;padding:6px 14px;border-radius:6px">Approve</button>
+            <button class="btn btn-ghost" style="font-size:13px">View Details</button>
+          </div>
+        </div>
+        <div class="attention-item">
+          <span class="attention-sev attention-sev-error">&#9888; Error</span>
+          <div class="attention-body">
+            <div class="attention-title">Benefits Enrollment failed</div>
+            <div class="attention-desc">Dental plan sync encountered an error during enrollment processing.</div>
+          </div>
+          <div class="attention-actions">
+            <button class="btn btn-secondary" style="font-size:13px;padding:6px 14px;border-radius:6px">Investigate</button>
+            <button class="btn btn-ghost" style="font-size:13px">Dismiss</button>
+          </div>
+        </div>
+        <div class="attention-item">
+          <span class="attention-sev attention-sev-review">Review</span>
+          <div class="attention-body">
+            <div class="attention-title">Compliance Check complete</div>
+            <div class="attention-desc">Annual compliance audit finished. 2 policy items flagged for your review.</div>
+          </div>
+          <div class="attention-actions">
+            <button class="btn btn-secondary" style="font-size:13px;padding:6px 14px;border-radius:6px">Review</button>
+            <button class="btn btn-ghost" style="font-size:13px">Snooze</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Bubbles -->
+    <div class="specimen full">
+      <div class="specimen-label">Chat — user bubble (muted), agent response (plain prose), inline data (sans bold)</div>
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:560px">
+        <div>
+          <div class="chat-meta" style="text-align:right">You &middot; 1:30 PM</div>
+          <div class="chat-bubble chat-user">Run payroll for January. Flag any anomalies over 150% variance.</div>
+        </div>
+        <div>
+          <div class="chat-meta">Payroll Runner &middot; 1:32 PM</div>
+          <div class="chat-bubble chat-agent">
+            Found an anomaly: Dr. Vance has <span class="inline-data">58 OT hrs</span> this period vs a 3-period average of <span class="inline-data">12 hrs</span>. That's a <span class="inline-data">+383%</span> variance. I've paused the payroll run — need your decision before proceeding.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Input -->
+    <div class="specimen full">
+      <div class="specimen-label">Chat Input — card surface, ghost toolbar buttons, primary send</div>
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <!-- Empty state -->
+        <div>
+          <div style="font-family:'Geist Mono',monospace;font-size:11px;color:var(--muted-foreground);margin-bottom:8px">EMPTY STATE</div>
+          <div class="chat-input-wrap">
+            <textarea class="chat-input-textarea" rows="1" placeholder="Ask anything... (type @ to mention a client)" readonly></textarea>
+            <div class="chat-input-toolbar">
+              <div style="display:flex;gap:2px">
+                <button class="chat-input-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                <button class="chat-input-tools-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Tools</button>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <button class="chat-input-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- With content -->
+        <div>
+          <div style="font-family:'Geist Mono',monospace;font-size:11px;color:var(--muted-foreground);margin-bottom:8px">WITH CONTENT</div>
+          <div class="chat-input-wrap">
+            <textarea class="chat-input-textarea" rows="2" readonly>Run payroll for January. Flag any anomalies over 150% variance threshold.</textarea>
+            <div class="chat-input-toolbar">
+              <div style="display:flex;gap:2px">
+                <button class="chat-input-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                <button class="chat-input-tools-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Tools</button>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <button class="chat-input-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></button>
+                <button class="chat-input-send"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- =============================== -->
+<!-- SECTION: SPACING & RADIUS       -->
+<!-- =============================== -->
+<div class="section" id="patterns">
+  <div class="section-label">04 &middot; Primitives</div>
+  <div class="section-title">Spacing &amp; Radius</div>
+  <div class="section-rule"></div>
+
+  <div class="specimens">
+    <div class="specimen">
+      <div class="specimen-label">Spacing Scale</div>
+      <div class="space-row"><span class="space-label">4px</span><div class="space-box" style="width:4px"></div></div>
+      <div class="space-row"><span class="space-label">8px</span><div class="space-box" style="width:8px"></div></div>
+      <div class="space-row"><span class="space-label">12px</span><div class="space-box" style="width:12px"></div></div>
+      <div class="space-row"><span class="space-label">16px</span><div class="space-box" style="width:16px"></div></div>
+      <div class="space-row"><span class="space-label">20px</span><div class="space-box" style="width:20px"></div></div>
+      <div class="space-row"><span class="space-label">24px</span><div class="space-box" style="width:24px"></div></div>
+      <div class="space-row"><span class="space-label">32px</span><div class="space-box" style="width:32px"></div></div>
+      <div class="space-row"><span class="space-label">48px</span><div class="space-box" style="width:48px"></div></div>
+      <div class="space-row"><span class="space-label">64px</span><div class="space-box" style="width:64px"></div></div>
+    </div>
+
+    <div class="specimen">
+      <div class="specimen-label">Border Radius</div>
+      <div class="radius-row">
+        <div><div class="radius-box" style="border-radius:4px">4</div></div>
+        <div><div class="radius-box" style="border-radius:6px">6</div></div>
+        <div><div class="radius-box" style="border-radius:8px">8</div></div>
+        <div><div class="radius-box" style="border-radius:10px">10</div></div>
+        <div><div class="radius-box" style="border-radius:12px">12</div></div>
+        <div><div class="radius-box" style="border-radius:14px">14</div></div>
+        <div><div class="radius-box" style="border-radius:9999px">pill</div></div>
+      </div>
+      <div style="margin-top:20px">
+        <div class="specimen-label" style="margin-bottom:8px">Usage</div>
+        <div style="font-size:13px;color:var(--muted-foreground);line-height:1.8">
+          <span style="font-family:'Geist Mono',monospace;color:var(--foreground)">4-6px</span> — inputs, small buttons, code blocks<br>
+          <span style="font-family:'Geist Mono',monospace;color:var(--foreground)">8-10px</span> — buttons, badges, tooltips<br>
+          <span style="font-family:'Geist Mono',monospace;color:var(--foreground)">12-14px</span> — cards, panels, dialogs<br>
+          <span style="font-family:'Geist Mono',monospace;color:var(--foreground)">pill</span> — status badges, avatar, tags
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Voice Rule -->
+<div class="section">
+  <div class="section-label">05 &middot; Voice Rule</div>
+  <div class="section-title">Mono = Agent. Sans = Human.</div>
+  <div class="section-rule"></div>
+  <div class="specimens" style="grid-template-columns:1fr 1fr">
+    <div class="specimen">
+      <div class="specimen-label" style="color:var(--primary)">Geist Mono — Agent produced it</div>
+      <div style="font-family:'Geist Mono',monospace; font-size:13px; color:var(--foreground); line-height:2">
+        Activity feed lines<br>
+        Thinking / reasoning blocks<br>
+        Tool call outputs<br>
+        Status badges (Done, Running, Gate)<br>
+        Anomaly evidence blocks
+      </div>
+    </div>
+    <div class="specimen">
+      <div class="specimen-label">Geist Sans — Human space</div>
+      <div style="font-size:13px; color:var(--foreground); line-height:2">
+        Headings, titles, navigation<br>
+        Buttons and form labels<br>
+        Chat message body text<br>
+        Action plan step descriptions<br>
+        Dashboard metrics and stat cards<br>
+        Inline data callouts (<span class="inline-data">58 OT hrs</span>)<br>
+        Timestamps, UI chrome, labels
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== -->
+<!-- SECTION: CONTRAST COMPARISON   -->
+<!-- =============================== -->
+<div class="section" id="contrast-compare">
+  <div class="section-label">06 &middot; Proposal</div>
+  <div class="section-title">Mercury Dark — Card Contrast Bump</div>
+  <div class="section-desc">More separation between background → card → inner. Background stays at #101214.</div>
+  <div class="section-rule"></div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:24px">
+
+    <!-- BEFORE -->
+    <div>
+      <div class="swatch-row-label" style="margin-bottom:16px">Before (current)</div>
+      <div style="background:#101214;border-radius:14px;padding:24px;border:1px solid rgba(180,185,200,0.07)">
+        <div style="font-family:'Geist Mono',monospace;font-size:11px;color:#9DA0A8;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px">--background #101214</div>
+
+        <div style="background:#191B1F;border-radius:10px;padding:20px;border:1px solid rgba(180,185,200,0.07);margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <span style="font-size:14px;color:#E8E9ED;font-weight:500">Run January Payroll</span>
+            <span style="font-family:'Geist Mono',monospace;font-size:12px;font-weight:500;color:#7EBE85;background:rgba(126,190,133,0.18);padding:3px 10px;border-radius:9999px">Running</span>
+          </div>
+          <div style="font-family:'Geist Mono',monospace;font-size:11px;color:#9DA0A8;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px">--card #191B1F</div>
+
+          <div style="background:#222428;border-radius:8px;padding:14px;margin-top:12px">
+            <div style="font-family:'Geist Mono',monospace;font-size:13px;color:#9DA0A8">current_ot: 58.0 hrs &middot; variance: +383%</div>
+            <div style="font-family:'Geist Mono',monospace;font-size:11px;color:#9DA0A8;letter-spacing:0.06em;text-transform:uppercase;margin-top:8px">--muted #222428</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;height:6px;border-radius:3px;background:#222428"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:#222428"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:#222428"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:12px;font-family:'Geist Mono',monospace;font-size:12px;color:#9DA0A8">
+        <span>bg→card: <span style="color:#E8E9ED">+9</span></span>
+        <span>card→inner: <span style="color:#E8E9ED">+9</span></span>
+        <span>bg→inner: <span style="color:#E8E9ED">+18</span></span>
+      </div>
+    </div>
+
+    <!-- AFTER -->
+    <div>
+      <div class="swatch-row-label" style="margin-bottom:16px">After (proposed)</div>
+      <div style="background:#101214;border-radius:14px;padding:24px;border:1px solid rgba(180,185,200,0.07)">
+        <div style="font-family:'Geist Mono',monospace;font-size:11px;color:#9DA0A8;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px">--background #101214</div>
+
+        <div style="background:#1D2024;border-radius:10px;padding:20px;border:1px solid rgba(180,185,200,0.07);margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <span style="font-size:14px;color:#E8E9ED;font-weight:500">Run January Payroll</span>
+            <span style="font-family:'Geist Mono',monospace;font-size:12px;font-weight:500;color:#7EBE85;background:rgba(126,190,133,0.18);padding:3px 10px;border-radius:9999px">Running</span>
+          </div>
+          <div style="font-family:'Geist Mono',monospace;font-size:11px;color:#6878B8;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px">--card #1D2024</div>
+
+          <div style="background:#282A30;border-radius:8px;padding:14px;margin-top:12px">
+            <div style="font-family:'Geist Mono',monospace;font-size:13px;color:#9DA0A8">current_ot: 58.0 hrs &middot; variance: +383%</div>
+            <div style="font-family:'Geist Mono',monospace;font-size:11px;color:#6878B8;letter-spacing:0.06em;text-transform:uppercase;margin-top:8px">--muted #282A30</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;height:6px;border-radius:3px;background:#282A30"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:#282A30"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:#282A30"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:12px;font-family:'Geist Mono',monospace;font-size:12px;color:#9DA0A8">
+        <span>bg→card: <span style="color:#6878B8">+13</span></span>
+        <span>card→inner: <span style="color:#6878B8">+11</span></span>
+        <span>bg→inner: <span style="color:#6878B8">+24</span></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- .page -->
+
+<script>
+let currentColorway = 'mercury';
+let currentMode = 'dark';
+
+function setColorway(cw) {
+  currentColorway = cw;
+  apply();
+}
+function setMode(mode) {
+  currentMode = mode;
+  apply();
+}
+function apply() {
+  document.documentElement.className = currentColorway + ' ' + currentMode;
+  document.querySelectorAll('#colorwayGroup .theme-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase() === currentColorway);
+  });
+  document.querySelectorAll('#modeGroup .theme-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase() === currentMode);
+  });
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === '1') setColorway('mercury');
+  if (e.key === '2') setColorway('inkwell');
+  if (e.key === '3') setColorway('orbital');
+  if (e.key === 'd') setMode('dark');
+  if (e.key === 'l') setMode('light');
+});
+</script>
+
+</body>
+</html>

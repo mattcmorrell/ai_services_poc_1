@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Home, Plus, X } from "lucide-react";
+import { House, Plus, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import type { Client, Chat } from "@/types/chat";
 import type { ClientTab } from "../client-tab-bar";
@@ -207,7 +207,7 @@ export function TabGroups({
 
                   {/* Name — truncated to keep chips compact */}
                   <span className={cn(
-                    "max-w-[72px] truncate text-[11px] font-semibold leading-none",
+                    "max-w-[72px] truncate text-[11px] font-medium leading-none",
                     isActive ? "text-foreground" : "text-muted-foreground",
                   )}>
                     {group.client.name.split(/[\s-]+/)[0]}
@@ -215,14 +215,14 @@ export function TabGroups({
 
                   {/* Collapsed: tab count in a subtle circle */}
                   {!isExpanded && tabCount > 0 && (
-                    <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground/10 px-1 text-[9px] font-medium leading-none text-muted-foreground">
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground/10 px-1 text-[11px] font-medium leading-none text-muted-foreground">
                       {tabCount}
                     </span>
                   )}
 
                   {/* Unread badge */}
                   {group.unreadCount > 0 && (
-                    <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-semibold leading-none text-primary-foreground">
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-medium leading-none text-primary-foreground">
                       {group.unreadCount}
                     </span>
                   )}
@@ -244,7 +244,7 @@ export function TabGroups({
                       )}
                       title={`${group.client.name} home`}
                     >
-                      <Home className="h-3.5 w-3.5" />
+                      <House className="h-3.5 w-3.5" />
                     </button>
 
                     {/* Chat tabs */}

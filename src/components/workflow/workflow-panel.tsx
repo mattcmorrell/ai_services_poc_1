@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { X, ArrowUpDown } from "lucide-react";
+import { X, ArrowsDownUp } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { WorkflowCanvas } from "./workflow-canvas";
 import { BambooHRView } from "./bamboo-hr-view";
@@ -80,9 +80,9 @@ export function WorkflowPanel({ workflow, onClose }: WorkflowPanelProps) {
               )}
             >
               {tab.type === "workflow" ? (
-                <ArrowUpDown className="h-4 w-4" />
+                <ArrowsDownUp className="h-4 w-4" />
               ) : (
-                <span className="flex h-4 w-4 items-center justify-center rounded bg-green-600 text-[10px] font-bold text-white">
+                <span className="flex h-5 w-5 items-center justify-center rounded bg-green-600 text-[11px] font-medium text-white">
                   B
                 </span>
               )}

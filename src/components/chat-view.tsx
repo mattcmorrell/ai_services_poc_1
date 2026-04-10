@@ -2,19 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import {
-  MoreHorizontal,
-  ChevronDown,
+  DotsThree,
   Plus,
-  Mic,
-} from "lucide-react";
+  Microphone,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Client, Message, Artifact, ActionPlan } from "@/types/chat";
 import { PlanSplitView } from "@/components/plan/plan-split-view";
 import { PlanPanelPill } from "@/components/plan/plan-panel";
@@ -49,14 +42,6 @@ interface ChatViewProps {
   onDeclineRequest?: (messageId: string) => void;
 }
 
-const models = [
-  "GPT-4o",
-  "GPT-4 Turbo",
-  "Claude 3.5 Sonnet",
-  "Claude 3 Opus",
-  "Gemini 1.5 Pro",
-  "Gemini 2.0 Flash",
-];
 
 const ogTheme: MessageListTheme = {
   messageSpacing: "mb-6",
@@ -91,7 +76,6 @@ export function ChatView({
   onDeclineRequest,
 }: ChatViewProps) {
   const [input, setInput] = useState("");
-  const [selectedModel, setSelectedModel] = useState("GPT-4o");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -118,8 +102,8 @@ export function ChatView({
       onSendMessage(input.trim());
       setInput("");
       if (inputRef.current) {
-        inputRef.current.style.height = "auto";
-        inputRef.current.style.overflowY = "hidden";
+        inputRef.current.style.height = "20px";
+        inputRef.current.style.overflow = "hidden";
       }
     }
   };
@@ -132,9 +116,9 @@ export function ChatView({
   };
 
   const chatContent = (
-    <div className="flex h-full flex-1 flex-col bg-background min-w-0">
+    <div className="relative flex h-full flex-1 flex-col bg-card dark:bg-background min-w-0">
       {/* Messages */}
-      <ScrollArea className="flex-1 px-6" ref={scrollRef}>
+      <ScrollArea className="flex-1 px-8" ref={scrollRef}>
         <MessageList
           messages={messages}
           artifacts={artifacts}
@@ -152,13 +136,15 @@ export function ChatView({
           onDeclineRequest={onDeclineRequest}
           isLoading={isLoading}
         />
+        {/* Spacer so last message can scroll above the floating input */}
+        <div className="h-24" />
       </ScrollArea>
 
-      {/* Input */}
-      <div className="border-t border-border p-4 shrink-0">
+      {/* Input — floats over scroll content */}
+      <div className="absolute bottom-0 left-0 right-0 px-8 pb-4 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 0%, var(--card) 40%)' }}>
         <div className="mx-auto max-w-3xl">
           <form onSubmit={handleSubmit}>
-            <div className="rounded-xl border border-border bg-card p-3">
+            <div className="rounded-xl bg-card shadow-[0_4px_24px_rgba(0,0,0,0.08)] pointer-events-auto" style={{ padding: "14px 16px" }}>
               <textarea
                 ref={inputRef}
                 value={input}
@@ -169,41 +155,21 @@ export function ChatView({
                   const lineHeight = 20;
                   const maxHeight = lineHeight * 5.5;
                   el.style.height = `${Math.min(el.scrollHeight, maxHeight)}px`;
-                  el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
+                  el.style.overflow = el.scrollHeight > maxHeight ? "auto" : "hidden";
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder="Ask anything..."
                 rows={1}
                 className="w-full resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                style={{ lineHeight: "20px", overflowY: "hidden" }}
+                style={{ lineHeight: "20px", overflow: "hidden", minHeight: "20px", height: "20px" }}
               />
               <div className="mt-2 flex items-center justify-between">
                 <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
                   <Plus className="h-4 w-4" />
                 </Button>
-                <div className="flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
-                        {selectedModel}
-                        <ChevronDown className="h-3 w-3" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {models.map((model) => (
-                        <DropdownMenuItem
-                          key={model}
-                          onClick={() => setSelectedModel(model)}
-                        >
-                          {model}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
-                    <Mic className="h-4 w-4" />
-                  </Button>
-                </div>
+                <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
+                  <Microphone className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </form>
@@ -215,9 +181,9 @@ export function ChatView({
   return (
     <div className="flex h-full flex-1 flex-col overflow-hidden bg-background">
       {/* Header — full width, above split */}
-      <div className="flex items-center justify-between border-b border-border px-6 py-4 shrink-0">
+      <div className="flex items-center justify-between border-b border-border px-6 py-4 shrink-0 bg-muted dark:bg-card">
         <div>
-          <h1 className="text-2xl font-semibold">{chatTitle}</h1>
+          <h1 className="text-[24px] font-semibold">{chatTitle}</h1>
           {client && (
             <p className="text-sm text-muted-foreground">{client.name}</p>
           )}
@@ -227,7 +193,7 @@ export function ChatView({
             <PlanPanelPill plan={activePlan} onClick={onOpenPlanPanel} />
           )}
           <Button variant="ghost" size="icon">
-            <MoreHorizontal className="h-5 w-5" />
+            <DotsThree className="h-5 w-5" />
           </Button>
         </div>
       </div>

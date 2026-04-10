@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useCallback, useState } from "react";
-import { Check } from "lucide-react";
+import { Check } from "@phosphor-icons/react";
+import { StatusLabel } from "@/components/ui/status-label";
 import { ClarifyingQuestions } from "@/types/chat";
 
 interface ClarifyingQuestionsCardProps {
@@ -115,11 +116,11 @@ export function ClarifyingQuestionsCard({
   // Answered state: compact read-only summary
   if (isAnswered && savedAnswers) {
     return (
-      <div className="rounded-lg border border-emerald-500/20 bg-card/50 px-4 py-3 max-w-[520px]">
-        <div className="flex items-center gap-2 mb-2.5 text-[12px] tracking-wide uppercase text-emerald-500/70">
+      <div className="rounded-xl bg-card/50 px-4 py-3 max-w-[520px]" style={{ border: "1px solid color-mix(in srgb, var(--color-success) 20%, transparent)" }}>
+        <StatusLabel variant="success" className="mb-2.5">
           <Check size={12} />
           <span>Questions answered</span>
-        </div>
+        </StatusLabel>
         <div className="flex flex-col gap-1.5">
           {questions.map((q) => {
             const answer = savedAnswers[q.id];
@@ -145,9 +146,9 @@ export function ClarifyingQuestionsCard({
 
   // Active state: tabbed question UI
   return (
-    <div className="rounded-lg border border-border bg-card/50 overflow-hidden max-w-[520px]">
+    <div className="rounded-xl border border-border bg-muted dark:bg-card/50 overflow-hidden max-w-[520px]">
       {/* Tab bar */}
-      <div className="flex border-b border-border bg-muted/30 overflow-x-auto">
+      <div className="flex border-b border-border bg-muted dark:bg-muted/30 overflow-x-auto">
         {questions.map((q, idx) => {
           const tabAnswered = hasAnswer(q.id);
           const isActive = idx === activeTab;
@@ -162,7 +163,7 @@ export function ClarifyingQuestionsCard({
               }`}
             >
               {tabAnswered && (
-                <Check size={10} className="text-emerald-500" />
+                <Check size={10} style={{ color: "var(--color-success)" }} />
               )}
               {q.header}
             </button>
@@ -197,13 +198,13 @@ export function ClarifyingQuestionsCard({
                   className={`p-2.5 px-3.5 text-left rounded-md cursor-pointer transition-all duration-150 w-full border flex items-start gap-3 ${
                     isSelected
                       ? "bg-primary/10 border-primary/30"
-                      : "bg-muted/30 border-border hover:border-border/80 hover:bg-muted/50"
+                      : "bg-card dark:bg-muted/30 border-border hover:border-border/80 hover:bg-card/80 dark:hover:bg-muted/50"
                   }`}
                 >
                   <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[12px] font-medium ${
                     isSelected
                       ? "bg-primary/20 text-foreground"
-                      : "bg-muted/60 text-foreground/50"
+                      : "bg-muted dark:bg-muted/60 text-muted-foreground dark:text-foreground/50"
                   }`}>
                     {idx + 1}
                   </span>
@@ -243,7 +244,7 @@ export function ClarifyingQuestionsCard({
                     className={`p-2.5 px-3.5 text-left rounded-md cursor-pointer transition-all duration-150 w-full border ${
                       isOtherSelected
                         ? "bg-primary/10 border-primary/30"
-                        : "bg-muted/30 border-border hover:border-border/80 hover:bg-muted/50"
+                        : "bg-card dark:bg-muted/30 border-border hover:border-border/80 hover:bg-card/80 dark:hover:bg-muted/50"
                     }`}
                   >
                     <div
@@ -285,7 +286,7 @@ export function ClarifyingQuestionsCard({
           <button
             onClick={() => setActiveTab(activeTab + 1)}
             disabled={!hasAnswer(currentQuestion.id)}
-            className={`w-full py-2.5 border-none rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 ${
+            className={`w-full border-none rounded-lg text-sm font-medium px-5 py-2 transition-all duration-200 ${
               hasAnswer(currentQuestion.id)
                 ? "bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
                 : "bg-muted/50 text-muted-foreground/40 cursor-not-allowed"
@@ -297,7 +298,7 @@ export function ClarifyingQuestionsCard({
           <button
             onClick={handleSubmit}
             disabled={!allAnswered}
-            className={`w-full py-2.5 border-none rounded-md text-[12px] font-semibold tracking-wide transition-all duration-200 ${
+            className={`w-full border-none rounded-lg text-sm font-medium px-5 py-2 transition-all duration-200 ${
               allAnswered
                 ? "bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90"
                 : "bg-muted/50 text-muted-foreground/40 cursor-not-allowed"
