@@ -116,9 +116,9 @@ export function ChatView({
   };
 
   const chatContent = (
-    <div className="flex h-full flex-1 flex-col bg-card dark:bg-background min-w-0">
+    <div className="relative flex h-full flex-1 flex-col bg-card dark:bg-background min-w-0">
       {/* Messages */}
-      <ScrollArea className="flex-1 px-6" ref={scrollRef}>
+      <ScrollArea className="flex-1 px-4" ref={scrollRef}>
         <MessageList
           messages={messages}
           artifacts={artifacts}
@@ -136,13 +136,15 @@ export function ChatView({
           onDeclineRequest={onDeclineRequest}
           isLoading={isLoading}
         />
+        {/* Spacer so last message can scroll above the floating input */}
+        <div className="h-24" />
       </ScrollArea>
 
-      {/* Input */}
-      <div className="p-4 shrink-0">
+      {/* Input — floats over scroll content */}
+      <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 0%, var(--card) 40%)' }}>
         <div className="mx-auto max-w-3xl">
           <form onSubmit={handleSubmit}>
-            <div className="rounded-xl border border-border bg-card dark:bg-muted" style={{ padding: "14px 16px" }}>
+            <div className="rounded-xl bg-card shadow-[0_4px_24px_rgba(0,0,0,0.08)] pointer-events-auto" style={{ padding: "14px 16px" }}>
               <textarea
                 ref={inputRef}
                 value={input}
