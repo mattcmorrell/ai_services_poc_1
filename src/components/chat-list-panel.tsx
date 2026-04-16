@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Client, Chat } from "@/types/chat";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useResizable, ResizeHandle } from "@/components/ui/resize-handle";
+import { ClientSelectDialog } from "@/components/agents/client-select-dialog";
 
 interface ChatListPanelProps {
   clients: Client[];
@@ -43,7 +44,7 @@ function ChatItem({ chat, clientName, isSelected, onSelect }: ChatItemProps) {
       className={cn(
         "p-3 cursor-pointer border-l-2",
         isSelected
-          ? "bg-accent border-primary"
+          ? "bg-primary border-primary"
           : "border-transparent hover:bg-accent/50"
       )}
     >
@@ -51,14 +52,14 @@ function ChatItem({ chat, clientName, isSelected, onSelect }: ChatItemProps) {
         <span
           className={cn(
             "w-2 h-2 flex-shrink-0 rounded-full",
-            chat.hasUnread ? "bg-primary" : ""
+            chat.hasUnread ? (isSelected ? "bg-primary-foreground" : "bg-primary") : ""
           )}
         />
-        <span className={cn("truncate", isSelected && "font-medium")}>
+        <span className={cn("truncate", isSelected ? "font-semibold text-primary-foreground" : "font-medium")}>
           {chat.title}
         </span>
       </div>
-      <div className="text-xs text-muted-foreground mt-1 ml-4 truncate">
+      <div className={cn("text-xs mt-1 ml-4 truncate", isSelected ? "font-medium text-primary-foreground" : "text-muted-foreground")}>
         {clientName ? `${clientName} · ` : ""}
         {formatTimeAgo(chat.updatedAt)}
       </div>
@@ -81,6 +82,7 @@ export function ChatListPanel({
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [clientDialogOpen, setClientDialogOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -123,6 +125,7 @@ export function ChatListPanel({
   };
 
   return (
+    <>
     <div className="flex flex-shrink-0" style={{ width }}>
     <div className="flex min-w-0 flex-1 flex-col bg-muted dark:bg-card">
       {/* Header: title + new chat + search */}
@@ -130,12 +133,7 @@ export function ChatListPanel({
         <h2 className="text-base font-semibold">Recent Chats</h2>
         <div className="mt-1 flex items-center justify-between">
           <button
-            onClick={() => {
-              const firstClient = clients[0];
-              if (firstClient) {
-                onNewChat(firstClient.id);
-              }
-            }}
+            onClick={() => setClientDialogOpen(true)}
             className="flex items-center gap-2 text-primary hover:text-primary/80 text-sm"
           >
             <Plus className="w-4 h-4" />
@@ -205,5 +203,15 @@ export function ChatListPanel({
     </div>
     <ResizeHandle onMouseDown={onDragStart} />
     </div>
+    <ClientSelectDialog
+      open={clientDialogOpen}
+      onOpenChange={setClientDialogOpen}
+      clients={clients}
+      onSelectClient={(clientId) => {
+        onNewChat(clientId);
+        setClientDialogOpen(false);
+      }}
+    />
+    </>
   );
 }

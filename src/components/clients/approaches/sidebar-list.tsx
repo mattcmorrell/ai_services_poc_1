@@ -104,7 +104,7 @@ export function SidebarList({
                   "group relative flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring",
                   isActive
-                    ? "border-l-2 border-primary bg-accent"
+                    ? "border-l-2 border-primary bg-primary"
                     : "border-l-2 border-transparent hover:bg-muted/50"
                 )}
               >
@@ -119,24 +119,32 @@ export function SidebarList({
                   <div className="flex items-center justify-between gap-2">
                     <span
                       className={cn(
-                        "truncate text-sm font-medium transition-colors",
+                        "truncate text-sm transition-colors",
                         isActive
-                          ? "text-foreground"
-                          : "text-foreground/80 group-hover:text-foreground"
+                          ? "font-semibold text-primary-foreground"
+                          : "font-medium text-foreground/80 group-hover:text-foreground"
                       )}
                     >
                       {client.name}
                     </span>
 
                     {unreadChats > 0 && (
-                      <span className="flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[11px] font-medium leading-none text-primary">
+                      <span className={cn(
+                        "flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-medium leading-none",
+                        isActive
+                          ? "bg-primary-foreground/20 text-primary-foreground"
+                          : "bg-primary/15 text-primary"
+                      )}>
                         <ChatDots className="h-2.5 w-2.5" />
                         {unreadChats}
                       </span>
                     )}
                   </div>
 
-                  <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <span className={cn(
+                    "flex items-center gap-1 text-[11px]",
+                    isActive ? "font-medium text-primary-foreground" : "text-muted-foreground"
+                  )}>
                     <Clock className="h-2.5 w-2.5" />
                     {lastActivity ? relativeTime(lastActivity) : "No activity"}
                   </span>

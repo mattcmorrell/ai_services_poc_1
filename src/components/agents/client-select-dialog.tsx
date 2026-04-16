@@ -15,7 +15,7 @@ import { Agent } from "@/types/agent";
 interface ClientSelectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  agent: Agent | null;
+  agent?: Agent | null;
   clients: Client[];
   onSelectClient: (clientId: string) => void;
 }
@@ -27,15 +27,13 @@ export function ClientSelectDialog({
   clients,
   onSelectClient,
 }: ClientSelectDialogProps) {
-  if (!agent) return null;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Select a Client</DialogTitle>
           <DialogDescription>
-            Choose which client you want to work on with {agent.name}
+            {agent ? `Choose which client you want to work on with ${agent.name}` : "Choose which client to start a new chat for"}
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="max-h-80">
