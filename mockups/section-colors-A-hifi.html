@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variation A — Mercury Light + Dark</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #111;
+    font-family: 'Inter', -apple-system, sans-serif;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 100vh;
+  }
+
+  h1 { color: #e0e0e0; font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { color: #777; font-size: 13px; margin-bottom: 24px; }
+
+  .frames {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+  }
+
+  .frame-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .frame-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0 2px;
+  }
+
+  /* ── The app shell ── */
+  .app {
+    display: flex;
+    height: 620px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 64px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 8px;
+    gap: 4px;
+  }
+
+  .logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .nav-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .nav-btn svg { width: 20px; height: 20px; }
+
+  .nav-btn.active { }
+
+  .badge {
+    position: absolute;
+    top: -2px; right: -2px;
+    width: 18px; height: 18px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+    line-height: 1;
+  }
+
+  .sidebar-spacer { flex: 1; }
+
+  .sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* ── CHAT LIST ── */
+  .chat-list {
+    width: 240px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-left-width: 1px;
+    border-left-style: solid;
+  }
+
+  .chat-list-header {
+    padding: 14px 12px 10px;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+  }
+
+  .chat-list-title { font-size: 15px; font-weight: 600; }
+
+  .chat-list-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+
+  .new-chat-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .chat-item {
+    padding: 10px 12px;
+    border-left: 2px solid transparent;
+    cursor: pointer;
+  }
+
+  .chat-item.selected { border-left-color: inherit; }
+
+  .chat-item-title {
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chat-item-meta {
+    font-size: 11px;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .unread-dot {
+    width: 6px; height: 6px;
+    border-radius: 3px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  /* ── CHAT AREA ── */
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border-left-width: 1px;
+    border-left-style: solid;
+  }
+
+  .chat-header {
+    padding: 16px 24px;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .chat-title { font-size: 20px; font-weight: 600; line-height: 1.2; }
+  .chat-client { font-size: 13px; margin-top: 2px; }
+
+  .chat-messages {
+    flex: 1;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden;
+  }
+
+  .message { display: flex; flex-direction: column; gap: 6px; max-width: 85%; }
+  .message.user { align-self: flex-end; }
+
+  .message-bubble {
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .message-meta { font-size: 11px; font-family: 'JetBrains Mono', monospace; padding: 0 4px; }
+
+  .activity-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 0;
+  }
+
+  .activity-dot {
+    width: 6px; height: 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .chat-input-wrap {
+    padding: 12px 24px 16px;
+    flex-shrink: 0;
+  }
+
+  .chat-input-box {
+    border-radius: 12px;
+    border-width: 1px;
+    border-style: solid;
+    padding: 12px 14px;
+  }
+
+  .input-placeholder { font-size: 13px; }
+
+  .input-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+
+  .input-btn {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── PLAN PANEL ── */
+  .plan-panel {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-left-width: 1px;
+    border-left-style: solid;
+  }
+
+  .plan-header {
+    padding: 14px 16px;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .plan-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    border-width: 1px;
+    border-style: solid;
+    flex-shrink: 0;
+  }
+
+  .plan-title { font-size: 13px; font-weight: 500; }
+  .plan-status { font-size: 10px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 1px; }
+
+  .plan-content { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+
+  .plan-card {
+    border-radius: 8px;
+    padding: 10px 12px;
+    border-width: 1px;
+    border-style: solid;
+  }
+
+  .plan-step-num {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .plan-step-title { font-size: 12px; font-weight: 500; line-height: 1.4; }
+  .plan-step-meta { font-size: 11px; margin-top: 3px; }
+
+  .plan-step-check {
+    width: 16px; height: 16px;
+    border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-right: 6px;
+    font-size: 9px;
+    flex-shrink: 0;
+  }
+
+  /* ── Token legend ── */
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .legend-swatch {
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.15);
+    flex-shrink: 0;
+  }
+
+  /* ── Icon SVGs inline ── */
+  svg { display: block; }
+</style>
+</head>
+<body>
+
+<h1>Variation A — Framed Content</h1>
+<p class="subtitle">Sidebar + ChatList + Header = <code style="background:#222;padding:2px 6px;border-radius:3px;font-size:11px">secondary</code> &nbsp;·&nbsp; Chat = <code style="background:#222;padding:2px 6px;border-radius:3px;font-size:11px">card</code> &nbsp;·&nbsp; Plan = <code style="background:#222;padding:2px 6px;border-radius:3px;font-size:11px">background</code></p>
+
+<div class="frames">
+
+  <!-- ════════ MERCURY LIGHT ════════ -->
+  <div class="frame-wrap">
+    <div class="frame-label" style="color:#9da0a8">Mercury Light</div>
+    <div class="app">
+
+      <!-- Sidebar: secondary #F4F5F7 -->
+      <div class="sidebar" style="background:#F4F5F7; border-right:1px solid rgba(30,35,50,0.08)">
+        <div class="logo" style="background:#E2E6F4; color:#506098">PC</div>
+
+        <!-- Active: Chats -->
+        <div class="nav-btn active" style="background:#E2E6F4; color:#3C3F48">
+          <svg viewBox="0 0 256 256" fill="currentColor"><path d="M216,48H40A16,16,0,0,0,24,64V224a8,8,0,0,0,13,6.22L72,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48Z"/></svg>
+          <div class="badge" style="background:#506098;color:#fff">5</div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="nav-btn" style="color:#6E7178">
+          <svg viewBox="0 0 256 256" fill="currentColor" style="opacity:0.6"><path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77Z"/></svg>
+          <div class="badge" style="background:#506098;color:#fff">12</div>
+        </div>
+
+        <!-- Clients -->
+        <div class="nav-btn" style="color:#6E7178">
+          <svg viewBox="0 0 256 256" fill="currentColor" style="opacity:0.6"><path d="M243.38,177.19a32,32,0,0,0-28.54-16.38c-9.64.15-18.38,3.57-24.78,9.59L152,194.68A40.11,40.11,0,0,0,112,160H88a8,8,0,0,0,0,16h24a24,24,0,0,1,0,48H56L32,200.69V168H96a8,8,0,0,0,0-16H24a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8H64v8a8,8,0,0,0,8,8H216a8,8,0,0,0,6.62-3.52l24-36A8,8,0,0,0,243.38,177.19ZM152,72a56,56,0,1,1-56-56A56.06,56.06,0,0,1,152,72Z"/></svg>
+        </div>
+
+        <!-- Agents -->
+        <div class="nav-btn" style="color:#6E7178">
+          <svg viewBox="0 0 256 256" fill="currentColor" style="opacity:0.6"><path d="M200,48H136V16a8,8,0,0,0-16,0V48H56A32,32,0,0,0,24,80V192a32,32,0,0,0,32,32H200a32,32,0,0,0,32-32V80A32,32,0,0,0,200,48ZM100,160H80a8,8,0,0,1,0-16h20a8,8,0,0,1,0,16Zm76,0H156a8,8,0,0,1,0-16h20a8,8,0,0,1,0,16ZM96,120a16,16,0,1,1,16,16A16,16,0,0,1,96,120Zm48,0a16,16,0,1,1,16,16A16,16,0,0,1,144,120Z"/></svg>
+        </div>
+
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-bottom">
+          <!-- Settings -->
+          <div class="nav-btn" style="color:#6E7178">
+            <svg viewBox="0 0 256 256" fill="currentColor" style="opacity:0.5; width:16px;height:16px"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.6,107.6,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.29,107.29,0,0,0-26.25-10.86,8,8,0,0,0-7.06,1.48L130.16,40Q128,40,125.84,40L107.2,25.08a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.48a8,8,0,0,0-3.93,6L67.32,64.19q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.08,148.8a8,8,0,0,0-1.48,7.06,107.6,107.6,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat List: secondary #F4F5F7 -->
+      <div class="chat-list" style="background:#F4F5F7; border-color:rgba(30,35,50,0.08)">
+        <div class="chat-list-header" style="border-color:rgba(30,35,50,0.08)">
+          <div class="chat-list-title" style="color:#1C1E24">Recent Chats</div>
+          <div class="chat-list-actions">
+            <div class="new-chat-btn" style="color:#506098">
+              <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>
+              New Chat
+            </div>
+            <div style="width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#6E7178">
+              <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,218.34l-50.07-50.07a88,88,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.31ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat items -->
+        <div class="chat-item selected" style="border-left-color:#506098; background:#E2E6F4">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="unread-dot" style="background:#506098"></div>
+            <div class="chat-item-title" style="color:#1C1E24">January Payroll</div>
+          </div>
+          <div class="chat-item-meta" style="color:#6E7178">
+            <span>Black Mesa · 5 min ago</span>
+          </div>
+        </div>
+
+        <div class="chat-item" style="border-left-color:transparent">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="unread-dot" style="background:#506098"></div>
+            <div class="chat-item-title" style="color:#1C1E24">Portal Gun Safety Training</div>
+          </div>
+          <div class="chat-item-meta" style="color:#6E7178">Portal Corp · 2 hr ago</div>
+        </div>
+
+        <div class="chat-item">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="unread-dot" style="background:transparent"></div>
+            <div class="chat-item-title" style="color:#3C3F48">Benefits Enrollment Q1</div>
+          </div>
+          <div class="chat-item-meta" style="color:#6E7178">Aperture · Yesterday</div>
+        </div>
+
+        <div class="chat-item">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="unread-dot" style="background:transparent"></div>
+            <div class="chat-item-title" style="color:#3C3F48">Virus Containment Protocol</div>
+          </div>
+          <div class="chat-item-meta" style="color:#6E7178">Umbrella · 3 days ago</div>
+        </div>
+
+        <div class="chat-item">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="unread-dot" style="background:transparent"></div>
+            <div class="chat-item-title" style="color:#3C3F48">Q4 OSHA Compliance</div>
+          </div>
+          <div class="chat-item-meta" style="color:#6E7178">Black Mesa · 5 days ago</div>
+        </div>
+
+        <div class="chat-item">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="unread-dot" style="background:transparent"></div>
+            <div class="chat-item-title" style="color:#3C3F48">Tax Forms 2024</div>
+          </div>
+          <div class="chat-item-meta" style="color:#6E7178">Black Mesa · 1 wk ago</div>
+        </div>
+      </div>
+
+      <!-- Chat Area: card #FFFFFF -->
+      <div class="chat-area" style="background:#FFFFFF; border-color:rgba(30,35,50,0.08)">
+        <!-- Header: secondary #F4F5F7 -->
+        <div class="chat-header" style="background:#F4F5F7; border-color:rgba(30,35,50,0.08)">
+          <div>
+            <div class="chat-title" style="color:#1C1E24">January Payroll</div>
+            <div class="chat-client" style="color:#6E7178">Black Mesa Inc.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <!-- Plan pill -->
+            <div style="display:flex;align-items:center;gap:6px;background:#E2E6F4;border:1px solid rgba(30,35,50,0.08);border-radius:20px;padding:4px 10px;cursor:pointer">
+              <div style="width:6px;height:6px;border-radius:3px;background:#506098"></div>
+              <span style="font-size:12px;font-weight:500;color:#506098">Run Payroll</span>
+              <svg width="12" height="12" viewBox="0 0 256 256" fill="#506098"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg>
+            </div>
+            <div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#6E7178">
+              <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M128,96a32,32,0,1,0,32,32A32,32,0,0,0,128,96Zm-80,0a32,32,0,1,0,32,32A32,32,0,0,0,48,96Zm160,0a32,32,0,1,0,32,32A32,32,0,0,0,208,96Z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-messages" style="background:#FFFFFF">
+
+          <div class="message">
+            <div class="message-bubble" style="background:#F4F5F7; color:#1C1E24">
+              Jan 15 Vance — 58 overtime hours. Dr. Vance has 58 overtime hours this payroll period, a 3-period average of 12 hours. That's a 383% increase. His department average is 6 hours. This is the OT that's unusual.
+            </div>
+            <div class="activity-line" style="color:#6E7178">
+              <div class="activity-dot" style="background:#506098"></div>
+              <span>Pulled payroll data for Q1</span>
+              <span style="color:#9DA0A8;margin-left:4px">✓</span>
+            </div>
+            <div class="activity-line" style="color:#6E7178">
+              <div class="activity-dot" style="background:#506098"></div>
+              <span>Flagged 2 anomalies</span>
+              <span style="color:#9DA0A8;margin-left:4px">✓</span>
+            </div>
+          </div>
+
+          <div class="message user">
+            <div class="message-bubble" style="background:#E2E6F4; color:#1C1E24">
+              Does it look unusual compared to the prior 3 payroll periods?
+            </div>
+          </div>
+
+          <div class="message">
+            <div class="message-bubble" style="background:#F4F5F7; color:#1C1E24">
+              Yes — it looks like 3x logged more OT this period than her average. Flagging it so you're aware. I need to know how to handle this before I run payroll.
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-wrap">
+          <div class="chat-input-box" style="background:#FFFFFF; border-color:rgba(30,35,50,0.12)">
+            <div class="input-placeholder" style="color:#9DA0A8">Ask anything...</div>
+            <div class="input-actions">
+              <div class="input-btn" style="color:#6E7178">
+                <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>
+              </div>
+              <div class="input-btn" style="color:#6E7178">
+                <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M128,176a48.05,48.05,0,0,0,48-48V64a48,48,0,0,0-96,0v64A48.05,48.05,0,0,0,128,176Zm88-48a88,88,0,0,1-176,0,8,8,0,0,1,16,0,72,72,0,0,0,144,0,8,8,0,0,1,16,0Z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plan Panel: background #F3F4F6 -->
+      <div class="plan-panel" style="background:#F3F4F6; border-color:rgba(30,35,50,0.08)">
+        <div class="plan-header" style="border-color:rgba(30,35,50,0.08)">
+          <div class="plan-icon" style="background:#FFFFFF; border-color:rgba(30,35,50,0.08); color:#6E7178">
+            <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"/></svg>
+          </div>
+          <div>
+            <div class="plan-title" style="color:#1C1E24">Run Payroll for Black Mesa</div>
+            <div class="plan-status" style="color:#506098">● Pending Approval</div>
+          </div>
+        </div>
+
+        <div class="plan-content">
+          <div class="plan-card" style="background:#FFFFFF; border-color:rgba(30,35,50,0.08)">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div class="plan-step-check" style="background:#E2E6F4;color:#506098;margin-top:1px">1</div>
+              <div>
+                <div class="plan-step-title" style="color:#1C1E24">Validate employee hours</div>
+                <div class="plan-step-meta" style="color:#6E7178">Checking 47 employees · +2 flagged</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="plan-card" style="background:#FFFFFF; border-color:rgba(30,35,50,0.08)">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div class="plan-step-check" style="background:#F4F5F7;color:#9DA0A8;margin-top:1px">2</div>
+              <div>
+                <div class="plan-step-title" style="color:#3C3F48">Apply deductions & benefits</div>
+                <div class="plan-step-meta" style="color:#9DA0A8">HSA, 401k, garnishments</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="plan-card" style="background:#FFFFFF; border-color:rgba(30,35,50,0.08)">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div class="plan-step-check" style="background:#F4F5F7;color:#9DA0A8;margin-top:1px">3</div>
+              <div>
+                <div class="plan-step-title" style="color:#3C3F48">Review individual employees against payroll</div>
+                <div class="plan-step-meta" style="color:#9DA0A8">Cross-check pay stubs</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="plan-card" style="background:#FFFFFF; border-color:rgba(30,35,50,0.08); border-left:2px solid #E08850">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div class="plan-step-check" style="background:#ECE4D4;color:#C06828;margin-top:1px">⚠</div>
+              <div>
+                <div class="plan-step-title" style="color:#3C3F48">Process direct deposits and send pay stubs</div>
+                <div class="plan-step-meta" style="color:#9DA0A8">⚠ Irreversible — requires approval</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Approve/Decline -->
+        <div style="padding:12px 16px 16px;display:flex;gap:8px;flex-shrink:0">
+          <div style="flex:1;padding:8px;background:#506098;color:#fff;border-radius:8px;text-align:center;font-size:13px;font-weight:500;cursor:pointer">Approve</div>
+          <div style="flex:1;padding:8px;background:#FFFFFF;color:#3C3F48;border:1px solid rgba(30,35,50,0.12);border-radius:8px;text-align:center;font-size:13px;font-weight:500;cursor:pointer">Decline</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Token legend -->
+    <div class="legend" style="background:#1e1e1e;border:1px solid #2a2a2a">
+      <div class="legend-item" style="color:#aaa">
+        <div class="legend-swatch" style="background:#F4F5F7"></div>
+        <span>Sidebar + List + Header = <strong style="color:#ddd">secondary</strong> #F4F5F7</span>
+      </div>
+      <div class="legend-item" style="color:#aaa">
+        <div class="legend-swatch" style="background:#FFFFFF;border-color:rgba(30,35,50,0.2)"></div>
+        <span>Chat = <strong style="color:#ddd">card</strong> #FFFFFF</span>
+      </div>
+      <div class="legend-item" style="color:#aaa">
+        <div class="legend-swatch" style="background:#F3F4F6"></div>
+        <span>Plan = <strong style="color:#ddd">background</strong> #F3F4F6</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ MERCURY DARK ════════ -->
+  <div class="frame-wrap">
+    <div class="frame-label" style="color:#6878b8">Mercury Dark</div>
+    <div class="app">
+
+      <!-- Sidebar: secondary #282A30 -->
+      <div class="sidebar" style="background:#282A30; border-right:1px solid rgba(180,185,200,0.07)">
+        <div class="logo" style="background:#1D2024; color:#6878B8">PC</div>
+
+        <!-- Active: Chats -->
+        <div class="nav-btn active" style="background:#1D2024; color:#E8E9ED">
+          <svg viewBox="0 0 256 256" fill="currentColor"><path d="M216,48H40A16,16,0,0,0,24,64V224a8,8,0,0,0,13,6.22L72,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48Z"/></svg>
+          <div class="badge" style="background:#6878B8;color:#fff">5</div>
+        </div>
+
+        <div class="nav-btn" style="color:#9DA0A8">
+          <svg viewBox="0 0 256 256" fill="currentColor" style="opacity:0.55"><path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77Z"/></svg>
+          <div class="badge" style="background:#6878B8;color:#fff">12</div>
+        </div>
+
+        <div class="nav-btn" style="color:#9DA0A8">
+          <svg viewBox="0 0 256 256" fill="currentColor" style="opacity:0.55"><path d="M243.38,177.19a32,32,0,0,0-28.54-16.38c-9.64.15-18.38,3.57-24.78,9.59L152,194.68A40.11,40.11,0,0,0,112,160H88a8,8,0,0,0,0,16h24a24,24,0,0,1,0,48H56L32,200.69V168H96a8,8,0,0,0,0-16H24a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8H64v8a8,8,0,0,0,8,8H216a8,8,0,0,0,6.62-3.52l24-36A8,8,0,0,0,243.38,177.19ZM152,72a56,56,0,1,1-56-56A56.06,56.06,0,0,1,152,72Z"/></svg>
+        </div>
+
+        <div class="nav-btn" style="color:#9DA0A8">
+          <svg viewBox="0 0 256 256" fill="currentColor" style="opacity:0.55"><path d="M200,48H136V16a8,8,0,0,0-16,0V48H56A32,32,0,0,0,24,80V192a32,32,0,0,0,32,32H200a32,32,0,0,0,32-32V80A32,32,0,0,0,200,48ZM100,160H80a8,8,0,0,1,0-16h20a8,8,0,0,1,0,16Zm76,0H156a8,8,0,0,1,0-16h20a8,8,0,0,1,0,16ZM96,120a16,16,0,1,1,16,16A16,16,0,0,1,96,120Zm48,0a16,16,0,1,1,16,16A16,16,0,0,1,144,120Z"/></svg>
+        </div>
+
+        <div class="sidebar-spacer"></div>
+        <div class="sidebar-bottom">
+          <div class="nav-btn" style="color:#9DA0A8">
+            <svg viewBox="0 0 256 256" fill="currentColor" style="opacity:0.5;width:16px;height:16px"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.6,107.6,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.29,107.29,0,0,0-26.25-10.86,8,8,0,0,0-7.06,1.48L130.16,40Q128,40,125.84,40L107.2,25.08a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.48a8,8,0,0,0-3.93,6L67.32,64.19q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.08,148.8a8,8,0,0,0-1.48,7.06,107.6,107.6,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat List: secondary #282A30 -->
+      <div class="chat-list" style="background:#282A30; border-color:rgba(180,185,200,0.07)">
+        <div class="chat-list-header" style="border-color:rgba(180,185,200,0.07)">
+          <div class="chat-list-title" style="color:#E8E9ED">Recent Chats</div>
+          <div class="chat-list-actions">
+            <div class="new-chat-btn" style="color:#6878B8">
+              <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>
+              New Chat
+            </div>
+            <div style="width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9DA0A8">
+              <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,218.34l-50.07-50.07a88,88,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.31ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-item selected" style="border-left-color:#6878B8; background:#222428">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="unread-dot" style="background:#6878B8"></div>
+            <div class="chat-item-title" style="color:#E8E9ED">January Payroll</div>
+          </div>
+          <div class="chat-item-meta" style="color:#9DA0A8">Black Mesa · 5 min ago</div>
+        </div>
+
+        <div class="chat-item">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="unread-dot" style="background:#6878B8"></div>
+            <div class="chat-item-title" style="color:#E8E9ED">Portal Gun Safety Training</div>
+          </div>
+          <div class="chat-item-meta" style="color:#9DA0A8">Portal Corp · 2 hr ago</div>
+        </div>
+
+        <div class="chat-item">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="unread-dot" style="background:transparent"></div>
+            <div class="chat-item-title" style="color:#9DA0A8">Benefits Enrollment Q1</div>
+          </div>
+          <div class="chat-item-meta" style="color:#6E7178">Aperture · Yesterday</div>
+        </div>
+
+        <div class="chat-item">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="unread-dot" style="background:transparent"></div>
+            <div class="chat-item-title" style="color:#9DA0A8">Virus Containment Protocol</div>
+          </div>
+          <div class="chat-item-meta" style="color:#6E7178">Umbrella · 3 days ago</div>
+        </div>
+
+        <div class="chat-item">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="unread-dot" style="background:transparent"></div>
+            <div class="chat-item-title" style="color:#9DA0A8">Q4 OSHA Compliance</div>
+          </div>
+          <div class="chat-item-meta" style="color:#6E7178">Black Mesa · 5 days ago</div>
+        </div>
+      </div>
+
+      <!-- Chat Area: card #1D2024 -->
+      <div class="chat-area" style="background:#1D2024; border-color:rgba(180,185,200,0.07)">
+        <!-- Header: secondary #282A30 -->
+        <div class="chat-header" style="background:#282A30; border-color:rgba(180,185,200,0.07)">
+          <div>
+            <div class="chat-title" style="color:#E8E9ED">January Payroll</div>
+            <div class="chat-client" style="color:#9DA0A8">Black Mesa Inc.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="display:flex;align-items:center;gap:6px;background:#1D2024;border:1px solid rgba(180,185,200,0.12);border-radius:20px;padding:4px 10px;cursor:pointer">
+              <div style="width:6px;height:6px;border-radius:3px;background:#6878B8"></div>
+              <span style="font-size:12px;font-weight:500;color:#6878B8">Run Payroll</span>
+              <svg width="12" height="12" viewBox="0 0 256 256" fill="#6878B8"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg>
+            </div>
+            <div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#9DA0A8">
+              <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M128,96a32,32,0,1,0,32,32A32,32,0,0,0,128,96Zm-80,0a32,32,0,1,0,32,32A32,32,0,0,0,48,96Zm160,0a32,32,0,1,0,32,32A32,32,0,0,0,208,96Z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Messages on card bg -->
+        <div class="chat-messages" style="background:#1D2024">
+          <div class="message">
+            <div class="message-bubble" style="background:#282A30; color:#E8E9ED">
+              Jan 15 Vance — 58 overtime hours. Dr. Vance has 58 overtime hours this payroll period, a 3-period average of 12 hours. That's a 383% increase.
+            </div>
+            <div class="activity-line" style="color:#9DA0A8">
+              <div class="activity-dot" style="background:#6878B8"></div>
+              <span>Pulled payroll data for Q1</span>
+              <span style="color:#6E7178;margin-left:4px">✓</span>
+            </div>
+            <div class="activity-line" style="color:#9DA0A8">
+              <div class="activity-dot" style="background:#6878B8"></div>
+              <span>Flagged 2 anomalies</span>
+              <span style="color:#6E7178;margin-left:4px">✓</span>
+            </div>
+          </div>
+
+          <div class="message user">
+            <div class="message-bubble" style="background:#282A30; color:#E8E9ED; border:1px solid rgba(104,120,184,0.2)">
+              Does it look unusual compared to the prior 3 payroll periods?
+            </div>
+          </div>
+
+          <div class="message">
+            <div class="message-bubble" style="background:#282A30; color:#E8E9ED">
+              Yes — it looks like 3x logged more OT this period than her average. Flagging it so you're aware.
+            </div>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-wrap">
+          <div class="chat-input-box" style="background:#282A30; border-color:rgba(180,185,200,0.11)">
+            <div class="input-placeholder" style="color:#6E7178">Ask anything...</div>
+            <div class="input-actions">
+              <div class="input-btn" style="color:#9DA0A8">
+                <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>
+              </div>
+              <div class="input-btn" style="color:#9DA0A8">
+                <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M128,176a48.05,48.05,0,0,0,48-48V64a48,48,0,0,0-96,0v64A48.05,48.05,0,0,0,128,176Zm88-48a88,88,0,0,1-176,0,8,8,0,0,1,16,0,72,72,0,0,0,144,0,8,8,0,0,1,16,0Z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plan Panel: background #101214 -->
+      <div class="plan-panel" style="background:#101214; border-color:rgba(180,185,200,0.07)">
+        <div class="plan-header" style="border-color:rgba(180,185,200,0.07)">
+          <div class="plan-icon" style="background:#1D2024; border-color:rgba(180,185,200,0.07); color:#9DA0A8">
+            <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"/></svg>
+          </div>
+          <div>
+            <div class="plan-title" style="color:#E8E9ED">Run Payroll for Black Mesa</div>
+            <div class="plan-status" style="color:#6878B8">● Pending Approval</div>
+          </div>
+        </div>
+
+        <div class="plan-content">
+          <div class="plan-card" style="background:#1D2024; border-color:rgba(180,185,200,0.07)">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div class="plan-step-check" style="background:#282A30;color:#6878B8;margin-top:1px">1</div>
+              <div>
+                <div class="plan-step-title" style="color:#E8E9ED">Validate employee hours</div>
+                <div class="plan-step-meta" style="color:#9DA0A8">47 employees · +2 flagged</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="plan-card" style="background:#1D2024; border-color:rgba(180,185,200,0.07)">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div class="plan-step-check" style="background:#282A30;color:#6E7178;margin-top:1px">2</div>
+              <div>
+                <div class="plan-step-title" style="color:#9DA0A8">Apply deductions & benefits</div>
+                <div class="plan-step-meta" style="color:#6E7178">HSA, 401k, garnishments</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="plan-card" style="background:#1D2024; border-color:rgba(180,185,200,0.07)">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div class="plan-step-check" style="background:#282A30;color:#6E7178;margin-top:1px">3</div>
+              <div>
+                <div class="plan-step-title" style="color:#9DA0A8">Review individual employees</div>
+                <div class="plan-step-meta" style="color:#6E7178">Cross-check pay stubs</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="plan-card" style="background:#1D2024; border-color:rgba(180,185,200,0.07); border-left:2px solid #E08850">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div class="plan-step-check" style="background:#382E16;color:#E08850;margin-top:1px">⚠</div>
+              <div>
+                <div class="plan-step-title" style="color:#9DA0A8">Process direct deposits</div>
+                <div class="plan-step-meta" style="color:#6E7178">⚠ Irreversible — approval needed</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:12px 16px 16px;display:flex;gap:8px;flex-shrink:0">
+          <div style="flex:1;padding:8px;background:#6878B8;color:#fff;border-radius:8px;text-align:center;font-size:13px;font-weight:500;cursor:pointer">Approve</div>
+          <div style="flex:1;padding:8px;background:#1D2024;color:#E8E9ED;border:1px solid rgba(180,185,200,0.11);border-radius:8px;text-align:center;font-size:13px;font-weight:500;cursor:pointer">Decline</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Token legend -->
+    <div class="legend" style="background:#1e1e1e;border:1px solid #2a2a2a">
+      <div class="legend-item" style="color:#aaa">
+        <div class="legend-swatch" style="background:#282A30"></div>
+        <span>Sidebar + List + Header = <strong style="color:#ddd">secondary</strong> #282A30</span>
+      </div>
+      <div class="legend-item" style="color:#aaa">
+        <div class="legend-swatch" style="background:#1D2024"></div>
+        <span>Chat = <strong style="color:#ddd">card</strong> #1D2024</span>
+      </div>
+      <div class="legend-item" style="color:#aaa">
+        <div class="legend-swatch" style="background:#101214"></div>
+        <span>Plan = <strong style="color:#ddd">background</strong> #101214</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="feedback-panel.js"></script>
+</body>
+</html>

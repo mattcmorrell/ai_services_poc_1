@@ -1,0 +1,20 @@
+- generic [ref=e1]:
+  - heading "Claude Code · Daily Activity" [level=1] [ref=e2]
+  - paragraph [ref=e3]: Jan 6 – Apr 7, 2026 · ~/.claude/stats-cache.json
+  - generic [ref=e4]:
+    - generic [ref=e5]
+    - generic [ref=e8]
+    - generic [ref=e11]
+    - generic [ref=e14]
+    - generic [ref=e17]
+    - generic [ref=e21]
+  - generic [ref=e25]:
+    - generic [ref=e26]
+    - generic [ref=e348]
+    - img [ref=e554]
+    - generic [ref=e335]
+  - generic [ref=e120]:
+    - strong [ref=e552]: On an API plan you pay for all three buckets.
+    - text: Bright bars = fresh token cost ($216 total). Orange = estimated cache write costs ($1,208). Purple = estimated cache read costs ($2,490).
+    - strong [ref=e553]: "Total: ~$3,914"
+    - text: "vs. ~$600 on Max — a 6.5× gap. Opus 4.6 is the dominant driver: its 3.57B cache reads alone cost ~$1,787. Toggle to \"Fresh only\" to see what this looked like before cache billing was visible."
