@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luminance Levels — Mercury Light</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111; font-family: 'Inter', -apple-system, sans-serif;
+    padding: 28px; display: flex; flex-direction: column; gap: 12px;
+  }
+  h1 { color: #e0e0e0; font-size: 18px; font-weight: 600; }
+  .subtitle { color: #777; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+  code { background: #222; padding: 1px 6px; border-radius: 3px; font-size: 11px; color: #ccc; }
+
+  .columns { display: flex; gap: 24px; }
+  .col { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .col-label { font-size: 13px; font-weight: 600; color: #ccc; }
+  .col-desc { font-size: 11px; color: #888; line-height: 1.5; margin-bottom: 4px; }
+
+  .app {
+    display: flex; height: 560px; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+  }
+
+  .sidebar { width: 52px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; padding: 12px 6px; gap: 3px; }
+  .logo { width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 8px; }
+  .nav-btn { width: 34px; height: 34px; border-radius: 7px; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
+  .nav-btn svg { width: 17px; height: 17px; }
+  .badge { position: absolute; top: -2px; right: -2px; width: 15px; height: 15px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; }
+
+  .chat-list { width: 180px; flex-shrink: 0; display: flex; flex-direction: column; }
+  .chat-list-hdr { padding: 10px 10px 8px; }
+  .chat-list-title { font-size: 13px; font-weight: 600; }
+  .chat-item { padding: 7px 10px; border-left: 2px solid transparent; }
+  .chat-item-title { font-size: 11px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chat-item-meta { font-size: 10px; margin-top: 1px; }
+
+  .chat-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .chat-header { padding: 12px 16px; flex-shrink: 0; display: flex; align-items: flex-start; justify-content: space-between; }
+  .chat-title { font-size: 16px; font-weight: 600; line-height: 1.2; }
+  .chat-client { font-size: 11px; margin-top: 2px; }
+
+  .chat-messages { flex: 1; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+  .msg { border-radius: 10px; padding: 8px 11px; font-size: 11px; line-height: 1.5; max-width: 88%; }
+  .msg.user { align-self: flex-end; }
+  .activity { display: flex; align-items: center; gap: 5px; font-size: 10px; font-family: 'JetBrains Mono', monospace; padding: 1px 0; }
+  .adot { width: 5px; height: 5px; border-radius: 3px; flex-shrink: 0; }
+
+  .input-wrap { padding: 8px 16px 12px; flex-shrink: 0; }
+  .input-box { border-radius: 10px; padding: 9px 11px; }
+  .input-ph { font-size: 11px; }
+
+  .plan-panel { width: 210px; flex-shrink: 0; display: flex; flex-direction: column; }
+  .plan-hdr { padding: 10px 12px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .plan-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .plan-title { font-size: 11px; font-weight: 500; }
+  .plan-status { font-size: 9px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1px; }
+  .plan-content { padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .plan-card { border-radius: 7px; padding: 7px 9px; }
+  .step-num { width: 14px; height: 14px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 600; flex-shrink: 0; margin-top: 1px; }
+  .step-title { font-size: 10.5px; font-weight: 500; line-height: 1.35; }
+  .step-meta { font-size: 9.5px; margin-top: 2px; }
+  .plan-actions { padding: 8px 12px 12px; display: flex; gap: 6px; flex-shrink: 0; }
+  .plan-btn { flex: 1; padding: 6px; border-radius: 7px; text-align: center; font-size: 11px; font-weight: 500; }
+
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; padding: 10px 12px; border-radius: 6px; background: #1a1a1a; border: 1px solid #2a2a2a; }
+  .swatch-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #aaa; }
+  .swatch { width: 12px; height: 12px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0; }
+  .swatch-item strong { color: #ddd; }
+
+  /* Luminance bar */
+  .lum-bar { display: flex; align-items: center; gap: 3px; margin-top: 6px; }
+  .lum-step { height: 18px; flex: 1; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  .br { border-right: 1px solid; }
+  .bb { border-bottom: 1px solid; }
+  .bl { border-left: 1px solid; }
+</style>
+</head>
+<body>
+
+<h1>Mercury Light — Luminance Steps</h1>
+<p class="subtitle">Same hue family, different lightness. Frame darker than chat, plan at its own step. 3 levels of contrast.</p>
+
+<div class="columns">
+
+<!-- ════════ COLUMN 1: 1-STEP ════════ -->
+<div class="col">
+  <div class="col-label">1-Step Down</div>
+  <div class="col-desc">Frame <code>#EAEBEE</code> (L*92) — one clear step below white<br>Plan <code>#E4E5E8</code> (L*91) — one more step down</div>
+  <div class="lum-bar">
+    <div class="lum-step" style="background:#EAEBEE;color:#666">Frame L92</div>
+    <div class="lum-step" style="background:#FFFFFF;color:#999;border:1px solid #ddd">Chat L100</div>
+    <div class="lum-step" style="background:#E4E5E8;color:#666">Plan L91</div>
+  </div>
+  <div class="app" id="app-1step"></div>
+  <div class="legend">
+    <div class="swatch-item"><div class="swatch" style="background:#EAEBEE"></div> Frame <strong>#EAEBEE</strong></div>
+    <div class="swatch-item"><div class="swatch" style="background:#FFF;border-color:rgba(0,0,0,.15)"></div> Chat <strong>#FFF</strong></div>
+    <div class="swatch-item"><div class="swatch" style="background:#E4E5E8"></div> Plan <strong>#E4E5E8</strong></div>
+  </div>
+</div>
+
+<!-- ════════ COLUMN 2: 2-STEP ════════ -->
+<div class="col">
+  <div class="col-label">2-Step Down</div>
+  <div class="col-desc">Frame <code>#E2E3E7</code> (L*90) — clearly distinct from white<br>Plan <code>#ECECEF</code> (L*93) — lighter than frame, darker than chat</div>
+  <div class="lum-bar">
+    <div class="lum-step" style="background:#E2E3E7;color:#666">Frame L90</div>
+    <div class="lum-step" style="background:#FFFFFF;color:#999;border:1px solid #ddd">Chat L100</div>
+    <div class="lum-step" style="background:#ECECEF;color:#666">Plan L93</div>
+  </div>
+  <div class="app" id="app-2step"></div>
+  <div class="legend">
+    <div class="swatch-item"><div class="swatch" style="background:#E2E3E7"></div> Frame <strong>#E2E3E7</strong></div>
+    <div class="swatch-item"><div class="swatch" style="background:#FFF;border-color:rgba(0,0,0,.15)"></div> Chat <strong>#FFF</strong></div>
+    <div class="swatch-item"><div class="swatch" style="background:#ECECEF"></div> Plan <strong>#ECECEF</strong></div>
+  </div>
+</div>
+
+<!-- ════════ COLUMN 3: 3-STEP ════════ -->
+<div class="col">
+  <div class="col-label">3-Step Down</div>
+  <div class="col-desc">Frame <code>#D9DBE0</code> (L*87) — bold, Notion/Linear territory<br>Plan <code>#E8E9EC</code> (L*92) — midpoint between frame and chat</div>
+  <div class="lum-bar">
+    <div class="lum-step" style="background:#D9DBE0;color:#555">Frame L87</div>
+    <div class="lum-step" style="background:#FFFFFF;color:#999;border:1px solid #ddd">Chat L100</div>
+    <div class="lum-step" style="background:#E8E9EC;color:#666">Plan L92</div>
+  </div>
+  <div class="app" id="app-3step"></div>
+  <div class="legend">
+    <div class="swatch-item"><div class="swatch" style="background:#D9DBE0"></div> Frame <strong>#D9DBE0</strong></div>
+    <div class="swatch-item"><div class="swatch" style="background:#FFF;border-color:rgba(0,0,0,.15)"></div> Chat <strong>#FFF</strong></div>
+    <div class="swatch-item"><div class="swatch" style="background:#E8E9EC"></div> Plan <strong>#E8E9EC</strong></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const border = 'rgba(30,35,50,0.08)';
+const primary = '#506098';
+const fg = '#1C1E24';
+const cardFg = '#3C3F48';
+const mutedFg = '#6E7178';
+const dimFg = '#9DA0A8';
+const accent = '#E2E6F4';
+
+const configs = [
+  {
+    id: 'app-1step',
+    frame: '#EAEBEE', chat: '#FFFFFF', plan: '#E4E5E8',
+    planCard: '#F2F2F4', msgBg: '#F0F0F3', activeBg: '#E2E6F4',
+  },
+  {
+    id: 'app-2step',
+    frame: '#E2E3E7', chat: '#FFFFFF', plan: '#ECECEF',
+    planCard: '#F5F5F7', msgBg: '#EEEFF2', activeBg: '#E2E6F4',
+  },
+  {
+    id: 'app-3step',
+    frame: '#D9DBE0', chat: '#FFFFFF', plan: '#E8E9EC',
+    planCard: '#F3F3F5', msgBg: '#EDEEF0', activeBg: '#E2E6F4',
+  },
+];
+
+function buildApp(cfg) {
+  return `
+    <!-- Sidebar -->
+    <div class="sidebar br" style="background:${cfg.frame};border-color:${border}">
+      <div class="logo" style="background:${accent};color:${primary}">PC</div>
+      <div class="nav-btn" style="background:${accent};color:${cardFg}">
+        <svg viewBox="0 0 256 256" fill="currentColor"><path d="M216,48H40A16,16,0,0,0,24,64V224a8,8,0,0,0,13,6.22L72,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48Z"/></svg>
+        <div class="badge" style="background:${primary};color:#fff">5</div>
+      </div>
+      <div class="nav-btn" style="color:${mutedFg}">
+        <svg viewBox="0 0 256 256" fill="currentColor" style="opacity:.55"><path d="M218.83,103.77l-80-75.48-.11-.11a16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77Z"/></svg>
+        <div class="badge" style="background:${primary};color:#fff">12</div>
+      </div>
+      <div class="nav-btn" style="color:${mutedFg}">
+        <svg viewBox="0 0 256 256" fill="currentColor" style="opacity:.55"><path d="M200,48H136V16a8,8,0,0,0-16,0V48H56A32,32,0,0,0,24,80V192a32,32,0,0,0,32,32H200a32,32,0,0,0,32-32V80A32,32,0,0,0,200,48ZM100,160H80a8,8,0,0,1,0-16h20a8,8,0,0,1,0,16Zm76,0H156a8,8,0,0,1,0-16h20a8,8,0,0,1,0,16ZM96,120a16,16,0,1,1,16,16A16,16,0,0,1,96,120Zm48,0a16,16,0,1,1,16,16A16,16,0,0,1,144,120Z"/></svg>
+      </div>
+    </div>
+
+    <!-- Chat List -->
+    <div class="chat-list br" style="background:${cfg.frame};border-color:${border}">
+      <div class="chat-list-hdr bb" style="border-color:${border}">
+        <div class="chat-list-title" style="color:${fg}">Recent Chats</div>
+        <div style="margin-top:4px;display:flex;align-items:center;gap:4px">
+          <svg width="12" height="12" viewBox="0 0 256 256" fill="${primary}"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>
+          <span style="font-size:11px;font-weight:500;color:${primary}">New Chat</span>
+        </div>
+      </div>
+      <div class="chat-item" style="border-left-color:${primary};background:${cfg.activeBg}">
+        <div style="display:flex;align-items:center;gap:4px">
+          <div style="width:5px;height:5px;border-radius:3px;background:${primary}"></div>
+          <div class="chat-item-title" style="color:${fg}">January Payroll</div>
+        </div>
+        <div class="chat-item-meta" style="color:${mutedFg}">Black Mesa · 5m</div>
+      </div>
+      <div class="chat-item">
+        <div style="display:flex;align-items:center;gap:4px">
+          <div style="width:5px;height:5px;border-radius:3px;background:${primary}"></div>
+          <div class="chat-item-title" style="color:${fg}">Portal Gun Safety</div>
+        </div>
+        <div class="chat-item-meta" style="color:${mutedFg}">Portal Corp · 2h</div>
+      </div>
+      <div class="chat-item">
+        <div style="display:flex;align-items:center;gap:4px">
+          <div style="width:5px;height:5px;border-radius:3px;background:transparent"></div>
+          <div class="chat-item-title" style="color:${cardFg}">Benefits Enrollment</div>
+        </div>
+        <div class="chat-item-meta" style="color:${mutedFg}">Aperture · Yesterday</div>
+      </div>
+      <div class="chat-item">
+        <div style="display:flex;align-items:center;gap:4px">
+          <div style="width:5px;height:5px;border-radius:3px;background:transparent"></div>
+          <div class="chat-item-title" style="color:${cardFg}">Virus Containment</div>
+        </div>
+        <div class="chat-item-meta" style="color:${mutedFg}">Umbrella · 3d</div>
+      </div>
+      <div class="chat-item">
+        <div style="display:flex;align-items:center;gap:4px">
+          <div style="width:5px;height:5px;border-radius:3px;background:transparent"></div>
+          <div class="chat-item-title" style="color:${cardFg}">Q4 OSHA Compliance</div>
+        </div>
+        <div class="chat-item-meta" style="color:${mutedFg}">Black Mesa · 5d</div>
+      </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area bl" style="background:${cfg.chat};border-color:${border}">
+      <div class="chat-header bb" style="background:${cfg.frame};border-color:${border}">
+        <div>
+          <div class="chat-title" style="color:${fg}">January Payroll</div>
+          <div class="chat-client" style="color:${mutedFg}">Black Mesa Inc.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="display:flex;align-items:center;gap:4px;background:${accent};border:1px solid ${border};border-radius:16px;padding:3px 8px">
+            <div style="width:5px;height:5px;border-radius:3px;background:${primary}"></div>
+            <span style="font-size:10px;font-weight:500;color:${primary}">Run Payroll</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-messages">
+        <div>
+          <div class="msg" style="background:${cfg.msgBg};color:${fg}">
+            Dr. Vance has 58 overtime hours this payroll period, a 3-period average of 12 hours. That's a 383% increase. His base hours and leave are normal — it's the OT that's unusual.
+          </div>
+          <div class="activity" style="color:${mutedFg};margin-top:4px">
+            <div class="adot" style="background:${primary}"></div>
+            Pulled payroll data for Q1 <span style="color:${dimFg};margin-left:2px">✓</span>
+          </div>
+          <div class="activity" style="color:${mutedFg}">
+            <div class="adot" style="background:${primary}"></div>
+            Flagged 2 anomalies <span style="color:${dimFg};margin-left:2px">✓</span>
+          </div>
+        </div>
+        <div class="msg user" style="background:${accent};color:${fg}">
+          Does it look unusual compared to the prior 3 payroll periods?
+        </div>
+        <div class="msg" style="background:${cfg.msgBg};color:${fg}">
+          Yes — 3x the logged OT this period vs her average. I need to know how to handle this before I run payroll.
+        </div>
+      </div>
+
+      <div class="input-wrap">
+        <div class="input-box" style="background:#fff;border:1px solid rgba(30,35,50,0.12)">
+          <div class="input-ph" style="color:${dimFg}">Ask anything...</div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px">
+            <svg width="14" height="14" viewBox="0 0 256 256" fill="${mutedFg}"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 256 256" fill="${mutedFg}"><path d="M128,176a48.05,48.05,0,0,0,48-48V64a48,48,0,0,0-96,0v64A48.05,48.05,0,0,0,128,176Zm88-48a88,88,0,0,1-176,0,8,8,0,0,1,16,0,72,72,0,0,0,144,0,8,8,0,0,1,16,0Z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Panel -->
+    <div class="plan-panel bl" style="background:${cfg.plan};border-color:${border}">
+      <div class="plan-hdr bb" style="border-color:${border}">
+        <div class="plan-icon" style="background:${cfg.planCard};border:1px solid ${border};color:${mutedFg}">
+          <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z"/></svg>
+        </div>
+        <div>
+          <div class="plan-title" style="color:${fg}">Run Payroll</div>
+          <div class="plan-status" style="color:${primary}">● Pending</div>
+        </div>
+      </div>
+
+      <div class="plan-content">
+        <div class="plan-card" style="background:${cfg.planCard};border:1px solid ${border}">
+          <div style="display:flex;align-items:flex-start;gap:6px">
+            <div class="step-num" style="background:${accent};color:${primary}">1</div>
+            <div>
+              <div class="step-title" style="color:${fg}">Validate employee hours</div>
+              <div class="step-meta" style="color:${mutedFg}">47 employees · +2 flagged</div>
+            </div>
+          </div>
+        </div>
+        <div class="plan-card" style="background:${cfg.planCard};border:1px solid ${border}">
+          <div style="display:flex;align-items:flex-start;gap:6px">
+            <div class="step-num" style="background:${cfg.plan};color:${dimFg}">2</div>
+            <div>
+              <div class="step-title" style="color:${cardFg}">Apply deductions</div>
+              <div class="step-meta" style="color:${dimFg}">HSA, 401k, garnishments</div>
+            </div>
+          </div>
+        </div>
+        <div class="plan-card" style="background:${cfg.planCard};border:1px solid ${border}">
+          <div style="display:flex;align-items:flex-start;gap:6px">
+            <div class="step-num" style="background:${cfg.plan};color:${dimFg}">3</div>
+            <div>
+              <div class="step-title" style="color:${cardFg}">Review employees</div>
+              <div class="step-meta" style="color:${dimFg}">Cross-check stubs</div>
+            </div>
+          </div>
+        </div>
+        <div class="plan-card" style="background:${cfg.planCard};border:1px solid ${border};border-left:2px solid #C06828">
+          <div style="display:flex;align-items:flex-start;gap:6px">
+            <div class="step-num" style="background:#ECE4D4;color:#C06828">⚠</div>
+            <div>
+              <div class="step-title" style="color:${cardFg}">Process deposits</div>
+              <div class="step-meta" style="color:${dimFg}">⚠ Irreversible</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="plan-actions">
+        <div class="plan-btn" style="background:${primary};color:#fff">Approve</div>
+        <div class="plan-btn" style="background:${cfg.planCard};color:${cardFg};border:1px solid rgba(30,35,50,0.12)">Decline</div>
+      </div>
+    </div>
+  `;
+}
+
+configs.forEach(cfg => {
+  document.getElementById(cfg.id).innerHTML = buildApp(cfg);
+});
+</script>
+
+<script src="feedback-panel.js"></script>
+</body>
+</html>

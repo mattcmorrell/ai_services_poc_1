@@ -130,7 +130,206 @@ h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
 }
 </style>
 </head>
+<style>
+/* ======================================= */
+/* PILL COMPARISON SECTION                 */
+/* ======================================= */
+.pill-section {
+  margin-bottom: 56px;
+}
+.pill-compare-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.pill-panel {
+  background: #ECEEF3;
+  border-radius: 16px;
+  padding: 24px;
+  font-family: 'Geist', sans-serif;
+}
+.pill-panel-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6E7178;
+  margin-bottom: 16px;
+}
+.needs-attention-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(30,35,50,0.06), 0 4px 12px rgba(30,35,50,0.04);
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.section-header-title {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3C3F48;
+}
+.section-header-count {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  background: #F0503C;
+  color: #fff;
+  border-radius: 10px;
+  padding: 1px 7px;
+  min-width: 20px;
+  text-align: center;
+}
+.pill-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(30,35,50,0.07);
+}
+.pill-row:last-child { border-bottom: none; }
+.pill-item {
+  font-family: 'Geist', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 4px;
+  min-width: 80px;
+  text-align: center;
+}
+.pill-content {
+  flex: 1;
+}
+.pill-content-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1C1E24;
+  margin-bottom: 2px;
+}
+.pill-content-sub {
+  font-size: 13px;
+  color: #6E7178;
+}
+
+/* Current pill colors */
+.pill-blocking-current { background: #ECE4D4; color: #9A8050; }
+.pill-error-current    { background: rgba(192,104,40,0.12); color: #C06828; }
+.pill-review-current   { background: #D8DCF0; color: #4558A5; }
+
+/* Proposed pill colors */
+.pill-blocking-proposed { background: #FEF3C7; color: #92600A; }
+.pill-error-proposed    { background: rgba(192,104,40,0.12); color: #C06828; }
+.pill-review-proposed   { background: #DBEAFE; color: #1D6B9A; }
+
+.warn-icon { font-size: 12px; margin-right: 2px; }
+</style>
+
 <body style="background:#1a1a1a; color:#e0e0e0">
+
+<h1>Alert Pills — Current vs Proposed</h1>
+<p class="sub">
+  BLOCKING and REVIEW pills are muddy in light mode — low contrast, similar in tone.
+  ERROR (destructive color) is untouched. Proposed: BLOCKING → amber, REVIEW → ocean blue.
+</p>
+
+<div class="pill-section">
+  <div class="pill-compare-row">
+
+    <!-- CURRENT -->
+    <div class="pill-panel">
+      <div class="pill-panel-label">Current — Mercury Light</div>
+      <div class="needs-attention-card">
+        <div class="section-header">
+          <span style="font-size:14px">⚠</span>
+          <span class="section-header-title">Needs Attention</span>
+          <span class="section-header-count">3</span>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill-item pill-blocking-current">BLOCKING</span>
+          <div class="pill-content">
+            <div class="pill-content-title">Payroll Review</div>
+            <div class="pill-content-sub">Q1 payroll period</div>
+          </div>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill-item pill-error-current"><span class="warn-icon">⚠</span>ERROR</span>
+          <div class="pill-content">
+            <div class="pill-content-title">Benefits Enrollment</div>
+            <div class="pill-content-sub">Dental plan sync failed</div>
+          </div>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill-item pill-review-current">REVIEW</span>
+          <div class="pill-content">
+            <div class="pill-content-title">Compliance Check</div>
+            <div class="pill-content-sub">Annual compliance audit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROPOSED -->
+    <div class="pill-panel">
+      <div class="pill-panel-label">Proposed — Mercury Light</div>
+      <div class="needs-attention-card">
+        <div class="section-header">
+          <span style="font-size:14px">⚠</span>
+          <span class="section-header-title">Needs Attention</span>
+          <span class="section-header-count">3</span>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill-item pill-blocking-proposed">BLOCKING</span>
+          <div class="pill-content">
+            <div class="pill-content-title">Payroll Review</div>
+            <div class="pill-content-sub">Q1 payroll period</div>
+          </div>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill-item pill-error-proposed"><span class="warn-icon">⚠</span>ERROR</span>
+          <div class="pill-content">
+            <div class="pill-content-title">Benefits Enrollment</div>
+            <div class="pill-content-sub">Dental plan sync failed</div>
+          </div>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill-item pill-review-proposed">REVIEW</span>
+          <div class="pill-content">
+            <div class="pill-content-title">Compliance Check</div>
+            <div class="pill-content-sub">Annual compliance audit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /pill-compare-row -->
+
+  <div style="margin-top:16px; padding:16px 20px; background:#222; border-radius:10px; font-size:13px; color:#ccc; line-height:1.8">
+    <strong style="color:#fff">BLOCKING</strong> &nbsp;#ECE4D4 / #9A8050 → <strong style="color:#FEF3C7">#FEF3C7</strong> / <strong style="color:#D4A832">#92600A</strong> — tan-brown to amber. Reads as "stuck."<br>
+    <strong style="color:#fff">ERROR</strong> &nbsp;unchanged — destructive color not touched.<br>
+    <strong style="color:#fff">REVIEW</strong> &nbsp;#D8DCF0 / #4558A5 → <strong style="color:#DBEAFE">#DBEAFE</strong> / <strong style="color:#60AADA">#1D6B9A</strong> — dusty indigo to ocean blue. Clear info signal.
+  </div>
+</div>
+
+<hr style="border:none;border-top:1px solid #333;margin-bottom:40px">
+
+<h2 style="font-size:18px; font-weight:600; margin-bottom:12px">Full Semantic Color Pass (previous exploration)</h2>
+<p class="sub" style="color:#aaa">The original color pass below — broader success/danger/info/warning changes across all three themes.</p>
 
 <h1>Light Mode Semantic Colors — Current vs Proposed</h1>
 <p class="sub">

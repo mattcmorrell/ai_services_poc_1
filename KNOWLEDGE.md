@@ -54,6 +54,16 @@ Marketing-page-level craft meets mission control — restrained, high-end, and e
 - `public/mockups/prometheus-references.html` — Weyland Industries design reference board
 - `public/mockups/figma-thumbnail.html` — PNDA\CMD branded thumbnail
 
+### Figma → CSS Token Gap (discovered April 2026)
+
+The Figma palette uses a token called `inner`; the CSS doesn't have `--inner`. Instead the CSS uses `--secondary` and `--muted`, which hold the same values but are split into two names that both do the same job. This is a latent inconsistency — Figma's `inner` maps to neither cleanly.
+
+`inner` also has an unintuitive luminance inversion between modes that was never intentional — it just accumulated that way:
+- **Light mode:** `inner` is darker than `card` (recessed feel)
+- **Dark mode:** `inner` is *lighter* than `card` (elevated feel)
+
+This makes `inner`/`secondary` unreliable as a zone background token if you want consistent stacking semantics across both modes. Worth resolving before leaning on it for section-level color differentiation.
+
 ---
 
 ## Typography & Agent Voice System
