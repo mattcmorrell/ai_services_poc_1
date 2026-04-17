@@ -1,0 +1,2662 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Global Nav — Read + Client Overview</title>
+<style>
+  :root {
+    --bg: #101214;
+    --panel: #161A1E;
+    --card: #1D2024;
+    --card-hover: #22262C;
+    --border: #2A2F36;
+    --border-soft: #22262C;
+    --fg: #E8E9ED;
+    --fg-muted: #A8ADB8;
+    --fg-dim: #8A8F99;
+    --primary: #6878B8;
+    --primary-bright: #8593D0;
+    --primary-soft: rgba(104, 120, 184, 0.15);
+    --primary-softer: rgba(104, 120, 184, 0.08);
+    --accent: #282A30;
+    --danger: #C76B6B;
+    --warning: #D9A867;
+    --success: #6BA88A;
+    --unread: #8593D0;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Inter", -apple-system, "SF Pro Text", system-ui, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app { display: flex; flex-direction: column; height: 100vh; }
+
+  /* ---------- Tab switcher ---------- */
+  .switcher {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .switcher .brand {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg-muted);
+    margin-right: 10px;
+    letter-spacing: 0.02em;
+  }
+  .switcher button {
+    background: transparent;
+    color: var(--fg-muted);
+    border: 1px solid transparent;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .switcher button:hover { background: var(--card); color: var(--fg); }
+  .switcher button.active {
+    background: var(--card);
+    color: var(--fg);
+    border-color: var(--border);
+  }
+  .switcher button .num {
+    color: var(--fg-dim);
+    margin-right: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .switcher button.active .num { color: var(--primary-bright); }
+  .switcher .hint { margin-left: auto; font-size: 12px; color: var(--fg-dim); }
+
+  /* ---------- Design container ---------- */
+  .designs { flex: 1; overflow: hidden; position: relative; }
+  .design-panel { display: none; height: 100%; }
+  .design-panel.active { display: flex; }
+
+  /* ---------- Shared content area ---------- */
+  .content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+  }
+  .content-header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 52px;
+  }
+  .content-header .crumb { font-size: 13px; color: var(--fg-dim); }
+  .content-header .crumb strong { color: var(--fg); font-weight: 600; }
+  .content-body {
+    flex: 1;
+    padding: 24px;
+    color: var(--fg-muted);
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+  }
+  .msg {
+    max-width: 640px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border-soft);
+    line-height: 1.55;
+    color: var(--fg);
+    font-size: 13.5px;
+  }
+  .msg.user {
+    align-self: flex-end;
+    background: var(--primary-soft);
+    border-color: transparent;
+  }
+  .placeholder-note {
+    font-size: 12px;
+    color: var(--fg-dim);
+    font-style: italic;
+    margin-top: auto;
+  }
+
+  /* Client overview stub page */
+  .client-overview {
+    flex: 1;
+    padding: 32px 40px;
+    overflow-y: auto;
+  }
+  .client-overview .co-title {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    color: var(--fg);
+    margin: 0 0 6px;
+  }
+  .client-overview .co-sub {
+    font-size: 13px;
+    color: var(--fg-muted);
+    margin-bottom: 24px;
+  }
+  .co-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .co-stat {
+    background: var(--card);
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .co-stat .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--fg-muted);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .co-stat .value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+  .co-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--fg);
+    margin: 16px 0 10px;
+  }
+  .co-meta {
+    background: var(--card);
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--fg-muted);
+    line-height: 1.65;
+  }
+  .co-meta strong { color: var(--fg); font-weight: 600; }
+
+  /* =============================================================
+     SHARED EDITORIAL SIDEBAR BASE
+     ============================================================= */
+  .sidebar-editorial {
+    width: 296px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .ed-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px 22px 14px;
+  }
+  .ed-wordmark {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+    line-height: 1.1;
+  }
+  .ed-toggle {
+    width: 28px;
+    height: 24px;
+    border: 1.5px solid var(--fg-muted);
+    border-radius: 4px;
+    background: transparent;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .ed-toggle::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1.5px;
+    background: var(--fg-muted);
+  }
+  .ed-toggle:hover { border-color: var(--fg); }
+  .ed-toggle:hover::after { background: var(--fg); }
+
+  .ed-section { padding: 4px 22px 0; }
+  .ed-section + .ed-section {
+    border-top: 1px solid var(--border);
+    margin-top: 14px;
+    padding-top: 16px;
+  }
+  .ed-link {
+    display: block;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--fg);
+    padding: 8px 0 14px;
+    text-decoration: none;
+    cursor: pointer;
+    letter-spacing: -0.01em;
+  }
+  .ed-link:hover { color: var(--primary-bright); }
+
+  .ed-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0 6px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .ed-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.005em;
+  }
+  .ed-chev {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    color: var(--fg-muted);
+    transition: transform 120ms ease;
+    flex-shrink: 0;
+  }
+  .ed-heading-row.collapsed .ed-chev { transform: rotate(-90deg); }
+  .ed-new-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    color: var(--fg-muted);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 6px;
+    margin-right: -6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .ed-new-btn:hover { background: var(--card); color: var(--primary-bright); }
+  .ed-new-btn svg { width: 14px; height: 14px; }
+
+  .ed-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 10px;
+  }
+  .ed-list[hidden] { display: none; }
+
+  .ed-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 6px 5px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    position: relative;
+  }
+  .ed-list li .label {
+    font-size: 13.5px;
+    color: var(--fg-muted);
+    font-weight: 400;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ed-list li:hover { background: var(--card); }
+  .ed-list li:hover .label { color: var(--fg); }
+  .ed-list li.active { background: var(--primary-soft); }
+  .ed-list li.active .label { color: var(--fg); font-weight: 600; }
+  .ed-dots {
+    opacity: 0;
+    background: transparent;
+    border: none;
+    color: var(--fg-muted);
+    font-size: 16px;
+    line-height: 1;
+    padding: 4px 6px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .ed-list li:hover .ed-dots { opacity: 1; }
+  .ed-dots:hover { background: var(--accent); color: var(--fg); }
+
+  .ed-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 8px;
+  }
+  .ed-scroll::-webkit-scrollbar { width: 6px; }
+  .ed-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .ed-footer {
+    margin-top: auto;
+    padding: 16px 22px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .ed-footer a {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .ed-footer a:hover { color: var(--primary-bright); }
+
+  /* =============================================================
+     DESIGN A — "Split zones"
+     Chevron (small) toggles expand/collapse
+     Client name is a link to the client overview page
+     Unread: bold label + accent dot on the right of chat item
+     ============================================================= */
+  .a-client { margin-top: 4px; }
+  .a-client-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 0;
+  }
+  .a-chev-btn {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--fg-muted);
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+  }
+  .a-chev-btn:hover { background: var(--card); color: var(--fg); }
+  .a-chev-btn svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 120ms ease;
+  }
+  .a-client-row.collapsed .a-chev-btn svg { transform: rotate(-90deg); }
+  .a-client-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  .a-client-name:hover {
+    background: var(--card);
+    color: var(--primary-bright);
+  }
+  .a-client-name.current {
+    color: var(--primary-bright);
+  }
+  .a-unread-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--unread);
+    flex-shrink: 0;
+  }
+
+  /* Unread row styling — Design A */
+  .a-list li.unread .label {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .a-list li.unread::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--unread);
+    flex-shrink: 0;
+    margin-left: 4px;
+  }
+  .a-list li.unread:hover::after { margin-right: 0; }
+
+  /* =============================================================
+     DESIGN B — "Hover open arrow"
+     Row click toggles expand/collapse (current behavior preserved)
+     Hover reveals "Open →" affordance that navigates to overview
+     Unread: count badge next to client name + accent rail on chats
+     ============================================================= */
+  .b-client { margin-top: 4px; }
+  .b-client-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 4px;
+  }
+  .b-client-row:hover { background: var(--card); }
+  .b-client-row.collapsed .ed-chev { transform: rotate(-90deg); }
+  .b-client-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.005em;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .b-count {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--unread);
+    padding: 2px 7px;
+    border-radius: 10px;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    flex-shrink: 0;
+  }
+  .b-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--primary-soft);
+    opacity: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: opacity 120ms ease;
+    border: none;
+    font-family: inherit;
+  }
+  .b-client-row:hover .b-open { opacity: 1; }
+  .b-open:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+  .b-open svg { width: 10px; height: 10px; }
+
+  /* Unread rail on chat items — Design B */
+  .b-list li {
+    padding-left: 16px;
+  }
+  .b-list li.unread {
+    position: relative;
+  }
+  .b-list li.unread::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--unread);
+    border-radius: 1px;
+  }
+  .b-list li.unread .label {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  /* =============================================================
+     DESIGN C — "Pinned overview item"
+     Row click toggles expand/collapse (current behavior preserved)
+     First item inside each client group is "Overview" (always pinned)
+     Unread: count pill on collapsed client; bold label on unread chats
+     ============================================================= */
+  .c-client { margin-top: 4px; }
+  .c-client-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .c-client-row.collapsed .ed-chev { transform: rotate(-90deg); }
+  .c-client-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.005em;
+    flex: 1;
+    min-width: 0;
+  }
+  .c-client-row:hover .c-client-name { color: var(--primary-bright); }
+  .c-pill {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--unread);
+    background: var(--primary-soft);
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.01em;
+    flex-shrink: 0;
+  }
+
+  /* Overview item — Design C */
+  .c-list li.overview {
+    padding-left: 16px;
+  }
+  .c-list li.overview .label {
+    font-size: 12.5px;
+    color: var(--fg-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .c-list li.overview .label svg {
+    width: 12px;
+    height: 12px;
+    color: var(--fg-muted);
+  }
+  .c-list li.overview:hover .label {
+    color: var(--primary-bright);
+  }
+  .c-list li.overview:hover .label svg { color: var(--primary-bright); }
+  .c-list li.overview.active {
+    background: var(--primary-soft);
+  }
+  .c-list li.overview.active .label {
+    color: var(--primary-bright);
+  }
+  .c-list li.overview.active .label svg { color: var(--primary-bright); }
+  .c-divider {
+    height: 1px;
+    background: var(--border-soft);
+    margin: 6px 16px 4px 16px;
+  }
+
+  /* Unread — Design C */
+  .c-list li.unread .label {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .c-list li.unread::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--unread);
+    flex-shrink: 0;
+    margin-left: auto;
+    margin-right: 6px;
+  }
+
+  /* Recent Chats unread handling — shared */
+  .ed-list.recent li.unread .label {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .ed-list.recent li.unread::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--unread);
+    flex-shrink: 0;
+    margin-left: 4px;
+  }
+
+  /* Recent count header pill */
+  .ed-recent-count {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--unread);
+    padding: 0 0 0 6px;
+    letter-spacing: 0.02em;
+  }
+
+  /* =============================================================
+     DESIGN D — v3 REFINED (builds on Split Zones)
+     - Two-line chat items: title + state/time on second line
+     - State icon + text descriptor (no bullet-only indicator)
+     - Children indent aligns with parent client-name text
+     - Selected state: 100% opaque accent color (clients AND chats)
+     - Pinned clients section at top
+     - Inline + button on client-row hover (client-scoped new chat)
+     - Activity-sorted children
+     - Color-coded client bullet
+     ============================================================= */
+
+  /* Client palette (shared) */
+  :root {
+    --client-aperture: #6878B8;
+    --client-umbrella: #C76B6B;
+    --client-blackmesa: #6BA88A;
+    --client-acme: #D9A867;
+    --client-coconut: #5EA5C7;
+  }
+
+  /* Section labels */
+  .d-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fg-muted);
+    padding: 14px 22px 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .d-section-label .d-count {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--unread);
+    text-transform: none;
+    letter-spacing: 0.02em;
+    margin-left: auto;
+  }
+  .d-section-label .d-new-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    color: var(--fg-muted);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .d-section-label .d-new-btn:hover {
+    background: var(--card);
+    color: var(--primary-bright);
+  }
+  .d-section-label .d-new-btn svg { width: 13px; height: 13px; }
+
+  /* Dashboard link reuse */
+  #design-d .ed-link { padding: 8px 22px 10px; }
+
+  /* Tree container */
+  .d-tree {
+    padding: 0 10px 2px 14px;
+  }
+
+  /* Client row */
+  .d-client { margin-bottom: 1px; }
+  .d-client-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px 6px 4px;
+    border-radius: 6px;
+    position: relative;
+    min-height: 34px;
+  }
+  .d-client-row:hover { background: var(--card); }
+
+  .d-chev-btn {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--fg-muted);
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+  }
+  .d-chev-btn:hover { background: var(--accent); color: var(--fg); }
+  .d-chev-btn svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 120ms ease;
+  }
+  .d-client-row.collapsed .d-chev-btn svg { transform: rotate(-90deg); }
+
+  .d-bullet {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--client-aperture);
+    margin: 0 4px 0 2px;
+  }
+  .d-client[data-client="aperture"] .d-bullet { background: var(--client-aperture); }
+  .d-client[data-client="umbrella"] .d-bullet { background: var(--client-umbrella); }
+  .d-client[data-client="blackmesa"] .d-bullet { background: var(--client-blackmesa); }
+  .d-client[data-client="acme"] .d-bullet { background: var(--client-acme); }
+  .d-client[data-client="coconut"] .d-bullet { background: var(--client-coconut); }
+
+  .d-client-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    padding: 3px 4px;
+    border-radius: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-decoration: none;
+  }
+  .d-client-name:hover { color: var(--primary-bright); }
+
+  .d-unread-inline {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--unread);
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    padding-right: 2px;
+  }
+
+  .d-inline-new {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--fg-muted);
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0;
+    padding: 0;
+  }
+  .d-inline-new svg { width: 13px; height: 13px; }
+  .d-inline-new:hover { background: var(--accent); color: var(--primary-bright); }
+  .d-client-row:hover .d-inline-new { opacity: 1; }
+
+  /* Selected client row — 100% opaque accent */
+  .d-client-row.selected {
+    background: var(--primary-bright);
+  }
+  .d-client-row.selected .d-client-name,
+  .d-client-row.selected .d-chev-btn,
+  .d-client-row.selected .d-inline-new,
+  .d-client-row.selected .d-unread-inline {
+    color: #0F1114;
+  }
+  .d-client-row.selected .d-chev-btn:hover,
+  .d-client-row.selected .d-inline-new:hover {
+    background: rgba(15, 17, 20, 0.12);
+    color: #0F1114;
+  }
+  .d-client-row.selected:hover { background: var(--primary-bright); }
+
+  /* Child list */
+  .d-list {
+    list-style: none;
+    margin: 2px 0 6px;
+    padding: 0;
+  }
+  .d-list[hidden] { display: none; }
+
+  /* Chat item — two-line */
+  .d-chat {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 10px 8px 40px;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+  }
+  .d-chat:hover { background: var(--card); }
+
+  .d-chat-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .d-chat-title {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--fg-muted);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+  .d-chat.unread .d-chat-title {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .d-chat-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--unread);
+    flex-shrink: 0;
+  }
+  .d-chat:not(.unread) .d-chat-dot { visibility: hidden; width: 0; }
+
+  .d-chat-bottom {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--fg-muted);
+    line-height: 1.3;
+    min-width: 0;
+  }
+  .d-chat-client {
+    font-weight: 600;
+    color: var(--fg-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .d-chat-sep {
+    color: var(--fg-muted);
+    flex-shrink: 0;
+  }
+  .d-chat-time { flex-shrink: 0; }
+
+  .d-chat-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .d-chat-state svg { width: 11px; height: 11px; flex-shrink: 0; }
+  .d-chat-state[data-state="running"] { color: var(--primary-bright); }
+  .d-chat-state[data-state="waiting"] { color: var(--warning); }
+  .d-chat-state[data-state="done"]    { color: var(--success); }
+  .d-chat-state[data-state="idle"]    { color: var(--fg-muted); }
+
+  /* Running pulse dot */
+  .d-state-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary-bright);
+    box-shadow: 0 0 0 0 rgba(133, 147, 208, 0.55);
+    animation: d-pulse 1.5s infinite;
+    flex-shrink: 0;
+  }
+  @keyframes d-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(133, 147, 208, 0.55); }
+    70%  { box-shadow: 0 0 0 5px rgba(133, 147, 208, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(133, 147, 208, 0); }
+  }
+
+  /* Selected chat — 100% opaque accent */
+  .d-chat.selected {
+    background: var(--primary-bright);
+  }
+  .d-chat.selected .d-chat-title { color: #0F1114; font-weight: 700; }
+  .d-chat.selected .d-chat-bottom,
+  .d-chat.selected .d-chat-client,
+  .d-chat.selected .d-chat-sep,
+  .d-chat.selected .d-chat-time { color: rgba(15, 17, 20, 0.72); }
+  .d-chat.selected .d-chat-state,
+  .d-chat.selected .d-chat-state[data-state="running"],
+  .d-chat.selected .d-chat-state[data-state="waiting"],
+  .d-chat.selected .d-chat-state[data-state="done"],
+  .d-chat.selected .d-chat-state[data-state="idle"] { color: #0F1114; }
+  .d-chat.selected .d-state-pulse {
+    background: #0F1114;
+    box-shadow: 0 0 0 0 rgba(15, 17, 20, 0.45);
+    animation-name: d-pulse-dark;
+  }
+  @keyframes d-pulse-dark {
+    0%   { box-shadow: 0 0 0 0 rgba(15, 17, 20, 0.45); }
+    70%  { box-shadow: 0 0 0 5px rgba(15, 17, 20, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(15, 17, 20, 0); }
+  }
+  .d-chat.selected .d-chat-dot { display: none; }
+  .d-chat.selected:hover { background: var(--primary-bright); }
+
+  /* Recent chats list (uses same .d-chat styling, different indent) */
+  .d-recent-list {
+    list-style: none;
+    margin: 2px 0 4px;
+    padding: 0 10px 0 14px;
+  }
+  .d-recent-list .d-chat {
+    padding: 8px 10px 8px 12px;
+  }
+
+  /* Divider between pinned and all clients */
+  .d-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 10px 22px 2px;
+  }
+
+  /* =============================================================
+     DESIGN E — v5 STREAMLINED
+     - No pinned section; single Clients list
+     - Collapsible Recent Chats header
+     - No colored client bullets
+     - No "X new" pills on client rows
+     - Read dot lives in the left gutter; title aligns with client name
+     - Chat title notably larger than the subtitle beneath
+     - Chat pane has no breadcrumb header
+     - Slightly wider sidebar (320px)
+     ============================================================= */
+  #design-e .sidebar-editorial { width: 320px; }
+
+  /* Clients list container under the "Clients" heading */
+  #design-e #e-clients-wrap { padding-top: 2px; }
+
+  /* Client row */
+  .e-client { margin-bottom: 1px; }
+  .e-client-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 6px 6px 4px;
+    border-radius: 6px;
+    position: relative;
+    min-height: 34px;
+  }
+  .e-client-row:hover { background: var(--card); }
+
+  .e-chev-btn {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--fg-muted);
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+  }
+  .e-chev-btn:hover { background: var(--accent); color: var(--fg); }
+  .e-chev-btn svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 120ms ease;
+  }
+  .e-client-row.collapsed .e-chev-btn svg { transform: rotate(-90deg); }
+
+  .e-client-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    padding: 3px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-decoration: none;
+  }
+  .e-client-name:hover { color: var(--primary-bright); }
+
+  .e-badge {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 7px;
+    border-radius: 10px;
+    background: var(--primary-soft);
+    color: var(--primary-bright);
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
+  .e-inline-new {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--fg-muted);
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0;
+    padding: 0;
+  }
+  .e-inline-new svg { width: 13px; height: 13px; }
+  .e-inline-new:hover { background: var(--accent); color: var(--primary-bright); }
+  .e-client-row:hover .e-inline-new { opacity: 1; }
+
+  /* Selected client row — 100% opaque accent */
+  .e-client-row.selected {
+    background: var(--primary-bright);
+  }
+  .e-client-row.selected .e-client-name,
+  .e-client-row.selected .e-chev-btn,
+  .e-client-row.selected .e-inline-new { color: #0F1114; }
+  .e-client-row.selected .e-badge {
+    background: rgba(15, 17, 20, 0.18);
+    color: #0F1114;
+  }
+  .e-client-row.selected .e-chev-btn:hover,
+  .e-client-row.selected .e-inline-new:hover {
+    background: rgba(15, 17, 20, 0.12);
+    color: #0F1114;
+  }
+  .e-client-row.selected:hover { background: var(--primary-bright); }
+
+  /* Chat list */
+  .e-list {
+    list-style: none;
+    margin: 2px 0 6px;
+    padding: 0;
+  }
+  .e-list[hidden] { display: none; }
+
+  /* Chat item — grid: [dot gutter | content] so title aligns with client name */
+  .e-chat {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    column-gap: 4px;
+    row-gap: 3px;
+    padding: 8px 10px 9px 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    align-items: start;
+  }
+  .e-chat:hover { background: var(--card); }
+
+  .e-chat-dot {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+    align-self: center;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: transparent;
+    flex-shrink: 0;
+  }
+  .e-chat.unread .e-chat-dot { background: var(--unread); }
+
+  .e-chat-title {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--fg-muted);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    letter-spacing: -0.003em;
+  }
+  .e-chat.unread .e-chat-title {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  .e-chat-bottom {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--fg-muted);
+    line-height: 1.3;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .e-chat-client {
+    font-weight: 600;
+    color: var(--fg-muted);
+    flex-shrink: 0;
+  }
+  .e-chat-sep { color: var(--fg-muted); flex-shrink: 0; }
+  .e-chat-time { flex-shrink: 0; }
+
+  .e-chat-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .e-chat-state svg { width: 11px; height: 11px; flex-shrink: 0; }
+  .e-chat-state[data-state="running"] { color: var(--primary-bright); }
+  .e-chat-state[data-state="waiting"] { color: var(--warning); }
+  .e-chat-state[data-state="done"]    { color: var(--success); }
+  .e-chat-state[data-state="idle"]    { color: var(--fg-muted); }
+
+  /* Running pulse dot */
+  .e-state-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary-bright);
+    box-shadow: 0 0 0 0 rgba(133, 147, 208, 0.55);
+    animation: e-pulse 1.5s infinite;
+    flex-shrink: 0;
+  }
+  @keyframes e-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(133, 147, 208, 0.55); }
+    70%  { box-shadow: 0 0 0 5px rgba(133, 147, 208, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(133, 147, 208, 0); }
+  }
+
+  /* Selected chat — 100% opaque accent */
+  .e-chat.selected {
+    background: var(--primary-bright);
+  }
+  .e-chat.selected .e-chat-title { color: #0F1114; font-weight: 700; }
+  .e-chat.selected .e-chat-bottom,
+  .e-chat.selected .e-chat-client,
+  .e-chat.selected .e-chat-sep,
+  .e-chat.selected .e-chat-time { color: rgba(15, 17, 20, 0.72); }
+  .e-chat.selected .e-chat-state,
+  .e-chat.selected .e-chat-state[data-state="running"],
+  .e-chat.selected .e-chat-state[data-state="waiting"],
+  .e-chat.selected .e-chat-state[data-state="done"],
+  .e-chat.selected .e-chat-state[data-state="idle"] { color: #0F1114; }
+  .e-chat.selected .e-state-pulse {
+    background: #0F1114;
+    box-shadow: 0 0 0 0 rgba(15, 17, 20, 0.45);
+    animation-name: e-pulse-dark;
+  }
+  @keyframes e-pulse-dark {
+    0%   { box-shadow: 0 0 0 0 rgba(15, 17, 20, 0.45); }
+    70%  { box-shadow: 0 0 0 5px rgba(15, 17, 20, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(15, 17, 20, 0); }
+  }
+  .e-chat.selected .e-chat-dot { background: transparent; }
+  .e-chat.selected:hover { background: var(--primary-bright); }
+
+  /* Recent chats list reuses .e-chat layout; slightly offset padding */
+  #design-e #e-recent-list { padding-left: 0; padding-right: 0; }
+
+  /* Content area without breadcrumb header */
+  #design-e .content-body { padding: 28px 32px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Tab switcher -->
+  <div class="switcher" role="tablist" aria-label="Design switcher">
+    <span class="brand">Global Nav v2</span>
+    <button class="active" data-target="design-a" title="Chevron toggles · client name navigates to overview">
+      <span class="num">1</span>Split Zones
+    </button>
+    <button data-target="design-b" title="Row toggles · hover reveals Open affordance">
+      <span class="num">2</span>Hover Open
+    </button>
+    <button data-target="design-c" title="Row toggles · first item under each client is Overview">
+      <span class="num">3</span>Pinned Overview
+    </button>
+    <button data-target="design-d" title="v3 — refined Split Zones with state, pins, inline +">
+      <span class="num">4</span>v3 Refined
+    </button>
+    <button data-target="design-e" title="v5 — streamlined: no bullets, no pins, dot gutter, larger title">
+      <span class="num">5</span>v5 Streamlined
+    </button>
+    <span class="hint">Press <b>1</b>–<b>5</b> to switch</span>
+  </div>
+
+  <div class="designs">
+
+    <!-- ============================================================
+         DESIGN A — SPLIT ZONES
+         ============================================================ -->
+    <section id="design-a" class="design-panel active">
+      <aside class="sidebar-editorial">
+        <div class="ed-header">
+          <div class="ed-wordmark">PandaCommand</div>
+          <button class="ed-toggle" aria-label="Collapse sidebar"></button>
+        </div>
+
+        <div class="ed-scroll">
+          <div class="ed-section">
+            <a class="ed-link">Dashboard</a>
+          </div>
+
+          <div class="ed-section">
+            <div class="ed-heading-row" data-toggle="a-recent">
+              <div class="ed-heading">
+                <span>Recent Chats</span>
+                <span class="ed-recent-count">2 new</span>
+                <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <button class="ed-new-btn" title="New chat">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5l2 2-7.5 7.5H4v-2l7.5-7.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                <span>New</span>
+              </button>
+            </div>
+            <ul class="ed-list recent a-list" id="a-recent-list">
+              <li class="active"><span class="label">Q2 benefits enrollment audit</span><button class="ed-dots">•••</button></li>
+              <li class="unread"><span class="label">PTO policy rewrite — Aperture</span><button class="ed-dots">•••</button></li>
+              <li><span class="label">Onboarding checklist refresh</span><button class="ed-dots">•••</button></li>
+              <li class="unread"><span class="label">I-9 remote verification memo</span><button class="ed-dots">•••</button></li>
+              <li><span class="label">Compensation band review</span><button class="ed-dots">•••</button></li>
+            </ul>
+          </div>
+
+          <div class="ed-section">
+            <div class="ed-heading-row" data-toggle="a-clients">
+              <div class="ed-heading">
+                <span>Clients</span>
+                <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div id="a-clients-wrap">
+
+              <div class="a-client">
+                <div class="a-client-row" data-a-toggle="a-aperture">
+                  <button class="a-chev-btn" aria-label="Expand">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="a-client-name current" data-a-nav="aperture">
+                    <span>Aperture Laboratories</span>
+                  </a>
+                </div>
+                <ul class="ed-list a-list indented" data-a-list="a-aperture">
+                  <li class="active"><span class="label">Q2 benefits enrollment audit</span><button class="ed-dots">•••</button></li>
+                  <li class="unread"><span class="label">PTO policy rewrite</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Manager training rollout</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Exit survey analysis</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="a-client">
+                <div class="a-client-row collapsed" data-a-toggle="a-umbrella">
+                  <button class="a-chev-btn" aria-label="Expand">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="a-client-name" data-a-nav="umbrella">
+                    <span>Umbrella Corp</span>
+                    <span class="a-unread-dot" title="Unread conversations"></span>
+                  </a>
+                </div>
+                <ul class="ed-list a-list indented" data-a-list="a-umbrella" hidden>
+                  <li class="unread"><span class="label">Onboarding checklist refresh</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Handbook compliance pass</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Compensation band review</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="a-client">
+                <div class="a-client-row" data-a-toggle="a-blackmesa">
+                  <button class="a-chev-btn" aria-label="Collapse">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="a-client-name" data-a-nav="blackmesa">
+                    <span>Black Mesa</span>
+                  </a>
+                </div>
+                <ul class="ed-list a-list indented" data-a-list="a-blackmesa">
+                  <li><span class="label">I-9 remote verification memo</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Safety training audit</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="a-client">
+                <div class="a-client-row collapsed" data-a-toggle="a-acme">
+                  <button class="a-chev-btn" aria-label="Expand">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="a-client-name" data-a-nav="acme">
+                    <span>Acme Corp.</span>
+                  </a>
+                </div>
+                <ul class="ed-list a-list indented" data-a-list="a-acme" hidden>
+                  <li><span class="label">Org chart cleanup</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Q1 performance review prep</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="a-client">
+                <div class="a-client-row collapsed" data-a-toggle="a-coconut">
+                  <button class="a-chev-btn" aria-label="Expand">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="a-client-name" data-a-nav="coconut">
+                    <span>Coconut Grove LLC.</span>
+                  </a>
+                </div>
+                <ul class="ed-list a-list indented" data-a-list="a-coconut" hidden>
+                  <li><span class="label">Seasonal staffing plan</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="ed-footer"><a>Settings &amp; Themes</a></div>
+      </aside>
+
+      <main class="content" id="a-content">
+        <div class="content-header">
+          <div class="crumb">Aperture Laboratories &nbsp;/&nbsp; <strong>Q2 benefits enrollment audit</strong></div>
+        </div>
+        <div class="content-body">
+          <div class="msg user">Can you audit open enrollment participation for Q2 and flag any plans with under-subscription?</div>
+          <div class="msg">Pulling enrollment records from the HRIS. I'll segment by plan tier and call out anything below the 30% threshold — stand by.</div>
+          <div class="placeholder-note">Click the chevron to expand a client group. Click the client name to go to its overview page.</div>
+        </div>
+      </main>
+    </section>
+
+    <!-- ============================================================
+         DESIGN B — HOVER OPEN
+         ============================================================ -->
+    <section id="design-b" class="design-panel">
+      <aside class="sidebar-editorial">
+        <div class="ed-header">
+          <div class="ed-wordmark">PandaCommand</div>
+          <button class="ed-toggle" aria-label="Collapse sidebar"></button>
+        </div>
+
+        <div class="ed-scroll">
+          <div class="ed-section">
+            <a class="ed-link">Dashboard</a>
+          </div>
+
+          <div class="ed-section">
+            <div class="ed-heading-row" data-toggle="b-recent">
+              <div class="ed-heading">
+                <span>Recent Chats</span>
+                <span class="ed-recent-count">2 new</span>
+                <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <button class="ed-new-btn" title="New chat">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5l2 2-7.5 7.5H4v-2l7.5-7.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                <span>New</span>
+              </button>
+            </div>
+            <ul class="ed-list recent b-list" id="b-recent-list">
+              <li class="active"><span class="label">Q2 benefits enrollment audit</span><button class="ed-dots">•••</button></li>
+              <li class="unread"><span class="label">PTO policy rewrite — Aperture</span><button class="ed-dots">•••</button></li>
+              <li><span class="label">Onboarding checklist refresh</span><button class="ed-dots">•••</button></li>
+              <li class="unread"><span class="label">I-9 remote verification memo</span><button class="ed-dots">•••</button></li>
+              <li><span class="label">Compensation band review</span><button class="ed-dots">•••</button></li>
+            </ul>
+          </div>
+
+          <div class="ed-section">
+            <div class="ed-heading-row" data-toggle="b-clients">
+              <div class="ed-heading">
+                <span>Clients</span>
+                <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div id="b-clients-wrap">
+
+              <div class="b-client">
+                <div class="b-client-row" data-b-toggle="b-aperture">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="b-client-name">Aperture Laboratories</span>
+                  <span class="b-count">1</span>
+                  <button class="b-open" data-b-nav="aperture" title="Go to client overview">
+                    Open
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+                <ul class="ed-list b-list indented" data-b-list="b-aperture">
+                  <li class="active"><span class="label">Q2 benefits enrollment audit</span><button class="ed-dots">•••</button></li>
+                  <li class="unread"><span class="label">PTO policy rewrite</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Manager training rollout</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Exit survey analysis</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="b-client">
+                <div class="b-client-row collapsed" data-b-toggle="b-umbrella">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="b-client-name">Umbrella Corp</span>
+                  <span class="b-count">1</span>
+                  <button class="b-open" data-b-nav="umbrella" title="Go to client overview">
+                    Open
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+                <ul class="ed-list b-list indented" data-b-list="b-umbrella" hidden>
+                  <li class="unread"><span class="label">Onboarding checklist refresh</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Handbook compliance pass</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Compensation band review</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="b-client">
+                <div class="b-client-row" data-b-toggle="b-blackmesa">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="b-client-name">Black Mesa</span>
+                  <button class="b-open" data-b-nav="blackmesa" title="Go to client overview">
+                    Open
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+                <ul class="ed-list b-list indented" data-b-list="b-blackmesa">
+                  <li><span class="label">I-9 remote verification memo</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Safety training audit</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="b-client">
+                <div class="b-client-row collapsed" data-b-toggle="b-acme">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="b-client-name">Acme Corp.</span>
+                  <button class="b-open" data-b-nav="acme" title="Go to client overview">
+                    Open
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+                <ul class="ed-list b-list indented" data-b-list="b-acme" hidden>
+                  <li><span class="label">Org chart cleanup</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Q1 performance review prep</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="b-client">
+                <div class="b-client-row collapsed" data-b-toggle="b-coconut">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="b-client-name">Coconut Grove LLC.</span>
+                  <button class="b-open" data-b-nav="coconut" title="Go to client overview">
+                    Open
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+                <ul class="ed-list b-list indented" data-b-list="b-coconut" hidden>
+                  <li><span class="label">Seasonal staffing plan</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="ed-footer"><a>Settings &amp; Themes</a></div>
+      </aside>
+
+      <main class="content" id="b-content">
+        <div class="content-header">
+          <div class="crumb">Aperture Laboratories &nbsp;/&nbsp; <strong>Q2 benefits enrollment audit</strong></div>
+        </div>
+        <div class="content-body">
+          <div class="msg user">Can you audit open enrollment participation for Q2 and flag any plans with under-subscription?</div>
+          <div class="msg">Pulling enrollment records from the HRIS. I'll segment by plan tier and call out anything below the 30% threshold — stand by.</div>
+          <div class="placeholder-note">Click a client row to expand. Hover a client and click "Open" to go to its overview page.</div>
+        </div>
+      </main>
+    </section>
+
+    <!-- ============================================================
+         DESIGN C — PINNED OVERVIEW ITEM
+         ============================================================ -->
+    <section id="design-c" class="design-panel">
+      <aside class="sidebar-editorial">
+        <div class="ed-header">
+          <div class="ed-wordmark">PandaCommand</div>
+          <button class="ed-toggle" aria-label="Collapse sidebar"></button>
+        </div>
+
+        <div class="ed-scroll">
+          <div class="ed-section">
+            <a class="ed-link">Dashboard</a>
+          </div>
+
+          <div class="ed-section">
+            <div class="ed-heading-row" data-toggle="c-recent">
+              <div class="ed-heading">
+                <span>Recent Chats</span>
+                <span class="ed-recent-count">2 new</span>
+                <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <button class="ed-new-btn" title="New chat">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5l2 2-7.5 7.5H4v-2l7.5-7.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                <span>New</span>
+              </button>
+            </div>
+            <ul class="ed-list recent c-list" id="c-recent-list">
+              <li class="active"><span class="label">Q2 benefits enrollment audit</span><button class="ed-dots">•••</button></li>
+              <li class="unread"><span class="label">PTO policy rewrite — Aperture</span><button class="ed-dots">•••</button></li>
+              <li><span class="label">Onboarding checklist refresh</span><button class="ed-dots">•••</button></li>
+              <li class="unread"><span class="label">I-9 remote verification memo</span><button class="ed-dots">•••</button></li>
+              <li><span class="label">Compensation band review</span><button class="ed-dots">•••</button></li>
+            </ul>
+          </div>
+
+          <div class="ed-section">
+            <div class="ed-heading-row" data-toggle="c-clients">
+              <div class="ed-heading">
+                <span>Clients</span>
+                <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div id="c-clients-wrap">
+
+              <div class="c-client">
+                <div class="c-client-row" data-c-toggle="c-aperture">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="c-client-name">Aperture Laboratories</span>
+                </div>
+                <ul class="ed-list c-list indented" data-c-list="c-aperture">
+                  <li class="overview" data-c-nav="aperture"><span class="label">
+                    <svg viewBox="0 0 16 16" fill="none"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 6h6M5 8.5h6M5 11h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    Client overview
+                  </span></li>
+                  <div class="c-divider"></div>
+                  <li class="active"><span class="label">Q2 benefits enrollment audit</span><button class="ed-dots">•••</button></li>
+                  <li class="unread"><span class="label">PTO policy rewrite</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Manager training rollout</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Exit survey analysis</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="c-client">
+                <div class="c-client-row collapsed" data-c-toggle="c-umbrella">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="c-client-name">Umbrella Corp</span>
+                  <span class="c-pill">1 new</span>
+                </div>
+                <ul class="ed-list c-list indented" data-c-list="c-umbrella" hidden>
+                  <li class="overview" data-c-nav="umbrella"><span class="label">
+                    <svg viewBox="0 0 16 16" fill="none"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 6h6M5 8.5h6M5 11h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    Client overview
+                  </span></li>
+                  <div class="c-divider"></div>
+                  <li class="unread"><span class="label">Onboarding checklist refresh</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Handbook compliance pass</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Compensation band review</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="c-client">
+                <div class="c-client-row" data-c-toggle="c-blackmesa">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="c-client-name">Black Mesa</span>
+                </div>
+                <ul class="ed-list c-list indented" data-c-list="c-blackmesa">
+                  <li class="overview" data-c-nav="blackmesa"><span class="label">
+                    <svg viewBox="0 0 16 16" fill="none"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 6h6M5 8.5h6M5 11h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    Client overview
+                  </span></li>
+                  <div class="c-divider"></div>
+                  <li><span class="label">I-9 remote verification memo</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Safety training audit</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="c-client">
+                <div class="c-client-row collapsed" data-c-toggle="c-acme">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="c-client-name">Acme Corp.</span>
+                </div>
+                <ul class="ed-list c-list indented" data-c-list="c-acme" hidden>
+                  <li class="overview" data-c-nav="acme"><span class="label">
+                    <svg viewBox="0 0 16 16" fill="none"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 6h6M5 8.5h6M5 11h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    Client overview
+                  </span></li>
+                  <div class="c-divider"></div>
+                  <li><span class="label">Org chart cleanup</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Q1 performance review prep</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="c-client">
+                <div class="c-client-row collapsed" data-c-toggle="c-coconut">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="c-client-name">Coconut Grove LLC.</span>
+                </div>
+                <ul class="ed-list c-list indented" data-c-list="c-coconut" hidden>
+                  <li class="overview" data-c-nav="coconut"><span class="label">
+                    <svg viewBox="0 0 16 16" fill="none"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 6h6M5 8.5h6M5 11h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    Client overview
+                  </span></li>
+                  <div class="c-divider"></div>
+                  <li><span class="label">Seasonal staffing plan</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="ed-footer"><a>Settings &amp; Themes</a></div>
+      </aside>
+
+      <main class="content" id="c-content">
+        <div class="content-header">
+          <div class="crumb">Aperture Laboratories &nbsp;/&nbsp; <strong>Q2 benefits enrollment audit</strong></div>
+        </div>
+        <div class="content-body">
+          <div class="msg user">Can you audit open enrollment participation for Q2 and flag any plans with under-subscription?</div>
+          <div class="msg">Pulling enrollment records from the HRIS. I'll segment by plan tier and call out anything below the 30% threshold — stand by.</div>
+          <div class="placeholder-note">Click a client row to expand. Click "Client overview" (the first item inside each group) to go to the overview page.</div>
+        </div>
+      </main>
+    </section>
+
+    <!-- ============================================================
+         DESIGN D — v3 REFINED (Split Zones, evolved)
+         ============================================================ -->
+    <section id="design-d" class="design-panel">
+      <aside class="sidebar-editorial">
+        <div class="ed-header">
+          <div class="ed-wordmark">PandaCommand</div>
+          <button class="ed-toggle" aria-label="Collapse sidebar"></button>
+        </div>
+
+        <div class="ed-scroll">
+          <div class="ed-section" style="padding:0;">
+            <a class="ed-link">Dashboard</a>
+          </div>
+
+          <!-- Recent Chats -->
+          <div class="d-section-label">
+            <span>Recent Chats</span>
+            <span class="d-count">2 new</span>
+            <button class="d-new-btn" title="New chat">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <span>New</span>
+            </button>
+          </div>
+          <ul class="d-recent-list" id="d-recent-list">
+            <li class="d-chat selected" data-chat="recent-1">
+              <div class="d-chat-top">
+                <span class="d-chat-dot"></span>
+                <span class="d-chat-title">Q2 benefits enrollment audit</span>
+              </div>
+              <div class="d-chat-bottom">
+                <span class="d-chat-client">Aperture</span>
+                <span class="d-chat-sep">·</span>
+                <span class="d-chat-state" data-state="running">
+                  <span class="d-state-pulse"></span>
+                  <span>Running</span>
+                </span>
+                <span class="d-chat-sep">·</span>
+                <span class="d-chat-time">2m</span>
+              </div>
+            </li>
+            <li class="d-chat" data-chat="recent-2">
+              <div class="d-chat-top">
+                <span class="d-chat-dot"></span>
+                <span class="d-chat-title">I-9 remote verification memo</span>
+              </div>
+              <div class="d-chat-bottom">
+                <span class="d-chat-client">Black Mesa</span>
+                <span class="d-chat-sep">·</span>
+                <span class="d-chat-state" data-state="running">
+                  <span class="d-state-pulse"></span>
+                  <span>Running</span>
+                </span>
+                <span class="d-chat-sep">·</span>
+                <span class="d-chat-time">8m</span>
+              </div>
+            </li>
+            <li class="d-chat unread" data-chat="recent-3">
+              <div class="d-chat-top">
+                <span class="d-chat-dot"></span>
+                <span class="d-chat-title">PTO policy rewrite — Aperture</span>
+              </div>
+              <div class="d-chat-bottom">
+                <span class="d-chat-client">Aperture</span>
+                <span class="d-chat-sep">·</span>
+                <span class="d-chat-state" data-state="waiting">
+                  <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5l5.5 10H1.5L7 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="10" r="0.7" fill="currentColor"/></svg>
+                  <span>Needs input</span>
+                </span>
+                <span class="d-chat-sep">·</span>
+                <span class="d-chat-time">12m</span>
+              </div>
+            </li>
+            <li class="d-chat unread" data-chat="recent-4">
+              <div class="d-chat-top">
+                <span class="d-chat-dot"></span>
+                <span class="d-chat-title">Onboarding checklist refresh</span>
+              </div>
+              <div class="d-chat-bottom">
+                <span class="d-chat-client">Umbrella</span>
+                <span class="d-chat-sep">·</span>
+                <span class="d-chat-state" data-state="waiting">
+                  <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                  <span>Awaiting approval</span>
+                </span>
+                <span class="d-chat-sep">·</span>
+                <span class="d-chat-time">1h</span>
+              </div>
+            </li>
+            <li class="d-chat" data-chat="recent-5">
+              <div class="d-chat-top">
+                <span class="d-chat-dot"></span>
+                <span class="d-chat-title">Compensation band review</span>
+              </div>
+              <div class="d-chat-bottom">
+                <span class="d-chat-client">Umbrella</span>
+                <span class="d-chat-sep">·</span>
+                <span class="d-chat-time">2h</span>
+              </div>
+            </li>
+          </ul>
+
+          <!-- Pinned Clients -->
+          <div class="d-section-label">
+            <span>Pinned Clients</span>
+          </div>
+          <div class="d-tree" id="d-pinned-tree">
+
+            <div class="d-client" data-client="aperture">
+              <div class="d-client-row selected" data-d-toggle="d-aperture">
+                <button class="d-chev-btn" aria-label="Collapse">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <span class="d-bullet"></span>
+                <a class="d-client-name" data-d-nav="aperture">Aperture Laboratories</a>
+                <span class="d-unread-inline">1 new</span>
+                <button class="d-inline-new" data-d-newchat="aperture" title="New chat for Aperture">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <ul class="d-list" data-d-list="d-aperture">
+                <li class="d-chat selected" data-chat="ap-1">
+                  <div class="d-chat-top">
+                    <span class="d-chat-dot"></span>
+                    <span class="d-chat-title">Q2 benefits enrollment audit</span>
+                  </div>
+                  <div class="d-chat-bottom">
+                    <span class="d-chat-state" data-state="running">
+                      <span class="d-state-pulse"></span>
+                      <span>Running · pulling HRIS</span>
+                    </span>
+                    <span class="d-chat-sep">·</span>
+                    <span class="d-chat-time">2m</span>
+                  </div>
+                </li>
+                <li class="d-chat unread" data-chat="ap-2">
+                  <div class="d-chat-top">
+                    <span class="d-chat-dot"></span>
+                    <span class="d-chat-title">PTO policy rewrite</span>
+                  </div>
+                  <div class="d-chat-bottom">
+                    <span class="d-chat-state" data-state="waiting">
+                      <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5l5.5 10H1.5L7 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="10" r="0.7" fill="currentColor"/></svg>
+                      <span>Needs input</span>
+                    </span>
+                    <span class="d-chat-sep">·</span>
+                    <span class="d-chat-time">12m</span>
+                  </div>
+                </li>
+                <li class="d-chat" data-chat="ap-3">
+                  <div class="d-chat-top">
+                    <span class="d-chat-dot"></span>
+                    <span class="d-chat-title">Manager training rollout</span>
+                  </div>
+                  <div class="d-chat-bottom">
+                    <span class="d-chat-state" data-state="idle">
+                      <span>Idle</span>
+                    </span>
+                    <span class="d-chat-sep">·</span>
+                    <span class="d-chat-time">2h</span>
+                  </div>
+                </li>
+                <li class="d-chat" data-chat="ap-4">
+                  <div class="d-chat-top">
+                    <span class="d-chat-dot"></span>
+                    <span class="d-chat-title">Exit survey analysis</span>
+                  </div>
+                  <div class="d-chat-bottom">
+                    <span class="d-chat-state" data-state="done">
+                      <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <span>Done</span>
+                    </span>
+                    <span class="d-chat-sep">·</span>
+                    <span class="d-chat-time">Yesterday</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="d-client" data-client="blackmesa">
+              <div class="d-client-row" data-d-toggle="d-blackmesa">
+                <button class="d-chev-btn" aria-label="Collapse">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <span class="d-bullet"></span>
+                <a class="d-client-name" data-d-nav="blackmesa">Black Mesa</a>
+                <button class="d-inline-new" data-d-newchat="blackmesa" title="New chat for Black Mesa">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <ul class="d-list" data-d-list="d-blackmesa">
+                <li class="d-chat" data-chat="bm-1">
+                  <div class="d-chat-top">
+                    <span class="d-chat-dot"></span>
+                    <span class="d-chat-title">I-9 remote verification memo</span>
+                  </div>
+                  <div class="d-chat-bottom">
+                    <span class="d-chat-state" data-state="running">
+                      <span class="d-state-pulse"></span>
+                      <span>Running · drafting memo</span>
+                    </span>
+                    <span class="d-chat-sep">·</span>
+                    <span class="d-chat-time">8m</span>
+                  </div>
+                </li>
+                <li class="d-chat" data-chat="bm-2">
+                  <div class="d-chat-top">
+                    <span class="d-chat-dot"></span>
+                    <span class="d-chat-title">Safety training audit</span>
+                  </div>
+                  <div class="d-chat-bottom">
+                    <span class="d-chat-state" data-state="idle">
+                      <span>Idle</span>
+                    </span>
+                    <span class="d-chat-sep">·</span>
+                    <span class="d-chat-time">3h</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+
+          <div class="d-divider"></div>
+
+          <!-- All Clients -->
+          <div class="d-section-label">
+            <span>All Clients</span>
+          </div>
+          <div class="d-tree" id="d-all-tree">
+
+            <div class="d-client" data-client="umbrella">
+              <div class="d-client-row collapsed" data-d-toggle="d-umbrella">
+                <button class="d-chev-btn" aria-label="Expand">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <span class="d-bullet"></span>
+                <a class="d-client-name" data-d-nav="umbrella">Umbrella Corp</a>
+                <span class="d-unread-inline">1 new</span>
+                <button class="d-inline-new" data-d-newchat="umbrella" title="New chat for Umbrella">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <ul class="d-list" data-d-list="d-umbrella" hidden>
+                <li class="d-chat unread" data-chat="um-1">
+                  <div class="d-chat-top">
+                    <span class="d-chat-dot"></span>
+                    <span class="d-chat-title">Onboarding checklist refresh</span>
+                  </div>
+                  <div class="d-chat-bottom">
+                    <span class="d-chat-state" data-state="waiting">
+                      <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                      <span>Awaiting approval</span>
+                    </span>
+                    <span class="d-chat-sep">·</span>
+                    <span class="d-chat-time">1h</span>
+                  </div>
+                </li>
+                <li class="d-chat" data-chat="um-2">
+                  <div class="d-chat-top">
+                    <span class="d-chat-dot"></span>
+                    <span class="d-chat-title">Compensation band review</span>
+                  </div>
+                  <div class="d-chat-bottom">
+                    <span class="d-chat-state" data-state="idle">
+                      <span>Idle</span>
+                    </span>
+                    <span class="d-chat-sep">·</span>
+                    <span class="d-chat-time">2h</span>
+                  </div>
+                </li>
+                <li class="d-chat" data-chat="um-3">
+                  <div class="d-chat-top">
+                    <span class="d-chat-dot"></span>
+                    <span class="d-chat-title">Handbook compliance pass</span>
+                  </div>
+                  <div class="d-chat-bottom">
+                    <span class="d-chat-state" data-state="idle">
+                      <span>Idle</span>
+                    </span>
+                    <span class="d-chat-sep">·</span>
+                    <span class="d-chat-time">Yesterday</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="d-client" data-client="acme">
+              <div class="d-client-row collapsed" data-d-toggle="d-acme">
+                <button class="d-chev-btn" aria-label="Expand">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <span class="d-bullet"></span>
+                <a class="d-client-name" data-d-nav="acme">Acme Corp.</a>
+                <button class="d-inline-new" data-d-newchat="acme" title="New chat for Acme">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <ul class="d-list" data-d-list="d-acme" hidden>
+                <li class="d-chat" data-chat="ac-1">
+                  <div class="d-chat-top">
+                    <span class="d-chat-dot"></span>
+                    <span class="d-chat-title">Q1 performance review prep</span>
+                  </div>
+                  <div class="d-chat-bottom">
+                    <span class="d-chat-state" data-state="idle"><span>Idle</span></span>
+                    <span class="d-chat-sep">·</span>
+                    <span class="d-chat-time">Yesterday</span>
+                  </div>
+                </li>
+                <li class="d-chat" data-chat="ac-2">
+                  <div class="d-chat-top">
+                    <span class="d-chat-dot"></span>
+                    <span class="d-chat-title">Org chart cleanup</span>
+                  </div>
+                  <div class="d-chat-bottom">
+                    <span class="d-chat-state" data-state="idle"><span>Idle</span></span>
+                    <span class="d-chat-sep">·</span>
+                    <span class="d-chat-time">2 days ago</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="d-client" data-client="coconut">
+              <div class="d-client-row collapsed" data-d-toggle="d-coconut">
+                <button class="d-chev-btn" aria-label="Expand">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <span class="d-bullet"></span>
+                <a class="d-client-name" data-d-nav="coconut">Coconut Grove LLC.</a>
+                <button class="d-inline-new" data-d-newchat="coconut" title="New chat for Coconut Grove">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <ul class="d-list" data-d-list="d-coconut" hidden>
+                <li class="d-chat" data-chat="co-1">
+                  <div class="d-chat-top">
+                    <span class="d-chat-dot"></span>
+                    <span class="d-chat-title">Seasonal staffing plan</span>
+                  </div>
+                  <div class="d-chat-bottom">
+                    <span class="d-chat-state" data-state="done">
+                      <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <span>Done</span>
+                    </span>
+                    <span class="d-chat-sep">·</span>
+                    <span class="d-chat-time">3 days ago</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="ed-footer"><a>Settings &amp; Themes</a></div>
+      </aside>
+
+      <main class="content" id="d-content">
+        <div class="content-header">
+          <div class="crumb">Aperture Laboratories &nbsp;/&nbsp; <strong>Q2 benefits enrollment audit</strong></div>
+        </div>
+        <div class="content-body">
+          <div class="msg user">Can you audit open enrollment participation for Q2 and flag any plans with under-subscription?</div>
+          <div class="msg">Pulling enrollment records from the HRIS. I'll segment by plan tier and call out anything below the 30% threshold — stand by.</div>
+          <div class="placeholder-note">Chevron toggles expand. Client name opens overview. Hover a client row to get the inline + (client-scoped new chat). Children sorted by most recent activity.</div>
+        </div>
+      </main>
+    </section>
+
+    <!-- ============================================================
+         DESIGN E — v5 STREAMLINED
+         ============================================================ -->
+    <section id="design-e" class="design-panel">
+      <aside class="sidebar-editorial">
+        <div class="ed-header">
+          <div class="ed-wordmark">PandaCommand</div>
+          <button class="ed-toggle" aria-label="Collapse sidebar"></button>
+        </div>
+
+        <div class="ed-scroll">
+          <div class="ed-section">
+            <a class="ed-link">Dashboard</a>
+          </div>
+
+          <div class="ed-section">
+            <div class="ed-heading-row" data-toggle="e-recent">
+              <div class="ed-heading">
+                <span>Recent Chats</span>
+                <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <button class="ed-new-btn" title="New chat">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5l2 2-7.5 7.5H4v-2l7.5-7.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                <span>New</span>
+              </button>
+            </div>
+            <ul class="e-list" id="e-recent-list">
+              <li class="e-chat selected" data-chat="e-recent-1">
+                <span class="e-chat-dot"></span>
+                <span class="e-chat-title">Q2 benefits enrollment audit</span>
+                <div class="e-chat-bottom">
+                  <span class="e-chat-client">Aperture</span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-state" data-state="running"><span class="e-state-pulse"></span><span>Running</span></span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-time">2m</span>
+                </div>
+              </li>
+              <li class="e-chat" data-chat="e-recent-2">
+                <span class="e-chat-dot"></span>
+                <span class="e-chat-title">I-9 remote verification memo</span>
+                <div class="e-chat-bottom">
+                  <span class="e-chat-client">Black Mesa</span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-state" data-state="running"><span class="e-state-pulse"></span><span>Running</span></span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-time">8m</span>
+                </div>
+              </li>
+              <li class="e-chat unread" data-chat="e-recent-3">
+                <span class="e-chat-dot"></span>
+                <span class="e-chat-title">PTO policy rewrite — Aperture</span>
+                <div class="e-chat-bottom">
+                  <span class="e-chat-client">Aperture</span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-state" data-state="waiting">
+                    <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5l5.5 10H1.5L7 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="10" r="0.7" fill="currentColor"/></svg>
+                    <span>Needs input</span>
+                  </span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-time">12m</span>
+                </div>
+              </li>
+              <li class="e-chat unread" data-chat="e-recent-4">
+                <span class="e-chat-dot"></span>
+                <span class="e-chat-title">Onboarding checklist refresh</span>
+                <div class="e-chat-bottom">
+                  <span class="e-chat-client">Umbrella</span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-state" data-state="waiting">
+                    <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    <span>Awaiting approval</span>
+                  </span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-time">1h</span>
+                </div>
+              </li>
+              <li class="e-chat" data-chat="e-recent-5">
+                <span class="e-chat-dot"></span>
+                <span class="e-chat-title">Compensation band review</span>
+                <div class="e-chat-bottom">
+                  <span class="e-chat-client">Umbrella</span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-time">2h</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="ed-section">
+            <div class="ed-heading-row" data-toggle="e-clients">
+              <div class="ed-heading">
+                <span>Clients</span>
+                <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div id="e-clients-wrap">
+
+              <div class="e-client">
+                <div class="e-client-row selected" data-e-toggle="e-aperture">
+                  <button class="e-chev-btn" aria-label="Collapse">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="e-client-name" data-e-nav="aperture">Aperture Laboratories</a>
+                  <span class="e-badge" title="1 unread">1</span>
+                  <button class="e-inline-new" data-e-newchat="aperture" title="New chat for Aperture">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+                <ul class="e-list" data-e-list="e-aperture">
+                  <li class="e-chat selected" data-chat="e-ap-1">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Q2 benefits enrollment audit</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="running"><span class="e-state-pulse"></span><span>Running · pulling HRIS</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">2m</span>
+                    </div>
+                  </li>
+                  <li class="e-chat unread" data-chat="e-ap-2">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">PTO policy rewrite</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="waiting">
+                        <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5l5.5 10H1.5L7 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="10" r="0.7" fill="currentColor"/></svg>
+                        <span>Needs input</span>
+                      </span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">12m</span>
+                    </div>
+                  </li>
+                  <li class="e-chat" data-chat="e-ap-3">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Manager training rollout</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">2h</span>
+                    </div>
+                  </li>
+                  <li class="e-chat" data-chat="e-ap-4">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Exit survey analysis</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="done">
+                        <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span>Done</span>
+                      </span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">Yesterday</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="e-client">
+                <div class="e-client-row collapsed" data-e-toggle="e-blackmesa">
+                  <button class="e-chev-btn" aria-label="Expand">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="e-client-name" data-e-nav="blackmesa">Black Mesa</a>
+                  <button class="e-inline-new" data-e-newchat="blackmesa" title="New chat for Black Mesa">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+                <ul class="e-list" data-e-list="e-blackmesa" hidden>
+                  <li class="e-chat" data-chat="e-bm-1">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">I-9 remote verification memo</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="running"><span class="e-state-pulse"></span><span>Running · drafting memo</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">8m</span>
+                    </div>
+                  </li>
+                  <li class="e-chat" data-chat="e-bm-2">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Safety training audit</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">3h</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="e-client">
+                <div class="e-client-row collapsed" data-e-toggle="e-umbrella">
+                  <button class="e-chev-btn" aria-label="Expand">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="e-client-name" data-e-nav="umbrella">Umbrella Corp</a>
+                  <span class="e-badge" title="1 unread">1</span>
+                  <button class="e-inline-new" data-e-newchat="umbrella" title="New chat for Umbrella">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+                <ul class="e-list" data-e-list="e-umbrella" hidden>
+                  <li class="e-chat unread" data-chat="e-um-1">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Onboarding checklist refresh</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="waiting">
+                        <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                        <span>Awaiting approval</span>
+                      </span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">1h</span>
+                    </div>
+                  </li>
+                  <li class="e-chat" data-chat="e-um-2">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Compensation band review</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">2h</span>
+                    </div>
+                  </li>
+                  <li class="e-chat" data-chat="e-um-3">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Handbook compliance pass</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">Yesterday</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="e-client">
+                <div class="e-client-row collapsed" data-e-toggle="e-acme">
+                  <button class="e-chev-btn" aria-label="Expand">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="e-client-name" data-e-nav="acme">Acme Corp.</a>
+                  <button class="e-inline-new" data-e-newchat="acme" title="New chat for Acme">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+                <ul class="e-list" data-e-list="e-acme" hidden>
+                  <li class="e-chat" data-chat="e-ac-1">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Q1 performance review prep</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">Yesterday</span>
+                    </div>
+                  </li>
+                  <li class="e-chat" data-chat="e-ac-2">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Org chart cleanup</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">2 days ago</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="e-client">
+                <div class="e-client-row collapsed" data-e-toggle="e-coconut">
+                  <button class="e-chev-btn" aria-label="Expand">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="e-client-name" data-e-nav="coconut">Coconut Grove LLC.</a>
+                  <button class="e-inline-new" data-e-newchat="coconut" title="New chat for Coconut">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+                <ul class="e-list" data-e-list="e-coconut" hidden>
+                  <li class="e-chat" data-chat="e-co-1">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Seasonal staffing plan</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="done">
+                        <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span>Done</span>
+                      </span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">3 days ago</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="ed-footer"><a>Settings &amp; Themes</a></div>
+      </aside>
+
+      <main class="content" id="e-content">
+        <div class="content-body">
+          <div class="msg user">Can you audit open enrollment participation for Q2 and flag any plans with under-subscription?</div>
+          <div class="msg">Pulling enrollment records from the HRIS. I'll segment by plan tier and call out anything below the 30% threshold — stand by.</div>
+          <div class="placeholder-note">Chevron toggles. Client name opens overview. Hover a client for the inline +. Read dot sits in the left gutter; chat titles align with client-name text above.</div>
+        </div>
+      </main>
+    </section>
+
+  </div>
+</div>
+
+<!-- Client overview template (reused by all three designs) -->
+<template id="client-overview-tpl">
+  <div class="content-header">
+    <div class="crumb"><strong>{{NAME}}</strong> &nbsp;/&nbsp; Overview</div>
+  </div>
+  <div class="client-overview">
+    <h1 class="co-title">{{NAME}}</h1>
+    <div class="co-sub">Client overview · last activity 2 hours ago</div>
+    <div class="co-grid">
+      <div class="co-stat"><div class="label">Active Chats</div><div class="value">{{ACTIVE}}</div></div>
+      <div class="co-stat"><div class="label">Open Plans</div><div class="value">3</div></div>
+      <div class="co-stat"><div class="label">Headcount</div><div class="value">{{HEAD}}</div></div>
+    </div>
+    <div class="co-section-title">Account</div>
+    <div class="co-meta">
+      <strong>Primary contact:</strong> {{CONTACT}}<br>
+      <strong>Plan:</strong> Enterprise · 3-year term<br>
+      <strong>Renewal:</strong> 2026-09-01<br>
+      <strong>Tags:</strong> Benefits, Compliance, L&amp;D
+    </div>
+  </div>
+</template>
+
+<script>
+  // --- Tab switcher ---
+  const tabs = document.querySelectorAll('.switcher button[data-target]');
+  const panels = document.querySelectorAll('.design-panel');
+  function activate(target) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.target === target));
+    panels.forEach(p => p.classList.toggle('active', p.id === target));
+  }
+  tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.target)));
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === '1') activate('design-a');
+    if (e.key === '2') activate('design-b');
+    if (e.key === '3') activate('design-c');
+    if (e.key === '4') activate('design-d');
+    if (e.key === '5') activate('design-e');
+  });
+
+  // --- Design D (v3): chevron toggles, name navigates ---
+  document.querySelectorAll('[data-d-toggle]').forEach(row => {
+    const chevBtn = row.querySelector('.d-chev-btn');
+    chevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = row.dataset.dToggle;
+      row.classList.toggle('collapsed');
+      const list = document.querySelector(`[data-d-list="${key}"]`);
+      if (list) list.hidden = row.classList.contains('collapsed');
+    });
+  });
+  document.querySelectorAll('[data-d-nav]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      renderOverview('d-content', el.dataset.dNav);
+      document.querySelectorAll('#design-d .d-client-row').forEach(r => r.classList.remove('selected'));
+      document.querySelectorAll('#design-d .d-chat').forEach(c => c.classList.remove('selected'));
+      el.closest('.d-client-row').classList.add('selected');
+    });
+  });
+  document.querySelectorAll('[data-d-newchat]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Stub — would create a new chat scoped to this client
+    });
+  });
+  // Chat selection within v3
+  document.querySelectorAll('#design-d .d-chat').forEach(chat => {
+    chat.addEventListener('click', () => {
+      document.querySelectorAll('#design-d .d-chat').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('#design-d .d-client-row').forEach(r => r.classList.remove('selected'));
+      chat.classList.add('selected');
+      chat.classList.remove('unread');
+      const main = document.getElementById('d-content');
+      const title = chat.querySelector('.d-chat-title').textContent;
+      const clientEl = chat.querySelector('.d-chat-client');
+      const client = clientEl ? clientEl.textContent : (chat.closest('.d-client')?.querySelector('.d-client-name')?.textContent || '');
+      main.innerHTML = `
+        <div class="content-header">
+          <div class="crumb">${client} &nbsp;/&nbsp; <strong>${title}</strong></div>
+        </div>
+        <div class="content-body">
+          <div class="msg user">Placeholder user message for this chat.</div>
+          <div class="msg">Placeholder agent reply — focus of this mockup is the sidebar.</div>
+          <div class="placeholder-note">Main content is placeholder — focus is the sidebar.</div>
+        </div>
+      `;
+    });
+  });
+
+  // --- Section toggles (Recent Chats / Clients headers) ---
+  document.querySelectorAll('[data-toggle]').forEach(row => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.ed-new-btn')) return;
+      const key = row.dataset.toggle;
+      row.classList.toggle('collapsed');
+      const map = {
+        'a-recent': 'a-recent-list', 'a-clients': 'a-clients-wrap',
+        'b-recent': 'b-recent-list', 'b-clients': 'b-clients-wrap',
+        'c-recent': 'c-recent-list', 'c-clients': 'c-clients-wrap',
+        'e-recent': 'e-recent-list', 'e-clients': 'e-clients-wrap',
+      };
+      const list = document.getElementById(map[key]);
+      if (list) list.hidden = row.classList.contains('collapsed');
+    });
+  });
+
+  // --- Design A: chevron toggles, name navigates ---
+  document.querySelectorAll('[data-a-toggle]').forEach(row => {
+    const chevBtn = row.querySelector('.a-chev-btn');
+    chevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = row.dataset.aToggle;
+      row.classList.toggle('collapsed');
+      const list = document.querySelector(`[data-a-list="${key}"]`);
+      if (list) list.hidden = row.classList.contains('collapsed');
+    });
+  });
+  document.querySelectorAll('[data-a-nav]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      renderOverview('a-content', el.dataset.aNav);
+      document.querySelectorAll('#design-a .a-client-name').forEach(n => n.classList.remove('current'));
+      el.classList.add('current');
+      document.querySelectorAll('#design-a .ed-list li').forEach(x => x.classList.remove('active'));
+    });
+  });
+
+  // --- Design B: row toggles, hover-open navigates ---
+  document.querySelectorAll('[data-b-toggle]').forEach(row => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.b-open')) return;
+      const key = row.dataset.bToggle;
+      row.classList.toggle('collapsed');
+      const list = document.querySelector(`[data-b-list="${key}"]`);
+      if (list) list.hidden = row.classList.contains('collapsed');
+    });
+  });
+  document.querySelectorAll('[data-b-nav]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      renderOverview('b-content', el.dataset.bNav);
+      document.querySelectorAll('#design-b .ed-list li').forEach(x => x.classList.remove('active'));
+    });
+  });
+
+  // --- Design C: row toggles, overview item navigates ---
+  document.querySelectorAll('[data-c-toggle]').forEach(row => {
+    row.addEventListener('click', () => {
+      const key = row.dataset.cToggle;
+      row.classList.toggle('collapsed');
+      const list = document.querySelector(`[data-c-list="${key}"]`);
+      if (list) list.hidden = row.classList.contains('collapsed');
+    });
+  });
+  document.querySelectorAll('[data-c-nav]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      renderOverview('c-content', el.dataset.cNav);
+      document.querySelectorAll('#design-c .ed-list li').forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+    });
+  });
+
+  // --- Chat item selection (all designs) ---
+  document.querySelectorAll('.ed-list').forEach(list => {
+    list.addEventListener('click', (e) => {
+      const li = e.target.closest('li');
+      if (!li || e.target.closest('.ed-dots') || li.classList.contains('overview')) return;
+      const scope = list.closest('.design-panel');
+      scope.querySelectorAll('.ed-list li').forEach(x => x.classList.remove('active'));
+      scope.querySelectorAll('.a-client-name').forEach(n => n.classList.remove('current'));
+      li.classList.add('active');
+      li.classList.remove('unread');
+      // Restore chat content header
+      const mainId = scope.querySelector('main.content').id;
+      const main = document.getElementById(mainId);
+      main.innerHTML = `
+        <div class="content-header">
+          <div class="crumb">Aperture Laboratories &nbsp;/&nbsp; <strong>${li.querySelector('.label').textContent}</strong></div>
+        </div>
+        <div class="content-body">
+          <div class="msg user">Placeholder user message for this chat.</div>
+          <div class="msg">Placeholder agent reply — focus of this mockup is the sidebar.</div>
+          <div class="placeholder-note">Main content is placeholder — focus is the sidebar.</div>
+        </div>
+      `;
+    });
+  });
+
+  // --- Design E (v5): chevron toggles, name navigates ---
+  document.querySelectorAll('[data-e-toggle]').forEach(row => {
+    const chevBtn = row.querySelector('.e-chev-btn');
+    chevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = row.dataset.eToggle;
+      row.classList.toggle('collapsed');
+      const list = document.querySelector(`[data-e-list="${key}"]`);
+      if (list) list.hidden = row.classList.contains('collapsed');
+    });
+  });
+  document.querySelectorAll('[data-e-nav]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      renderOverviewBare('e-content', el.dataset.eNav);
+      document.querySelectorAll('#design-e .e-client-row').forEach(r => r.classList.remove('selected'));
+      document.querySelectorAll('#design-e .e-chat').forEach(c => c.classList.remove('selected'));
+      el.closest('.e-client-row').classList.add('selected');
+    });
+  });
+  document.querySelectorAll('[data-e-newchat]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Stub — would create a client-scoped new chat
+    });
+  });
+  // Chat selection within v5 (no breadcrumb in main)
+  document.querySelectorAll('#design-e .e-chat').forEach(chat => {
+    chat.addEventListener('click', () => {
+      document.querySelectorAll('#design-e .e-chat').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('#design-e .e-client-row').forEach(r => r.classList.remove('selected'));
+      chat.classList.add('selected');
+      chat.classList.remove('unread');
+      const main = document.getElementById('e-content');
+      main.innerHTML = `
+        <div class="content-body">
+          <div class="msg user">Placeholder user message for this chat.</div>
+          <div class="msg">Placeholder agent reply — focus of this mockup is the sidebar.</div>
+          <div class="placeholder-note">Main content is placeholder — focus is the sidebar.</div>
+        </div>
+      `;
+    });
+  });
+
+  // --- Client overview renderer ---
+  const CLIENT_DATA = {
+    aperture:  { name: "Aperture Laboratories", active: "4", head: "1,240", contact: "Cave Johnson" },
+    umbrella:  { name: "Umbrella Corp",         active: "3", head: "3,820", contact: "Albert Wesker" },
+    blackmesa: { name: "Black Mesa",            active: "2", head: "680",   contact: "Eli Vance" },
+    acme:      { name: "Acme Corp.",            active: "2", head: "210",   contact: "Wile E. Coyote" },
+    coconut:   { name: "Coconut Grove LLC.",    active: "1", head: "85",    contact: "Marge Singer" },
+  };
+  function renderOverview(mainId, key) {
+    const main = document.getElementById(mainId);
+    const d = CLIENT_DATA[key] || CLIENT_DATA.aperture;
+    const tpl = document.getElementById('client-overview-tpl').innerHTML
+      .replaceAll('{{NAME}}', d.name)
+      .replaceAll('{{ACTIVE}}', d.active)
+      .replaceAll('{{HEAD}}', d.head)
+      .replaceAll('{{CONTACT}}', d.contact);
+    main.innerHTML = tpl;
+  }
+  // Bare variant — no content-header breadcrumb (v5)
+  function renderOverviewBare(mainId, key) {
+    const main = document.getElementById(mainId);
+    const d = CLIENT_DATA[key] || CLIENT_DATA.aperture;
+    main.innerHTML = `
+      <div class="client-overview">
+        <h1 class="co-title">${d.name}</h1>
+        <div class="co-sub">Client overview · last activity 2 hours ago</div>
+        <div class="co-grid">
+          <div class="co-stat"><div class="label">Active Chats</div><div class="value">${d.active}</div></div>
+          <div class="co-stat"><div class="label">Open Plans</div><div class="value">3</div></div>
+          <div class="co-stat"><div class="label">Headcount</div><div class="value">${d.head}</div></div>
+        </div>
+        <div class="co-section-title">Account</div>
+        <div class="co-meta">
+          <strong>Primary contact:</strong> ${d.contact}<br>
+          <strong>Plan:</strong> Enterprise · 3-year term<br>
+          <strong>Renewal:</strong> 2026-09-01<br>
+          <strong>Tags:</strong> Benefits, Compliance, L&amp;D
+        </div>
+      </div>
+    `;
+  }
+</script>
+<script src="feedback-panel.js"></script>
+</body>
+</html>
