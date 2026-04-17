@@ -42,6 +42,9 @@ yarn-error.log*
 # playwright MCP logs
 .playwright-mcp/
 
+# mockup feedback data
+/feedback/
+
 # vercel
 .vercel
 
