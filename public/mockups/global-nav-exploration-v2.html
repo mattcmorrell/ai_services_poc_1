@@ -1226,12 +1226,12 @@
   .e-chat.selected .e-chat-dot { background: transparent; }
   .e-chat.selected:hover { background: var(--primary-bright); }
 
-  /* All / Recent filter — segmented control under Clients heading */
+  /* All / Recent filter — compact segmented control in heading row */
   #design-e .e-filter {
     display: inline-flex;
-    gap: 2px;
+    gap: 1px;
     padding: 2px;
-    margin: 4px 0 8px;
+    margin-right: -2px;
     background: var(--card);
     border-radius: 6px;
   }
@@ -1241,10 +1241,10 @@
     background: transparent;
     color: var(--fg-muted);
     font-family: inherit;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 600;
     letter-spacing: 0.01em;
-    padding: 4px 12px;
+    padding: 3px 9px;
     border-radius: 4px;
     cursor: pointer;
     line-height: 1.2;
@@ -1255,6 +1255,28 @@
     color: var(--fg);
     box-shadow: 0 1px 2px rgba(0,0,0,0.25);
   }
+
+  /* + New chat link — appears above recent flat list */
+  #design-e .e-recent-new {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0 4px;
+    padding: 4px 4px 4px 0;
+    color: var(--fg-muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+  #design-e .e-recent-new:hover { color: var(--primary-bright); }
+  #design-e .e-recent-new svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  #design-e .e-recent-new[hidden] { display: none; }
 
   /* Recent flat list — same layout as client-chats, dot flush left */
   #design-e .e-recent-flat { padding-left: 0; padding-right: 0; }
@@ -1369,6 +1391,7 @@
   #design-e[data-layout="filter"] #e-recent-section { display: none; }
   #design-e[data-layout="section"] .e-filter { display: none; }
   #design-e[data-layout="section"] #e-recent-list { display: none; }
+  #design-e[data-layout="section"] .e-recent-new { display: none; }
 
   /* Selected client row: darker accent, all text white */
   #design-e .e-client-row.selected { background: #5668A8; }
@@ -2310,17 +2333,18 @@
                 <span>Clients</span>
                 <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
-              <button class="ed-new-btn" title="New chat">
-                <svg viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5l2 2-7.5 7.5H4v-2l7.5-7.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-                <span>New</span>
-              </button>
+              <div class="e-filter" role="tablist" aria-label="Chat filter">
+                <button class="e-filter-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
+                <button class="e-filter-btn" data-filter="recent" role="tab" aria-selected="false">Recent</button>
+              </div>
             </div>
 
             <div id="e-clients-section">
-            <div class="e-filter" role="tablist" aria-label="Chat filter">
-              <button class="e-filter-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
-              <button class="e-filter-btn" data-filter="recent" role="tab" aria-selected="false">Recent</button>
-            </div>
+            <!-- + New chat link, shown only when filter=recent -->
+            <a class="e-recent-new" id="e-recent-new-link" hidden>
+              <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <span>New chat</span>
+            </a>
 
             <!-- Recent flat list (hidden unless filter=recent) -->
             <ul class="e-list e-recent-flat" id="e-recent-list" hidden>
@@ -2861,21 +2885,20 @@
     const filterBtns = document.querySelectorAll('#design-e .e-filter-btn');
     const clientsWrap = document.getElementById('e-clients-wrap');
     const recentList = document.getElementById('e-recent-list');
+    const recentNew = document.getElementById('e-recent-new-link');
     filterBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const mode = btn.dataset.filter;
         filterBtns.forEach(b => {
           const active = b === btn;
           b.classList.toggle('active', active);
           b.setAttribute('aria-selected', active ? 'true' : 'false');
         });
-        if (mode === 'recent') {
-          clientsWrap.hidden = true;
-          recentList.hidden = false;
-        } else {
-          clientsWrap.hidden = false;
-          recentList.hidden = true;
-        }
+        const isRecent = mode === 'recent';
+        clientsWrap.hidden = isRecent;
+        recentList.hidden = !isRecent;
+        recentNew.hidden = !isRecent;
       });
     });
   })();
