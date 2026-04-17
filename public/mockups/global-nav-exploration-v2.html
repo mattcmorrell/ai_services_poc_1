@@ -996,6 +996,29 @@
      ============================================================= */
   #design-e .sidebar-editorial { width: 320px; }
 
+  /* Nav icons — same size/weight for Dashboard and Chats */
+  #design-e .ed-nav-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--fg-muted);
+    flex-shrink: 0;
+  }
+
+  /* Dashboard link: match Chats heading size (15px) */
+  #design-e .ed-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 8px 0 14px;
+    letter-spacing: -0.005em;
+  }
+  #design-e .ed-link:hover .ed-nav-icon { color: var(--primary-bright); }
+
+  /* Chats heading: widen gap so icon + label align with Dashboard */
+  #design-e .ed-heading { gap: 10px; }
+
   /* Clients list container under the "Clients" heading */
   #design-e #e-clients-wrap { padding-top: 2px; }
 
@@ -2251,7 +2274,10 @@
 
         <div class="ed-scroll">
           <div class="ed-section">
-            <a class="ed-link">Dashboard</a>
+            <a class="ed-link">
+              <svg class="ed-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+              <span>Dashboard</span>
+            </a>
           </div>
 
           <!-- OLD LAYOUT: Recent Chats as its own section (shown when data-layout="section") -->
@@ -2330,6 +2356,7 @@
           <div class="ed-section">
             <div class="ed-heading-row">
               <div class="ed-heading">
+                <svg class="ed-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 <span>Chats</span>
               </div>
               <div class="e-filter" role="tablist" aria-label="Chat filter">
