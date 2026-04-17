@@ -1718,6 +1718,377 @@
   #design-f.pinned .ed-pin .icon-pin   { display: inline; }
   #design-f.pinned .ed-pin .icon-unpin { display: none; }
 
+  /* =============================================================
+     DESIGN G — v7 REVEAL MODES (A/B/C sub-switcher)
+     Three reveal strategies share one sidebar. Behavior is driven
+     by [data-g-mode="a|b|c"] on the panel:
+       A · Click-rail      — rail visible; click opens overlay
+       B · Menu button     — hamburger opens drawer + scrim
+       C · Pinned default  — open by default; click collapses to rail
+     ============================================================= */
+
+  #design-g.active { flex-direction: column; }
+
+  #design-g .g-sub-switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    font-size: 13px;
+  }
+  #design-g .g-sub-label {
+    color: var(--fg-muted);
+    font-weight: 600;
+    margin-right: 4px;
+  }
+  #design-g .g-sub-btn {
+    background: transparent;
+    color: var(--fg-muted);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  #design-g .g-sub-btn:hover { background: var(--card); color: var(--fg); }
+  #design-g .g-sub-btn.active {
+    background: var(--primary-soft);
+    color: var(--primary-bright);
+    border-color: transparent;
+  }
+  #design-g .g-sub-desc {
+    margin-left: auto;
+    color: var(--fg-muted);
+    font-size: 12px;
+    font-style: italic;
+  }
+
+  #design-g .g-stage {
+    flex: 1;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  #design-g .sidebar-editorial { width: 320px; }
+
+  #design-g .ed-nav-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--fg-muted);
+    flex-shrink: 0;
+  }
+  #design-g .ed-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 8px 0 14px;
+    letter-spacing: -0.01em;
+  }
+  #design-g .ed-link:hover .ed-nav-icon { color: var(--primary-bright); }
+  #design-g .ed-heading { gap: 12px; font-size: 17px; letter-spacing: -0.01em; }
+  #design-g #g-clients-wrap { padding-top: 2px; }
+
+  #design-g .e-client .e-list .e-chat {
+    grid-template-columns: 26px 1fr;
+    padding-left: 0;
+  }
+
+  #design-g .content-body { padding: 28px 32px; }
+  #design-g .chat-header { padding: 20px 32px 16px; flex-shrink: 0; }
+  #design-g .chat-header-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 4px;
+  }
+  #design-g .chat-header-client {
+    font-size: 14px;
+    color: var(--fg-muted);
+    font-weight: 500;
+  }
+
+  /* Selected state — matches v5/v6 accent */
+  #design-g .e-chat.selected { background: #5668A8; }
+  #design-g .e-chat.selected:hover { background: #5668A8; }
+  #design-g .e-chat.selected .e-chat-title,
+  #design-g .e-chat.selected .e-chat-bottom,
+  #design-g .e-chat.selected .e-chat-client,
+  #design-g .e-chat.selected .e-chat-sep,
+  #design-g .e-chat.selected .e-chat-time,
+  #design-g .e-chat.selected .e-chat-state,
+  #design-g .e-chat.selected .e-chat-state[data-state="running"],
+  #design-g .e-chat.selected .e-chat-state[data-state="done"] { color: #fff; }
+  #design-g .e-chat.selected .e-chat-title { font-weight: 700; }
+  #design-g .e-chat.selected .e-spin-icon { color: #fff; }
+  #design-g .e-client-row.selected { background: #5668A8; }
+  #design-g .e-client-row.selected:hover { background: #5668A8; }
+  #design-g .e-client-row.selected .e-client-name,
+  #design-g .e-client-row.selected .e-chev-btn,
+  #design-g .e-client-row.selected .e-inline-new { color: #fff; }
+  #design-g .e-client-row.selected .e-badge { background: rgba(255,255,255,0.25); color: #fff; }
+  #design-g .e-client-row.selected .e-chev-btn:hover,
+  #design-g .e-client-row.selected .e-inline-new:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+  /* Filter chip — mirrors v6 */
+  #design-g .e-filter {
+    display: inline-flex;
+    gap: 1px;
+    padding: 2px;
+    margin-right: -2px;
+    background: var(--card);
+    border-radius: 6px;
+  }
+  #design-g .e-filter-btn {
+    background: transparent;
+    color: var(--fg-muted);
+    border: 0;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  #design-g .e-filter-btn:hover { color: var(--fg); }
+  #design-g .e-filter-btn.active { background: var(--panel); color: var(--fg); }
+  #design-g .e-recent-new {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 0 14px;
+    color: var(--primary-bright);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #design-g .e-recent-new svg { width: 14px; height: 14px; flex-shrink: 0; }
+  #design-g .e-recent-new[hidden] { display: none; }
+  #design-g .e-recent-flat { padding-left: 0; padding-right: 0; }
+  #design-g .e-recent-flat .e-chat {
+    grid-template-columns: 26px 1fr;
+    padding-left: 0;
+  }
+  #design-g .e-recent-flat[hidden] { display: none; }
+  #design-g #g-clients-wrap[hidden] { display: none; }
+  #design-g .e-recent-flat .e-chat-status-row {
+    grid-column: 2;
+    grid-row: 3;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 1px;
+  }
+
+  /* Sidebar-header "collapse" button */
+  #design-g .ed-toggle-btn {
+    width: 30px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--fg-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    padding: 0;
+  }
+  #design-g .ed-toggle-btn:hover {
+    background: var(--card);
+    color: var(--fg);
+    border-color: var(--border);
+  }
+  #design-g .ed-toggle-btn svg { width: 17px; height: 17px; }
+
+  /* Rail — shared by modes A (always) and C (when collapsed) */
+  #design-g .g-rail {
+    width: 56px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 0;
+    gap: 4px;
+    flex-shrink: 0;
+    z-index: 4;
+  }
+  #design-g .rail-icon {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--fg-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    transition: background 120ms ease, color 120ms ease;
+  }
+  #design-g .rail-icon:hover { background: var(--card); color: var(--fg); }
+  #design-g .rail-icon.active {
+    color: var(--primary-bright);
+    background: var(--primary-soft);
+  }
+  #design-g .rail-icon svg { width: 20px; height: 20px; }
+  #design-g .rail-divider {
+    width: 28px;
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0 6px;
+    flex-shrink: 0;
+  }
+  #design-g .rail-spacer { flex: 1; }
+
+  /* Content needs a positioned stacking context so the scrim reliably
+     paints above the chat bubbles inside it. */
+  #design-g .content { position: relative; z-index: 1; }
+
+  /* Scrim (mode B only) */
+  #design-g .g-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+    z-index: 15;
+  }
+
+  /* Menu button — floating trigger (mode B only) */
+  #design-g .g-menu-btn {
+    display: none;
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 6;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 0;
+  }
+  #design-g .g-menu-btn:hover {
+    background: var(--card);
+    color: var(--fg);
+    border-color: var(--fg-muted);
+  }
+  #design-g .g-menu-btn svg { width: 18px; height: 18px; }
+  #design-g[data-g-mode="b"] .g-menu-btn { display: inline-flex; }
+  /* Keep chat header clear of the floating menu button */
+  #design-g[data-g-mode="b"] .chat-header { padding-left: 64px; }
+
+  /* ---------- MODE A — click-rail with overlay ---------- */
+  #design-g[data-g-mode="a"] .g-rail { display: flex; position: relative; }
+  #design-g[data-g-mode="a"] .sidebar-editorial {
+    position: absolute;
+    top: 0;
+    left: 56px;
+    bottom: 0;
+    /* Offset accounts for the 56px rail so closed state fully hides sidebar */
+    transform: translateX(calc(-100% - 60px));
+    transition: transform 260ms cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 8px 0 28px rgba(0, 0, 0, 0.45);
+    z-index: 10;
+    will-change: transform;
+  }
+  #design-g[data-g-mode="a"].g-open .sidebar-editorial { transform: translateX(0); }
+
+  /* ---------- MODE B — menu-button drawer ---------- */
+  #design-g[data-g-mode="b"] .sidebar-editorial {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-110%);
+    transition: transform 260ms cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 8px 0 28px rgba(0, 0, 0, 0.45);
+    z-index: 20;
+    will-change: transform;
+  }
+  #design-g[data-g-mode="b"].g-open .sidebar-editorial { transform: translateX(0); }
+  #design-g[data-g-mode="b"].g-open .g-scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ---------- MODE C — pinned by default ---------- */
+  #design-g[data-g-mode="c"] .sidebar-editorial {
+    position: relative;
+    transform: none;
+    transition: none;
+    box-shadow: none;
+  }
+  #design-g[data-g-mode="c"].g-collapsed .sidebar-editorial { display: none; }
+  #design-g[data-g-mode="c"].g-collapsed .g-rail {
+    display: flex;
+    position: relative;
+  }
+
+  /* Chats popover — v7c collapsed: clicking the Chats rail icon opens a
+     popover positioned alongside the rail icon. Only the Chats section
+     is shown (no wordmark, no Dashboard, no footer, no heading icon). */
+  #design-g[data-g-mode="c"].g-collapsed.g-popover .sidebar-editorial {
+    display: flex;
+    position: absolute;
+    /* top aligned with the chat rail icon: 14 (rail pad) + 40 (expand) +
+       4 (gap) + 11 (divider+margins) + 40 (dashboard) + 4 (gap) = ~113 */
+    top: 108px;
+    left: 56px;
+    bottom: auto;
+    width: 320px;
+    max-height: calc(100% - 124px);
+    z-index: 15;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    animation: g-popover-in 180ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  /* Strip the pinned-sidebar chrome: header wordmark, Dashboard link, footer */
+  #design-g[data-g-mode="c"].g-collapsed.g-popover .ed-header,
+  #design-g[data-g-mode="c"].g-collapsed.g-popover .ed-footer,
+  #design-g[data-g-mode="c"].g-collapsed.g-popover .ed-scroll > .ed-section:first-of-type {
+    display: none;
+  }
+  /* With Dashboard section hidden, Chats becomes the first section — drop its
+     top border + margin so it sits cleanly at the popover top. */
+  #design-g[data-g-mode="c"].g-collapsed.g-popover .ed-scroll > .ed-section + .ed-section {
+    border-top: 0;
+    margin-top: 0;
+    padding-top: 10px;
+  }
+  /* Remove the duplicated chat icon next to the "Chats" heading (rail already has one) */
+  #design-g[data-g-mode="c"].g-collapsed.g-popover .ed-heading .ed-nav-icon {
+    display: none;
+  }
+  @keyframes g-popover-in {
+    from { transform: translateX(-8px); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+  }
+
 </style>
 </head>
 <body>
@@ -1740,10 +2111,13 @@
     <button data-target="design-e" title="v5 — streamlined: no bullets, no pins, dot gutter, larger title">
       <span class="num">5</span>v5 Streamlined
     </button>
-    <button class="active" data-target="design-f" title="v6 — collapsible: hover left edge to peek, pin to keep open">
+    <button data-target="design-f" title="v6 — collapsible: hover left edge to peek, pin to keep open">
       <span class="num">6</span>v6 Collapsible
     </button>
-    <span class="hint">Press <b>1</b>–<b>6</b> to switch</span>
+    <button class="active" data-target="design-g" title="v7 — reveal modes: click-rail / menu button / pinned default (A/B/C sub-switcher)">
+      <span class="num">7</span>v7 Reveal Modes
+    </button>
+    <span class="hint">Press <b>1</b>–<b>7</b> to switch</span>
   </div>
 
   <div class="designs">
@@ -2948,7 +3322,7 @@
          Hover left edge to peek · pin button keeps sidebar open
          Floating button (top-left) is a click-to-open affordance
          ============================================================ -->
-    <section id="design-f" class="design-panel active">
+    <section id="design-f" class="design-panel">
 
       <!-- Always-visible rail with primary nav icons + expand button.
            Hover the rail (or sidebar) to peek; click expand or pin to keep open. -->
@@ -3284,6 +3658,336 @@
       </main>
     </section>
 
+    <!-- ============================================================
+         DESIGN G — v7 REVEAL MODES (A/B/C sub-switcher)
+         ============================================================ -->
+    <section id="design-g" class="design-panel active" data-g-mode="a">
+
+      <div class="g-sub-switcher">
+        <span class="g-sub-label">Reveal mode</span>
+        <button class="g-sub-btn active" data-g-mode-set="a">A · Click-rail</button>
+        <button class="g-sub-btn" data-g-mode-set="b">B · Menu button</button>
+        <button class="g-sub-btn" data-g-mode-set="c">C · Pinned default</button>
+        <span class="g-sub-desc" id="g-mode-desc">Rail stays visible. Click the top icon (or a rail nav icon) to slide the sidebar out over content.</span>
+      </div>
+
+      <div class="g-stage">
+
+        <!-- Rail — visible in mode A always, in mode C only when collapsed -->
+        <nav class="g-rail" aria-label="Sidebar rail">
+          <button class="rail-icon rail-expand" data-g-action="toggle" aria-label="Open sidebar" title="Open sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M9 3v18"/>
+            </svg>
+          </button>
+          <div class="rail-divider"></div>
+          <button class="rail-icon" data-g-rail="dashboard" aria-label="Dashboard" title="Dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          </button>
+          <button class="rail-icon active" data-g-rail="chats" aria-label="Chats" title="Chats">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <div class="rail-spacer"></div>
+          <button class="rail-icon" data-g-rail="settings" aria-label="Settings" title="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+        </nav>
+
+        <!-- Sidebar (shared across modes) -->
+        <aside class="sidebar-editorial">
+          <div class="ed-header">
+            <div class="ed-wordmark">PandaCommand</div>
+            <button class="ed-toggle-btn" data-g-action="toggle" aria-label="Collapse sidebar" title="Collapse sidebar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M9 3v18"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="ed-scroll">
+            <div class="ed-section">
+              <a class="ed-link">
+                <svg class="ed-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                <span>Dashboard</span>
+              </a>
+            </div>
+
+            <div class="ed-section">
+              <div class="ed-heading-row">
+                <div class="ed-heading">
+                  <svg class="ed-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  <span>Chats</span>
+                </div>
+                <div class="e-filter" role="tablist" aria-label="Chat filter">
+                  <button class="e-filter-btn active" data-g-filter="all" role="tab" aria-selected="true">By Client</button>
+                  <button class="e-filter-btn" data-g-filter="recent" role="tab" aria-selected="false">Recent</button>
+                </div>
+              </div>
+
+              <a class="e-recent-new" id="g-recent-new-link" hidden>
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                <span>New chat</span>
+              </a>
+
+              <ul class="e-list e-recent-flat" id="g-recent-list" hidden>
+                <li class="e-chat" data-chat="g-recent-1">
+                  <span class="e-chat-dot"></span>
+                  <span class="e-chat-title">Q2 benefits enrollment audit</span>
+                  <div class="e-chat-bottom">
+                    <span class="e-chat-client">Aperture Laboratories</span>
+                    <span class="e-chat-sep">·</span>
+                    <span class="e-chat-time">2m</span>
+                  </div>
+                  <div class="e-chat-status-row">
+                    <span class="e-chat-state" data-state="running"><svg class="e-spin-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 13" stroke-linecap="round"/></svg><span>Running</span></span>
+                  </div>
+                </li>
+                <li class="e-chat unread" data-chat="g-recent-2">
+                  <span class="e-chat-dot"></span>
+                  <span class="e-chat-title">I-9 remote verification memo</span>
+                  <div class="e-chat-bottom">
+                    <span class="e-chat-client">Black Mesa</span>
+                    <span class="e-chat-sep">·</span>
+                    <span class="e-chat-time">8m</span>
+                  </div>
+                  <div class="e-chat-status-row">
+                    <span class="e-chat-state" data-state="running"><svg class="e-spin-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 13" stroke-linecap="round"/></svg><span>Running</span></span>
+                  </div>
+                </li>
+                <li class="e-chat" data-chat="g-recent-3">
+                  <span class="e-chat-dot"></span>
+                  <span class="e-chat-title">PTO policy rewrite — Aperture</span>
+                  <div class="e-chat-bottom">
+                    <span class="e-chat-client">Aperture Laboratories</span>
+                    <span class="e-chat-sep">·</span>
+                    <span class="e-chat-time">12m</span>
+                  </div>
+                </li>
+                <li class="e-chat unread" data-chat="g-recent-4">
+                  <span class="e-chat-dot"></span>
+                  <span class="e-chat-title">Onboarding checklist refresh</span>
+                  <div class="e-chat-bottom">
+                    <span class="e-chat-client">Umbrella Corp</span>
+                    <span class="e-chat-sep">·</span>
+                    <span class="e-chat-time">1h</span>
+                  </div>
+                  <div class="e-chat-status-row">
+                    <span class="e-chat-state" data-state="waiting">
+                      <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                      <span>Needs Approval</span>
+                    </span>
+                  </div>
+                </li>
+                <li class="e-chat" data-chat="g-recent-5">
+                  <span class="e-chat-dot"></span>
+                  <span class="e-chat-title">Compensation band review</span>
+                  <div class="e-chat-bottom">
+                    <span class="e-chat-client">Umbrella Corp</span>
+                    <span class="e-chat-sep">·</span>
+                    <span class="e-chat-time">2h</span>
+                  </div>
+                </li>
+              </ul>
+
+              <div id="g-clients-wrap">
+                <div class="e-client">
+                  <div class="e-client-row" data-e-toggle="g-aperture">
+                    <button class="e-chev-btn" aria-label="Collapse"><svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                    <a class="e-client-name" data-e-nav="aperture">Aperture Laboratories</a>
+                    <span class="e-badge" title="1 unread">1</span>
+                    <button class="e-inline-new" data-e-newchat="aperture" title="New chat for Aperture">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <ul class="e-list" data-e-list="g-aperture">
+                    <li class="e-chat selected" data-chat="g-ap-1">
+                      <span class="e-chat-dot"></span>
+                      <span class="e-chat-title">Q2 benefits enrollment audit</span>
+                      <div class="e-chat-bottom">
+                        <span class="e-chat-state" data-state="running"><svg class="e-spin-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 13" stroke-linecap="round"/></svg><span>Running · pulling HRIS</span></span>
+                        <span class="e-chat-sep">·</span>
+                        <span class="e-chat-time">2m</span>
+                      </div>
+                    </li>
+                    <li class="e-chat unread" data-chat="g-ap-2">
+                      <span class="e-chat-dot"></span>
+                      <span class="e-chat-title">PTO policy rewrite</span>
+                      <div class="e-chat-bottom">
+                        <span class="e-chat-state" data-state="needs-input">
+                          <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5l5.5 10H1.5L7 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="10" r="0.7" fill="currentColor"/></svg>
+                          <span>needs-input</span>
+                        </span>
+                        <span class="e-chat-sep">·</span>
+                        <span class="e-chat-time">12m</span>
+                      </div>
+                    </li>
+                    <li class="e-chat" data-chat="g-ap-3">
+                      <span class="e-chat-dot"></span>
+                      <span class="e-chat-title">Manager training rollout</span>
+                      <div class="e-chat-bottom">
+                        <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                        <span class="e-chat-sep">·</span>
+                        <span class="e-chat-time">2h</span>
+                      </div>
+                    </li>
+                    <li class="e-chat" data-chat="g-ap-4">
+                      <span class="e-chat-dot"></span>
+                      <span class="e-chat-title">Exit survey analysis</span>
+                      <div class="e-chat-bottom">
+                        <span class="e-chat-state" data-state="done">
+                          <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                          <span>Done</span>
+                        </span>
+                        <span class="e-chat-sep">·</span>
+                        <span class="e-chat-time">Yesterday</span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="e-client">
+                  <div class="e-client-row collapsed" data-e-toggle="g-blackmesa">
+                    <button class="e-chev-btn" aria-label="Expand"><svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                    <a class="e-client-name" data-e-nav="blackmesa">Black Mesa</a>
+                    <button class="e-inline-new" data-e-newchat="blackmesa" title="New chat for Black Mesa">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <ul class="e-list" data-e-list="g-blackmesa" hidden>
+                    <li class="e-chat" data-chat="g-bm-1">
+                      <span class="e-chat-dot"></span>
+                      <span class="e-chat-title">I-9 remote verification memo</span>
+                      <div class="e-chat-bottom">
+                        <span class="e-chat-state" data-state="running"><svg class="e-spin-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 13" stroke-linecap="round"/></svg><span>Running · drafting memo</span></span>
+                        <span class="e-chat-sep">·</span>
+                        <span class="e-chat-time">8m</span>
+                      </div>
+                    </li>
+                    <li class="e-chat" data-chat="g-bm-2">
+                      <span class="e-chat-dot"></span>
+                      <span class="e-chat-title">Safety training audit</span>
+                      <div class="e-chat-bottom">
+                        <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                        <span class="e-chat-sep">·</span>
+                        <span class="e-chat-time">3h</span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="e-client">
+                  <div class="e-client-row collapsed" data-e-toggle="g-umbrella">
+                    <button class="e-chev-btn" aria-label="Expand"><svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                    <a class="e-client-name" data-e-nav="umbrella">Umbrella Corp</a>
+                    <span class="e-badge" title="1 unread">1</span>
+                    <button class="e-inline-new" data-e-newchat="umbrella" title="New chat for Umbrella">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <ul class="e-list" data-e-list="g-umbrella" hidden>
+                    <li class="e-chat unread" data-chat="g-um-1">
+                      <span class="e-chat-dot"></span>
+                      <span class="e-chat-title">Onboarding checklist refresh</span>
+                      <div class="e-chat-bottom">
+                        <span class="e-chat-state" data-state="waiting">
+                          <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                          <span>Needs Approval</span>
+                        </span>
+                        <span class="e-chat-sep">·</span>
+                        <span class="e-chat-time">1h</span>
+                      </div>
+                    </li>
+                    <li class="e-chat" data-chat="g-um-2">
+                      <span class="e-chat-dot"></span>
+                      <span class="e-chat-title">Compensation band review</span>
+                      <div class="e-chat-bottom">
+                        <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                        <span class="e-chat-sep">·</span>
+                        <span class="e-chat-time">2h</span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="e-client">
+                  <div class="e-client-row collapsed" data-e-toggle="g-acme">
+                    <button class="e-chev-btn" aria-label="Expand"><svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                    <a class="e-client-name" data-e-nav="acme">Acme Corp.</a>
+                    <button class="e-inline-new" data-e-newchat="acme" title="New chat for Acme">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <ul class="e-list" data-e-list="g-acme" hidden>
+                    <li class="e-chat" data-chat="g-ac-1">
+                      <span class="e-chat-dot"></span>
+                      <span class="e-chat-title">Q1 performance review prep</span>
+                      <div class="e-chat-bottom">
+                        <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                        <span class="e-chat-sep">·</span>
+                        <span class="e-chat-time">Yesterday</span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="e-client">
+                  <div class="e-client-row collapsed" data-e-toggle="g-coconut">
+                    <button class="e-chev-btn" aria-label="Expand"><svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                    <a class="e-client-name" data-e-nav="coconut">Coconut Grove LLC.</a>
+                    <button class="e-inline-new" data-e-newchat="coconut" title="New chat for Coconut">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <ul class="e-list" data-e-list="g-coconut" hidden>
+                    <li class="e-chat" data-chat="g-co-1">
+                      <span class="e-chat-dot"></span>
+                      <span class="e-chat-title">Seasonal staffing plan</span>
+                      <div class="e-chat-bottom">
+                        <span class="e-chat-state" data-state="done">
+                          <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                          <span>Done</span>
+                        </span>
+                        <span class="e-chat-sep">·</span>
+                        <span class="e-chat-time">3 days ago</span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ed-footer"><a>Settings &amp; Themes</a></div>
+        </aside>
+
+        <!-- Floating menu button (mode B only) -->
+        <button class="g-menu-btn" data-g-action="toggle" aria-label="Open sidebar" title="Open sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M3 12h18M3 18h18"/>
+          </svg>
+        </button>
+
+        <main class="content" id="g-content">
+          <div class="chat-header">
+            <div class="chat-header-title">Q2 benefits enrollment audit</div>
+            <div class="chat-header-client">Aperture Laboratories</div>
+          </div>
+          <div class="content-body">
+            <div class="msg user">Can you audit open enrollment participation for Q2 and flag any plans with under-subscription?</div>
+            <div class="msg">Pulling enrollment records from the HRIS. I'll segment by plan tier and call out anything below the 30% threshold — stand by.</div>
+            <div class="placeholder-note">Try each reveal mode with the A/B/C switcher above. Press Esc to close overlay modes.</div>
+          </div>
+        </main>
+
+        <!-- Scrim (mode B only; click to close). Placed last so it paints
+             above the content flex item regardless of stacking quirks. -->
+        <div class="g-scrim"></div>
+
+      </div>
+    </section>
+
   </div>
 </div>
 
@@ -3327,6 +4031,7 @@
     if (e.key === '4') activate('design-d');
     if (e.key === '5') activate('design-e');
     if (e.key === '6') activate('design-f');
+    if (e.key === '7') activate('design-g');
   });
 
   // --- Design D (v3): chevron toggles, name navigates ---
@@ -3695,6 +4400,166 @@
         e.stopPropagation();
         panel.querySelectorAll('[data-f-rail]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+      });
+    });
+  })();
+
+  // --- Design G (v7): mode switcher + open/collapse toggle ---
+  (function () {
+    const panel = document.getElementById('design-g');
+    if (!panel) return;
+
+    const modeBtns = panel.querySelectorAll('[data-g-mode-set]');
+    const modeDesc = panel.querySelector('#g-mode-desc');
+    const scrim = panel.querySelector('.g-scrim');
+
+    const DESCRIPTIONS = {
+      a: 'Rail stays visible. Click the top icon (or a rail nav icon) to slide the sidebar out over content.',
+      b: 'No persistent chrome. Click the menu button (top-left) to open the sidebar as a drawer with scrim.',
+      c: 'Sidebar is open by default. Click the collapse button in its header to shrink to a rail.'
+    };
+
+    function setMode(m) {
+      panel.dataset.gMode = m;
+      panel.classList.remove('g-open', 'g-collapsed', 'g-popover');
+      modeBtns.forEach(b => b.classList.toggle('active', b.dataset.gModeSet === m));
+      modeDesc.textContent = DESCRIPTIONS[m];
+    }
+    modeBtns.forEach(b => b.addEventListener('click', () => setMode(b.dataset.gModeSet)));
+
+    function toggle() {
+      const mode = panel.dataset.gMode;
+      if (mode === 'c') {
+        panel.classList.remove('g-popover');
+        panel.classList.toggle('g-collapsed');
+      } else {
+        panel.classList.toggle('g-open');
+      }
+    }
+    panel.querySelectorAll('[data-g-action="toggle"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggle();
+      });
+    });
+
+    scrim.addEventListener('click', () => panel.classList.remove('g-open'));
+
+    function closePopover() { panel.classList.remove('g-popover'); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (!panel.classList.contains('active')) return;
+      panel.classList.remove('g-open');
+      closePopover();
+    });
+
+    // Rail icon clicks — highlight the active one. In v7c collapsed,
+    // clicking the Chats icon opens the sidebar as a popover next to the rail.
+    panel.querySelectorAll('[data-g-rail]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        panel.querySelectorAll('[data-g-rail]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const isChatsRail = btn.dataset.gRail === 'chats';
+        const isCCollapsed = panel.dataset.gMode === 'c' && panel.classList.contains('g-collapsed');
+        if (isChatsRail && isCCollapsed) {
+          panel.classList.toggle('g-popover');
+        } else {
+          closePopover();
+        }
+      });
+    });
+
+    // Clicks outside rail+sidebar close the popover
+    document.addEventListener('click', (e) => {
+      if (!panel.classList.contains('g-popover')) return;
+      const sidebar = panel.querySelector('.sidebar-editorial');
+      const rail = panel.querySelector('.g-rail');
+      if (sidebar.contains(e.target) || rail.contains(e.target)) return;
+      closePopover();
+    });
+
+    // Clicking a chat inside the popover closes it (after navigation runs)
+    panel.querySelectorAll('.e-chat').forEach(chat => {
+      chat.addEventListener('click', () => {
+        if (panel.classList.contains('g-popover')) closePopover();
+      });
+    });
+    panel.querySelectorAll('[data-e-nav]').forEach(el => {
+      el.addEventListener('click', () => {
+        if (panel.classList.contains('g-popover')) closePopover();
+      });
+    });
+  })();
+
+  // --- Design G (v7): chevron toggles, name navigates, chat selection ---
+  document.querySelectorAll('#design-g [data-e-toggle]').forEach(row => {
+    const chevBtn = row.querySelector('.e-chev-btn');
+    chevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = row.dataset.eToggle;
+      row.classList.toggle('collapsed');
+      const list = document.querySelector(`[data-e-list="${key}"]`);
+      if (list) list.hidden = row.classList.contains('collapsed');
+    });
+  });
+  document.querySelectorAll('#design-g [data-e-nav]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      renderOverviewBare('g-content', el.dataset.eNav);
+      document.querySelectorAll('#design-g .e-client-row').forEach(r => r.classList.remove('selected'));
+      document.querySelectorAll('#design-g .e-chat').forEach(c => c.classList.remove('selected'));
+      el.closest('.e-client-row').classList.add('selected');
+    });
+  });
+  document.querySelectorAll('#design-g [data-e-newchat]').forEach(btn => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); });
+  });
+  document.querySelectorAll('#design-g .e-chat').forEach(chat => {
+    chat.addEventListener('click', () => {
+      document.querySelectorAll('#design-g .e-chat').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('#design-g .e-client-row').forEach(r => r.classList.remove('selected'));
+      chat.classList.add('selected');
+      chat.classList.remove('unread');
+      const title = chat.querySelector('.e-chat-title')?.textContent || '';
+      const clientEl = chat.querySelector('.e-chat-client');
+      const clientRow = chat.closest('.e-client')?.querySelector('.e-client-name');
+      const client = clientEl ? clientEl.textContent : (clientRow ? clientRow.textContent : '');
+      const main = document.getElementById('g-content');
+      main.innerHTML = `
+        <div class="chat-header">
+          <div class="chat-header-title">${title}</div>
+          <div class="chat-header-client">${client}</div>
+        </div>
+        <div class="content-body">
+          <div class="msg user">Placeholder user message.</div>
+          <div class="msg">Placeholder agent reply.</div>
+        </div>
+      `;
+    });
+  });
+
+  // --- Design G (v7): By Client / Recent filter ---
+  (function () {
+    const filterBtns = document.querySelectorAll('#design-g .e-filter-btn');
+    const clientsWrap = document.getElementById('g-clients-wrap');
+    const recentList = document.getElementById('g-recent-list');
+    const recentNew = document.getElementById('g-recent-new-link');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const mode = btn.dataset.gFilter;
+        filterBtns.forEach(b => {
+          const active = b === btn;
+          b.classList.toggle('active', active);
+          b.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        const isRecent = mode === 'recent';
+        clientsWrap.hidden = isRecent;
+        recentList.hidden = !isRecent;
+        recentNew.hidden = !isRecent;
       });
     });
   })();
