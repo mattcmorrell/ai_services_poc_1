@@ -996,28 +996,32 @@
      ============================================================= */
   #design-e .sidebar-editorial { width: 320px; }
 
-  /* Nav icons — same size/weight for Dashboard and Chats */
+  /* Nav icons — Dashboard/Chats sit above client names in hierarchy */
   #design-e .ed-nav-icon {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     color: var(--fg-muted);
     flex-shrink: 0;
   }
 
-  /* Dashboard link: match Chats heading size (15px) */
+  /* Top-level nav labels — larger than client names (15px) to establish hierarchy */
   #design-e .ed-link {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 700;
     padding: 8px 0 14px;
-    letter-spacing: -0.005em;
+    letter-spacing: -0.01em;
   }
   #design-e .ed-link:hover .ed-nav-icon { color: var(--primary-bright); }
 
-  /* Chats heading: widen gap so icon + label align with Dashboard */
-  #design-e .ed-heading { gap: 10px; }
+  /* Chats heading: match Dashboard size + gap */
+  #design-e .ed-heading {
+    gap: 10px;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+  }
 
   /* Clients list container under the "Clients" heading */
   #design-e #e-clients-wrap { padding-top: 2px; }
