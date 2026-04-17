@@ -985,8 +985,8 @@
 
   /* =============================================================
      DESIGN E — v5 STREAMLINED
-     - No pinned section; single Clients list
-     - Collapsible Recent Chats header
+     - Single Clients list (Recent is a filter, not a separate section)
+     - All / Recent filter under the Clients heading
      - No colored client bullets
      - No "X new" pills on client rows
      - Read dot lives in the left gutter; title aligns with client name
@@ -1226,13 +1226,41 @@
   .e-chat.selected .e-chat-dot { background: transparent; }
   .e-chat.selected:hover { background: var(--primary-bright); }
 
-  /* Recent chats list reuses .e-chat layout; slightly offset padding */
-  #design-e #e-recent-list { padding-left: 0; padding-right: 0; }
-
-  /* Recent chats: dot flush to left edge */
-  #design-e #e-recent-list .e-chat {
-    padding-left: 0;
+  /* All / Recent filter — segmented control under Clients heading */
+  #design-e .e-filter {
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    margin: 4px 0 8px;
+    background: var(--card);
+    border-radius: 6px;
   }
+  #design-e .e-filter-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--fg-muted);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    line-height: 1.2;
+  }
+  #design-e .e-filter-btn:hover { color: var(--fg); }
+  #design-e .e-filter-btn.active {
+    background: var(--bg);
+    color: var(--fg);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  }
+
+  /* Recent flat list — same layout as client-chats, dot flush left */
+  #design-e .e-recent-flat { padding-left: 0; padding-right: 0; }
+  #design-e .e-recent-flat .e-chat { padding-left: 0; }
+  #design-e .e-recent-flat[hidden] { display: none; }
+  #design-e #e-clients-wrap[hidden] { display: none; }
 
   /* Client chats: wider dot column so title aligns with client name (30px) */
   #design-e .e-client .e-list .e-chat {
@@ -2147,9 +2175,9 @@
           </div>
 
           <div class="ed-section">
-            <div class="ed-heading-row" data-toggle="e-recent">
+            <div class="ed-heading-row" data-toggle="e-clients">
               <div class="ed-heading">
-                <span>Recent Chats</span>
+                <span>Clients</span>
                 <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
               <button class="ed-new-btn" title="New chat">
@@ -2157,8 +2185,16 @@
                 <span>New</span>
               </button>
             </div>
-            <ul class="e-list" id="e-recent-list">
-              <li class="e-chat selected" data-chat="e-recent-1">
+
+            <div id="e-clients-section">
+            <div class="e-filter" role="tablist" aria-label="Chat filter">
+              <button class="e-filter-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
+              <button class="e-filter-btn" data-filter="recent" role="tab" aria-selected="false">Recent</button>
+            </div>
+
+            <!-- Recent flat list (hidden unless filter=recent) -->
+            <ul class="e-list e-recent-flat" id="e-recent-list" hidden>
+              <li class="e-chat" data-chat="e-recent-1">
                 <span class="e-chat-dot"></span>
                 <span class="e-chat-title">Q2 benefits enrollment audit</span>
                 <div class="e-chat-bottom">
@@ -2216,15 +2252,7 @@
                 </div>
               </li>
             </ul>
-          </div>
 
-          <div class="ed-section">
-            <div class="ed-heading-row" data-toggle="e-clients">
-              <div class="ed-heading">
-                <span>Clients</span>
-                <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
-            </div>
             <div id="e-clients-wrap">
 
               <div class="e-client">
@@ -2239,7 +2267,7 @@
                   </button>
                 </div>
                 <ul class="e-list" data-e-list="e-aperture">
-                  <li class="e-chat" data-chat="e-ap-1">
+                  <li class="e-chat selected" data-chat="e-ap-1">
                     <span class="e-chat-dot"></span>
                     <span class="e-chat-title">Q2 benefits enrollment audit</span>
                     <div class="e-chat-bottom">
@@ -2420,6 +2448,7 @@
               </div>
 
             </div>
+            </div>
           </div>
         </div>
 
@@ -2542,7 +2571,7 @@
         'a-recent': 'a-recent-list', 'a-clients': 'a-clients-wrap',
         'b-recent': 'b-recent-list', 'b-clients': 'b-clients-wrap',
         'c-recent': 'c-recent-list', 'c-clients': 'c-clients-wrap',
-        'e-recent': 'e-recent-list', 'e-clients': 'e-clients-wrap',
+        'e-clients': 'e-clients-section',
       };
       const list = document.getElementById(map[key]);
       if (list) list.hidden = row.classList.contains('collapsed');
@@ -2682,6 +2711,30 @@
       `;
     });
   });
+
+  // --- Design E (v5): All / Recent filter ---
+  (function () {
+    const filterBtns = document.querySelectorAll('#design-e .e-filter-btn');
+    const clientsWrap = document.getElementById('e-clients-wrap');
+    const recentList = document.getElementById('e-recent-list');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.filter;
+        filterBtns.forEach(b => {
+          const active = b === btn;
+          b.classList.toggle('active', active);
+          b.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        if (mode === 'recent') {
+          clientsWrap.hidden = true;
+          recentList.hidden = false;
+        } else {
+          clientsWrap.hidden = false;
+          recentList.hidden = true;
+        }
+      });
+    });
+  })();
 
   // --- Client overview renderer ---
   const CLIENT_DATA = {
