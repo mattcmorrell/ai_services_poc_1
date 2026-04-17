@@ -1005,10 +1005,13 @@
   }
 
   /* Top-level nav labels — larger than client names (15px) to establish hierarchy */
+  /* Gap chosen so label text aligns with client names below:
+     ed-section pad 22px + icon 18px + gap 12px = 52px
+     matches: client row 22 + 4 + chev 22 + gap 4 = 52px */
   #design-e .ed-link {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     font-size: 17px;
     font-weight: 700;
     padding: 8px 0 14px;
@@ -1018,7 +1021,7 @@
 
   /* Chats heading: match Dashboard size + gap */
   #design-e .ed-heading {
-    gap: 10px;
+    gap: 12px;
     font-size: 17px;
     letter-spacing: -0.01em;
   }
@@ -1305,9 +1308,12 @@
   }
   #design-e .e-recent-new[hidden] { display: none; }
 
-  /* Recent flat list — same layout as client-chats, dot flush left */
+  /* Recent flat list — align titles with client names / tree chat titles */
   #design-e .e-recent-flat { padding-left: 0; padding-right: 0; }
-  #design-e .e-recent-flat .e-chat { padding-left: 0; }
+  #design-e .e-recent-flat .e-chat {
+    grid-template-columns: 26px 1fr;
+    padding-left: 0;
+  }
   #design-e .e-recent-flat[hidden] { display: none; }
   #design-e #e-clients-wrap[hidden] { display: none; }
 
