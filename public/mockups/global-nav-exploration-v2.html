@@ -1145,9 +1145,6 @@
     font-weight: 500;
     color: var(--fg-muted);
     line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     min-width: 0;
     letter-spacing: -0.003em;
   }
@@ -1192,19 +1189,14 @@
   .e-chat-state[data-state="idle"]    { color: var(--fg-muted); }
 
   /* Running pulse dot */
-  .e-state-pulse {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--primary-bright);
-    box-shadow: 0 0 0 0 rgba(133, 147, 208, 0.55);
-    animation: e-pulse 1.5s infinite;
+  .e-spin-icon {
+    width: 12px;
+    height: 12px;
     flex-shrink: 0;
+    animation: e-spin 900ms linear infinite;
   }
-  @keyframes e-pulse {
-    0%   { box-shadow: 0 0 0 0 rgba(133, 147, 208, 0.55); }
-    70%  { box-shadow: 0 0 0 5px rgba(133, 147, 208, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(133, 147, 208, 0); }
+  @keyframes e-spin {
+    to { transform: rotate(360deg); }
   }
 
   /* Selected chat — 100% opaque accent */
@@ -1237,8 +1229,78 @@
   /* Recent chats list reuses .e-chat layout; slightly offset padding */
   #design-e #e-recent-list { padding-left: 0; padding-right: 0; }
 
+  /* Recent chats: dot flush to left edge */
+  #design-e #e-recent-list .e-chat {
+    padding-left: 0;
+  }
+
+  /* Client chats: wider dot column so title aligns with client name (30px) */
+  #design-e .e-client .e-list .e-chat {
+    grid-template-columns: 26px 1fr;
+    padding-left: 0;
+  }
+
+  /* Third-row status badge in recent chats */
+  #design-e #e-recent-list .e-chat-status-row {
+    grid-column: 2;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 1px;
+  }
+
   /* Content area without breadcrumb header */
   #design-e .content-body { padding: 28px 32px; }
+
+  /* Chat conversation header — padding-top matches .ed-header so baselines align */
+  #design-e .chat-header {
+    padding: 20px 32px 16px;
+    flex-shrink: 0;
+  }
+  #design-e .chat-header-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 4px;
+  }
+  #design-e .chat-header-client {
+    font-size: 14px;
+    color: var(--fg-muted);
+    font-weight: 500;
+  }
+
+  /* Hide idle + needs-input badges and trailing separators */
+  [data-state="idle"], [data-state="needs-input"] { display: none; }
+  [data-state="idle"] + .e-chat-sep, [data-state="needs-input"] + .e-chat-sep,
+  [data-state="idle"] + .d-chat-sep, [data-state="needs-input"] + .d-chat-sep { display: none; }
+
+  /* Selected chat row: darker accent, all text white */
+  #design-e .e-chat.selected { background: #5668A8; }
+  #design-e .e-chat.selected:hover { background: #5668A8; }
+  #design-e .e-chat.selected .e-chat-title,
+  #design-e .e-chat.selected .e-chat-bottom,
+  #design-e .e-chat.selected .e-chat-client,
+  #design-e .e-chat.selected .e-chat-sep,
+  #design-e .e-chat.selected .e-chat-time,
+  #design-e .e-chat.selected .e-chat-state,
+  #design-e .e-chat.selected .e-chat-state[data-state="running"],
+  #design-e .e-chat.selected .e-chat-state[data-state="done"] { color: #fff; }
+  #design-e .e-chat.selected .e-chat-title { font-weight: 700; }
+  #design-e .e-chat.selected .e-spin-icon { color: #fff; }
+
+  /* Selected client row: darker accent, all text white */
+  #design-e .e-client-row.selected { background: #5668A8; }
+  #design-e .e-client-row.selected:hover { background: #5668A8; }
+  #design-e .e-client-row.selected .e-client-name,
+  #design-e .e-client-row.selected .e-chev-btn,
+  #design-e .e-client-row.selected .e-inline-new { color: #fff; }
+  #design-e .e-client-row.selected .e-badge { background: rgba(255,255,255,0.25); color: #fff; }
+  #design-e .e-client-row.selected .e-chev-btn:hover,
+  #design-e .e-client-row.selected .e-inline-new:hover { background: rgba(255,255,255,0.15); color: #fff; }
 </style>
 </head>
 <body>
@@ -1246,7 +1308,7 @@
   <!-- Tab switcher -->
   <div class="switcher" role="tablist" aria-label="Design switcher">
     <span class="brand">Global Nav v2</span>
-    <button class="active" data-target="design-a" title="Chevron toggles · client name navigates to overview">
+    <button data-target="design-a" title="Chevron toggles · client name navigates to overview">
       <span class="num">1</span>Split Zones
     </button>
     <button data-target="design-b" title="Row toggles · hover reveals Open affordance">
@@ -1258,7 +1320,7 @@
     <button data-target="design-d" title="v3 — refined Split Zones with state, pins, inline +">
       <span class="num">4</span>v3 Refined
     </button>
-    <button data-target="design-e" title="v5 — streamlined: no bullets, no pins, dot gutter, larger title">
+    <button class="active" data-target="design-e" title="v5 — streamlined: no bullets, no pins, dot gutter, larger title">
       <span class="num">5</span>v5 Streamlined
     </button>
     <span class="hint">Press <b>1</b>–<b>5</b> to switch</span>
@@ -1269,7 +1331,7 @@
     <!-- ============================================================
          DESIGN A — SPLIT ZONES
          ============================================================ -->
-    <section id="design-a" class="design-panel active">
+    <section id="design-a" class="design-panel">
       <aside class="sidebar-editorial">
         <div class="ed-header">
           <div class="ed-wordmark">PandaCommand</div>
@@ -1729,7 +1791,7 @@
                 <span class="d-chat-title">Q2 benefits enrollment audit</span>
               </div>
               <div class="d-chat-bottom">
-                <span class="d-chat-client">Aperture</span>
+                <span class="d-chat-client">Aperture Laboratories</span>
                 <span class="d-chat-sep">·</span>
                 <span class="d-chat-state" data-state="running">
                   <span class="d-state-pulse"></span>
@@ -1761,11 +1823,11 @@
                 <span class="d-chat-title">PTO policy rewrite — Aperture</span>
               </div>
               <div class="d-chat-bottom">
-                <span class="d-chat-client">Aperture</span>
+                <span class="d-chat-client">Aperture Laboratories</span>
                 <span class="d-chat-sep">·</span>
-                <span class="d-chat-state" data-state="waiting">
+                <span class="d-chat-state" data-state="needs-input">
                   <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5l5.5 10H1.5L7 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="10" r="0.7" fill="currentColor"/></svg>
-                  <span>Needs input</span>
+                  <span>needs-input-remove</span>
                 </span>
                 <span class="d-chat-sep">·</span>
                 <span class="d-chat-time">12m</span>
@@ -1777,11 +1839,11 @@
                 <span class="d-chat-title">Onboarding checklist refresh</span>
               </div>
               <div class="d-chat-bottom">
-                <span class="d-chat-client">Umbrella</span>
+                <span class="d-chat-client">Umbrella Corp</span>
                 <span class="d-chat-sep">·</span>
                 <span class="d-chat-state" data-state="waiting">
                   <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-                  <span>Awaiting approval</span>
+                  <span>Needs Approval</span>
                 </span>
                 <span class="d-chat-sep">·</span>
                 <span class="d-chat-time">1h</span>
@@ -1793,7 +1855,7 @@
                 <span class="d-chat-title">Compensation band review</span>
               </div>
               <div class="d-chat-bottom">
-                <span class="d-chat-client">Umbrella</span>
+                <span class="d-chat-client">Umbrella Corp</span>
                 <span class="d-chat-sep">·</span>
                 <span class="d-chat-time">2h</span>
               </div>
@@ -1839,9 +1901,9 @@
                     <span class="d-chat-title">PTO policy rewrite</span>
                   </div>
                   <div class="d-chat-bottom">
-                    <span class="d-chat-state" data-state="waiting">
+                    <span class="d-chat-state" data-state="needs-input">
                       <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5l5.5 10H1.5L7 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="10" r="0.7" fill="currentColor"/></svg>
-                      <span>Needs input</span>
+                      <span>needs-input-remove</span>
                     </span>
                     <span class="d-chat-sep">·</span>
                     <span class="d-chat-time">12m</span>
@@ -1950,7 +2012,7 @@
                   <div class="d-chat-bottom">
                     <span class="d-chat-state" data-state="waiting">
                       <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-                      <span>Awaiting approval</span>
+                      <span>Needs Approval</span>
                     </span>
                     <span class="d-chat-sep">·</span>
                     <span class="d-chat-time">1h</span>
@@ -2072,7 +2134,7 @@
     <!-- ============================================================
          DESIGN E — v5 STREAMLINED
          ============================================================ -->
-    <section id="design-e" class="design-panel">
+    <section id="design-e" class="design-panel active">
       <aside class="sidebar-editorial">
         <div class="ed-header">
           <div class="ed-wordmark">PandaCommand</div>
@@ -2100,11 +2162,12 @@
                 <span class="e-chat-dot"></span>
                 <span class="e-chat-title">Q2 benefits enrollment audit</span>
                 <div class="e-chat-bottom">
-                  <span class="e-chat-client">Aperture</span>
-                  <span class="e-chat-sep">·</span>
-                  <span class="e-chat-state" data-state="running"><span class="e-state-pulse"></span><span>Running</span></span>
+                  <span class="e-chat-client">Aperture Laboratories</span>
                   <span class="e-chat-sep">·</span>
                   <span class="e-chat-time">2m</span>
+                </div>
+                <div class="e-chat-status-row">
+                  <span class="e-chat-state" data-state="running"><svg class="e-spin-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 13" stroke-linecap="round"/></svg><span>Running</span></span>
                 </div>
               </li>
               <li class="e-chat" data-chat="e-recent-2">
@@ -2113,21 +2176,17 @@
                 <div class="e-chat-bottom">
                   <span class="e-chat-client">Black Mesa</span>
                   <span class="e-chat-sep">·</span>
-                  <span class="e-chat-state" data-state="running"><span class="e-state-pulse"></span><span>Running</span></span>
-                  <span class="e-chat-sep">·</span>
                   <span class="e-chat-time">8m</span>
+                </div>
+                <div class="e-chat-status-row">
+                  <span class="e-chat-state" data-state="running"><svg class="e-spin-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 13" stroke-linecap="round"/></svg><span>Running</span></span>
                 </div>
               </li>
               <li class="e-chat unread" data-chat="e-recent-3">
                 <span class="e-chat-dot"></span>
                 <span class="e-chat-title">PTO policy rewrite — Aperture</span>
                 <div class="e-chat-bottom">
-                  <span class="e-chat-client">Aperture</span>
-                  <span class="e-chat-sep">·</span>
-                  <span class="e-chat-state" data-state="waiting">
-                    <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5l5.5 10H1.5L7 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="10" r="0.7" fill="currentColor"/></svg>
-                    <span>Needs input</span>
-                  </span>
+                  <span class="e-chat-client">Aperture Laboratories</span>
                   <span class="e-chat-sep">·</span>
                   <span class="e-chat-time">12m</span>
                 </div>
@@ -2136,23 +2195,22 @@
                 <span class="e-chat-dot"></span>
                 <span class="e-chat-title">Onboarding checklist refresh</span>
                 <div class="e-chat-bottom">
-                  <span class="e-chat-client">Umbrella</span>
-                  <span class="e-chat-sep">·</span>
-                  <span class="e-chat-state" data-state="waiting">
-                    <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-                    <span>Awaiting approval</span>
-                  </span>
+                  <span class="e-chat-client">Umbrella Corp</span>
                   <span class="e-chat-sep">·</span>
                   <span class="e-chat-time">1h</span>
+                </div>
+                <div class="e-chat-status-row">
+                  <span class="e-chat-state" data-state="waiting">
+                    <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    <span>Needs Approval</span>
+                  </span>
                 </div>
               </li>
               <li class="e-chat" data-chat="e-recent-5">
                 <span class="e-chat-dot"></span>
                 <span class="e-chat-title">Compensation band review</span>
                 <div class="e-chat-bottom">
-                  <span class="e-chat-client">Umbrella</span>
-                  <span class="e-chat-sep">·</span>
-                  <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                  <span class="e-chat-client">Umbrella Corp</span>
                   <span class="e-chat-sep">·</span>
                   <span class="e-chat-time">2h</span>
                 </div>
@@ -2170,7 +2228,7 @@
             <div id="e-clients-wrap">
 
               <div class="e-client">
-                <div class="e-client-row selected" data-e-toggle="e-aperture">
+                <div class="e-client-row" data-e-toggle="e-aperture">
                   <button class="e-chev-btn" aria-label="Collapse">
                     <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   </button>
@@ -2181,11 +2239,11 @@
                   </button>
                 </div>
                 <ul class="e-list" data-e-list="e-aperture">
-                  <li class="e-chat selected" data-chat="e-ap-1">
+                  <li class="e-chat" data-chat="e-ap-1">
                     <span class="e-chat-dot"></span>
                     <span class="e-chat-title">Q2 benefits enrollment audit</span>
                     <div class="e-chat-bottom">
-                      <span class="e-chat-state" data-state="running"><span class="e-state-pulse"></span><span>Running · pulling HRIS</span></span>
+                      <span class="e-chat-state" data-state="running"><svg class="e-spin-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 13" stroke-linecap="round"/></svg><span>Running · pulling HRIS</span></span>
                       <span class="e-chat-sep">·</span>
                       <span class="e-chat-time">2m</span>
                     </div>
@@ -2194,9 +2252,9 @@
                     <span class="e-chat-dot"></span>
                     <span class="e-chat-title">PTO policy rewrite</span>
                     <div class="e-chat-bottom">
-                      <span class="e-chat-state" data-state="waiting">
+                      <span class="e-chat-state" data-state="needs-input">
                         <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5l5.5 10H1.5L7 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="10" r="0.7" fill="currentColor"/></svg>
-                        <span>Needs input</span>
+                        <span>needs-input-remove</span>
                       </span>
                       <span class="e-chat-sep">·</span>
                       <span class="e-chat-time">12m</span>
@@ -2241,7 +2299,7 @@
                     <span class="e-chat-dot"></span>
                     <span class="e-chat-title">I-9 remote verification memo</span>
                     <div class="e-chat-bottom">
-                      <span class="e-chat-state" data-state="running"><span class="e-state-pulse"></span><span>Running · drafting memo</span></span>
+                      <span class="e-chat-state" data-state="running"><svg class="e-spin-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 13" stroke-linecap="round"/></svg><span>Running · drafting memo</span></span>
                       <span class="e-chat-sep">·</span>
                       <span class="e-chat-time">8m</span>
                     </div>
@@ -2276,7 +2334,7 @@
                     <div class="e-chat-bottom">
                       <span class="e-chat-state" data-state="waiting">
                         <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-                        <span>Awaiting approval</span>
+                        <span>Needs Approval</span>
                       </span>
                       <span class="e-chat-sep">·</span>
                       <span class="e-chat-time">1h</span>
@@ -2369,10 +2427,13 @@
       </aside>
 
       <main class="content" id="e-content">
+        <div class="chat-header">
+          <div class="chat-header-title">Q2 benefits enrollment audit</div>
+          <div class="chat-header-client">Aperture Laboratories</div>
+        </div>
         <div class="content-body">
           <div class="msg user">Can you audit open enrollment participation for Q2 and flag any plans with under-subscription?</div>
           <div class="msg">Pulling enrollment records from the HRIS. I'll segment by plan tier and call out anything below the 30% threshold — stand by.</div>
-          <div class="placeholder-note">Chevron toggles. Client name opens overview. Hover a client for the inline +. Read dot sits in the left gutter; chat titles align with client-name text above.</div>
         </div>
       </main>
     </section>
@@ -2597,19 +2658,26 @@
       // Stub — would create a client-scoped new chat
     });
   });
-  // Chat selection within v5 (no breadcrumb in main)
+  // Chat selection within v5
   document.querySelectorAll('#design-e .e-chat').forEach(chat => {
     chat.addEventListener('click', () => {
       document.querySelectorAll('#design-e .e-chat').forEach(c => c.classList.remove('selected'));
       document.querySelectorAll('#design-e .e-client-row').forEach(r => r.classList.remove('selected'));
       chat.classList.add('selected');
       chat.classList.remove('unread');
+      const title = chat.querySelector('.e-chat-title')?.textContent || '';
+      const clientEl = chat.querySelector('.e-chat-client');
+      const clientRow = chat.closest('.e-client')?.querySelector('.e-client-name');
+      const client = clientEl ? clientEl.textContent : (clientRow ? clientRow.textContent : '');
       const main = document.getElementById('e-content');
       main.innerHTML = `
+        <div class="chat-header">
+          <div class="chat-header-title">${title}</div>
+          <div class="chat-header-client">${client}</div>
+        </div>
         <div class="content-body">
-          <div class="msg user">Placeholder user message for this chat.</div>
-          <div class="msg">Placeholder agent reply — focus of this mockup is the sidebar.</div>
-          <div class="placeholder-note">Main content is placeholder — focus is the sidebar.</div>
+          <div class="msg user">Placeholder user message.</div>
+          <div class="msg">Placeholder agent reply.</div>
         </div>
       `;
     });
