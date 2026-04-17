@@ -1435,6 +1435,289 @@
   #design-e .e-client-row.selected .e-badge { background: rgba(255,255,255,0.25); color: #fff; }
   #design-e .e-client-row.selected .e-chev-btn:hover,
   #design-e .e-client-row.selected .e-inline-new:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+  /* =============================================================
+     DESIGN F — v6 COLLAPSIBLE (sidebar styling — mirrors v5)
+     ============================================================= */
+  #design-f .sidebar-editorial { width: 320px; }
+
+  /* Nav icons */
+  #design-f .ed-nav-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--fg-muted);
+    flex-shrink: 0;
+  }
+
+  #design-f .ed-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 8px 0 14px;
+    letter-spacing: -0.01em;
+  }
+  #design-f .ed-link:hover .ed-nav-icon { color: var(--primary-bright); }
+
+  #design-f .ed-heading {
+    gap: 12px;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+  }
+
+  #design-f #f-clients-wrap { padding-top: 2px; }
+
+  /* Inherits .e-client / .e-client-row / .e-chat etc. from the global v5 rules
+     above (those base rules are unscoped so they apply to design-f rows too). */
+
+  #design-f .e-client .e-list .e-chat {
+    grid-template-columns: 26px 1fr;
+    padding-left: 0;
+  }
+
+  #design-f .content-body { padding: 28px 32px; }
+
+  #design-f .chat-header {
+    padding: 20px 32px 16px;
+    flex-shrink: 0;
+  }
+  #design-f .chat-header-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 4px;
+  }
+  #design-f .chat-header-client {
+    font-size: 14px;
+    color: var(--fg-muted);
+    font-weight: 500;
+  }
+
+  /* Selected client row & chat — match v5 darker accent */
+  #design-f .e-chat.selected { background: #5668A8; }
+  #design-f .e-chat.selected:hover { background: #5668A8; }
+  #design-f .e-chat.selected .e-chat-title,
+  #design-f .e-chat.selected .e-chat-bottom,
+  #design-f .e-chat.selected .e-chat-client,
+  #design-f .e-chat.selected .e-chat-sep,
+  #design-f .e-chat.selected .e-chat-time,
+  #design-f .e-chat.selected .e-chat-state,
+  #design-f .e-chat.selected .e-chat-state[data-state="running"],
+  #design-f .e-chat.selected .e-chat-state[data-state="done"] { color: #fff; }
+  #design-f .e-chat.selected .e-chat-title { font-weight: 700; }
+  #design-f .e-chat.selected .e-spin-icon { color: #fff; }
+
+  #design-f .e-client-row.selected { background: #5668A8; }
+  #design-f .e-client-row.selected:hover { background: #5668A8; }
+  #design-f .e-client-row.selected .e-client-name,
+  #design-f .e-client-row.selected .e-chev-btn,
+  #design-f .e-client-row.selected .e-inline-new { color: #fff; }
+  #design-f .e-client-row.selected .e-badge { background: rgba(255,255,255,0.25); color: #fff; }
+  #design-f .e-client-row.selected .e-chev-btn:hover,
+  #design-f .e-client-row.selected .e-inline-new:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+  /* All / Recent filter — segmented control in heading row (mirrors v5) */
+  #design-f .e-filter {
+    display: inline-flex;
+    gap: 1px;
+    padding: 2px;
+    margin-right: -2px;
+    background: var(--card);
+    border-radius: 6px;
+  }
+  #design-f .e-filter-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--fg-muted);
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    padding: 3px 9px;
+    border-radius: 4px;
+    cursor: pointer;
+    line-height: 1.2;
+  }
+  #design-f .e-filter-btn:hover { color: var(--fg); }
+  #design-f .e-filter-btn.active {
+    background: var(--bg);
+    color: var(--fg);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  }
+
+  /* + New chat link (visible only when filter=recent) */
+  #design-f .e-recent-new {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0 4px;
+    padding: 4px 4px 4px 0;
+    color: var(--fg-muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+  #design-f .e-recent-new:hover { color: var(--primary-bright); }
+  #design-f .e-recent-new svg { width: 14px; height: 14px; flex-shrink: 0; }
+  #design-f .e-recent-new[hidden] { display: none; }
+
+  /* Recent flat list */
+  #design-f .e-recent-flat { padding-left: 0; padding-right: 0; }
+  #design-f .e-recent-flat .e-chat {
+    grid-template-columns: 26px 1fr;
+    padding-left: 0;
+  }
+  #design-f .e-recent-flat[hidden] { display: none; }
+  #design-f #f-clients-wrap[hidden] { display: none; }
+
+  #design-f .e-recent-flat .e-chat-status-row {
+    grid-column: 2;
+    grid-row: 3;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 1px;
+  }
+
+  /* =============================================================
+     DESIGN F — v6 COLLAPSIBLE BEHAVIOR (rail pattern)
+     - Always-visible 56px rail with Dashboard / Chats / Settings icons
+       plus an expand button at the top
+     - Hover the rail (or the sidebar) to peek the full sidebar
+       (slides in next to the rail, as overlay over content)
+     - Pin button in sidebar header (or rail expand button) keeps it open
+     - Pinned: rail hides, sidebar joins layout (pushes content right)
+     ============================================================= */
+
+  #design-f { position: relative; overflow: hidden; }
+
+  /* Rail — always visible (collapsed state's chrome) */
+  #design-f .rail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 56px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    z-index: 8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 0 14px;
+    gap: 4px;
+  }
+  #design-f.pinned .rail { display: none; }
+
+  #design-f .rail-icon {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--fg-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    transition: background 120ms ease, color 120ms ease;
+  }
+  #design-f .rail-icon:hover {
+    background: var(--card);
+    color: var(--fg);
+  }
+  #design-f .rail-icon.active {
+    color: var(--primary-bright);
+    background: var(--primary-soft);
+  }
+  #design-f .rail-icon svg { width: 20px; height: 20px; }
+
+  #design-f .rail-divider {
+    width: 28px;
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0 6px;
+    flex-shrink: 0;
+  }
+  #design-f .rail-spacer { flex: 1; }
+
+  /* Rail-expand uses a slightly distinct icon (panel-with-divider) */
+  #design-f .rail-expand { color: var(--fg-muted); }
+  #design-f .rail-expand:hover { color: var(--primary-bright); }
+
+  /* Content always leaves room for the rail (unless pinned, where the
+     full sidebar takes layout space and rail is hidden) */
+  #design-f .content { margin-left: 56px; }
+  #design-f.pinned .content { margin-left: 0; }
+
+  /* Sidebar — overlays the rail when open (left:0, higher z-index).
+     Hidden offscreen by default (translateX -100%). */
+  #design-f .sidebar-editorial {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 10;
+    transform: translateX(-100%);
+    transition: transform 240ms cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 8px 0 28px rgba(0, 0, 0, 0.45);
+    will-change: transform;
+  }
+  #design-f.peeking .sidebar-editorial,
+  #design-f.pinned  .sidebar-editorial { transform: translateX(0); }
+  #design-f.pinned .sidebar-editorial {
+    position: relative;
+    box-shadow: none;
+    transition: none;
+  }
+
+  /* Pin button in sidebar header (replaces v5 ed-toggle) */
+  #design-f .ed-pin {
+    width: 30px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--fg-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    padding: 0;
+  }
+  #design-f .ed-pin svg { width: 17px; height: 17px; }
+  #design-f .ed-pin:hover {
+    background: var(--card);
+    color: var(--fg);
+    border-color: var(--border);
+  }
+  #design-f.pinned .ed-pin {
+    background: var(--primary-soft);
+    color: var(--primary-bright);
+    border-color: transparent;
+  }
+  #design-f.pinned .ed-pin:hover {
+    background: var(--primary-softer);
+    color: var(--primary-bright);
+  }
+  /* Swap pin/unpin icons based on state */
+  #design-f .ed-pin .icon-pin   { display: none; }
+  #design-f .ed-pin .icon-unpin { display: inline; }
+  #design-f.pinned .ed-pin .icon-pin   { display: inline; }
+  #design-f.pinned .ed-pin .icon-unpin { display: none; }
+
 </style>
 </head>
 <body>
@@ -1454,10 +1737,13 @@
     <button data-target="design-d" title="v3 — refined Split Zones with state, pins, inline +">
       <span class="num">4</span>v3 Refined
     </button>
-    <button class="active" data-target="design-e" title="v5 — streamlined: no bullets, no pins, dot gutter, larger title">
+    <button data-target="design-e" title="v5 — streamlined: no bullets, no pins, dot gutter, larger title">
       <span class="num">5</span>v5 Streamlined
     </button>
-    <span class="hint">Press <b>1</b>–<b>5</b> to switch</span>
+    <button class="active" data-target="design-f" title="v6 — collapsible: hover left edge to peek, pin to keep open">
+      <span class="num">6</span>v6 Collapsible
+    </button>
+    <span class="hint">Press <b>1</b>–<b>6</b> to switch</span>
   </div>
 
   <div class="designs">
@@ -2268,7 +2554,7 @@
     <!-- ============================================================
          DESIGN E — v5 STREAMLINED
          ============================================================ -->
-    <section id="design-e" class="design-panel active" data-layout="filter">
+    <section id="design-e" class="design-panel" data-layout="filter">
       <!-- Layout toggle (mockup comparison control — not part of the actual UI) -->
       <div class="e-layout-toggle" role="group" aria-label="Recent chats layout">
         <span class="e-layout-label">Recent:</span>
@@ -2657,6 +2943,347 @@
       </main>
     </section>
 
+    <!-- ============================================================
+         DESIGN F — v6 COLLAPSIBLE
+         Hover left edge to peek · pin button keeps sidebar open
+         Floating button (top-left) is a click-to-open affordance
+         ============================================================ -->
+    <section id="design-f" class="design-panel active">
+
+      <!-- Always-visible rail with primary nav icons + expand button.
+           Hover the rail (or sidebar) to peek; click expand or pin to keep open. -->
+      <nav class="rail" aria-label="Sidebar rail">
+        <button class="rail-icon rail-expand" data-f-action="pin" aria-label="Expand sidebar" title="Expand sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M9 3v18"/>
+          </svg>
+        </button>
+        <div class="rail-divider"></div>
+        <button class="rail-icon" data-f-rail="dashboard" aria-label="Dashboard" title="Dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        </button>
+        <button class="rail-icon active" data-f-rail="chats" aria-label="Chats" title="Chats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </button>
+        <div class="rail-spacer"></div>
+        <button class="rail-icon" data-f-rail="settings" aria-label="Settings &amp; Themes" title="Settings &amp; Themes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </nav>
+
+      <aside class="sidebar-editorial">
+        <div class="ed-header">
+          <div class="ed-wordmark">PandaCommand</div>
+          <button class="ed-pin" aria-label="Pin sidebar" title="Pin sidebar open">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M9 3v18"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="ed-scroll">
+          <div class="ed-section">
+            <a class="ed-link">
+              <svg class="ed-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+              <span>Dashboard</span>
+            </a>
+          </div>
+
+          <div class="ed-section">
+            <div class="ed-heading-row">
+              <div class="ed-heading">
+                <svg class="ed-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Chats</span>
+              </div>
+              <div class="e-filter" role="tablist" aria-label="Chat filter">
+                <button class="e-filter-btn active" data-f-filter="all" role="tab" aria-selected="true">By Client</button>
+                <button class="e-filter-btn" data-f-filter="recent" role="tab" aria-selected="false">Recent</button>
+              </div>
+            </div>
+
+            <!-- + New chat link, shown only when filter=recent -->
+            <a class="e-recent-new" id="f-recent-new-link" hidden>
+              <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <span>New chat</span>
+            </a>
+
+            <!-- Recent flat list (hidden unless filter=recent) -->
+            <ul class="e-list e-recent-flat" id="f-recent-list" hidden>
+              <li class="e-chat" data-chat="f-recent-1">
+                <span class="e-chat-dot"></span>
+                <span class="e-chat-title">Q2 benefits enrollment audit</span>
+                <div class="e-chat-bottom">
+                  <span class="e-chat-client">Aperture Laboratories</span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-time">2m</span>
+                </div>
+                <div class="e-chat-status-row">
+                  <span class="e-chat-state" data-state="running"><svg class="e-spin-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 13" stroke-linecap="round"/></svg><span>Running</span></span>
+                </div>
+              </li>
+              <li class="e-chat" data-chat="f-recent-2">
+                <span class="e-chat-dot"></span>
+                <span class="e-chat-title">I-9 remote verification memo</span>
+                <div class="e-chat-bottom">
+                  <span class="e-chat-client">Black Mesa</span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-time">8m</span>
+                </div>
+                <div class="e-chat-status-row">
+                  <span class="e-chat-state" data-state="running"><svg class="e-spin-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 13" stroke-linecap="round"/></svg><span>Running</span></span>
+                </div>
+              </li>
+              <li class="e-chat unread" data-chat="f-recent-3">
+                <span class="e-chat-dot"></span>
+                <span class="e-chat-title">PTO policy rewrite — Aperture</span>
+                <div class="e-chat-bottom">
+                  <span class="e-chat-client">Aperture Laboratories</span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-time">12m</span>
+                </div>
+              </li>
+              <li class="e-chat unread" data-chat="f-recent-4">
+                <span class="e-chat-dot"></span>
+                <span class="e-chat-title">Onboarding checklist refresh</span>
+                <div class="e-chat-bottom">
+                  <span class="e-chat-client">Umbrella Corp</span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-time">1h</span>
+                </div>
+                <div class="e-chat-status-row">
+                  <span class="e-chat-state" data-state="waiting">
+                    <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    <span>Needs Approval</span>
+                  </span>
+                </div>
+              </li>
+              <li class="e-chat" data-chat="f-recent-5">
+                <span class="e-chat-dot"></span>
+                <span class="e-chat-title">Compensation band review</span>
+                <div class="e-chat-bottom">
+                  <span class="e-chat-client">Umbrella Corp</span>
+                  <span class="e-chat-sep">·</span>
+                  <span class="e-chat-time">2h</span>
+                </div>
+              </li>
+            </ul>
+
+            <div id="f-clients-wrap">
+
+              <div class="e-client">
+                <div class="e-client-row" data-e-toggle="f-aperture">
+                  <button class="e-chev-btn" aria-label="Collapse">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="e-client-name" data-e-nav="aperture">Aperture Laboratories</a>
+                  <span class="e-badge" title="1 unread">1</span>
+                  <button class="e-inline-new" data-e-newchat="aperture" title="New chat for Aperture">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+                <ul class="e-list" data-e-list="f-aperture">
+                  <li class="e-chat selected" data-chat="f-ap-1">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Q2 benefits enrollment audit</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="running"><svg class="e-spin-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 13" stroke-linecap="round"/></svg><span>Running · pulling HRIS</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">2m</span>
+                    </div>
+                  </li>
+                  <li class="e-chat unread" data-chat="f-ap-2">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">PTO policy rewrite</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="needs-input">
+                        <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5l5.5 10H1.5L7 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="10" r="0.7" fill="currentColor"/></svg>
+                        <span>needs-input</span>
+                      </span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">12m</span>
+                    </div>
+                  </li>
+                  <li class="e-chat" data-chat="f-ap-3">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Manager training rollout</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">2h</span>
+                    </div>
+                  </li>
+                  <li class="e-chat" data-chat="f-ap-4">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Exit survey analysis</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="done">
+                        <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span>Done</span>
+                      </span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">Yesterday</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="e-client">
+                <div class="e-client-row collapsed" data-e-toggle="f-blackmesa">
+                  <button class="e-chev-btn" aria-label="Expand">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="e-client-name" data-e-nav="blackmesa">Black Mesa</a>
+                  <button class="e-inline-new" data-e-newchat="blackmesa" title="New chat for Black Mesa">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+                <ul class="e-list" data-e-list="f-blackmesa" hidden>
+                  <li class="e-chat" data-chat="f-bm-1">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">I-9 remote verification memo</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="running"><svg class="e-spin-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 13" stroke-linecap="round"/></svg><span>Running · drafting memo</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">8m</span>
+                    </div>
+                  </li>
+                  <li class="e-chat" data-chat="f-bm-2">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Safety training audit</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">3h</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="e-client">
+                <div class="e-client-row collapsed" data-e-toggle="f-umbrella">
+                  <button class="e-chev-btn" aria-label="Expand">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="e-client-name" data-e-nav="umbrella">Umbrella Corp</a>
+                  <span class="e-badge" title="1 unread">1</span>
+                  <button class="e-inline-new" data-e-newchat="umbrella" title="New chat for Umbrella">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+                <ul class="e-list" data-e-list="f-umbrella" hidden>
+                  <li class="e-chat unread" data-chat="f-um-1">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Onboarding checklist refresh</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="waiting">
+                        <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3M7 9.5v0.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                        <span>Needs Approval</span>
+                      </span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">1h</span>
+                    </div>
+                  </li>
+                  <li class="e-chat" data-chat="f-um-2">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Compensation band review</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">2h</span>
+                    </div>
+                  </li>
+                  <li class="e-chat" data-chat="f-um-3">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Handbook compliance pass</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">Yesterday</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="e-client">
+                <div class="e-client-row collapsed" data-e-toggle="f-acme">
+                  <button class="e-chev-btn" aria-label="Expand">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="e-client-name" data-e-nav="acme">Acme Corp.</a>
+                  <button class="e-inline-new" data-e-newchat="acme" title="New chat for Acme">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+                <ul class="e-list" data-e-list="f-acme" hidden>
+                  <li class="e-chat" data-chat="f-ac-1">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Q1 performance review prep</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">Yesterday</span>
+                    </div>
+                  </li>
+                  <li class="e-chat" data-chat="f-ac-2">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Org chart cleanup</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="idle"><span>Idle</span></span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">2 days ago</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="e-client">
+                <div class="e-client-row collapsed" data-e-toggle="f-coconut">
+                  <button class="e-chev-btn" aria-label="Expand">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <a class="e-client-name" data-e-nav="coconut">Coconut Grove LLC.</a>
+                  <button class="e-inline-new" data-e-newchat="coconut" title="New chat for Coconut">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+                <ul class="e-list" data-e-list="f-coconut" hidden>
+                  <li class="e-chat" data-chat="f-co-1">
+                    <span class="e-chat-dot"></span>
+                    <span class="e-chat-title">Seasonal staffing plan</span>
+                    <div class="e-chat-bottom">
+                      <span class="e-chat-state" data-state="done">
+                        <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span>Done</span>
+                      </span>
+                      <span class="e-chat-sep">·</span>
+                      <span class="e-chat-time">3 days ago</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="ed-footer"><a>Settings &amp; Themes</a></div>
+      </aside>
+
+      <main class="content" id="f-content">
+        <div class="chat-header">
+          <div class="chat-header-title">Q2 benefits enrollment audit</div>
+          <div class="chat-header-client">Aperture Laboratories</div>
+        </div>
+        <div class="content-body">
+          <div class="msg user">Can you audit open enrollment participation for Q2 and flag any plans with under-subscription?</div>
+          <div class="msg">Pulling enrollment records from the HRIS. I'll segment by plan tier and call out anything below the 30% threshold — stand by.</div>
+          <div class="placeholder-note">Hover the left edge of the page to peek the sidebar. Click the pin button (top-right of the sidebar) to keep it open. Click it again to release.</div>
+        </div>
+      </main>
+    </section>
+
   </div>
 </div>
 
@@ -2699,6 +3326,7 @@
     if (e.key === '3') activate('design-c');
     if (e.key === '4') activate('design-d');
     if (e.key === '5') activate('design-e');
+    if (e.key === '6') activate('design-f');
   });
 
   // --- Design D (v3): chevron toggles, name navigates ---
@@ -2853,7 +3481,7 @@
   });
 
   // --- Design E (v5): chevron toggles, name navigates ---
-  document.querySelectorAll('[data-e-toggle]').forEach(row => {
+  document.querySelectorAll('#design-e [data-e-toggle]').forEach(row => {
     const chevBtn = row.querySelector('.e-chev-btn');
     chevBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -2863,7 +3491,7 @@
       if (list) list.hidden = row.classList.contains('collapsed');
     });
   });
-  document.querySelectorAll('[data-e-nav]').forEach(el => {
+  document.querySelectorAll('#design-e [data-e-nav]').forEach(el => {
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       renderOverviewBare('e-content', el.dataset.eNav);
@@ -2872,7 +3500,7 @@
       el.closest('.e-client-row').classList.add('selected');
     });
   });
-  document.querySelectorAll('[data-e-newchat]').forEach(btn => {
+  document.querySelectorAll('#design-e [data-e-newchat]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       // Stub — would create a client-scoped new chat
@@ -2935,6 +3563,138 @@
         clientsWrap.hidden = isRecent;
         recentList.hidden = !isRecent;
         recentNew.hidden = !isRecent;
+      });
+    });
+  })();
+
+  // --- Design F (v6): chevron toggles, name navigates, chat selection ---
+  document.querySelectorAll('#design-f [data-e-toggle]').forEach(row => {
+    const chevBtn = row.querySelector('.e-chev-btn');
+    chevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = row.dataset.eToggle;
+      row.classList.toggle('collapsed');
+      const list = document.querySelector(`[data-e-list="${key}"]`);
+      if (list) list.hidden = row.classList.contains('collapsed');
+    });
+  });
+  document.querySelectorAll('#design-f [data-e-nav]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      renderOverviewBare('f-content', el.dataset.eNav);
+      document.querySelectorAll('#design-f .e-client-row').forEach(r => r.classList.remove('selected'));
+      document.querySelectorAll('#design-f .e-chat').forEach(c => c.classList.remove('selected'));
+      el.closest('.e-client-row').classList.add('selected');
+    });
+  });
+  document.querySelectorAll('#design-f [data-e-newchat]').forEach(btn => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); });
+  });
+  document.querySelectorAll('#design-f .e-chat').forEach(chat => {
+    chat.addEventListener('click', () => {
+      document.querySelectorAll('#design-f .e-chat').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('#design-f .e-client-row').forEach(r => r.classList.remove('selected'));
+      chat.classList.add('selected');
+      chat.classList.remove('unread');
+      const title = chat.querySelector('.e-chat-title')?.textContent || '';
+      const clientEl = chat.querySelector('.e-chat-client');
+      const clientRow = chat.closest('.e-client')?.querySelector('.e-client-name');
+      const client = clientEl ? clientEl.textContent : (clientRow ? clientRow.textContent : '');
+      const main = document.getElementById('f-content');
+      main.innerHTML = `
+        <div class="chat-header">
+          <div class="chat-header-title">${title}</div>
+          <div class="chat-header-client">${client}</div>
+        </div>
+        <div class="content-body">
+          <div class="msg user">Placeholder user message.</div>
+          <div class="msg">Placeholder agent reply.</div>
+        </div>
+      `;
+    });
+  });
+
+  // --- Design F (v6): By Client / Recent filter ---
+  (function () {
+    const filterBtns = document.querySelectorAll('#design-f .e-filter-btn');
+    const clientsWrap = document.getElementById('f-clients-wrap');
+    const recentList = document.getElementById('f-recent-list');
+    const recentNew = document.getElementById('f-recent-new-link');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const mode = btn.dataset.fFilter;
+        filterBtns.forEach(b => {
+          const active = b === btn;
+          b.classList.toggle('active', active);
+          b.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        const isRecent = mode === 'recent';
+        clientsWrap.hidden = isRecent;
+        recentList.hidden = !isRecent;
+        recentNew.hidden = !isRecent;
+      });
+    });
+  })();
+
+  // --- Design F (v6): collapse behavior ---
+  // States: collapsed/rail (default) → peeking (hover) → pinned (click expand or pin)
+  (function () {
+    const panel   = document.getElementById('design-f');
+    const sidebar = panel.querySelector('.sidebar-editorial');
+    const rail    = panel.querySelector('.rail');
+    const pinBtn  = panel.querySelector('.ed-pin');
+    const expandBtn = panel.querySelector('.rail-expand');
+
+    let hideTimer;
+
+    function showPeek() {
+      if (panel.classList.contains('pinned')) return;
+      clearTimeout(hideTimer);
+      panel.classList.add('peeking');
+    }
+    function schedulePeekHide() {
+      if (panel.classList.contains('pinned')) return;
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => panel.classList.remove('peeking'), 220);
+    }
+
+    rail.addEventListener('mouseenter', showPeek);
+    sidebar.addEventListener('mouseenter', showPeek);
+    sidebar.addEventListener('mouseleave', schedulePeekHide);
+    rail.addEventListener('mouseleave', () => {
+      setTimeout(() => {
+        if (!sidebar.matches(':hover')) schedulePeekHide();
+      }, 30);
+    });
+
+    function pin() {
+      panel.classList.add('pinned');
+      panel.classList.remove('peeking');
+      pinBtn.title = 'Unpin sidebar (collapse to rail)';
+      pinBtn.setAttribute('aria-label', 'Unpin sidebar');
+    }
+    function unpin() {
+      panel.classList.remove('pinned');
+      pinBtn.title = 'Pin sidebar open';
+      pinBtn.setAttribute('aria-label', 'Pin sidebar');
+    }
+    pinBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (panel.classList.contains('pinned')) unpin();
+      else pin();
+    });
+    expandBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pin();
+    });
+
+    // Rail icon clicks — stub navigation (Dashboard / Chats / Settings)
+    panel.querySelectorAll('[data-f-rail]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        panel.querySelectorAll('[data-f-rail]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
       });
     });
   })();

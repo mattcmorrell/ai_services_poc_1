@@ -38,6 +38,7 @@ yarn-error.log*
 /check-*.png
 /hrc-review-*.png
 /*.png
+screenshots/
 
 # playwright MCP logs
 .playwright-mcp/
