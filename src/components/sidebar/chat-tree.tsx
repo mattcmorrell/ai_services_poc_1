@@ -138,7 +138,7 @@ export function ChatTree({
                 <button
                   onClick={() => onSelectChat(chat.id)}
                   className={cn(
-                    "grid w-full grid-cols-[18px_1fr] gap-x-1.5 gap-y-[3px] py-2 pl-2 pr-9 text-left rounded-md",
+                    "grid w-full grid-cols-[18px_1fr] gap-x-1.5 gap-y-[3px] py-1.5 pl-2 pr-9 text-left rounded-md",
                     isSelected
                       ? "bg-primary text-primary-foreground"
                       : "hover:bg-accent/60"
@@ -155,11 +155,7 @@ export function ChatTree({
                   <span className={cn(
                     "col-start-2 type-chat-name leading-snug",
                     (isSelected || chat.hasUnread) && "font-semibold!",
-                    isSelected
-                      ? "text-primary-foreground"
-                      : chat.hasUnread
-                        ? "text-foreground"
-                        : "text-muted-foreground"
+                    isSelected ? "text-primary-foreground" : "text-foreground"
                   )}>
                     {chat.title}
                     <span className={cn(
@@ -180,7 +176,7 @@ export function ChatTree({
                     </span>
                   )}
                 </button>
-                <div className="absolute right-1.5 top-1.5">
+                <div className="absolute right-1.5 top-1">
                   <ChatRowMenu
                     chatId={chat.id}
                     onRename={onRenameChat}
