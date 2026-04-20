@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLineLeft, House } from "@phosphor-icons/react";
+import { ArrowLineLeft } from "@phosphor-icons/react";
 import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { ChatsSection } from "./chats-section";
@@ -63,27 +63,6 @@ export function SidebarExpanded({
               <ArrowLineLeft className="h-[18px] w-[18px]" />
             </button>
           )}
-        </div>
-      )}
-
-      {/* Dashboard nav row */}
-      {!popoverMode && (
-        <div className="flex-shrink-0 px-[14px] pt-2">
-          <button
-            onClick={() => onViewChange("dashboard")}
-            className={cn(
-              "flex w-full items-center gap-1.5 px-2 py-2 text-left rounded-md transition-colors",
-              activeView === "dashboard"
-                ? "bg-primary text-primary-foreground"
-                : "text-foreground hover:bg-accent"
-            )}
-          >
-            <House
-              className="h-[18px] w-[18px] flex-shrink-0"
-              weight={activeView === "dashboard" ? "fill" : "light"}
-            />
-            <span className="type-chat-name">Dashboard</span>
-          </button>
         </div>
       )}
 

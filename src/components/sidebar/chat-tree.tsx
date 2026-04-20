@@ -89,15 +89,15 @@ export function ChatTree({
                 />
               </button>
 
-              <button
-                onClick={() => onSelectClient(client.id)}
+              <span
+                onClick={() => onToggleClient(client.id)}
                 className={cn(
-                  "flex-1 truncate text-left",
+                  "flex-1 truncate cursor-pointer",
                   isActiveClient ? "text-primary-foreground" : "text-foreground"
                 )}
               >
                 <span className="type-client-name">{client.name}</span>
-              </button>
+              </span>
 
               <button
                 onClick={() => onNewChat(client.id)}

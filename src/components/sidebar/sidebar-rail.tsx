@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ArrowLineRight, House, ChatDots, Sun, Moon, Palette } from "@phosphor-icons/react";
+import { ArrowLineRight, ChatDots, Sun, Moon, Palette } from "@phosphor-icons/react";
 import { useTheme, type Colorway } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import {
@@ -65,27 +65,6 @@ export function SidebarRail({
         </Tooltip>
 
         <nav className="flex flex-1 flex-col items-center">
-          {/* Dashboard */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => onViewChange("dashboard")}
-                className={cn(
-                  "mt-[7px] flex h-10 w-10 items-center justify-center rounded-lg transition-colors",
-                  activeView === "dashboard"
-                    ? "bg-primary/15 text-primary"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                )}
-              >
-                <House
-                  className="h-5 w-5"
-                  weight={activeView === "dashboard" ? "fill" : "light"}
-                />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right">Dashboard</TooltipContent>
-          </Tooltip>
-
           {/* Chats */}
           <Tooltip>
             <TooltipTrigger asChild>

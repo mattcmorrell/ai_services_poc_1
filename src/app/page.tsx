@@ -3,24 +3,20 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Sidebar } from "@/components/sidebar/sidebar";
 import { ChatView } from "@/components/chat-view";
-import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { AgentsView } from "@/components/agents/agents-view";
 import { ClientSelectDialog } from "@/components/agents/client-select-dialog";
 import { WorkflowPanel } from "@/components/workflow/workflow-panel";
 import { mockClients, mockChats } from "@/data/mock-data";
-import { mockAgentAttention, mockTodos, suggestedActions } from "@/data/dashboard-data";
 import { mockAgents } from "@/data/agents-data";
 import { defaultPayrollWorkflow } from "@/data/workflow-data";
 import { Message, Chat, Client, Artifact, ActionPlan } from "@/types/chat";
 import { ArtifactPanel } from "@/components/artifacts/artifact-panel";
 import { Agent } from "@/types/agent";
-import { ClientsView } from "@/components/clients/clients-view";
 import { useStreamingChatSession } from "@/hooks/use-streaming-chat-session";
 
 export default function Home() {
-  const [activeView, setActiveView] = useState("dashboard");
+  const [activeView, setActiveView] = useState("chats");
   const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [chats, setChats] = useState<Chat[]>(mockChats);
   // Loading state is now derived from streamingSession.loadingChatId
   const [agents, setAgents] = useState<Agent[]>(mockAgents);
@@ -675,50 +671,12 @@ export default function Home() {
     setActiveView("chats");
   };
 
-  // Pending message from dashboard — sent via streaming hook after chat becomes active
-  const pendingDashboardMessageRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (pendingDashboardMessageRef.current && selectedChatId) {
-      const msg = pendingDashboardMessageRef.current;
-      pendingDashboardMessageRef.current = null;
-      streamingSession.sendMessage(msg);
-    }
-  }, [selectedChatId, streamingSession]);
-
-  const handleDashboardMessage = useCallback(
-    (message: string, client: Client | null, chipPosition: number) => {
-      const newChatId = `chat-${Date.now()}`;
-
-      const newChat: Chat = {
-        id: newChatId,
-        clientId: client?.id || null,
-        title: "New Chat",
-        hasUnread: false,
-        updatedAt: new Date(),
-        messages: [],
-        artifacts: [],
-      };
-
-      setChats((prev) => [newChat, ...prev]);
-      pendingDashboardMessageRef.current = message;
-      setSelectedChatId(newChatId);
-      setActiveView("chats");
-    },
-    []
-  );
-
   const handleAgentFromAgentsView = (agentId: string) => {
     const agent = agents.find((a) => a.id === agentId);
     if (agent) {
       setSelectedAgentForClient(agent);
       setClientSelectOpen(true);
     }
-  };
-
-  const handleAgentSelectedFromDashboard = (agent: Agent) => {
-    setSelectedAgentForClient(agent);
-    setClientSelectOpen(true);
   };
 
   const handleClientSelectedForAgent = async (clientId: string) => {
@@ -788,21 +746,6 @@ export default function Home() {
   }, []);
 
   const renderMainContent = () => {
-    if (activeView === "dashboard") {
-      return (
-        <DashboardView
-          clients={mockClients}
-          agents={mockAgentAttention}
-          allAgents={agents}
-          initialTodos={mockTodos}
-          suggestedActions={suggestedActions}
-          onAgentClick={handleAgentClick}
-          onSendMessage={handleDashboardMessage}
-          onAgentSelected={handleAgentSelectedFromDashboard}
-        />
-      );
-    }
-
     if (activeView === "chats") {
       return (
         <div className="flex flex-1 overflow-hidden">
@@ -864,21 +807,6 @@ export default function Home() {
       );
     }
 
-    if (activeView === "clients") {
-      return (
-        <ClientsView
-          clients={mockClients}
-          chats={chats}
-          selectedClientId={selectedClientId}
-          onSelectChat={(id) => {
-            setSelectedChatId(id);
-            setChats((prev) => prev.map((c) => (c.id === id ? { ...c, hasUnread: false } : c)));
-            setActiveView("chats");
-          }}
-        />
-      );
-    }
-
     if (activeView === "agents") {
       return (
         <AgentsView
@@ -903,7 +831,7 @@ export default function Home() {
           clients={mockClients}
           chats={chats}
           selectedChatId={selectedChatId}
-          selectedClientId={selectedClientId}
+          selectedClientId={null}
           onViewChange={setActiveView}
           onSelectChat={(id) => {
             setSelectedChatId(id);
@@ -911,10 +839,7 @@ export default function Home() {
           }}
           onNewChat={handleNewChat}
           onNewChatRecent={() => { setSelectedAgentForClient(null); setClientSelectOpen(true); }}
-          onSelectClient={(clientId) => {
-            setSelectedClientId(clientId);
-            setActiveView("clients");
-          }}
+          onSelectClient={() => {}}
           onRenameChat={handleRenameChat}
           onDeleteChat={handleDeleteChat}
         />
