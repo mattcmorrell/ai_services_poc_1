@@ -56,7 +56,7 @@ export function SidebarFooter() {
         )}
         <button
           onClick={() => setPickerOpen(!pickerOpen)}
-          className="flex w-full items-center gap-3 px-2 py-2 text-left rounded-md transition-colors text-foreground hover:bg-accent"
+          className="flex w-full items-center gap-1.5 px-2 py-2 text-left rounded-md transition-colors text-foreground hover:bg-accent"
           title="Theme"
         >
           <Palette className="h-[18px] w-[18px] flex-shrink-0" weight="light" />
@@ -74,7 +74,7 @@ export function SidebarFooter() {
       <button
         onClick={toggleMode}
         title={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-        className="flex w-full items-center gap-3 px-2 py-2 text-left rounded-md transition-colors text-foreground hover:bg-accent"
+        className="flex w-full items-center gap-1.5 px-2 py-2 text-left rounded-md transition-colors text-foreground hover:bg-accent"
       >
         {mode === "dark" ? (
           <Moon className="h-[18px] w-[18px] flex-shrink-0" weight="light" />

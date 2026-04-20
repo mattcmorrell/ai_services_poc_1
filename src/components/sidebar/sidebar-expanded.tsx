@@ -72,7 +72,7 @@ export function SidebarExpanded({
           <button
             onClick={() => onViewChange("dashboard")}
             className={cn(
-              "flex w-full items-center gap-3 px-2 py-2 text-left rounded-md transition-colors",
+              "flex w-full items-center gap-1.5 px-2 py-2 text-left rounded-md transition-colors",
               activeView === "dashboard"
                 ? "bg-primary text-primary-foreground"
                 : "text-foreground hover:bg-accent"
