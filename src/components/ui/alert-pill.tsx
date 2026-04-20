@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-type AlertPillVariant = "urgent" | "attention" | "info";
+type AlertPillVariant = "urgent" | "attention" | "info" | "success";
 
 const variantStyles: Record<AlertPillVariant, React.CSSProperties> = {
   urgent: {
@@ -14,6 +14,10 @@ const variantStyles: Record<AlertPillVariant, React.CSSProperties> = {
   info: {
     background: "var(--color-info-muted)",
     color: "var(--color-info)",
+  },
+  success: {
+    background: "color-mix(in srgb, var(--color-success) 12%, transparent)",
+    color: "var(--color-success)",
   },
 };
 
