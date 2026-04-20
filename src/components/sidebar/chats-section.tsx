@@ -46,26 +46,25 @@ export function ChatsSection({
       {/* Section header */}
       <div className="flex items-center justify-between px-[22px] pt-5 pb-2 flex-shrink-0">
         <span className="type-label text-muted-foreground">Chats</span>
-        <div className="flex gap-px overflow-hidden rounded-md">
+        <div className="inline-flex items-center rounded-md bg-muted p-0.5">
           <button
             onClick={() => onFilterChange("by-client")}
             className={cn(
-              "px-2 py-0.5 transition-colors type-label",
+              "rounded-[5px] px-2.5 py-0.5 text-[12px] font-medium transition-all",
               filter === "by-client"
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-foreground/55 hover:text-foreground"
             )}
           >
-            By Client
+            Grouped
           </button>
-          <span className="type-label text-muted-foreground/40 px-0.5 py-0.5">·</span>
           <button
             onClick={() => onFilterChange("recent")}
             className={cn(
-              "px-2 py-0.5 transition-colors type-label",
+              "rounded-[5px] px-2.5 py-0.5 text-[12px] font-medium transition-all",
               filter === "recent"
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-foreground/55 hover:text-foreground"
             )}
           >
             Recent
