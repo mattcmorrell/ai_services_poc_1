@@ -43,12 +43,12 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat }: Rec
             key={chat.id}
             onClick={() => onSelectChat(chat.id)}
             className={cn(
-              "grid w-full grid-cols-[22px_1fr] gap-x-1 gap-y-[3px] py-2 pl-1 pr-2.5 text-left rounded-md",
+              "grid w-full grid-cols-[18px_1fr] gap-x-3 gap-y-[3px] py-2 pr-2.5 text-left rounded-md",
               isSelected ? "bg-primary text-primary-foreground" : "hover:bg-accent"
             )}
           >
             {/* Col 1: unread dot */}
-            <span className="flex items-start justify-center pt-1">
+            <span className="flex items-start justify-center pt-1.5">
               {chat.hasUnread && !isSelected && (
                 <span className="h-[7px] w-[7px] rounded-full bg-primary" />
               )}

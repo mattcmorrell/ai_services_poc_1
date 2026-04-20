@@ -64,13 +64,13 @@ export function ChatTree({
           <div key={client.id}>
             {/* Client row */}
             <div className={cn(
-              "group flex items-center gap-1 py-2.5 pl-1 pr-1.5 rounded-md",
+              "group flex items-center gap-3 py-2.5 pr-1.5 rounded-md",
               isActiveClient ? "bg-primary text-primary-foreground" : "hover:bg-accent"
             )}>
               <button
                 onClick={() => onToggleClient(client.id)}
                 className={cn(
-                  "flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded",
+                  "flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center rounded",
                   isActiveClient
                     ? "text-primary-foreground hover:bg-primary-foreground/20"
                     : "text-muted-foreground hover:bg-foreground/15 hover:text-foreground"
@@ -118,12 +118,12 @@ export function ChatTree({
                   key={chat.id}
                   onClick={() => onSelectChat(chat.id)}
                   className={cn(
-                    "grid w-full grid-cols-[22px_1fr] gap-x-1 gap-y-[3px] py-2 pl-1 pr-2.5 text-left rounded-md",
+                    "grid w-full grid-cols-[18px_1fr] gap-x-3 gap-y-[3px] py-2 pr-2.5 text-left rounded-md",
                     isSelected ? "bg-primary text-primary-foreground" : "hover:bg-accent"
                   )}
                 >
                   {/* Col 1: unread dot */}
-                  <span className="flex items-start pt-1">
+                  <span className="flex items-start justify-center pt-1.5">
                     {chat.hasUnread && !isSelected && (
                       <span className="h-[7px] w-[7px] rounded-full bg-primary" />
                     )}
