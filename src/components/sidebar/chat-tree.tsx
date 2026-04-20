@@ -151,9 +151,9 @@ export function ChatTree({
                     )}
                   </span>
 
-                  {/* Col 2: title */}
+                  {/* Col 2: title · timestamp inline, wraps if long */}
                   <span className={cn(
-                    "col-start-2 truncate type-chat-name",
+                    "col-start-2 type-chat-name leading-snug",
                     (isSelected || chat.hasUnread) && "font-semibold!",
                     isSelected
                       ? "text-primary-foreground"
@@ -162,28 +162,21 @@ export function ChatTree({
                         : "text-muted-foreground"
                   )}>
                     {chat.title}
+                    <span className={cn(
+                      "font-normal type-meta",
+                      isSelected ? "text-primary-foreground/50" : "text-muted-foreground/60"
+                    )}>
+                      {"\u00A0\u00A0·\u00A0"}{formatTimeAgoCompact(chat.updatedAt)}
+                    </span>
                   </span>
 
-                  {/* Col 2: state + timestamp on same line when state is present */}
-                  {showState ? (
+                  {/* Col 2 row 2: state indicator (only when active) */}
+                  {showState && (
                     <span className={cn(
                       "col-start-2 inline-flex items-center gap-1.5",
                       isSelected && "[&_*]:!text-primary-foreground"
                     )}>
                       <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
-                      <span className={cn(
-                        "type-meta",
-                        isSelected ? "text-primary-foreground/80" : "text-muted-foreground"
-                      )}>
-                        · {formatTimeAgoCompact(chat.updatedAt)}
-                      </span>
-                    </span>
-                  ) : (
-                    <span className={cn(
-                      "col-start-2 type-meta",
-                      isSelected ? "text-primary-foreground/80" : "text-muted-foreground"
-                    )}>
-                      {formatTimeAgoCompact(chat.updatedAt)}
                     </span>
                   )}
                 </button>
