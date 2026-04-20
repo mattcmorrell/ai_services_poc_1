@@ -138,22 +138,20 @@ export function ChatTree({
                 <button
                   onClick={() => onSelectChat(chat.id)}
                   className={cn(
-                    "grid w-full grid-cols-[18px_1fr] gap-x-1.5 gap-y-[3px] py-1.5 pl-2 pr-9 text-left rounded-md",
+                    "relative flex w-full flex-col gap-y-[3px] py-1.5 pl-8 pr-9 text-left rounded-md",
                     isSelected
                       ? "bg-primary text-primary-foreground"
                       : "hover:bg-accent/60"
                   )}
                 >
-                  {/* Col 1: unread dot */}
-                  <span className="flex items-start justify-center pt-1.5">
-                    {chat.hasUnread && !isSelected && (
-                      <span className="h-[7px] w-[7px] rounded-full bg-primary" />
-                    )}
-                  </span>
+                  {/* Unread dot, positioned in the gutter */}
+                  {chat.hasUnread && !isSelected && (
+                    <span className="absolute left-[11px] top-[11px] h-[7px] w-[7px] rounded-full bg-primary" />
+                  )}
 
-                  {/* Col 2: title · timestamp inline, wraps if long */}
+                  {/* Title · timestamp inline, wraps if long */}
                   <span className={cn(
-                    "col-start-2 type-chat-name leading-snug",
+                    "type-chat-name leading-snug",
                     (isSelected || chat.hasUnread) && "font-semibold!",
                     isSelected ? "text-primary-foreground" : "text-foreground"
                   )}>
@@ -166,10 +164,10 @@ export function ChatTree({
                     </span>
                   </span>
 
-                  {/* Col 2 row 2: state indicator (only when active) */}
+                  {/* State indicator (only when active) */}
                   {showState && (
                     <span className={cn(
-                      "col-start-2 inline-flex items-center gap-1.5",
+                      "inline-flex items-center gap-1.5",
                       isSelected && "[&_*]:!text-primary-foreground"
                     )}>
                       <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
