@@ -166,12 +166,7 @@ export function ChatTree({
 
                   {/* State indicator (only when active) */}
                   {showState && (
-                    <span className={cn(
-                      "inline-flex items-center gap-1.5",
-                      isSelected && "[&_*]:!text-primary-foreground"
-                    )}>
-                      <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
-                    </span>
+                    <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
                   )}
                 </button>
                 <div className="absolute right-1.5 top-1">

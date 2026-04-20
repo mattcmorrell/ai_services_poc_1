@@ -78,9 +78,7 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat, onRen
 
             {/* Agent state indicator */}
             {hasState && (
-              <span className={cn("-mt-0.5", isSelected && "[&_*]:!text-primary-foreground")}>
-                <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
-              </span>
+              <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
             )}
           </button>
           <div className="absolute right-1.5 top-1.5">
