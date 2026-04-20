@@ -1,7 +1,6 @@
 "use client";
 
-import { CircleNotch, WarningCircle } from "@phosphor-icons/react";
-import { AlertPill } from "./alert-pill";
+import { CircleNotch } from "@phosphor-icons/react";
 import { StatusBadge } from "./status-badge";
 
 export type AgentState = 'running' | 'needs-approval' | 'done' | 'idle';
@@ -30,10 +29,9 @@ export function AgentStateIndicator({ state, detail, className }: AgentStateIndi
 
   if (state === 'needs-approval') {
     return (
-      <AlertPill variant="attention" className={className}>
-        <WarningCircle weight="fill" className="h-2.5 w-2.5 flex-shrink-0" />
+      <StatusBadge variant="paused" className={className}>
         {detail ? sentenceCase(detail) : 'Needs approval'}
-      </AlertPill>
+      </StatusBadge>
     );
   }
 
