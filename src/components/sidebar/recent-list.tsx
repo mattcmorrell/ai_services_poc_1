@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { formatTimeAgo } from "@/lib/format-time";
-import { AgentStateIndicator } from "./agent-state-indicator";
+import { AgentStateIndicator } from "@/components/ui/agent-state-indicator";
 
 interface RecentListProps {
   chats: Chat[];

@@ -810,8 +810,36 @@ body {
         <span class="alert-pill alert-pill-urgent">&#9888; Urgent</span>
         <span class="alert-pill alert-pill-attention">&#9679; Needs attention</span>
       </div>
-      <div style="font-size:12px;color:var(--muted-foreground);line-height:1.6">
+      <div style="font-size:12px;color:var(--muted-foreground);line-height:1.6;margin-bottom:20px">
         Urgent owns the full danger/destructive color. Needs attention uses warning. These are UI labels (sans), not agent states (mono).
+      </div>
+
+      <style>
+        .asi { display:inline-flex; align-items:center; gap:4px; font-family: var(--font-sans, 'Geist', system-ui); font-size:13px; font-weight:600; line-height:1.5; }
+        .asi svg { width:12px; height:12px; flex-shrink:0; }
+        .asi-running { color: var(--primary); }
+        .asi-needs-approval { color: var(--color-warning); }
+        .asi-done { color: var(--color-success); }
+        .asi-spin { animation: asi-spin 900ms linear infinite; }
+        @keyframes asi-spin { to { transform: rotate(360deg); } }
+      </style>
+      <div class="specimen-label">Agent State Indicator — sidebar chat-row status</div>
+      <div class="btn-row" style="gap:16px;margin-bottom:8px;flex-wrap:wrap">
+        <span class="asi asi-running">
+          <svg class="asi-spin" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128a104,104,0,0,1-208,0c0-41,23.81-78.36,60.66-95.27a8,8,0,1,1,6.68,14.54C60.15,61.59,40,93,40,128a88,88,0,0,0,176,0c0-35-20.15-66.41-51.34-80.73a8,8,0,1,1,6.68-14.54C208.19,49.64,232,87,232,128Z"/></svg>
+          Running · Pulling HRIS
+        </span>
+        <span class="asi asi-needs-approval">
+          <svg viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.13,104.13,0,0,0,128,24Zm-8,56a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm8,112a12,12,0,1,1,12-12A12,12,0,0,1,128,192Z"/></svg>
+          Approve schedule
+        </span>
+        <span class="asi asi-done">
+          <svg viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.13,104.13,0,0,0,128,24Zm45.66,85.66-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z"/></svg>
+          Review complete
+        </span>
+      </div>
+      <div style="font-size:12px;color:var(--muted-foreground);line-height:1.6">
+        Component: <code>&lt;AgentStateIndicator state detail /&gt;</code> (src/components/ui/agent-state-indicator.tsx). States: <code>running</code>, <code>needs-approval</code>, <code>done</code>, <code>idle</code> (renders nothing). Icons are filled for terminal/blocked states; <code>running</code> uses a bold-weight outline spinner. The <code>detail</code> string is auto-sentence-cased (e.g. "pulling HRIS" → "Pulling HRIS"); <code>running</code> additionally prefixes "Running · ".
       </div>
     </div>
 
