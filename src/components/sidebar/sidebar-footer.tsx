@@ -26,21 +26,14 @@ export function SidebarFooter() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [pickerOpen]);
 
-  return (
-    <div className="flex flex-shrink-0 items-center gap-1 border-t border-sidebar-border py-4 px-5">
-      {/* Dark/light toggle */}
-      <button
-        onClick={toggleMode}
-        title={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-      >
-        {mode === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-      </button>
+  const activeColorway = colorways.find((c) => c.id === colorway);
 
-      {/* Theme picker */}
-      <div ref={pickerRef} className="relative flex-1">
+  return (
+    <div className="flex flex-shrink-0 flex-col gap-0.5 border-t border-sidebar-border px-[14px] py-3">
+      {/* Theme picker row */}
+      <div ref={pickerRef} className="relative">
         {pickerOpen && (
-          <div className="absolute bottom-full left-0 mb-1 w-[140px] rounded-lg border border-border bg-popover p-1.5 shadow-xl z-50">
+          <div className="absolute bottom-full left-2 mb-1 w-[160px] rounded-lg border border-border bg-popover p-1.5 shadow-xl z-50">
             {colorways.map((c) => (
               <button
                 key={c.id}
@@ -63,13 +56,33 @@ export function SidebarFooter() {
         )}
         <button
           onClick={() => setPickerOpen(!pickerOpen)}
-          className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          className="flex w-full items-center gap-3 px-2 py-2 text-left rounded-md transition-colors text-foreground hover:bg-accent"
           title="Theme"
         >
-          <Palette className="h-4 w-4 flex-shrink-0" />
-          <span className="type-body">Theme</span>
+          <Palette className="h-[18px] w-[18px] flex-shrink-0" weight="light" />
+          <span className="type-chat-name flex-1">Theme</span>
+          {activeColorway && (
+            <span
+              className="h-2.5 w-2.5 flex-shrink-0 rounded-full"
+              style={{ backgroundColor: activeColorway.dot }}
+            />
+          )}
         </button>
       </div>
+
+      {/* Dark/light mode row */}
+      <button
+        onClick={toggleMode}
+        title={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        className="flex w-full items-center gap-3 px-2 py-2 text-left rounded-md transition-colors text-foreground hover:bg-accent"
+      >
+        {mode === "dark" ? (
+          <Moon className="h-[18px] w-[18px] flex-shrink-0" weight="light" />
+        ) : (
+          <Sun className="h-[18px] w-[18px] flex-shrink-0" weight="light" />
+        )}
+        <span className="type-chat-name">{mode === "dark" ? "Dark mode" : "Light mode"}</span>
+      </button>
     </div>
   );
 }

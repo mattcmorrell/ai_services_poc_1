@@ -121,8 +121,8 @@ export function ChatTree({
                   "flex h-6 w-6 items-center justify-center rounded-full transition-colors",
                   unreadCount > 0 ? "hidden group-hover:flex" : "flex",
                   isActiveClient
-                    ? "bg-primary-foreground/15 text-primary-foreground group-hover/nc:bg-primary-foreground/30"
-                    : "bg-sidebar-foreground/25 text-foreground group-hover/nc:bg-primary group-hover/nc:text-white!"
+                    ? "bg-primary-foreground text-primary group-hover/nc:bg-primary-foreground/85"
+                    : "bg-primary text-primary-foreground group-hover/nc:bg-primary/85"
                 )}>
                   <Plus weight="bold" className="h-3.5 w-3.5" />
                 </span>
