@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { Sidebar } from "@/components/sidebar";
-import { ChatListPanel } from "@/components/chat-list-panel";
+import { Sidebar } from "@/components/sidebar/sidebar";
 import { ChatView } from "@/components/chat-view";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { AgentsView } from "@/components/agents/agents-view";
@@ -20,7 +19,8 @@ import { useStreamingChatSession } from "@/hooks/use-streaming-chat-session";
 
 export default function Home() {
   const [activeView, setActiveView] = useState("dashboard");
-const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
+  const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [chats, setChats] = useState<Chat[]>(mockChats);
   // Loading state is now derived from streamingSession.loadingChatId
   const [agents, setAgents] = useState<Agent[]>(mockAgents);
@@ -633,6 +633,28 @@ const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
     []
   );
 
+  const handleRenameChat = useCallback((chatId: string) => {
+    setChats((prev) => {
+      const chat = prev.find((c) => c.id === chatId);
+      if (!chat) return prev;
+      const next = window.prompt("Rename chat", chat.title);
+      if (next === null) return prev;
+      const trimmed = next.trim();
+      if (!trimmed) return prev;
+      return prev.map((c) => (c.id === chatId ? { ...c, title: trimmed } : c));
+    });
+  }, []);
+
+  const handleDeleteChat = useCallback((chatId: string) => {
+    setChats((prev) => {
+      const chat = prev.find((c) => c.id === chatId);
+      if (!chat) return prev;
+      if (!window.confirm(`Delete "${chat.title}"? This can't be undone.`)) return prev;
+      return prev.filter((c) => c.id !== chatId);
+    });
+    setSelectedChatId((current) => (current === chatId ? null : current));
+  }, []);
+
   const handleAgentClick = (agentId: string) => {
     const agentClientMap: Record<string, string> = {
       "agent-1": "4",
@@ -702,6 +724,13 @@ const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
   const handleClientSelectedForAgent = async (clientId: string) => {
     const client = mockClients.find((c) => c.id === clientId);
     const agent = selectedAgentForClient;
+
+    if (!agent && client) {
+      handleNewChat(clientId);
+      setClientSelectOpen(false);
+      setActiveView("chats");
+      return;
+    }
 
     if (agent && client) {
       const newChatId = `chat-${Date.now()}`;
@@ -777,13 +806,6 @@ const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
     if (activeView === "chats") {
       return (
         <div className="flex flex-1 overflow-hidden">
-            <ChatListPanel
-              clients={mockClients}
-              chats={chats}
-              selectedChatId={selectedChatId}
-              onSelectChat={setSelectedChatId}
-              onNewChat={handleNewChat}
-            />
             {selectedChat ? (
               <ChatView
                 client={selectedClient || null}
@@ -847,13 +869,12 @@ const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
         <ClientsView
           clients={mockClients}
           chats={chats}
-          onSendMessage={handleSendMessageForChat}
-          onApprove={handleApproveForChat}
-          onDecline={handleDeclineForChat}
-          onNewChat={handleNewChat}
-          onWorkflowClick={handleWorkflowClick}
-          onArtifactClick={setSelectedArtifactId}
-          loadingChatId={streamingSession.loadingChatId}
+          selectedClientId={selectedClientId}
+          onSelectChat={(id) => {
+            setSelectedChatId(id);
+            setChats((prev) => prev.map((c) => (c.id === id ? { ...c, hasUnread: false } : c)));
+            setActiveView("chats");
+          }}
         />
       );
     }
@@ -877,8 +898,29 @@ const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar activeView={activeView} onViewChange={setActiveView} />
-      {renderMainContent()}
+      <Sidebar
+          activeView={activeView}
+          clients={mockClients}
+          chats={chats}
+          selectedChatId={selectedChatId}
+          selectedClientId={selectedClientId}
+          onViewChange={setActiveView}
+          onSelectChat={(id) => {
+            setSelectedChatId(id);
+            setChats((prev) => prev.map((c) => (c.id === id ? { ...c, hasUnread: false } : c)));
+          }}
+          onNewChat={handleNewChat}
+          onNewChatRecent={() => { setSelectedAgentForClient(null); setClientSelectOpen(true); }}
+          onSelectClient={(clientId) => {
+            setSelectedClientId(clientId);
+            setActiveView("clients");
+          }}
+          onRenameChat={handleRenameChat}
+          onDeleteChat={handleDeleteChat}
+        />
+      <div className="flex flex-1 min-w-0 overflow-hidden">
+        {renderMainContent()}
+      </div>
       <ClientSelectDialog
         open={clientSelectOpen}
         onOpenChange={setClientSelectOpen}

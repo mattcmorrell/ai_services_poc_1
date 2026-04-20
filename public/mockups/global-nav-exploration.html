@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Global Nav Exploration</title>
+<style>
+  :root {
+    --bg: #101214;
+    --panel: #161A1E;
+    --card: #1D2024;
+    --card-hover: #22262C;
+    --border: #2A2F36;
+    --border-soft: #22262C;
+    --fg: #E8E9ED;
+    --fg-muted: #A8ADB8;
+    --fg-dim: #8A8F99;
+    --primary: #6878B8;
+    --primary-soft: rgba(104, 120, 184, 0.15);
+    --primary-stripe: #6878B8;
+    --accent: #282A30;
+    --danger: #C76B6B;
+    --warning: #D9A867;
+    --success: #6BA88A;
+
+    /* Per-client colors — Design 2 */
+    --client-aperture: #6878B8;
+    --client-umbrella: #C76B6B;
+    --client-blackmesa: #6BA88A;
+    --client-acme: #D9A867;
+    --client-coconut: #5EA5C7;
+    --client-widget: #B57ECC;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "SF Pro Text", "Inter", system-ui, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* ---------- Tab switcher ---------- */
+  .switcher {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .switcher .brand {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg-muted);
+    margin-right: 10px;
+    letter-spacing: 0.02em;
+  }
+  .switcher button {
+    background: transparent;
+    color: var(--fg-muted);
+    border: 1px solid transparent;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .switcher button:hover {
+    background: var(--card);
+    color: var(--fg);
+  }
+  .switcher button.active {
+    background: var(--card);
+    color: var(--fg);
+    border-color: var(--border);
+  }
+  .switcher button .num {
+    color: var(--fg-dim);
+    margin-right: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .switcher button.active .num { color: var(--primary); }
+  .switcher .hint {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--fg-dim);
+  }
+
+  /* ---------- Design container ---------- */
+  .designs {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+  .design-panel {
+    display: none;
+    height: 100%;
+  }
+  .design-panel.active { display: flex; }
+
+  /* ---------- Shared content area ---------- */
+  .content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+  }
+  .content-header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 52px;
+  }
+  .content-header .crumb {
+    font-size: 13px;
+    color: var(--fg-dim);
+  }
+  .content-header .crumb strong {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .content-body {
+    flex: 1;
+    padding: 24px;
+    color: var(--fg-muted);
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+  }
+  .msg {
+    max-width: 640px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border-soft);
+    line-height: 1.55;
+    color: var(--fg);
+    font-size: 13.5px;
+  }
+  .msg.user {
+    align-self: flex-end;
+    background: var(--primary-soft);
+    border-color: transparent;
+  }
+  .placeholder-note {
+    font-size: 12px;
+    color: var(--fg-dim);
+    font-style: italic;
+    margin-top: auto;
+  }
+
+  /* =============================================================
+     DESIGN 1 — Editorial sidebar
+     ============================================================= */
+  .sidebar-editorial {
+    width: 288px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    font-family: "Inter", -apple-system, system-ui, sans-serif;
+  }
+
+  .ed-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px 22px 14px;
+  }
+  .ed-wordmark {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+    line-height: 1.1;
+  }
+  .ed-toggle {
+    width: 28px;
+    height: 24px;
+    border: 1.5px solid var(--fg-muted);
+    border-radius: 4px;
+    background: transparent;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .ed-toggle::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1.5px;
+    background: var(--fg-muted);
+  }
+  .ed-toggle:hover { border-color: var(--fg); }
+  .ed-toggle:hover::after { background: var(--fg); }
+
+  .ed-section {
+    padding: 4px 22px 0;
+  }
+  .ed-section + .ed-section {
+    border-top: 1px solid var(--border);
+    margin-top: 14px;
+    padding-top: 16px;
+  }
+  .ed-link {
+    display: block;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--fg);
+    padding: 8px 0 14px;
+    text-decoration: none;
+    cursor: pointer;
+    letter-spacing: -0.01em;
+  }
+  .ed-link:hover { color: var(--primary); }
+  .ed-link.active { color: var(--primary); }
+
+  .ed-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0 6px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .ed-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.005em;
+  }
+  .ed-chev {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    color: var(--fg-muted);
+    transition: transform 120ms ease;
+  }
+  .ed-heading-row.collapsed .ed-chev { transform: rotate(-90deg); }
+  .ed-new-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    color: var(--fg-muted);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 6px;
+    margin-right: -6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .ed-new-btn:hover {
+    background: var(--card);
+    color: var(--primary);
+  }
+  .ed-new-btn svg { width: 14px; height: 14px; }
+
+  .ed-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 10px;
+  }
+  .ed-list[hidden] { display: none; }
+
+  .ed-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0 5px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    position: relative;
+  }
+  .ed-list.indented li { padding-left: 16px; }
+  .ed-list li .label {
+    font-size: 13.5px;
+    color: var(--fg-muted);
+    font-weight: 400;
+  }
+  .ed-list li:hover {
+    background: var(--card);
+  }
+  .ed-list li:hover .label { color: var(--primary); }
+  .ed-list li.active {
+    background: var(--primary-soft);
+  }
+  .ed-list li.active .label {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .ed-dots {
+    opacity: 0;
+    background: transparent;
+    border: none;
+    color: var(--fg-muted);
+    font-size: 16px;
+    line-height: 1;
+    padding: 4px 6px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .ed-list li:hover .ed-dots { opacity: 1; }
+  .ed-dots:hover { background: var(--accent); color: var(--fg); }
+
+  .ed-client {
+    margin-top: 4px;
+  }
+  .ed-client-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .ed-client-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.005em;
+  }
+  .ed-client-row.collapsed .ed-chev { transform: rotate(-90deg); }
+  .ed-client-row:hover .ed-client-name { color: var(--primary); }
+
+  .ed-footer {
+    margin-top: auto;
+    padding: 16px 22px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .ed-footer a {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .ed-footer a:hover { color: var(--primary); }
+
+  .ed-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 8px;
+  }
+  .ed-scroll::-webkit-scrollbar { width: 6px; }
+  .ed-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* =============================================================
+     DESIGN 2 — Session cards (cmux-style)
+     ============================================================= */
+  .sidebar-cards {
+    width: 320px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sc-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sc-wordmark {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    margin-right: auto;
+    padding-left: 4px;
+  }
+  .sc-iconbtn {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--fg-muted);
+    cursor: pointer;
+    position: relative;
+  }
+  .sc-iconbtn:hover {
+    background: var(--card);
+    color: var(--fg);
+  }
+  .sc-iconbtn svg { width: 16px; height: 16px; }
+  .sc-iconbtn.primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .sc-iconbtn.primary:hover { background: #7887c4; }
+
+  .sc-search {
+    padding: 10px 12px 4px;
+  }
+  .sc-search input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border-soft);
+    border-radius: 6px;
+    color: var(--fg);
+    font-size: 12.5px;
+    padding: 7px 10px;
+    font-family: inherit;
+    outline: none;
+  }
+  .sc-search input::placeholder { color: var(--fg-dim); }
+  .sc-search input:focus { border-color: var(--primary); }
+
+  .sc-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 8px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .sc-list::-webkit-scrollbar { width: 8px; }
+  .sc-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .sc-card {
+    display: grid;
+    grid-template-columns: 4px 1fr auto;
+    gap: 10px;
+    padding: 10px 10px 10px 0;
+    background: var(--card);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: grab;
+    position: relative;
+    transition: background 100ms ease, border-color 100ms ease;
+  }
+  .sc-card:hover {
+    background: var(--card-hover);
+    border-color: var(--border);
+  }
+  .sc-card:active { cursor: grabbing; }
+  .sc-card.active {
+    background: var(--primary-soft);
+    border-color: transparent;
+  }
+  .sc-card.dragging {
+    opacity: 0.5;
+  }
+  .sc-card.drop-above {
+    box-shadow: inset 0 2px 0 var(--primary);
+  }
+
+  .sc-stripe {
+    width: 4px;
+    border-radius: 3px 0 0 3px;
+    align-self: stretch;
+    background: var(--client-aperture);
+  }
+  .sc-card[data-client="aperture"] .sc-stripe { background: var(--client-aperture); }
+  .sc-card[data-client="umbrella"] .sc-stripe { background: var(--client-umbrella); }
+  .sc-card[data-client="blackmesa"] .sc-stripe { background: var(--client-blackmesa); }
+  .sc-card[data-client="acme"] .sc-stripe { background: var(--client-acme); }
+  .sc-card[data-client="coconut"] .sc-stripe { background: var(--client-coconut); }
+  .sc-card[data-client="widget"] .sc-stripe { background: var(--client-widget); }
+
+  .sc-body {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .sc-client {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--client-aperture);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sc-card[data-client="umbrella"] .sc-client { color: var(--client-umbrella); }
+  .sc-card[data-client="blackmesa"] .sc-client { color: var(--client-blackmesa); }
+  .sc-card[data-client="acme"] .sc-client { color: var(--client-acme); }
+  .sc-card[data-client="coconut"] .sc-client { color: var(--client-coconut); }
+  .sc-card[data-client="widget"] .sc-client { color: var(--client-widget); }
+
+  .sc-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--fg);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sc-context {
+    font-size: 12px;
+    color: var(--fg-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.35;
+  }
+  .sc-state-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .sc-state-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .sc-state[data-state="running"] .sc-state-dot {
+    background: var(--primary);
+    box-shadow: 0 0 0 0 rgba(104, 120, 184, 0.6);
+    animation: pulse 1.4s infinite;
+  }
+  .sc-state[data-state="idle"] .sc-state-dot { background: var(--fg-dim); }
+  .sc-state[data-state="waiting-input"] .sc-state-dot { background: var(--warning); }
+  .sc-state[data-state="waiting-approval"] .sc-state-dot { background: var(--warning); }
+  .sc-state[data-state="done"] .sc-state-dot { background: var(--success); }
+
+  .sc-state[data-state="running"] .sc-state-label { color: var(--primary); }
+  .sc-state[data-state="idle"] .sc-state-label { color: var(--fg-dim); }
+  .sc-state[data-state="waiting-input"] .sc-state-label { color: var(--warning); }
+  .sc-state[data-state="waiting-approval"] .sc-state-label { color: var(--warning); }
+  .sc-state[data-state="done"] .sc-state-label { color: var(--success); }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(104, 120, 184, 0.5); }
+    70% { box-shadow: 0 0 0 6px rgba(104, 120, 184, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(104, 120, 184, 0); }
+  }
+
+  .sc-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-right: 8px;
+    padding-top: 2px;
+  }
+  .sc-attn {
+    color: var(--warning);
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
+    opacity: 1;
+  }
+  .sc-attn.hidden { visibility: hidden; }
+  .sc-dots {
+    background: transparent;
+    border: none;
+    color: var(--fg-muted);
+    font-size: 16px;
+    line-height: 1;
+    padding: 2px 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    opacity: 0;
+  }
+  .sc-card:hover .sc-dots { opacity: 1; }
+  .sc-dots:hover { background: var(--accent); color: var(--fg); }
+
+  .sc-footer {
+    padding: 10px 14px 14px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--fg-dim);
+  }
+  .sc-footer a {
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .sc-footer a:hover { color: var(--fg); }
+
+  /* Drag indicator handle on hover */
+  .sc-card .sc-drag-handle {
+    position: absolute;
+    left: -2px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 14px;
+    border-radius: 2px;
+    background: var(--fg-dim);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .sc-card:hover .sc-drag-handle { opacity: 0.5; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Tab switcher -->
+  <div class="switcher" role="tablist" aria-label="Design switcher">
+    <span class="brand">Global Nav</span>
+    <button class="active" data-target="design-editorial" title="Typography-forward, no icons, editorial hierarchy">
+      <span class="num">1</span>Editorial
+    </button>
+    <button data-target="design-cards" title="Session cards with live state (cmux-style)">
+      <span class="num">2</span>Session Cards
+    </button>
+    <span class="hint">Press <b>1</b>, <b>2</b> to switch</span>
+  </div>
+
+  <div class="designs">
+
+    <!-- ============================================================
+         DESIGN 1: EDITORIAL SIDEBAR
+         ============================================================ -->
+    <section id="design-editorial" class="design-panel active">
+      <aside class="sidebar-editorial">
+        <div class="ed-header">
+          <div class="ed-wordmark">PandaCommand</div>
+          <button class="ed-toggle" aria-label="Collapse sidebar"></button>
+        </div>
+
+        <div class="ed-scroll">
+          <div class="ed-section">
+            <a class="ed-link" data-nav="dashboard">Dashboard</a>
+          </div>
+
+          <div class="ed-section">
+            <div class="ed-heading-row" data-toggle="recent">
+              <div class="ed-heading">
+                <span>Recent Chats</span>
+                <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <button class="ed-new-btn" title="New chat">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5l2 2-7.5 7.5H4v-2l7.5-7.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                <span>New</span>
+              </button>
+            </div>
+            <ul class="ed-list" id="recent-list">
+              <li class="active">
+                <span class="label">Q2 benefits enrollment audit</span>
+                <button class="ed-dots">•••</button>
+              </li>
+              <li>
+                <span class="label">PTO policy rewrite — Aperture</span>
+                <button class="ed-dots">•••</button>
+              </li>
+              <li>
+                <span class="label">Onboarding checklist refresh</span>
+                <button class="ed-dots">•••</button>
+              </li>
+              <li>
+                <span class="label">I-9 remote verification memo</span>
+                <button class="ed-dots">•••</button>
+              </li>
+              <li>
+                <span class="label">Compensation band review</span>
+                <button class="ed-dots">•••</button>
+              </li>
+            </ul>
+          </div>
+
+          <div class="ed-section">
+            <div class="ed-heading-row" data-toggle="clients">
+              <div class="ed-heading">
+                <span>Clients</span>
+                <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div id="clients-wrap">
+              <div class="ed-client">
+                <div class="ed-client-row" data-toggle="c-aperture">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="ed-client-name">Aperture Laboratories</span>
+                </div>
+                <ul class="ed-list indented" data-list="c-aperture">
+                  <li class="active"><span class="label">Q2 benefits enrollment audit</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">PTO policy rewrite</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Manager training rollout</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Exit survey analysis</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="ed-client">
+                <div class="ed-client-row collapsed" data-toggle="c-umbrella">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="ed-client-name">Umbrella Corp</span>
+                </div>
+                <ul class="ed-list indented" data-list="c-umbrella" hidden>
+                  <li><span class="label">Onboarding checklist refresh</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Handbook compliance pass</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Compensation band review</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="ed-client">
+                <div class="ed-client-row" data-toggle="c-blackmesa">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="ed-client-name">Black Mesa</span>
+                </div>
+                <ul class="ed-list indented" data-list="c-blackmesa">
+                  <li><span class="label">I-9 remote verification memo</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Safety training audit</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="ed-client">
+                <div class="ed-client-row collapsed" data-toggle="c-acme">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="ed-client-name">Acme Corp.</span>
+                </div>
+                <ul class="ed-list indented" data-list="c-acme" hidden>
+                  <li><span class="label">Org chart cleanup</span><button class="ed-dots">•••</button></li>
+                  <li><span class="label">Q1 performance review prep</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+
+              <div class="ed-client">
+                <div class="ed-client-row collapsed" data-toggle="c-coconut">
+                  <svg class="ed-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="ed-client-name">Coconut Grove LLC.</span>
+                </div>
+                <ul class="ed-list indented" data-list="c-coconut" hidden>
+                  <li><span class="label">Seasonal staffing plan</span><button class="ed-dots">•••</button></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ed-footer">
+          <a>Settings &amp; Themes</a>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="content-header">
+          <div class="crumb">Aperture Laboratories &nbsp;/&nbsp; <strong>Q2 benefits enrollment audit</strong></div>
+        </div>
+        <div class="content-body">
+          <div class="msg user">Can you audit open enrollment participation for Q2 and flag any plans with under-subscription?</div>
+          <div class="msg">Pulling enrollment records from the HRIS. I'll segment by plan tier and call out anything below the 30% threshold — stand by.</div>
+          <div class="placeholder-note">(Main content is placeholder — focus is the sidebar.)</div>
+        </div>
+      </main>
+    </section>
+
+    <!-- ============================================================
+         DESIGN 2: SESSION CARDS
+         ============================================================ -->
+    <section id="design-cards" class="design-panel">
+      <aside class="sidebar-cards">
+        <div class="sc-toolbar">
+          <span class="sc-wordmark">PandaCommand</span>
+          <button class="sc-iconbtn" title="Notifications">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 12h10l-1.2-1.6V7a3.8 3.8 0 10-7.6 0v3.4L3 12zm3.2 1.5a1.8 1.8 0 003.6 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="sc-iconbtn" title="Collapse sidebar">
+            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 2.5v11" stroke="currentColor" stroke-width="1.3"/></svg>
+          </button>
+          <button class="sc-iconbtn primary" title="New chat">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="sc-search">
+          <input type="text" placeholder="Search chats…" />
+        </div>
+
+        <div class="sc-list" id="sc-list">
+          <!-- Card 1 — Running -->
+          <div class="sc-card active" data-client="aperture" draggable="true">
+            <div class="sc-drag-handle"></div>
+            <div class="sc-stripe"></div>
+            <div class="sc-body">
+              <div class="sc-client">Aperture Laboratories</div>
+              <div class="sc-title">Q2 benefits enrollment audit</div>
+              <div class="sc-context">Benefits Agent · 4 artifacts</div>
+              <div class="sc-state-row sc-state" data-state="running">
+                <span class="sc-state-dot"></span>
+                <span class="sc-state-label">Running · pulling HRIS records</span>
+              </div>
+            </div>
+            <div class="sc-right">
+              <span class="sc-attn hidden">✱</span>
+              <button class="sc-dots" title="More">•••</button>
+            </div>
+          </div>
+
+          <!-- Card 2 — Waiting approval -->
+          <div class="sc-card" data-client="umbrella" draggable="true">
+            <div class="sc-drag-handle"></div>
+            <div class="sc-stripe"></div>
+            <div class="sc-body">
+              <div class="sc-client">Umbrella Corp</div>
+              <div class="sc-title">Handbook compliance pass</div>
+              <div class="sc-context">Policy Agent · 6-step plan ready</div>
+              <div class="sc-state-row sc-state" data-state="waiting-approval">
+                <span class="sc-state-dot"></span>
+                <span class="sc-state-label">Waiting · approval on plan</span>
+              </div>
+            </div>
+            <div class="sc-right">
+              <span class="sc-attn">✱</span>
+              <button class="sc-dots" title="More">•••</button>
+            </div>
+          </div>
+
+          <!-- Card 3 — Waiting input -->
+          <div class="sc-card" data-client="blackmesa" draggable="true">
+            <div class="sc-drag-handle"></div>
+            <div class="sc-stripe"></div>
+            <div class="sc-body">
+              <div class="sc-client">Black Mesa</div>
+              <div class="sc-title">I-9 remote verification memo</div>
+              <div class="sc-context">Compliance Agent · clarifying Qs open</div>
+              <div class="sc-state-row sc-state" data-state="waiting-input">
+                <span class="sc-state-dot"></span>
+                <span class="sc-state-label">Waiting · needs your input</span>
+              </div>
+            </div>
+            <div class="sc-right">
+              <span class="sc-attn">✱</span>
+              <button class="sc-dots" title="More">•••</button>
+            </div>
+          </div>
+
+          <!-- Card 4 — Idle -->
+          <div class="sc-card" data-client="aperture" draggable="true">
+            <div class="sc-drag-handle"></div>
+            <div class="sc-stripe"></div>
+            <div class="sc-body">
+              <div class="sc-client">Aperture Laboratories</div>
+              <div class="sc-title">PTO policy rewrite</div>
+              <div class="sc-context">Policy Agent · last edit 2h ago</div>
+              <div class="sc-state-row sc-state" data-state="idle">
+                <span class="sc-state-dot"></span>
+                <span class="sc-state-label">Idle</span>
+              </div>
+            </div>
+            <div class="sc-right">
+              <span class="sc-attn hidden">✱</span>
+              <button class="sc-dots" title="More">•••</button>
+            </div>
+          </div>
+
+          <!-- Card 5 — Running -->
+          <div class="sc-card" data-client="acme" draggable="true">
+            <div class="sc-drag-handle"></div>
+            <div class="sc-stripe"></div>
+            <div class="sc-body">
+              <div class="sc-client">Acme Corp.</div>
+              <div class="sc-title">Q1 performance review prep</div>
+              <div class="sc-context">Review Agent · drafting rubric</div>
+              <div class="sc-state-row sc-state" data-state="running">
+                <span class="sc-state-dot"></span>
+                <span class="sc-state-label">Running · drafting rubric</span>
+              </div>
+            </div>
+            <div class="sc-right">
+              <span class="sc-attn hidden">✱</span>
+              <button class="sc-dots" title="More">•••</button>
+            </div>
+          </div>
+
+          <!-- Card 6 — Done -->
+          <div class="sc-card" data-client="coconut" draggable="true">
+            <div class="sc-drag-handle"></div>
+            <div class="sc-stripe"></div>
+            <div class="sc-body">
+              <div class="sc-client">Coconut Grove LLC.</div>
+              <div class="sc-title">Seasonal staffing plan</div>
+              <div class="sc-context">Staffing Agent · plan complete</div>
+              <div class="sc-state-row sc-state" data-state="done">
+                <span class="sc-state-dot"></span>
+                <span class="sc-state-label">Done · ready for review</span>
+              </div>
+            </div>
+            <div class="sc-right">
+              <span class="sc-attn hidden">✱</span>
+              <button class="sc-dots" title="More">•••</button>
+            </div>
+          </div>
+
+          <!-- Card 7 — Idle -->
+          <div class="sc-card" data-client="umbrella" draggable="true">
+            <div class="sc-drag-handle"></div>
+            <div class="sc-stripe"></div>
+            <div class="sc-body">
+              <div class="sc-client">Umbrella Corp</div>
+              <div class="sc-title">Compensation band review</div>
+              <div class="sc-context">Comp Agent · 2 artifacts</div>
+              <div class="sc-state-row sc-state" data-state="idle">
+                <span class="sc-state-dot"></span>
+                <span class="sc-state-label">Idle</span>
+              </div>
+            </div>
+            <div class="sc-right">
+              <span class="sc-attn hidden">✱</span>
+              <button class="sc-dots" title="More">•••</button>
+            </div>
+          </div>
+
+          <!-- Card 8 — Idle, same client as card 1 (shows same-client color) -->
+          <div class="sc-card" data-client="aperture" draggable="true">
+            <div class="sc-drag-handle"></div>
+            <div class="sc-stripe"></div>
+            <div class="sc-body">
+              <div class="sc-client">Aperture Laboratories</div>
+              <div class="sc-title">Manager training rollout</div>
+              <div class="sc-context">L&amp;D Agent · outline ready</div>
+              <div class="sc-state-row sc-state" data-state="idle">
+                <span class="sc-state-dot"></span>
+                <span class="sc-state-label">Idle</span>
+              </div>
+            </div>
+            <div class="sc-right">
+              <span class="sc-attn hidden">✱</span>
+              <button class="sc-dots" title="More">•••</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sc-footer">
+          <a>Dashboard</a>
+          <a>Settings</a>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="content-header">
+          <div class="crumb">Aperture Laboratories &nbsp;/&nbsp; <strong>Q2 benefits enrollment audit</strong></div>
+        </div>
+        <div class="content-body">
+          <div class="msg user">Can you audit open enrollment participation for Q2 and flag any plans with under-subscription?</div>
+          <div class="msg">Pulling enrollment records from the HRIS. I'll segment by plan tier and call out anything below the 30% threshold — stand by.</div>
+          <div class="placeholder-note">(Tip: drag cards in the sidebar to reorder.)</div>
+        </div>
+      </main>
+    </section>
+
+  </div>
+</div>
+
+<script>
+  // --- Tab switcher ---
+  const tabs = document.querySelectorAll('.switcher button[data-target]');
+  const panels = document.querySelectorAll('.design-panel');
+  function activate(target) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.target === target));
+    panels.forEach(p => p.classList.toggle('active', p.id === target));
+  }
+  tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.target)));
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === '1') activate('design-editorial');
+    if (e.key === '2') activate('design-cards');
+  });
+
+  // --- Design 1: expand/collapse headings ---
+  document.querySelectorAll('[data-toggle]').forEach(row => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.ed-new-btn')) return;
+      const key = row.dataset.toggle;
+      row.classList.toggle('collapsed');
+      let list;
+      if (key === 'recent') list = document.getElementById('recent-list');
+      else if (key === 'clients') list = document.getElementById('clients-wrap');
+      else list = document.querySelector(`[data-list="${key}"]`);
+      if (list) list.hidden = row.classList.contains('collapsed');
+    });
+  });
+
+  // --- Design 1: ed-list item selection ---
+  document.querySelectorAll('.ed-list').forEach(list => {
+    list.addEventListener('click', (e) => {
+      const li = e.target.closest('li');
+      if (!li || e.target.closest('.ed-dots')) return;
+      document.querySelectorAll('.ed-list li').forEach(x => x.classList.remove('active'));
+      li.classList.add('active');
+    });
+  });
+
+  // --- Design 2: card selection ---
+  document.querySelectorAll('.sc-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.sc-dots')) return;
+      document.querySelectorAll('.sc-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+    });
+  });
+
+  // --- Design 2: drag to reorder ---
+  const list = document.getElementById('sc-list');
+  let dragEl = null;
+  list.addEventListener('dragstart', (e) => {
+    const card = e.target.closest('.sc-card');
+    if (!card) return;
+    dragEl = card;
+    card.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  list.addEventListener('dragend', () => {
+    if (dragEl) dragEl.classList.remove('dragging');
+    document.querySelectorAll('.sc-card').forEach(c => c.classList.remove('drop-above'));
+    dragEl = null;
+  });
+  list.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    const target = e.target.closest('.sc-card');
+    document.querySelectorAll('.sc-card').forEach(c => c.classList.remove('drop-above'));
+    if (!target || target === dragEl) return;
+    target.classList.add('drop-above');
+  });
+  list.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const target = e.target.closest('.sc-card');
+    if (!target || !dragEl || target === dragEl) return;
+    list.insertBefore(dragEl, target);
+    target.classList.remove('drop-above');
+  });
+</script>
+<script src="feedback-panel.js"></script>
+</body>
+</html>

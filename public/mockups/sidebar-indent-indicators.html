@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sidebar — Indent + Read Indicator</title>
+<style>
+  :root {
+    --page: #EEECE6;
+    --sidebar: #FAFAF7;
+    --border: #E5E3DC;
+    --fg: #1A1A1A;
+    --fg-muted: #6B6B6B;
+    --fg-dim: #8C8A84;
+    --primary: #4F5CAD;
+    --primary-strong: #3E4A96;
+    --primary-soft: rgba(79, 92, 173, 0.10);
+    --hover: rgba(0,0,0,0.04);
+    --selected-bg: #4F5CAD;
+    --selected-fg: #FFFFFF;
+    --warning: #B47A24;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: var(--page); color: var(--fg);
+    font-family: "Inter", -apple-system, system-ui, sans-serif;
+    font-size: 14px; -webkit-font-smoothing: antialiased;
+  }
+  .app { display: flex; flex-direction: column; height: 100vh; }
+
+  /* ---------- Switcher ---------- */
+  .switcher {
+    display: flex; gap: 6px; padding: 10px 14px;
+    background: #FFFFFF; border-bottom: 1px solid var(--border);
+    align-items: center; flex-shrink: 0;
+  }
+  .switcher .brand {
+    font-size: 13px; font-weight: 600; color: var(--fg-muted);
+    margin-right: 10px; letter-spacing: 0.02em;
+  }
+  .switcher button {
+    background: transparent; color: var(--fg-muted);
+    border: 1px solid transparent; padding: 6px 12px; border-radius: 6px;
+    font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer;
+  }
+  .switcher button:hover { background: #F5F3EC; color: var(--fg); }
+  .switcher button.active {
+    background: #F5F3EC; color: var(--fg); border-color: var(--border);
+  }
+  .switcher button .num {
+    color: var(--fg-dim); margin-right: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Stage ---------- */
+  .stage {
+    flex: 1; display: flex; align-items: flex-start;
+    justify-content: center; padding: 32px 24px; overflow: auto;
+    gap: 24px;
+  }
+  .design-panel { display: none; }
+  .design-panel.active { display: block; }
+
+  .caption {
+    max-width: 720px; margin: 0 auto 16px; padding: 12px 16px;
+    background: #FFFFFF; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 13px; color: var(--fg-muted); line-height: 1.5;
+  }
+  .caption strong { color: var(--fg); }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    width: 320px; background: var(--sidebar);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 0 12px; display: flex; flex-direction: column;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .logo {
+    font-size: 22px; font-weight: 800; color: var(--primary-strong);
+    padding: 0 22px 12px; letter-spacing: -0.01em;
+  }
+  .dashboard {
+    display: flex; align-items: center; gap: 8px;
+    margin: 0 14px 12px; padding: 8px; border-radius: 6px;
+    color: var(--fg);
+  }
+  .dashboard .icon { width: 18px; height: 18px; }
+  .dashboard .label { font-size: 14px; font-weight: 500; }
+
+  .chats-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 22px 6px; font-size: 11px; font-weight: 600;
+    color: var(--fg-muted); letter-spacing: 0.08em;
+  }
+  .chats-header .tabs { display: flex; gap: 8px; }
+  .chats-header .tab.active { color: var(--fg); }
+
+  .tree { padding: 4px 14px; }
+  .client-group { margin-bottom: 4px; }
+  .client-row {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 6px 4px 8px; border-radius: 6px;
+    position: relative;
+  }
+  .client-row .caret {
+    width: 18px; height: 18px; display: flex;
+    align-items: center; justify-content: center; color: var(--fg);
+  }
+  .client-row .name {
+    flex: 1; font-size: 15px; font-weight: 700; color: var(--fg);
+    letter-spacing: -0.005em;
+  }
+  .client-row .unread-pill {
+    background: var(--primary); color: white; font-size: 11px;
+    font-weight: 600; border-radius: 999px; padding: 2px 7px;
+    min-width: 20px; text-align: center;
+  }
+  .client-row.selected { background: var(--selected-bg); }
+  .client-row.selected .name, .client-row.selected .caret { color: var(--selected-fg); }
+
+  /* Chat row — base (overridden per variant) */
+  .chat-row {
+    position: relative; display: block; width: 100%; text-align: left;
+    background: transparent; border: 0; cursor: pointer;
+    padding: 6px 36px 6px 32px; border-radius: 6px; color: var(--fg);
+  }
+  .chat-row:hover { background: var(--hover); }
+  .chat-row .title {
+    font-size: 13px; font-weight: 500; line-height: 1.35;
+    color: var(--fg);
+  }
+  .chat-row .title.unread { font-weight: 600; }
+  .chat-row .ts {
+    font-size: 12px; font-weight: 400; color: var(--fg-muted);
+  }
+  .chat-row .state {
+    display: flex; align-items: center; gap: 6px; margin-top: 3px;
+    font-size: 12px; color: var(--primary);
+  }
+  .chat-row .state.warn { color: var(--warning); }
+  .chat-row.selected { background: var(--selected-bg); }
+  .chat-row.selected .title { color: var(--selected-fg); font-weight: 600; }
+  .chat-row.selected .ts { color: rgba(255,255,255,0.65); }
+  .chat-row.selected .state { color: var(--selected-fg); }
+
+  /* ========== V1: GUTTER DOT ========== */
+  .v-gutter .chat-row { padding-left: 44px; }
+  .v-gutter .chat-row .dot {
+    position: absolute; left: 26px; top: 11px;
+    width: 7px; height: 7px; border-radius: 50%; background: var(--primary);
+  }
+
+  /* ========== V2: LEFT STRIPE ========== */
+  .v-stripe .chat-row { padding-left: 44px; }
+  .v-stripe .chat-row .stripe {
+    position: absolute; left: 14px; top: 6px; bottom: 6px;
+    width: 3px; border-radius: 2px; background: var(--primary);
+  }
+  .v-stripe .chat-row.selected .stripe { background: rgba(255,255,255,0.85); }
+
+  /* ========== V3: TYPOGRAPHY ONLY ========== */
+  .v-type .chat-row { padding-left: 44px; }
+  .v-type .chat-row .title.unread {
+    color: var(--primary-strong); font-weight: 700;
+  }
+  .v-type .chat-row.selected .title.unread { color: var(--selected-fg); }
+
+  /* ========== V4: INLINE PREFIX ========== */
+  .v-inline .chat-row { padding-left: 44px; }
+  .v-inline .chat-row .bullet {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--primary); margin-right: 7px;
+    vertical-align: middle; transform: translateY(-1px);
+  }
+  .v-inline .chat-row.selected .bullet { background: rgba(255,255,255,0.95); }
+
+  /* ========== V5: RIGHT RAIL ========== */
+  .v-right .chat-row { padding-left: 44px; padding-right: 22px; }
+  .v-right .chat-row .right-dot {
+    position: absolute; right: 12px; top: 10px;
+    width: 8px; height: 8px; border-radius: 50%; background: var(--primary);
+  }
+  .v-right .chat-row.selected .right-dot { background: rgba(255,255,255,0.95); }
+
+  /* ========== V6: CARET-ALIGNED DOT (iter on #1) ========== */
+  /* Caret center sits at x=17px from tree-content edge (8 client-row pad + 9 half-caret).
+     Dot center should land on the same x-line to create a clean vertical spine. */
+  .v-aligned .chat-row { padding-left: 44px; }
+  .v-aligned .chat-row .dot {
+    position: absolute; left: 13.5px; top: 11px;
+    width: 7px; height: 7px; border-radius: 50%; background: var(--primary);
+  }
+
+  /* ========== V7: TINTED ROW (no dot) ========== */
+  .v-tint .chat-row { padding-left: 44px; }
+  .v-tint .chat-row.unread-row {
+    background: rgba(79, 92, 173, 0.07);
+  }
+  .v-tint .chat-row.unread-row:hover {
+    background: rgba(79, 92, 173, 0.12);
+  }
+
+  /* ========== V8: RESERVED PREFIX (iter on #4) ========== */
+  .v-reserved .chat-row { padding-left: 44px; }
+  .v-reserved .chat-row .title {
+    display: block;
+    text-indent: -14px; padding-left: 14px;
+  }
+  .v-reserved .chat-row .bullet {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--primary); margin-right: 7px;
+    vertical-align: middle; transform: translateY(-1px);
+  }
+  .v-reserved .chat-row .bullet.empty { background: transparent; }
+  .v-reserved .chat-row.selected .bullet { background: rgba(255,255,255,0.95); }
+
+  /* Shared mini-icon styles */
+  .caret svg, .dashboard svg { display: block; }
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="switcher">
+    <span class="brand">Sidebar · Indent + Read Indicator</span>
+    <button data-target="v-gutter" class="active" title="Dot sits in the gap between client-name x and indented chat x">
+      <span class="num">1</span>Gutter Dot
+    </button>
+    <button data-target="v-stripe" title="Vertical accent bar at the left edge of unread rows">
+      <span class="num">2</span>Left Stripe
+    </button>
+    <button data-target="v-type" title="No dot — unread = bold + primary-tinted title color">
+      <span class="num">3</span>Typography Only
+    </button>
+    <button data-target="v-inline" title="Small bullet rendered inline before the title text">
+      <span class="num">4</span>Inline Prefix
+    </button>
+    <button data-target="v-right" title="Dot on the right, next to the timestamp">
+      <span class="num">5</span>Right Rail
+    </button>
+    <span style="width:1px;height:20px;background:var(--border);margin:0 4px;"></span>
+    <button data-target="v-aligned" title="Iter on #1 — dot aligned to the caret column above, cleaner left edge">
+      <span class="num">6</span>Caret-aligned Dot
+    </button>
+    <button data-target="v-tint" title="No dot — unread rows get a faint primary-tinted background">
+      <span class="num">7</span>Tinted Row
+    </button>
+    <button data-target="v-reserved" title="Iter on #4 — inline bullet in a reserved slot, no layout shift">
+      <span class="num">8</span>Reserved Prefix
+    </button>
+  </div>
+
+  <div class="stage">
+
+    <!-- ============== V1 GUTTER DOT ============== -->
+    <div class="design-panel active" data-panel="v-gutter">
+      <div class="caption">
+        <strong>1 · Gutter Dot.</strong> Chat titles indent 12px past the client name. The unread dot lives in that narrow band — same mental model you have today, just with a real indent. Risk: dot is in a tight slot, close to the caret column visually.
+      </div>
+      <div class="sidebar v-gutter">
+        <div class="logo">PandaCommand</div>
+        <div class="dashboard">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 9 9M5 10v10h4v-6h6v6h4V10"/></svg>
+          <span class="label">Dashboard</span>
+        </div>
+        <div class="chats-header">
+          <span>CHATS</span>
+          <span class="tabs"><span class="tab active">BY CLIENT</span> · <span class="tab">RECENT</span></span>
+        </div>
+        <div class="tree">
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Aperture Science</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Portal Gun Safety Training<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+              <div class="state warn">⚠ Approve schedule</div>
+            </button>
+            <button class="chat-row">
+              <div class="title">GLaDOS Maintenance<span class="ts">&nbsp;&nbsp;·&nbsp;3h</span></div>
+            </button>
+          </div>
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Umbrella Corporation</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Virus Containment Protocol<span class="ts">&nbsp;&nbsp;·&nbsp;2h</span></div>
+            </button>
+          </div>
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Black Mesa</span>
+              <span class="unread-pill">1</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">New Chat with Black Mesa<span class="ts">&nbsp;&nbsp;·&nbsp;20m</span></div>
+            </button>
+            <button class="chat-row">
+              <div class="title">January Payroll<span class="ts">&nbsp;&nbsp;·&nbsp;37m</span></div>
+              <div class="state">⟳ Running · Pulling HRIS</div>
+            </button>
+            <button class="chat-row">
+              <div class="title">Benefits Enrollment Q1<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+            </button>
+            <button class="chat-row">
+              <span class="dot"></span>
+              <div class="title unread">New Hire: Dr. Freeman<span class="ts">&nbsp;&nbsp;·&nbsp;Yesterday</span></div>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== V2 LEFT STRIPE ============== -->
+    <div class="design-panel" data-panel="v-stripe">
+      <div class="caption">
+        <strong>2 · Left Stripe.</strong> Chats indent past client names. Unread rows get a vertical primary-color bar flush to the left edge of the row. Strong glance cue, pairs well with future "running / needs-approval" state colors.
+      </div>
+      <div class="sidebar v-stripe">
+        <div class="logo">PandaCommand</div>
+        <div class="dashboard">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 9 9M5 10v10h4v-6h6v6h4V10"/></svg>
+          <span class="label">Dashboard</span>
+        </div>
+        <div class="chats-header">
+          <span>CHATS</span>
+          <span class="tabs"><span class="tab active">BY CLIENT</span> · <span class="tab">RECENT</span></span>
+        </div>
+        <div class="tree">
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Aperture Science</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Portal Gun Safety Training<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+              <div class="state warn">⚠ Approve schedule</div>
+            </button>
+            <button class="chat-row">
+              <div class="title">GLaDOS Maintenance<span class="ts">&nbsp;&nbsp;·&nbsp;3h</span></div>
+            </button>
+          </div>
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Umbrella Corporation</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Virus Containment Protocol<span class="ts">&nbsp;&nbsp;·&nbsp;2h</span></div>
+            </button>
+          </div>
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Black Mesa</span>
+              <span class="unread-pill">1</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">New Chat with Black Mesa<span class="ts">&nbsp;&nbsp;·&nbsp;20m</span></div>
+            </button>
+            <button class="chat-row">
+              <div class="title">January Payroll<span class="ts">&nbsp;&nbsp;·&nbsp;37m</span></div>
+              <div class="state">⟳ Running · Pulling HRIS</div>
+            </button>
+            <button class="chat-row">
+              <div class="title">Benefits Enrollment Q1<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+            </button>
+            <button class="chat-row">
+              <span class="stripe"></span>
+              <div class="title unread">New Hire: Dr. Freeman<span class="ts">&nbsp;&nbsp;·&nbsp;Yesterday</span></div>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== V3 TYPOGRAPHY ONLY ============== -->
+    <div class="design-panel" data-panel="v-type">
+      <div class="caption">
+        <strong>3 · Typography Only.</strong> No dot at all — unread rows are bold + primary-tinted color. Cleanest, least visual chrome, but the signal lives only in the title itself (so it's weaker at peripheral glance).
+      </div>
+      <div class="sidebar v-type">
+        <div class="logo">PandaCommand</div>
+        <div class="dashboard">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 9 9M5 10v10h4v-6h6v6h4V10"/></svg>
+          <span class="label">Dashboard</span>
+        </div>
+        <div class="chats-header">
+          <span>CHATS</span>
+          <span class="tabs"><span class="tab active">BY CLIENT</span> · <span class="tab">RECENT</span></span>
+        </div>
+        <div class="tree">
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Aperture Science</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Portal Gun Safety Training<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+              <div class="state warn">⚠ Approve schedule</div>
+            </button>
+            <button class="chat-row">
+              <div class="title">GLaDOS Maintenance<span class="ts">&nbsp;&nbsp;·&nbsp;3h</span></div>
+            </button>
+          </div>
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Umbrella Corporation</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Virus Containment Protocol<span class="ts">&nbsp;&nbsp;·&nbsp;2h</span></div>
+            </button>
+          </div>
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Black Mesa</span>
+              <span class="unread-pill">1</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">New Chat with Black Mesa<span class="ts">&nbsp;&nbsp;·&nbsp;20m</span></div>
+            </button>
+            <button class="chat-row">
+              <div class="title">January Payroll<span class="ts">&nbsp;&nbsp;·&nbsp;37m</span></div>
+              <div class="state">⟳ Running · Pulling HRIS</div>
+            </button>
+            <button class="chat-row">
+              <div class="title">Benefits Enrollment Q1<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+            </button>
+            <button class="chat-row">
+              <div class="title unread">New Hire: Dr. Freeman<span class="ts">&nbsp;&nbsp;·&nbsp;Yesterday</span></div>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== V4 INLINE PREFIX ============== -->
+    <div class="design-panel" data-panel="v-inline">
+      <div class="caption">
+        <strong>4 · Inline Prefix.</strong> Small bullet rendered inline, before the title. Simple and unambiguous, but creates layout shift (read vs unread titles don't start at the same x) unless we reserve space.
+      </div>
+      <div class="sidebar v-inline">
+        <div class="logo">PandaCommand</div>
+        <div class="dashboard">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 9 9M5 10v10h4v-6h6v6h4V10"/></svg>
+          <span class="label">Dashboard</span>
+        </div>
+        <div class="chats-header">
+          <span>CHATS</span>
+          <span class="tabs"><span class="tab active">BY CLIENT</span> · <span class="tab">RECENT</span></span>
+        </div>
+        <div class="tree">
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Aperture Science</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Portal Gun Safety Training<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+              <div class="state warn">⚠ Approve schedule</div>
+            </button>
+            <button class="chat-row">
+              <div class="title">GLaDOS Maintenance<span class="ts">&nbsp;&nbsp;·&nbsp;3h</span></div>
+            </button>
+          </div>
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Umbrella Corporation</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Virus Containment Protocol<span class="ts">&nbsp;&nbsp;·&nbsp;2h</span></div>
+            </button>
+          </div>
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Black Mesa</span>
+              <span class="unread-pill">1</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">New Chat with Black Mesa<span class="ts">&nbsp;&nbsp;·&nbsp;20m</span></div>
+            </button>
+            <button class="chat-row">
+              <div class="title">January Payroll<span class="ts">&nbsp;&nbsp;·&nbsp;37m</span></div>
+              <div class="state">⟳ Running · Pulling HRIS</div>
+            </button>
+            <button class="chat-row">
+              <div class="title">Benefits Enrollment Q1<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+            </button>
+            <button class="chat-row">
+              <div class="title unread"><span class="bullet"></span>New Hire: Dr. Freeman<span class="ts">&nbsp;&nbsp;·&nbsp;Yesterday</span></div>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== V5 RIGHT RAIL ============== -->
+    <div class="design-panel" data-panel="v-right">
+      <div class="caption">
+        <strong>5 · Right Rail.</strong> Dot sits on the right edge, next to the timestamp. Moves all "state" signals to one side. Clean left edge, but scanning eye has to reach the far edge to catch unread.
+      </div>
+      <div class="sidebar v-right">
+        <div class="logo">PandaCommand</div>
+        <div class="dashboard">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 9 9M5 10v10h4v-6h6v6h4V10"/></svg>
+          <span class="label">Dashboard</span>
+        </div>
+        <div class="chats-header">
+          <span>CHATS</span>
+          <span class="tabs"><span class="tab active">BY CLIENT</span> · <span class="tab">RECENT</span></span>
+        </div>
+        <div class="tree">
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Aperture Science</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Portal Gun Safety Training<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+              <div class="state warn">⚠ Approve schedule</div>
+            </button>
+            <button class="chat-row">
+              <div class="title">GLaDOS Maintenance<span class="ts">&nbsp;&nbsp;·&nbsp;3h</span></div>
+            </button>
+          </div>
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Umbrella Corporation</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Virus Containment Protocol<span class="ts">&nbsp;&nbsp;·&nbsp;2h</span></div>
+            </button>
+          </div>
+
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Black Mesa</span>
+              <span class="unread-pill">1</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">New Chat with Black Mesa<span class="ts">&nbsp;&nbsp;·&nbsp;20m</span></div>
+            </button>
+            <button class="chat-row">
+              <div class="title">January Payroll<span class="ts">&nbsp;&nbsp;·&nbsp;37m</span></div>
+              <div class="state">⟳ Running · Pulling HRIS</div>
+            </button>
+            <button class="chat-row">
+              <div class="title">Benefits Enrollment Q1<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+            </button>
+            <button class="chat-row">
+              <span class="right-dot"></span>
+              <div class="title unread">New Hire: Dr. Freeman<span class="ts">&nbsp;&nbsp;·&nbsp;Yesterday</span></div>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== V6 CARET-ALIGNED DOT ============== -->
+    <div class="design-panel" data-panel="v-aligned">
+      <div class="caption">
+        <strong>6 · Caret-aligned Dot (iter on #1).</strong> Same as Gutter Dot, but the dot's x-center now lines up with the caret above it. The left edge forms a clean vertical spine: caret, caret, caret, dot, caret. Fixes the "messy rag" from v1.
+      </div>
+      <div class="sidebar v-aligned">
+        <div class="logo">PandaCommand</div>
+        <div class="dashboard">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 9 9M5 10v10h4v-6h6v6h4V10"/></svg>
+          <span class="label">Dashboard</span>
+        </div>
+        <div class="chats-header">
+          <span>CHATS</span>
+          <span class="tabs"><span class="tab active">BY CLIENT</span> · <span class="tab">RECENT</span></span>
+        </div>
+        <div class="tree">
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Aperture Science</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Portal Gun Safety Training<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+              <div class="state warn">⚠ Approve schedule</div>
+            </button>
+            <button class="chat-row">
+              <div class="title">GLaDOS Maintenance<span class="ts">&nbsp;&nbsp;·&nbsp;3h</span></div>
+            </button>
+          </div>
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Umbrella Corporation</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Virus Containment Protocol<span class="ts">&nbsp;&nbsp;·&nbsp;2h</span></div>
+            </button>
+          </div>
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Black Mesa</span>
+              <span class="unread-pill">1</span>
+            </div>
+            <button class="chat-row"><div class="title">New Chat with Black Mesa<span class="ts">&nbsp;&nbsp;·&nbsp;20m</span></div></button>
+            <button class="chat-row">
+              <div class="title">January Payroll<span class="ts">&nbsp;&nbsp;·&nbsp;37m</span></div>
+              <div class="state">⟳ Running · Pulling HRIS</div>
+            </button>
+            <button class="chat-row"><div class="title">Benefits Enrollment Q1<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div></button>
+            <button class="chat-row">
+              <span class="dot"></span>
+              <div class="title unread">New Hire: Dr. Freeman<span class="ts">&nbsp;&nbsp;·&nbsp;Yesterday</span></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== V7 TINTED ROW ============== -->
+    <div class="design-panel" data-panel="v-tint">
+      <div class="caption">
+        <strong>7 · Tinted Row.</strong> No dot — unread rows get a faint primary-tinted fill. Clean left edge, nothing to align, "read" signal covers the whole row. Distinct from the saturated selected state. Risk: could read as a subtle hover.
+      </div>
+      <div class="sidebar v-tint">
+        <div class="logo">PandaCommand</div>
+        <div class="dashboard">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 9 9M5 10v10h4v-6h6v6h4V10"/></svg>
+          <span class="label">Dashboard</span>
+        </div>
+        <div class="chats-header">
+          <span>CHATS</span>
+          <span class="tabs"><span class="tab active">BY CLIENT</span> · <span class="tab">RECENT</span></span>
+        </div>
+        <div class="tree">
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Aperture Science</span>
+            </div>
+            <button class="chat-row">
+              <div class="title">Portal Gun Safety Training<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+              <div class="state warn">⚠ Approve schedule</div>
+            </button>
+            <button class="chat-row"><div class="title">GLaDOS Maintenance<span class="ts">&nbsp;&nbsp;·&nbsp;3h</span></div></button>
+          </div>
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Umbrella Corporation</span>
+            </div>
+            <button class="chat-row"><div class="title">Virus Containment Protocol<span class="ts">&nbsp;&nbsp;·&nbsp;2h</span></div></button>
+          </div>
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Black Mesa</span>
+              <span class="unread-pill">1</span>
+            </div>
+            <button class="chat-row"><div class="title">New Chat with Black Mesa<span class="ts">&nbsp;&nbsp;·&nbsp;20m</span></div></button>
+            <button class="chat-row">
+              <div class="title">January Payroll<span class="ts">&nbsp;&nbsp;·&nbsp;37m</span></div>
+              <div class="state">⟳ Running · Pulling HRIS</div>
+            </button>
+            <button class="chat-row"><div class="title">Benefits Enrollment Q1<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div></button>
+            <button class="chat-row unread-row">
+              <div class="title unread">New Hire: Dr. Freeman<span class="ts">&nbsp;&nbsp;·&nbsp;Yesterday</span></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== V8 RESERVED PREFIX ============== -->
+    <div class="design-panel" data-panel="v-reserved">
+      <div class="caption">
+        <strong>8 · Reserved Prefix (iter on #4).</strong> Inline bullet before the title, but the slot is always reserved (using hanging indent), so read and unread titles start at the same x. No layout shift, clean left edge, dot travels with the title.
+      </div>
+      <div class="sidebar v-reserved">
+        <div class="logo">PandaCommand</div>
+        <div class="dashboard">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 9 9M5 10v10h4v-6h6v6h4V10"/></svg>
+          <span class="label">Dashboard</span>
+        </div>
+        <div class="chats-header">
+          <span>CHATS</span>
+          <span class="tabs"><span class="tab active">BY CLIENT</span> · <span class="tab">RECENT</span></span>
+        </div>
+        <div class="tree">
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Aperture Science</span>
+            </div>
+            <button class="chat-row">
+              <div class="title"><span class="bullet empty"></span>Portal Gun Safety Training<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div>
+              <div class="state warn">⚠ Approve schedule</div>
+            </button>
+            <button class="chat-row"><div class="title"><span class="bullet empty"></span>GLaDOS Maintenance<span class="ts">&nbsp;&nbsp;·&nbsp;3h</span></div></button>
+          </div>
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Umbrella Corporation</span>
+            </div>
+            <button class="chat-row"><div class="title"><span class="bullet empty"></span>Virus Containment Protocol<span class="ts">&nbsp;&nbsp;·&nbsp;2h</span></div></button>
+          </div>
+          <div class="client-group">
+            <div class="client-row">
+              <span class="caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(90deg)"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="name">Black Mesa</span>
+              <span class="unread-pill">1</span>
+            </div>
+            <button class="chat-row"><div class="title"><span class="bullet empty"></span>New Chat with Black Mesa<span class="ts">&nbsp;&nbsp;·&nbsp;20m</span></div></button>
+            <button class="chat-row">
+              <div class="title"><span class="bullet empty"></span>January Payroll<span class="ts">&nbsp;&nbsp;·&nbsp;37m</span></div>
+              <div class="state">⟳ Running · Pulling HRIS</div>
+            </button>
+            <button class="chat-row"><div class="title"><span class="bullet empty"></span>Benefits Enrollment Q1<span class="ts">&nbsp;&nbsp;·&nbsp;1h</span></div></button>
+            <button class="chat-row">
+              <div class="title unread"><span class="bullet"></span>New Hire: Dr. Freeman<span class="ts">&nbsp;&nbsp;·&nbsp;Yesterday</span></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const buttons = document.querySelectorAll('.switcher button');
+  const panels = document.querySelectorAll('.design-panel');
+  function activate(target) {
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.target === target));
+    panels.forEach(p => p.classList.toggle('active', p.dataset.panel === target));
+  }
+  buttons.forEach(b => b.addEventListener('click', () => activate(b.dataset.target)));
+  window.addEventListener('keydown', (e) => {
+    const map = { '1': 'v-gutter', '2': 'v-stripe', '3': 'v-type', '4': 'v-inline', '5': 'v-right', '6': 'v-aligned', '7': 'v-tint', '8': 'v-reserved' };
+    if (map[e.key]) activate(map[e.key]);
+  });
+</script>
+<script src="feedback-panel.js"></script>
+</body>
+</html>

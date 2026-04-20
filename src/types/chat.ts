@@ -106,4 +106,6 @@ export interface Chat {
   updatedAt: Date;
   messages: Message[];
   artifacts: Artifact[];
+  state?: 'running' | 'needs-approval' | 'done' | 'idle';
+  stateDetail?: string;
 }

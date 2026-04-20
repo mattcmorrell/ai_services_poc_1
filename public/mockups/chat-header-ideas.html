@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chat List Header — Ideas</title>
+<style>
+  :root {
+    --bg: #F7F7F5;
+    --panel: #FFFFFF;
+    --fg: #1A1A1A;
+    --fg-muted: #6B6B6B;
+    --fg-dim: #8A8A8A;
+    --border: #E5E5E2;
+    --border-soft: #EEEEEC;
+    --accent: #F0F0EC;
+    --accent-hover: #E8E8E3;
+    --primary: #4A5B9A;
+    --primary-soft: rgba(74, 91, 154, 0.12);
+    --primary-softer: rgba(74, 91, 154, 0.06);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Inter", -apple-system, "SF Pro Text", system-ui, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 32px 40px 80px;
+  }
+
+  h1.page-title {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
+  }
+  .page-sub {
+    font-size: 13px;
+    color: var(--fg-muted);
+    margin: 0 0 28px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-head {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .card-desc {
+    font-size: 12px;
+    color: var(--fg-muted);
+    margin: 3px 0 0;
+    line-height: 1.45;
+  }
+
+  .sidebar-wrap {
+    background: var(--panel);
+    padding: 18px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .sidebar {
+    width: 320px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 0 8px;
+    overflow: hidden;
+  }
+
+  /* ——— Shared tree styling ——— */
+  .section-pad { padding: 0 22px; }
+
+  .tree {
+    padding: 4px 10px 0;
+  }
+  .client-row, .chat-row, .nav-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--fg);
+  }
+  .client-row { font-weight: 600; }
+  .client-row .caret {
+    width: 14px; height: 14px; color: var(--fg-muted);
+  }
+  .client-row .plus {
+    margin-left: auto;
+    width: 14px; height: 14px;
+    color: var(--fg-muted);
+    opacity: 0;
+  }
+  .client-row:hover .plus { opacity: 1; }
+
+  .chat-row {
+    font-weight: 400;
+    padding-left: 34px;
+    color: var(--fg);
+  }
+  .chat-row .chat-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .chat-row .chat-meta {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--fg-dim);
+    flex-shrink: 0;
+  }
+  .chat-row.active {
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 500;
+  }
+  .chat-row.active .chat-meta { color: var(--primary); opacity: 0.7; }
+  .chat-row:not(.active):hover { background: var(--accent); }
+
+  /* ——— OPTION 1: No header label, just toggle ——— */
+  .v1-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 4px 22px 10px;
+  }
+  .v1-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .v1-toggle button {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--fg-muted);
+    letter-spacing: -0.005em;
+  }
+  .v1-toggle button.active {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .v1-toggle button:hover:not(.active) { color: var(--fg); }
+
+  /* ——— OPTION 2: Chats + icon menu trigger ——— */
+  .v2-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 22px 10px;
+  }
+  .v2-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+  .v2-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--fg-muted);
+    cursor: pointer;
+  }
+  .v2-trigger:hover { background: var(--accent); color: var(--fg); }
+  .v2-trigger svg.icon { width: 14px; height: 14px; }
+  .v2-trigger svg.chev { width: 10px; height: 10px; opacity: 0.7; }
+
+  /* ——— OPTION 3: Segmented pill ——— */
+  .v3-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 4px 14px 10px;
+  }
+  .v3-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    padding-left: 8px;
+  }
+  .v3-segmented {
+    display: inline-flex;
+    padding: 2px;
+    background: var(--accent);
+    border-radius: 7px;
+    gap: 2px;
+  }
+  .v3-segmented button {
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--fg-muted);
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .v3-segmented button.active {
+    background: var(--panel);
+    color: var(--fg);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .v3-segmented button:hover:not(.active) { color: var(--fg); }
+
+  /* ——— OPTION 5: Full-width segmented, stacked under Chats ——— */
+  .v5-header {
+    padding: 4px 14px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .v5-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+  }
+  .v5-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+  .v5-new {
+    border: 0;
+    background: transparent;
+    color: var(--fg-muted);
+    width: 22px; height: 22px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .v5-new:hover { background: var(--accent); color: var(--fg); }
+  .v5-segmented {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 2px;
+    background: var(--accent);
+    border-radius: 7px;
+    gap: 2px;
+  }
+  .v5-segmented button {
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--fg-muted);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .v5-segmented button.active {
+    background: var(--panel);
+    color: var(--fg);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .v5-segmented button:hover:not(.active) { color: var(--fg); }
+
+  /* ——— OPTION 4: Grouped-primary + search + Recent chip ——— */
+  .v4-header {
+    padding: 4px 14px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .v4-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+  }
+  .v4-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .v4-new {
+    border: 0;
+    background: transparent;
+    color: var(--fg-muted);
+    width: 22px; height: 22px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .v4-new:hover { background: var(--accent); color: var(--fg); }
+  .v4-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--fg-muted);
+    font-size: 12px;
+  }
+  .v4-search svg { width: 13px; height: 13px; }
+  .v4-chips {
+    display: inline-flex;
+    gap: 6px;
+    padding: 0 2px;
+  }
+  .v4-chip {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--fg-muted);
+    padding: 3px 9px;
+    border-radius: 999px;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+  }
+  .v4-chip.active {
+    background: var(--fg);
+    color: var(--panel);
+    border-color: var(--fg);
+  }
+  .v4-chip:hover:not(.active) { color: var(--fg); }
+
+  /* Nav above chats — common to all */
+  .top-nav {
+    padding: 0 14px;
+  }
+  .nav-row {
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .nav-row.active {
+    background: var(--primary);
+    color: #fff;
+  }
+  .nav-row svg { width: 15px; height: 15px; }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 22px 14px;
+  }
+  .brand {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: -0.01em;
+  }
+  .brand-collapse {
+    width: 26px; height: 26px;
+    border: 0;
+    background: transparent;
+    color: var(--fg-muted);
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .brand-collapse:hover { background: var(--accent); color: var(--fg); }
+
+  .divider {
+    height: 1px;
+    background: var(--border-soft);
+    margin: 10px 14px;
+  }
+
+  /* spacer after header */
+  .after-header-spacer { height: 2px; }
+
+  /* notes */
+  .notes {
+    padding: 12px 18px 16px;
+    border-top: 1px solid var(--border-soft);
+    background: #FAFAF8;
+    font-size: 12px;
+    color: var(--fg-muted);
+    line-height: 1.55;
+  }
+  .notes strong { color: var(--fg); font-weight: 600; }
+
+</style>
+</head>
+<body>
+<div class="page">
+  <h1 class="page-title">Chat list header — four directions</h1>
+  <p class="page-sub">Replacing the dual-label "CHATS  ·  BY CLIENT · RECENT" arrangement. Sidebar width and row styling match production.</p>
+
+  <div class="grid">
+
+    <!-- ============ OPTION 1 ============ -->
+    <section class="card">
+      <div class="card-head">
+        <p class="card-title">1 · Drop the "Chats" label</p>
+        <p class="card-desc">Toggle is the header. Two labels competing becomes one. Active = darker + heavier; inactive = muted. No separator.</p>
+      </div>
+      <div class="sidebar-wrap">
+        <div class="sidebar">
+          <div class="brand-row">
+            <span class="brand">PandaCommand</span>
+            <button class="brand-collapse" aria-label="collapse">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l-4 4 4 4M14 4v8"/></svg>
+            </button>
+          </div>
+          <div class="top-nav">
+            <div class="nav-row active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+              Dashboard
+            </div>
+          </div>
+          <div class="divider"></div>
+
+          <div class="v1-header">
+            <div class="v1-toggle">
+              <button class="active">Grouped</button>
+              <button>Recent</button>
+            </div>
+          </div>
+          <div class="tree">
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+              Aperture Science
+              <svg class="plus" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v10M3 8h10"/></svg>
+            </div>
+            <div class="chat-row active"><span class="chat-title">Q2 turnover analysis</span><span class="chat-meta">2h</span></div>
+            <div class="chat-row"><span class="chat-title">Onboarding checklist refresh</span><span class="chat-meta">yesterday</span></div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Black Mesa
+            </div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Tyrell Corp
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <strong>Pros:</strong> cleanest — one header, one decision. The toggle reads as the section identity.
+        <strong>Cons:</strong> if you want "Chats" as an orienting anchor for new users, it's gone. Active state is text-only so the hit target reads quietly.
+      </div>
+    </section>
+
+    <!-- ============ OPTION 2 ============ -->
+    <section class="card">
+      <div class="card-head">
+        <p class="card-title">2 · Chats header + icon menu</p>
+        <p class="card-desc">Keep "Chats" as the section anchor. Demote the mode switcher to a small trigger that opens a menu (Group by client / Recent).</p>
+      </div>
+      <div class="sidebar-wrap">
+        <div class="sidebar">
+          <div class="brand-row">
+            <span class="brand">PandaCommand</span>
+            <button class="brand-collapse" aria-label="collapse">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l-4 4 4 4M14 4v8"/></svg>
+            </button>
+          </div>
+          <div class="top-nav">
+            <div class="nav-row active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+              Dashboard
+            </div>
+          </div>
+          <div class="divider"></div>
+
+          <div class="v2-header">
+            <span class="v2-title">Chats</span>
+            <button class="v2-trigger">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                <path d="M3 7h18M6 12h12M9 17h6"/>
+              </svg>
+              Grouped
+              <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+          </div>
+          <div class="tree">
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+              Aperture Science
+              <svg class="plus" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v10M3 8h10"/></svg>
+            </div>
+            <div class="chat-row active"><span class="chat-title">Q2 turnover analysis</span><span class="chat-meta">2h</span></div>
+            <div class="chat-row"><span class="chat-title">Onboarding checklist refresh</span><span class="chat-meta">yesterday</span></div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Black Mesa
+            </div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Tyrell Corp
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <strong>Pros:</strong> header is quiet and legible; "Chats" anchors the section. Room to add future sort/filter options in the menu.
+        <strong>Cons:</strong> switching modes now takes two clicks. If users toggle frequently, this is friction.
+      </div>
+    </section>
+
+    <!-- ============ OPTION 3 ============ -->
+    <section class="card">
+      <div class="card-head">
+        <p class="card-title">3 · Segmented pill</p>
+        <p class="card-desc">Proper button-shaped toggle. Active side has a raised, filled look so the affordance is obvious.</p>
+      </div>
+      <div class="sidebar-wrap">
+        <div class="sidebar">
+          <div class="brand-row">
+            <span class="brand">PandaCommand</span>
+            <button class="brand-collapse" aria-label="collapse">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l-4 4 4 4M14 4v8"/></svg>
+            </button>
+          </div>
+          <div class="top-nav">
+            <div class="nav-row active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+              Dashboard
+            </div>
+          </div>
+          <div class="divider"></div>
+
+          <div class="v3-header">
+            <span class="v3-title">Chats</span>
+            <div class="v3-segmented">
+              <button class="active">Grouped</button>
+              <button>Recent</button>
+            </div>
+          </div>
+          <div class="tree">
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+              Aperture Science
+              <svg class="plus" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v10M3 8h10"/></svg>
+            </div>
+            <div class="chat-row active"><span class="chat-title">Q2 turnover analysis</span><span class="chat-meta">2h</span></div>
+            <div class="chat-row"><span class="chat-title">Onboarding checklist refresh</span><span class="chat-meta">yesterday</span></div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Black Mesa
+            </div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Tyrell Corp
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <strong>Pros:</strong> obvious affordance, no ambiguity about what the toggle does. Familiar pattern (iOS-style).
+        <strong>Cons:</strong> adds visible chrome to the sidebar — more shapes and shadows than the rest of the nav. Slight inconsistency with the flat, quiet tree rows below it.
+      </div>
+    </section>
+
+    <!-- ============ OPTION 4 ============ -->
+    <section class="card">
+      <div class="card-head">
+        <p class="card-title">4 · Grouped as the default, Recent as a chip</p>
+        <p class="card-desc">Treat grouping as the primary mental model. Recent becomes one of several possible filter chips above the list, alongside search.</p>
+      </div>
+      <div class="sidebar-wrap">
+        <div class="sidebar">
+          <div class="brand-row">
+            <span class="brand">PandaCommand</span>
+            <button class="brand-collapse" aria-label="collapse">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l-4 4 4 4M14 4v8"/></svg>
+            </button>
+          </div>
+          <div class="top-nav">
+            <div class="nav-row active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+              Dashboard
+            </div>
+          </div>
+          <div class="divider"></div>
+
+          <div class="v4-header">
+            <div class="v4-title-row">
+              <span class="v4-title">Chats</span>
+              <button class="v4-new" aria-label="new chat">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3v10M3 8h10"/></svg>
+              </button>
+            </div>
+            <div class="v4-search">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M11 11l3 3"/></svg>
+              Search chats
+            </div>
+            <div class="v4-chips">
+              <button class="v4-chip active">All</button>
+              <button class="v4-chip">Recent</button>
+              <button class="v4-chip">Unread</button>
+            </div>
+          </div>
+          <div class="tree">
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+              Aperture Science
+              <svg class="plus" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v10M3 8h10"/></svg>
+            </div>
+            <div class="chat-row active"><span class="chat-title">Q2 turnover analysis</span><span class="chat-meta">2h</span></div>
+            <div class="chat-row"><span class="chat-title">Onboarding checklist refresh</span><span class="chat-meta">yesterday</span></div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Black Mesa
+            </div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Tyrell Corp
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <strong>Pros:</strong> treats grouping as the spine (matches the by-client mental model). Search was missing and is now present. Room to grow — Unread, Starred, etc.
+        <strong>Cons:</strong> tallest header of the four. "Recent" is no longer a peer to "Grouped" — it becomes a filter over grouped data, which is a different semantic. May be the wrong direction if users think of them as two separate views.
+      </div>
+    </section>
+
+    <!-- ============ OPTION 5 ============ -->
+    <section class="card">
+      <div class="card-head">
+        <p class="card-title">5 · Full-width segmented under "Chats"</p>
+        <p class="card-desc">Section label on top, segmented toggle spans the full sidebar width below it. Each side gets equal weight — no cramped inline competition.</p>
+      </div>
+      <div class="sidebar-wrap">
+        <div class="sidebar">
+          <div class="brand-row">
+            <span class="brand">PandaCommand</span>
+            <button class="brand-collapse" aria-label="collapse">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l-4 4 4 4M14 4v8"/></svg>
+            </button>
+          </div>
+          <div class="top-nav">
+            <div class="nav-row active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+              Dashboard
+            </div>
+          </div>
+          <div class="divider"></div>
+
+          <div class="v5-header">
+            <div class="v5-title-row">
+              <span class="v5-title">Chats</span>
+              <button class="v5-new" aria-label="new chat">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3v10M3 8h10"/></svg>
+              </button>
+            </div>
+            <div class="v5-segmented">
+              <button class="active">By client</button>
+              <button>Recent</button>
+            </div>
+          </div>
+          <div class="tree">
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+              Aperture Science
+              <svg class="plus" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v10M3 8h10"/></svg>
+            </div>
+            <div class="chat-row active"><span class="chat-title">Q2 turnover analysis</span><span class="chat-meta">2h</span></div>
+            <div class="chat-row"><span class="chat-title">Onboarding checklist refresh</span><span class="chat-meta">yesterday</span></div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Black Mesa
+            </div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Tyrell Corp
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <strong>Pros:</strong> no cramped row — "Chats" owns the top line, toggle owns the second. Full-width gives equal gravity to both modes and a generous hit target. Reads as a deliberate header block, not a label fighting a toggle.
+        <strong>Cons:</strong> takes two rows of vertical space instead of one. The segmented fill ("bubble" on active) is still the most chrome-heavy element in an otherwise flat sidebar — may want to tone the shadow down, or swap to a simple underline bar if it competes too loudly with the tree below.
+      </div>
+    </section>
+
+    <!-- ============ OPTION 5B ============ -->
+    <section class="card">
+      <div class="card-head">
+        <p class="card-title">5b · No header, self-describing toggle</p>
+        <p class="card-desc">Drop "Chats" entirely. The toggle describes itself: "Chats by client" / "Recent chats". Redundant on "chats," but each side reads cleanly on its own.</p>
+      </div>
+      <div class="sidebar-wrap">
+        <div class="sidebar">
+          <div class="brand-row">
+            <span class="brand">PandaCommand</span>
+            <button class="brand-collapse" aria-label="collapse">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l-4 4 4 4M14 4v8"/></svg>
+            </button>
+          </div>
+          <div class="top-nav">
+            <div class="nav-row active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+              Dashboard
+            </div>
+          </div>
+          <div class="divider"></div>
+
+          <div class="v5-header" style="padding-top:8px;">
+            <div class="v5-segmented">
+              <button class="active">Chats by client</button>
+              <button>Recent chats</button>
+            </div>
+          </div>
+          <div class="tree">
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+              Aperture Science
+              <svg class="plus" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v10M3 8h10"/></svg>
+            </div>
+            <div class="chat-row active"><span class="chat-title">Q2 turnover analysis</span><span class="chat-meta">2h</span></div>
+            <div class="chat-row"><span class="chat-title">Onboarding checklist refresh</span><span class="chat-meta">yesterday</span></div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Black Mesa
+            </div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Tyrell Corp
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <strong>Pros:</strong> single element does all the work — no header fighting a toggle. Each side is self-contained: you can read either button and know what it does.
+        <strong>Cons:</strong> "chats / chats" is the redundancy that's bugging you. Labels are longer — less air, tighter fit at this width.
+      </div>
+    </section>
+
+    <!-- ============ OPTION 5C ============ -->
+    <section class="card">
+      <div class="card-head">
+        <p class="card-title">5c · No header, short labels w/ icons</p>
+        <p class="card-desc">Same no-header approach, but lean on icons to carry the "chats" idea. Labels are shorter and more symmetric.</p>
+      </div>
+      <div class="sidebar-wrap">
+        <div class="sidebar">
+          <div class="brand-row">
+            <span class="brand">PandaCommand</span>
+            <button class="brand-collapse" aria-label="collapse">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l-4 4 4 4M14 4v8"/></svg>
+            </button>
+          </div>
+          <div class="top-nav">
+            <div class="nav-row active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+              Dashboard
+            </div>
+          </div>
+          <div class="divider"></div>
+
+          <div class="v5-header" style="padding-top:8px;">
+            <div class="v5-segmented">
+              <button class="active" style="display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" style="width:12px;height:12px;"><path d="M3 4h10M3 8h10M3 12h6"/></svg>
+                By client
+              </button>
+              <button style="display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:12px;height:12px;"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5l2 1.5"/></svg>
+                Recent
+              </button>
+            </div>
+          </div>
+          <div class="tree">
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+              Aperture Science
+              <svg class="plus" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v10M3 8h10"/></svg>
+            </div>
+            <div class="chat-row active"><span class="chat-title">Q2 turnover analysis</span><span class="chat-meta">2h</span></div>
+            <div class="chat-row"><span class="chat-title">Onboarding checklist refresh</span><span class="chat-meta">yesterday</span></div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Black Mesa
+            </div>
+            <div class="client-row">
+              <svg class="caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+              Tyrell Corp
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <strong>Pros:</strong> icons carry enough context that "Chats" as a word isn't needed. Shorter, more balanced labels. Tree icon = group, clock = recent.
+        <strong>Cons:</strong> icon choice matters a lot; if they don't read cleanly, you're back to ambiguous. Chrome count goes up (pill + icons + tree).
+      </div>
+    </section>
+
+  </div>
+</div>
+</body>
+</html>

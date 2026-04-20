@@ -478,6 +478,8 @@ export const mockChats: Chat[] = [
     updatedAt: new Date(Date.now() - 2 * 60 * 1000), // 2 min ago
     messages: payrollMessages,
     artifacts: [],
+    state: 'running',
+    stateDetail: 'pulling HRIS',
   },
   {
     id: "chat-2",
@@ -496,6 +498,8 @@ export const mockChats: Chat[] = [
     updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
     messages: taxFormsMessages,
     artifacts: [],
+    state: 'done',
+    stateDetail: 'review complete',
   },
   {
     id: "chat-4",
@@ -515,6 +519,8 @@ export const mockChats: Chat[] = [
     updatedAt: new Date(Date.now() - 30 * 60 * 1000), // 30 min ago
     messages: portalGunMessages,
     artifacts: [],
+    state: 'needs-approval',
+    stateDetail: 'approve schedule',
   },
   {
     id: "chat-6",

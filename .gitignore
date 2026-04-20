@@ -38,9 +38,13 @@ yarn-error.log*
 /check-*.png
 /hrc-review-*.png
 /*.png
+screenshots/
 
 # playwright MCP logs
 .playwright-mcp/
+
+# mockup feedback data
+/feedback/
 
 # vercel
 .vercel
