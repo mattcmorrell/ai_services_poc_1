@@ -78,9 +78,7 @@ export function ChatTree({
                 onClick={() => onToggleClient(client.id)}
                 className={cn(
                   "flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center rounded",
-                  isActiveClient
-                    ? "text-primary-foreground hover:bg-primary-foreground/20"
-                    : "text-foreground hover:bg-foreground/15"
+                  isActiveClient ? "text-primary-foreground" : "text-foreground"
                 )}
                 aria-label={expanded ? "Collapse" : "Expand"}
               >
