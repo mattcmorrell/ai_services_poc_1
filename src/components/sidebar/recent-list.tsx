@@ -37,7 +37,7 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat, onRen
   }
 
   return (
-    <div className="flex flex-col py-1 px-[22px]">
+    <div className="flex flex-col py-1 px-[14px]">
       {sorted.map((chat) => {
         const isSelected = chat.id === selectedChatId;
         const hasState = chat.state && chat.state !== 'idle';

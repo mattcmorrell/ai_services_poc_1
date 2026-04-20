@@ -153,7 +153,7 @@ export function ChatTree({
                   <span className={cn(
                     "type-chat-name leading-snug",
                     (isSelected || chat.hasUnread) && "font-semibold!",
-                    isSelected ? "text-primary-foreground" : "text-foreground"
+                    isSelected ? "text-primary-foreground" : chat.hasUnread ? "text-foreground" : "text-muted-foreground"
                   )}>
                     {chat.title}
                     <span className={cn(
