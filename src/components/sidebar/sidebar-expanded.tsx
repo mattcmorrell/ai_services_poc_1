@@ -62,21 +62,21 @@ export function SidebarExpanded({
 
       {/* Dashboard nav row */}
       {!popoverMode && (
-        <div className="flex-shrink-0 px-[22px] pt-2">
+        <div className="flex-shrink-0 px-[14px] pt-2">
           <button
             onClick={() => onViewChange("dashboard")}
             className={cn(
-              "flex w-full items-center gap-3 pt-2 pb-3 text-left",
+              "flex w-full items-center gap-3 px-2 py-2 text-left rounded-md transition-colors",
               activeView === "dashboard"
-                ? "text-primary"
-                : "text-foreground hover:text-primary"
+                ? "bg-accent text-foreground"
+                : "text-foreground hover:bg-accent"
             )}
           >
             <House
               className="h-[18px] w-[18px] flex-shrink-0"
               weight={activeView === "dashboard" ? "fill" : "light"}
             />
-            <span className="type-subhead">Dashboard</span>
+            <span className="type-chat-name">Dashboard</span>
           </button>
         </div>
       )}

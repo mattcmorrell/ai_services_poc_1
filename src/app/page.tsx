@@ -843,6 +843,7 @@ export default function Home() {
           selectedClientId={selectedClientId}
           onSelectChat={(id) => {
             setSelectedChatId(id);
+            setChats((prev) => prev.map((c) => (c.id === id ? { ...c, hasUnread: false } : c)));
             setActiveView("chats");
           }}
         />
@@ -875,7 +876,10 @@ export default function Home() {
           selectedChatId={selectedChatId}
           selectedClientId={selectedClientId}
           onViewChange={setActiveView}
-          onSelectChat={setSelectedChatId}
+          onSelectChat={(id) => {
+            setSelectedChatId(id);
+            setChats((prev) => prev.map((c) => (c.id === id ? { ...c, hasUnread: false } : c)));
+          }}
           onNewChat={handleNewChat}
           onSelectClient={(clientId) => {
             setSelectedClientId(clientId);

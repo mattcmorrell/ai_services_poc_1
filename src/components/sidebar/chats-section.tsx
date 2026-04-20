@@ -1,6 +1,6 @@
 "use client";
 
-import { ChatDots, Plus } from "@phosphor-icons/react";
+import { Plus } from "@phosphor-icons/react";
 import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { ChatTree } from "./chat-tree";
@@ -38,33 +38,31 @@ export function ChatsSection({
   return (
     <div className="flex flex-1 flex-col min-h-0">
       {/* Section header */}
-      <div className="flex items-center justify-between px-[22px] py-2 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <ChatDots className="h-[18px] w-[18px] text-foreground flex-shrink-0" />
-          <span className="type-subhead text-foreground">Chats</span>
-        </div>
-        <div className="flex gap-px overflow-hidden rounded-md border border-border">
+      <div className="flex items-center justify-between px-[22px] pt-5 pb-2 flex-shrink-0">
+        <span className="type-label text-muted-foreground">Chats</span>
+        <div className="flex gap-px overflow-hidden rounded-md">
           <button
             onClick={() => onFilterChange("by-client")}
             className={cn(
-              "px-2.5 py-1 transition-colors",
+              "px-2 py-0.5 transition-colors type-label",
               filter === "by-client"
-                ? "bg-accent text-foreground"
+                ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <span className="type-meta">By Client</span>
+            By Client
           </button>
+          <span className="type-label text-muted-foreground/40 px-0.5 py-0.5">·</span>
           <button
             onClick={() => onFilterChange("recent")}
             className={cn(
-              "px-2.5 py-1 transition-colors",
+              "px-2 py-0.5 transition-colors type-label",
               filter === "recent"
-                ? "bg-accent text-foreground"
+                ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <span className="type-meta">Recent</span>
+            Recent
           </button>
         </div>
       </div>

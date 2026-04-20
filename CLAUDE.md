@@ -14,6 +14,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **This is the #1 recurring issue. Grep your output for color declarations and font-size values before you're done. Every time.**
 
+## ⛔ No card-within-a-card selected states
+
+On a filled selected row, do NOT add `ring`, `border`, or inset `shadow` — makes it look like a floating tile. To emphasize selection, saturate the fill or bold the text. Never add chrome around the fill.
+
 ## Project Overview
 
 AI Services POC - A Next.js 16 single-page application for BambooHR consultants to manage client HR tasks through AI-powered agents. Features a chat interface with action plans (require approval), artifacts (code/tables/documents), clarifying questions, and workflow visualization.

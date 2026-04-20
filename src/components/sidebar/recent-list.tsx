@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
-import { formatTimeAgo } from "@/lib/format-time";
+import { formatTimeAgoCompact } from "@/lib/format-time";
 import { AgentStateIndicator } from "@/components/ui/agent-state-indicator";
 
 interface RecentListProps {
@@ -57,7 +57,7 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat }: Rec
             {/* Col 2: title */}
             <span className={cn(
               "col-start-2 truncate type-chat-name",
-              (chat.hasUnread || isSelected) && "font-semibold",
+              (chat.hasUnread || isSelected) && "font-semibold!",
               isSelected
                 ? "text-primary-foreground"
                 : chat.hasUnread
@@ -79,7 +79,7 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat }: Rec
               "col-start-2 type-meta truncate",
               isSelected ? "text-primary-foreground/75" : "text-muted-foreground"
             )}>
-              {chat.clientId ? clientMap.get(chat.clientId) : 'No client'} · {formatTimeAgo(chat.updatedAt)}
+              {chat.clientId ? clientMap.get(chat.clientId) : 'No client'} · {formatTimeAgoCompact(chat.updatedAt)}
             </span>
           </button>
         );

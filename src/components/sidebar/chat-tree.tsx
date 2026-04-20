@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { CaretRight, Plus } from "@phosphor-icons/react";
 import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
-import { formatTimeAgo } from "@/lib/format-time";
+import { formatTimeAgoCompact } from "@/lib/format-time";
 import { AgentStateIndicator } from "@/components/ui/agent-state-indicator";
 
 interface ChatTreeProps {
@@ -64,8 +64,10 @@ export function ChatTree({
           <div key={client.id} className="mb-4">
             {/* Client row */}
             <div className={cn(
-              "group flex items-center gap-2 py-2.5 pl-3 pr-1.5 rounded-md",
-              isActiveClient ? "bg-primary text-primary-foreground" : "hover:bg-accent"
+              "group relative flex items-center gap-2 py-2 pl-3 pr-1.5 rounded-md",
+              isActiveClient
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-accent"
             )}>
               <button
                 onClick={() => onToggleClient(client.id)}
@@ -95,7 +97,9 @@ export function ChatTree({
               {unreadCount > 0 && (
                 <span className={cn(
                   "flex h-5 min-w-5 items-center justify-center rounded-full px-1.5",
-                  isActiveClient ? "bg-primary-foreground text-primary" : "bg-primary text-primary-foreground"
+                  isActiveClient
+                    ? "bg-primary-foreground text-primary"
+                    : "bg-primary text-primary-foreground"
                 )}>
                   <span className="type-status">{unreadCount}</span>
                 </span>
@@ -113,13 +117,16 @@ export function ChatTree({
             {/* Chat rows */}
             {expanded && clientChats.map((chat) => {
               const isSelected = chat.id === selectedChatId;
+              const showState = chat.state === 'running' || chat.state === 'needs-approval';
               return (
                 <button
                   key={chat.id}
                   onClick={() => onSelectChat(chat.id)}
                   className={cn(
                     "grid w-full grid-cols-[18px_1fr] gap-x-2 gap-y-[3px] py-2 pl-3 pr-2.5 text-left rounded-md",
-                    isSelected ? "bg-primary text-primary-foreground" : "hover:bg-accent"
+                    isSelected
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-accent/60"
                   )}
                 >
                   {/* Col 1: unread dot */}
@@ -132,7 +139,7 @@ export function ChatTree({
                   {/* Col 2: title */}
                   <span className={cn(
                     "col-start-2 truncate type-chat-name",
-                    (chat.hasUnread || isSelected) && "font-semibold",
+                    (isSelected || chat.hasUnread) && "font-semibold!",
                     isSelected
                       ? "text-primary-foreground"
                       : chat.hasUnread
@@ -142,20 +149,28 @@ export function ChatTree({
                     {chat.title}
                   </span>
 
-                  {/* Col 2: state indicator — own line when present */}
-                  {chat.state && chat.state !== 'idle' && (
-                    <span className="col-start-2">
+                  {/* Col 2: state + timestamp on same line when state is present */}
+                  {showState ? (
+                    <span className={cn(
+                      "col-start-2 inline-flex items-center gap-1.5",
+                      isSelected && "[&_*]:!text-primary-foreground"
+                    )}>
                       <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
+                      <span className={cn(
+                        "type-meta",
+                        isSelected ? "text-primary-foreground/80" : "text-muted-foreground"
+                      )}>
+                        · {formatTimeAgoCompact(chat.updatedAt)}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className={cn(
+                      "col-start-2 type-meta",
+                      isSelected ? "text-primary-foreground/80" : "text-muted-foreground"
+                    )}>
+                      {formatTimeAgoCompact(chat.updatedAt)}
                     </span>
                   )}
-
-                  {/* Col 2: timestamp */}
-                  <span className={cn(
-                    "col-start-2 type-meta",
-                    isSelected ? "text-primary-foreground/75" : "text-muted-foreground"
-                  )}>
-                    {formatTimeAgo(chat.updatedAt)}
-                  </span>
                 </button>
               );
             })}
