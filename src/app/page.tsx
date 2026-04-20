@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { Sidebar } from "@/components/sidebar";
-import { ChatListPanel } from "@/components/chat-list-panel";
+import { Sidebar } from "@/components/sidebar/sidebar";
 import { ChatView } from "@/components/chat-view";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { AgentsView } from "@/components/agents/agents-view";
@@ -20,7 +19,8 @@ import { useStreamingChatSession } from "@/hooks/use-streaming-chat-session";
 
 export default function Home() {
   const [activeView, setActiveView] = useState("dashboard");
-const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
+  const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [chats, setChats] = useState<Chat[]>(mockChats);
   // Loading state is now derived from streamingSession.loadingChatId
   const [agents, setAgents] = useState<Agent[]>(mockAgents);
@@ -777,13 +777,6 @@ const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
     if (activeView === "chats") {
       return (
         <div className="flex flex-1 overflow-hidden">
-            <ChatListPanel
-              clients={mockClients}
-              chats={chats}
-              selectedChatId={selectedChatId}
-              onSelectChat={setSelectedChatId}
-              onNewChat={handleNewChat}
-            />
             {selectedChat ? (
               <ChatView
                 client={selectedClient || null}
@@ -847,13 +840,11 @@ const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
         <ClientsView
           clients={mockClients}
           chats={chats}
-          onSendMessage={handleSendMessageForChat}
-          onApprove={handleApproveForChat}
-          onDecline={handleDeclineForChat}
-          onNewChat={handleNewChat}
-          onWorkflowClick={handleWorkflowClick}
-          onArtifactClick={setSelectedArtifactId}
-          loadingChatId={streamingSession.loadingChatId}
+          selectedClientId={selectedClientId}
+          onSelectChat={(id) => {
+            setSelectedChatId(id);
+            setActiveView("chats");
+          }}
         />
       );
     }
@@ -877,8 +868,23 @@ const [selectedChatId, setSelectedChatId] = useState<string | null>("chat-1");
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar activeView={activeView} onViewChange={setActiveView} />
-      {renderMainContent()}
+      <Sidebar
+          activeView={activeView}
+          clients={mockClients}
+          chats={chats}
+          selectedChatId={selectedChatId}
+          selectedClientId={selectedClientId}
+          onViewChange={setActiveView}
+          onSelectChat={setSelectedChatId}
+          onNewChat={handleNewChat}
+          onSelectClient={(clientId) => {
+            setSelectedClientId(clientId);
+            setActiveView("clients");
+          }}
+        />
+      <div className="flex flex-1 min-w-0 overflow-hidden">
+        {renderMainContent()}
+      </div>
       <ClientSelectDialog
         open={clientSelectOpen}
         onOpenChange={setClientSelectOpen}

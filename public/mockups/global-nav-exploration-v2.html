@@ -253,6 +253,12 @@
     margin-top: 14px;
     padding-top: 16px;
   }
+  /* v7c — drop the divider between Dashboard and Chats for a quieter header stack */
+  #design-g .ed-section + .ed-section {
+    border-top: 0;
+    margin-top: 6px;
+    padding-top: 6px;
+  }
   .ed-link {
     display: block;
     font-size: 17px;
@@ -1912,9 +1918,17 @@
     color: var(--fg);
     border-color: var(--border);
   }
-  #design-g .ed-toggle-btn svg { width: 17px; height: 17px; }
+  #design-g .ed-toggle-btn svg { width: 18px; height: 18px; }
 
-  /* Rail — shared by modes A (always) and C (when collapsed) */
+  /* Rail — shared by modes A (always) and C (when collapsed).
+     Source of truth = open-sidebar Y centers, derived from header padding
+     + section padding + ed-link/heading padding. The rail mirrors those
+     gaps so every icon lines up across states.
+       toggle    ↔ header row     (center y ≈ 36px)
+       dashboard ↔ Dashboard link (center y ≈ 83px)
+       chats     ↔ Chats heading  (center y ≈ 138px)
+     Padding-top derives from: header.padding-top (20) - half the icon-box
+     overhang (4) = 16, so the 40px icon centers on the wordmark baseline. */
   #design-g .g-rail {
     width: 56px;
     background: var(--panel);
@@ -1922,11 +1936,19 @@
     display: none;
     flex-direction: column;
     align-items: center;
-    padding: 14px 0;
-    gap: 4px;
+    padding: 16px 0 14px;
+    gap: 0;
     flex-shrink: 0;
     z-index: 4;
   }
+  /* Toggle→Dashboard gap mirrors header.padding-bottom(14) + section.padding-top(4)
+     + ed-link.padding-top(8) − icon-box overhang(11+11+8) ≈ 7 */
+  #design-g .g-rail .rail-icon[data-g-rail="dashboard"] { margin-top: 7px; }
+  /* Dashboard→Chats gap mirrors ed-link.padding-bottom(14) + section.margin(6)
+     + section.padding-top(6) + heading-row.padding-top(4) − icon-box overhang ≈ 15 */
+  #design-g .g-rail .rail-icon[data-g-rail="chats"]     { margin-top: 15px; }
+  /* Divider no longer needed — alignment-driven spacing replaces it */
+  #design-g .g-rail .rail-divider { display: none; }
   #design-g .rail-icon {
     width: 40px;
     height: 40px;
@@ -1947,7 +1969,8 @@
     color: var(--primary-bright);
     background: var(--primary-soft);
   }
-  #design-g .rail-icon svg { width: 20px; height: 20px; }
+  /* Match the open-sidebar nav-icon size (18px) so icons don't jump on collapse */
+  #design-g .rail-icon svg { width: 18px; height: 18px; }
   #design-g .rail-divider {
     width: 28px;
     height: 1px;

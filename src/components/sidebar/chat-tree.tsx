@@ -1,0 +1,169 @@
+"use client";
+
+import { useMemo } from "react";
+import { CaretRight, Plus } from "@phosphor-icons/react";
+import { Chat, Client } from "@/types/chat";
+import { cn } from "@/lib/utils";
+import { formatTimeAgo } from "@/lib/format-time";
+import { AgentStateIndicator } from "./agent-state-indicator";
+
+interface ChatTreeProps {
+  chats: Chat[];
+  clients: Client[];
+  selectedChatId: string | null;
+  expandedClientIds: Set<string>;
+  activeClientId: string | null;
+  onSelectChat: (chatId: string) => void;
+  onSelectClient: (clientId: string) => void;
+  onNewChat: (clientId: string) => void;
+  onToggleClient: (clientId: string) => void;
+}
+
+export function ChatTree({
+  chats,
+  clients,
+  selectedChatId,
+  expandedClientIds,
+  activeClientId,
+  onSelectChat,
+  onSelectClient,
+  onNewChat,
+  onToggleClient,
+}: ChatTreeProps) {
+  const chatsByClient = useMemo(() => {
+    const map = new Map<string, Chat[]>();
+    clients.forEach((c) => map.set(c.id, []));
+    chats.forEach((chat) => {
+      if (chat.clientId && map.has(chat.clientId)) {
+        map.get(chat.clientId)!.push(chat);
+      }
+    });
+    map.forEach((clientChats) => {
+      clientChats.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+    });
+    return map;
+  }, [chats, clients]);
+
+  if (clients.length === 0) {
+    return (
+      <div className="px-4 py-6 text-center type-meta text-muted-foreground">
+        No clients
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col py-1 px-[22px]">
+      {clients.map((client) => {
+        const clientChats = chatsByClient.get(client.id) || [];
+        const expanded = expandedClientIds.has(client.id);
+        const isActiveClient = client.id === activeClientId;
+        const unreadCount = clientChats.filter((c) => c.hasUnread).length;
+
+        return (
+          <div key={client.id}>
+            {/* Client row */}
+            <div className={cn(
+              "group flex items-center gap-1 py-2.5 pl-1 pr-1.5 rounded-md",
+              isActiveClient ? "bg-primary text-primary-foreground" : "hover:bg-accent"
+            )}>
+              <button
+                onClick={() => onToggleClient(client.id)}
+                className={cn(
+                  "flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded",
+                  isActiveClient
+                    ? "text-primary-foreground hover:bg-primary-foreground/20"
+                    : "text-muted-foreground hover:bg-foreground/15 hover:text-foreground"
+                )}
+                aria-label={expanded ? "Collapse" : "Expand"}
+              >
+                <CaretRight
+                  className={cn("h-3.5 w-3.5", expanded && "rotate-90")}
+                />
+              </button>
+
+              <button
+                onClick={() => onSelectClient(client.id)}
+                className={cn(
+                  "flex-1 truncate text-left",
+                  isActiveClient ? "text-primary-foreground" : "text-foreground"
+                )}
+              >
+                <span className="type-client-name">{client.name}</span>
+              </button>
+
+              {unreadCount > 0 && (
+                <span className={cn(
+                  "flex h-5 min-w-5 items-center justify-center rounded-full px-1.5",
+                  isActiveClient ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary/15 text-primary"
+                )}>
+                  <span className="type-status">{unreadCount}</span>
+                </span>
+              )}
+
+              <button
+                onClick={() => onNewChat(client.id)}
+                className="ml-0.5 flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-accent hover:text-foreground"
+                title={`New chat — ${client.name}`}
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
+            {/* Chat rows */}
+            {expanded && clientChats.map((chat) => {
+              const isSelected = chat.id === selectedChatId;
+              return (
+                <button
+                  key={chat.id}
+                  onClick={() => onSelectChat(chat.id)}
+                  className={cn(
+                    "grid w-full grid-cols-[22px_1fr] gap-x-1 gap-y-[3px] py-2 pl-1 pr-2.5 text-left rounded-md",
+                    isSelected ? "bg-primary text-primary-foreground" : "hover:bg-accent"
+                  )}
+                >
+                  {/* Col 1: unread dot */}
+                  <span className="flex items-start pt-1">
+                    {chat.hasUnread && !isSelected && (
+                      <span className="h-[7px] w-[7px] rounded-full bg-primary" />
+                    )}
+                  </span>
+
+                  {/* Col 2: title */}
+                  <span className={cn(
+                    "col-start-2 truncate type-chat-name",
+                    (chat.hasUnread || isSelected) && "font-semibold",
+                    isSelected
+                      ? "text-primary-foreground"
+                      : chat.hasUnread
+                        ? "text-foreground"
+                        : "text-muted-foreground"
+                  )}>
+                    {chat.title}
+                  </span>
+
+                  {/* Col 2: metadata row */}
+                  <span className={cn(
+                    "col-start-2 flex items-center gap-1.5",
+                    isSelected ? "text-primary-foreground/75" : "text-muted-foreground"
+                  )}>
+                    <span className="type-meta">{formatTimeAgo(chat.updatedAt)}</span>
+                    {chat.state && chat.state !== 'idle' && (
+                      <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+
+            {expanded && clientChats.length === 0 && (
+              <div className="py-1.5 pl-[30px] type-meta text-muted-foreground">
+                No chats yet
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
