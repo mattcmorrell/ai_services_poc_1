@@ -146,7 +146,7 @@ export function ChatTree({
                 >
                   {/* Unread dot, positioned in the gutter */}
                   {chat.hasUnread && !isSelected && (
-                    <span className="absolute left-[11px] top-[11px] h-[7px] w-[7px] rounded-full bg-primary" />
+                    <span className="absolute left-[14px] top-[11px] h-[7px] w-[7px] rounded-full bg-primary" />
                   )}
 
                   {/* Title · timestamp inline, wraps if long */}

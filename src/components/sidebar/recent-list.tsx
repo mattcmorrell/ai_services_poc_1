@@ -46,20 +46,18 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat, onRen
           <button
             onClick={() => onSelectChat(chat.id)}
             className={cn(
-              "grid w-full grid-cols-[18px_1fr] gap-x-3 gap-y-[3px] py-2 pl-0 pr-9 text-left rounded-md",
+              "relative flex w-full flex-col gap-y-[3px] py-2 pl-8 pr-9 text-left rounded-md",
               isSelected ? "bg-primary text-primary-foreground" : "hover:bg-accent"
             )}
           >
-            {/* Col 1: unread dot */}
-            <span className="flex items-start justify-center pt-1.5">
-              {chat.hasUnread && !isSelected && (
-                <span className="h-[7px] w-[7px] rounded-full bg-primary" />
-              )}
-            </span>
+            {/* Unread dot, positioned in the gutter — matches Grouped */}
+            {chat.hasUnread && !isSelected && (
+              <span className="absolute left-[14px] top-[13px] h-[7px] w-[7px] rounded-full bg-primary" />
+            )}
 
-            {/* Col 2: title */}
+            {/* Title */}
             <span className={cn(
-              "col-start-2 truncate type-chat-name",
+              "truncate type-chat-name",
               (chat.hasUnread || isSelected) && "font-semibold!",
               isSelected
                 ? "text-primary-foreground"
@@ -70,17 +68,17 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat, onRen
               {chat.title}
             </span>
 
-            {/* Col 2: client · time */}
+            {/* Client · time */}
             <span className={cn(
-              "col-start-2 type-meta truncate",
+              "type-meta truncate",
               isSelected ? "text-primary-foreground/75" : "text-muted-foreground"
             )}>
               {chat.clientId ? clientMap.get(chat.clientId) : 'No client'} · {formatTimeAgoCompact(chat.updatedAt)}
             </span>
 
-            {/* Col 2: agent state indicator — own line when present */}
+            {/* Agent state indicator */}
             {hasState && (
-              <span className={cn("col-start-2 -mt-0.5", isSelected && "[&_*]:!text-primary-foreground")}>
+              <span className={cn("-mt-0.5", isSelected && "[&_*]:!text-primary-foreground")}>
                 <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
               </span>
             )}
