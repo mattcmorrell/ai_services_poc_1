@@ -103,11 +103,11 @@ export function ChatTree({
                 onClick={() => onNewChat(client.id)}
                 title={`New chat — ${client.name}`}
                 className={cn(
-                  "ml-0.5 flex-shrink-0 flex items-center justify-center transition-opacity",
+                  "group/nc ml-0.5 flex-shrink-0 flex items-center justify-center transition-opacity",
                   unreadCount === 0 && "opacity-0 group-hover:opacity-100"
                 )}
               >
-                {/* Count pill — hidden on hover */}
+                {/* Count pill — hidden on row hover */}
                 {unreadCount > 0 && (
                   <span className={cn(
                     "group-hover:hidden flex h-5 min-w-5 items-center justify-center rounded-full px-1.5",
@@ -116,15 +116,15 @@ export function ChatTree({
                     <span className="type-status">{unreadCount}</span>
                   </span>
                 )}
-                {/* Plus circle — shown on hover */}
+                {/* Plus circle — shown on row hover */}
                 <span className={cn(
                   "flex h-6 w-6 items-center justify-center rounded-full transition-colors",
                   unreadCount > 0 ? "hidden group-hover:flex" : "flex",
                   isActiveClient
-                    ? "bg-primary-foreground/15 text-primary-foreground hover:bg-primary-foreground/25"
-                    : "bg-sidebar-foreground/25 text-foreground hover:bg-accent"
+                    ? "bg-primary-foreground/15 text-primary-foreground group-hover/nc:bg-primary-foreground/30"
+                    : "bg-sidebar-foreground/25 text-foreground group-hover/nc:bg-primary group-hover/nc:text-white!"
                 )}>
-                  <Plus className="h-3.5 w-3.5" />
+                  <Plus weight="bold" className="h-3.5 w-3.5" />
                 </span>
               </button>
             </div>
