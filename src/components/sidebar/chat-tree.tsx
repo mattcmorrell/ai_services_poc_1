@@ -69,7 +69,7 @@ export function ChatTree({
           <div key={client.id} className="mb-4">
             {/* Client row */}
             <div className={cn(
-              "group relative flex items-center gap-3 py-2 pl-2 pr-1.5 rounded-md",
+              "group relative flex items-center gap-3 py-1 pl-2 pr-1.5 rounded-md",
               isActiveClient
                 ? "bg-primary text-primary-foreground"
                 : "hover:bg-accent"
@@ -128,7 +128,7 @@ export function ChatTree({
                 <button
                   onClick={() => onSelectChat(chat.id)}
                   className={cn(
-                    "grid w-full grid-cols-[18px_1fr] gap-x-2 gap-y-[3px] py-2 pl-5 pr-9 text-left rounded-md",
+                    "grid w-full grid-cols-[18px_1fr] gap-x-3 gap-y-[3px] py-2 pl-2 pr-9 text-left rounded-md",
                     isSelected
                       ? "bg-primary text-primary-foreground"
                       : "hover:bg-accent/60"
