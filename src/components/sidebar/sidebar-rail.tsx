@@ -46,7 +46,7 @@ export function SidebarRail({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [pickerOpen]);
 
-  const chatsActive = activeView === "chats" || popoverOpen;
+  const chatsActive = popoverOpen;
 
   return (
     <TooltipProvider delayDuration={300}>
