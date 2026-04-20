@@ -53,7 +53,7 @@ export function SidebarExpanded({
       {/* Header */}
       {!popoverMode && (
         <div className="flex flex-shrink-0 items-center justify-between pt-5 pb-3 px-[22px]">
-          <span className="type-logotype">PandaCommand</span>
+          <span className="type-logotype text-primary">PandaCommand</span>
           {onCollapse && (
             <button
               onClick={onCollapse}
