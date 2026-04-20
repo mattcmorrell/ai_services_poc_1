@@ -16,6 +16,7 @@ export interface SidebarProps {
   onViewChange: (view: string) => void;
   onSelectChat: (chatId: string) => void;
   onNewChat: (clientId: string) => void;
+  onNewChatRecent?: () => void;
   onSelectClient: (clientId: string) => void;
   onRenameChat: (chatId: string) => void;
   onDeleteChat: (chatId: string) => void;
@@ -30,6 +31,7 @@ export function Sidebar({
   onViewChange,
   onSelectChat,
   onNewChat,
+  onNewChatRecent,
   onSelectClient,
   onRenameChat,
   onDeleteChat,
@@ -113,6 +115,7 @@ export function Sidebar({
               setPopoverOpen(false);
             }}
             onNewChat={handleNewChat}
+            onNewChatRecent={onNewChatRecent}
             onToggleClient={toggleClientExpanded}
             onRenameChat={onRenameChat}
             onDeleteChat={onDeleteChat}
@@ -140,6 +143,7 @@ export function Sidebar({
         onSelectChat={handleSelectChat}
         onSelectClient={handleSelectClient}
         onNewChat={handleNewChat}
+        onNewChatRecent={onNewChatRecent}
         onToggleClient={toggleClientExpanded}
         onRenameChat={onRenameChat}
         onDeleteChat={onDeleteChat}

@@ -725,6 +725,13 @@ export default function Home() {
     const client = mockClients.find((c) => c.id === clientId);
     const agent = selectedAgentForClient;
 
+    if (!agent && client) {
+      handleNewChat(clientId);
+      setClientSelectOpen(false);
+      setActiveView("chats");
+      return;
+    }
+
     if (agent && client) {
       const newChatId = `chat-${Date.now()}`;
 
@@ -903,6 +910,7 @@ export default function Home() {
             setChats((prev) => prev.map((c) => (c.id === id ? { ...c, hasUnread: false } : c)));
           }}
           onNewChat={handleNewChat}
+          onNewChatRecent={() => { setSelectedAgentForClient(null); setClientSelectOpen(true); }}
           onSelectClient={(clientId) => {
             setSelectedClientId(clientId);
             setActiveView("clients");

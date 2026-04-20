@@ -80,7 +80,7 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat, onRen
 
             {/* Col 2: agent state indicator — own line when present */}
             {hasState && (
-              <span className="col-start-2 -mt-0.5">
+              <span className={cn("col-start-2 -mt-0.5", isSelected && "[&_*]:!text-primary-foreground")}>
                 <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
               </span>
             )}
