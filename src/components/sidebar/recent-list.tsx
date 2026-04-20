@@ -43,7 +43,7 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat }: Rec
             key={chat.id}
             onClick={() => onSelectChat(chat.id)}
             className={cn(
-              "grid w-full grid-cols-[18px_1fr] gap-x-3 gap-y-[3px] py-2 pr-2.5 text-left rounded-md",
+              "grid w-full grid-cols-[18px_1fr] gap-x-2 gap-y-[3px] py-2 pl-3 pr-2.5 text-left rounded-md",
               isSelected ? "bg-primary text-primary-foreground" : "hover:bg-accent"
             )}
           >

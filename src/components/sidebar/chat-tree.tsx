@@ -61,10 +61,10 @@ export function ChatTree({
         const unreadCount = clientChats.filter((c) => c.hasUnread).length;
 
         return (
-          <div key={client.id}>
+          <div key={client.id} className="mb-4">
             {/* Client row */}
             <div className={cn(
-              "group flex items-center gap-3 py-2.5 pr-1.5 rounded-md",
+              "group flex items-center gap-2 py-2.5 pl-3 pr-1.5 rounded-md",
               isActiveClient ? "bg-primary text-primary-foreground" : "hover:bg-accent"
             )}>
               <button
@@ -95,7 +95,7 @@ export function ChatTree({
               {unreadCount > 0 && (
                 <span className={cn(
                   "flex h-5 min-w-5 items-center justify-center rounded-full px-1.5",
-                  isActiveClient ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary/15 text-primary"
+                  isActiveClient ? "bg-primary-foreground text-primary" : "bg-primary text-primary-foreground"
                 )}>
                   <span className="type-status">{unreadCount}</span>
                 </span>
@@ -118,7 +118,7 @@ export function ChatTree({
                   key={chat.id}
                   onClick={() => onSelectChat(chat.id)}
                   className={cn(
-                    "grid w-full grid-cols-[18px_1fr] gap-x-3 gap-y-[3px] py-2 pr-2.5 text-left rounded-md",
+                    "grid w-full grid-cols-[18px_1fr] gap-x-2 gap-y-[3px] py-2 pl-3 pr-2.5 text-left rounded-md",
                     isSelected ? "bg-primary text-primary-foreground" : "hover:bg-accent"
                   )}
                 >
@@ -157,7 +157,7 @@ export function ChatTree({
             })}
 
             {expanded && clientChats.length === 0 && (
-              <div className="py-1.5 pl-[30px] type-meta text-muted-foreground">
+              <div className="py-1.5 pl-[38px] type-meta text-muted-foreground">
                 No chats yet
               </div>
             )}
