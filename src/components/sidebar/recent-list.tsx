@@ -67,6 +67,13 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat }: Rec
               {chat.title}
             </span>
 
+            {/* Col 2: agent state indicator — own line when present */}
+            {hasState && (
+              <span className="col-start-2">
+                <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
+              </span>
+            )}
+
             {/* Col 2: client · time */}
             <span className={cn(
               "col-start-2 type-meta truncate",
@@ -74,13 +81,6 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat }: Rec
             )}>
               {chat.clientId ? clientMap.get(chat.clientId) : 'No client'} · {formatTimeAgo(chat.updatedAt)}
             </span>
-
-            {/* Col 2: agent state indicator (row 3, conditional) */}
-            {hasState && (
-              <span className="col-start-2">
-                <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
-              </span>
-            )}
           </button>
         );
       })}

@@ -142,15 +142,19 @@ export function ChatTree({
                     {chat.title}
                   </span>
 
-                  {/* Col 2: metadata row */}
+                  {/* Col 2: state indicator — own line when present */}
+                  {chat.state && chat.state !== 'idle' && (
+                    <span className="col-start-2">
+                      <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
+                    </span>
+                  )}
+
+                  {/* Col 2: timestamp */}
                   <span className={cn(
-                    "col-start-2 flex items-center gap-1.5",
+                    "col-start-2 type-meta",
                     isSelected ? "text-primary-foreground/75" : "text-muted-foreground"
                   )}>
-                    <span className="type-meta">{formatTimeAgo(chat.updatedAt)}</span>
-                    {chat.state && chat.state !== 'idle' && (
-                      <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
-                    )}
+                    {formatTimeAgo(chat.updatedAt)}
                   </span>
                 </button>
               );
