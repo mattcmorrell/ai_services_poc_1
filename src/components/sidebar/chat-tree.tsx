@@ -58,7 +58,7 @@ export function ChatTree({
   }
 
   return (
-    <div className="flex flex-col py-1 px-[22px]">
+    <div className="flex flex-col py-1 px-[14px]">
       {clients.map((client) => {
         const clientChats = chatsByClient.get(client.id) || [];
         const expanded = expandedClientIds.has(client.id);
@@ -69,7 +69,7 @@ export function ChatTree({
           <div key={client.id} className="mb-4">
             {/* Client row */}
             <div className={cn(
-              "group relative flex items-center gap-2 py-2 pl-3 pr-1.5 rounded-md",
+              "group relative flex items-center gap-3 py-2 pl-2 pr-1.5 rounded-md",
               isActiveClient
                 ? "bg-primary text-primary-foreground"
                 : "hover:bg-accent"
@@ -128,7 +128,7 @@ export function ChatTree({
                 <button
                   onClick={() => onSelectChat(chat.id)}
                   className={cn(
-                    "grid w-full grid-cols-[18px_1fr] gap-x-2 gap-y-[3px] py-2 pl-3 pr-9 text-left rounded-md",
+                    "grid w-full grid-cols-[18px_1fr] gap-x-2 gap-y-[3px] py-2 pl-5 pr-9 text-left rounded-md",
                     isSelected
                       ? "bg-primary text-primary-foreground"
                       : "hover:bg-accent/60"
@@ -190,7 +190,7 @@ export function ChatTree({
             })}
 
             {expanded && clientChats.length === 0 && (
-              <div className="py-1.5 pl-[38px] type-meta text-muted-foreground">
+              <div className="py-1.5 pl-[46px] type-meta text-muted-foreground">
                 No chats yet
               </div>
             )}
