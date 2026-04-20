@@ -99,23 +99,33 @@ export function ChatTree({
                 <span className="type-client-name">{client.name}</span>
               </button>
 
-              {unreadCount > 0 && (
-                <span className={cn(
-                  "flex h-5 min-w-5 items-center justify-center rounded-full px-1.5",
-                  isActiveClient
-                    ? "bg-primary-foreground text-primary"
-                    : "bg-primary text-primary-foreground"
-                )}>
-                  <span className="type-status">{unreadCount}</span>
-                </span>
-              )}
-
               <button
                 onClick={() => onNewChat(client.id)}
-                className="ml-0.5 flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-accent hover:text-foreground"
                 title={`New chat — ${client.name}`}
+                className={cn(
+                  "ml-0.5 flex-shrink-0 flex items-center justify-center transition-opacity",
+                  unreadCount === 0 && "opacity-0 group-hover:opacity-100"
+                )}
               >
-                <Plus className="h-3.5 w-3.5" />
+                {/* Count pill — hidden on hover */}
+                {unreadCount > 0 && (
+                  <span className={cn(
+                    "group-hover:hidden flex h-5 min-w-5 items-center justify-center rounded-full px-1.5",
+                    isActiveClient ? "bg-primary-foreground text-primary" : "bg-primary text-primary-foreground"
+                  )}>
+                    <span className="type-status">{unreadCount}</span>
+                  </span>
+                )}
+                {/* Plus circle — shown on hover */}
+                <span className={cn(
+                  "flex h-6 w-6 items-center justify-center rounded-full transition-colors",
+                  unreadCount > 0 ? "hidden group-hover:flex" : "flex",
+                  isActiveClient
+                    ? "bg-primary-foreground/15 text-primary-foreground hover:bg-primary-foreground/25"
+                    : "bg-sidebar-foreground/25 text-foreground hover:bg-accent"
+                )}>
+                  <Plus className="h-3.5 w-3.5" />
+                </span>
               </button>
             </div>
 

@@ -79,6 +79,14 @@ export function Sidebar({
     setPopoverOpen((open) => !open);
   };
 
+  const handleNewChat = (clientId: string) => {
+    if (!expandedClientIds.has(clientId)) {
+      toggleClientExpanded(clientId);
+    }
+    onNewChat(clientId);
+    onViewChange("chats");
+  };
+
   if (collapsed) {
     return (
       <div className="relative flex-shrink-0">
@@ -104,10 +112,7 @@ export function Sidebar({
               handleSelectClient(id);
               setPopoverOpen(false);
             }}
-            onNewChat={(clientId) => {
-              onNewChat(clientId);
-              onViewChange("chats");
-            }}
+            onNewChat={handleNewChat}
             onToggleClient={toggleClientExpanded}
             onRenameChat={onRenameChat}
             onDeleteChat={onDeleteChat}
@@ -134,7 +139,7 @@ export function Sidebar({
         onFilterChange={setFilter}
         onSelectChat={handleSelectChat}
         onSelectClient={handleSelectClient}
-        onNewChat={onNewChat}
+        onNewChat={handleNewChat}
         onToggleClient={toggleClientExpanded}
         onRenameChat={onRenameChat}
         onDeleteChat={onDeleteChat}
