@@ -633,6 +633,28 @@ export default function Home() {
     []
   );
 
+  const handleRenameChat = useCallback((chatId: string) => {
+    setChats((prev) => {
+      const chat = prev.find((c) => c.id === chatId);
+      if (!chat) return prev;
+      const next = window.prompt("Rename chat", chat.title);
+      if (next === null) return prev;
+      const trimmed = next.trim();
+      if (!trimmed) return prev;
+      return prev.map((c) => (c.id === chatId ? { ...c, title: trimmed } : c));
+    });
+  }, []);
+
+  const handleDeleteChat = useCallback((chatId: string) => {
+    setChats((prev) => {
+      const chat = prev.find((c) => c.id === chatId);
+      if (!chat) return prev;
+      if (!window.confirm(`Delete "${chat.title}"? This can't be undone.`)) return prev;
+      return prev.filter((c) => c.id !== chatId);
+    });
+    setSelectedChatId((current) => (current === chatId ? null : current));
+  }, []);
+
   const handleAgentClick = (agentId: string) => {
     const agentClientMap: Record<string, string> = {
       "agent-1": "4",
@@ -885,6 +907,8 @@ export default function Home() {
             setSelectedClientId(clientId);
             setActiveView("clients");
           }}
+          onRenameChat={handleRenameChat}
+          onDeleteChat={handleDeleteChat}
         />
       <div className="flex flex-1 min-w-0 overflow-hidden">
         {renderMainContent()}

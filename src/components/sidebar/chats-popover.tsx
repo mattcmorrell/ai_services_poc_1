@@ -18,6 +18,8 @@ interface ChatsPopoverProps {
   onSelectClient: (id: string) => void;
   onNewChat: (clientId: string) => void;
   onToggleClient: (id: string) => void;
+  onRenameChat: (chatId: string) => void;
+  onDeleteChat: (chatId: string) => void;
   onClose: () => void;
   onViewChange: (view: string) => void;
 }
@@ -35,6 +37,8 @@ export function ChatsPopover({
   onSelectClient,
   onNewChat,
   onToggleClient,
+  onRenameChat,
+  onDeleteChat,
   onClose,
   onViewChange,
 }: ChatsPopoverProps) {
@@ -101,6 +105,8 @@ export function ChatsPopover({
         onSelectClient={handleSelectClient}
         onNewChat={handleNewChat}
         onToggleClient={onToggleClient}
+        onRenameChat={onRenameChat}
+        onDeleteChat={onDeleteChat}
       />
     </div>
   );

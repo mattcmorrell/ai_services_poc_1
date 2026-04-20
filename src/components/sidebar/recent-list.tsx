@@ -5,15 +5,18 @@ import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { formatTimeAgoCompact } from "@/lib/format-time";
 import { AgentStateIndicator } from "@/components/ui/agent-state-indicator";
+import { ChatRowMenu } from "./chat-row-menu";
 
 interface RecentListProps {
   chats: Chat[];
   clients: Client[];
   selectedChatId: string | null;
   onSelectChat: (chatId: string) => void;
+  onRenameChat: (chatId: string) => void;
+  onDeleteChat: (chatId: string) => void;
 }
 
-export function RecentList({ chats, clients, selectedChatId, onSelectChat }: RecentListProps) {
+export function RecentList({ chats, clients, selectedChatId, onSelectChat, onRenameChat, onDeleteChat }: RecentListProps) {
   const clientMap = useMemo(() => {
     const m = new Map<string, string>();
     clients.forEach((c) => m.set(c.id, c.name));
@@ -39,11 +42,11 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat }: Rec
         const isSelected = chat.id === selectedChatId;
         const hasState = chat.state && chat.state !== 'idle';
         return (
+          <div key={chat.id} className="group relative">
           <button
-            key={chat.id}
             onClick={() => onSelectChat(chat.id)}
             className={cn(
-              "grid w-full grid-cols-[18px_1fr] gap-x-2 gap-y-[3px] py-2 pl-3 pr-2.5 text-left rounded-md",
+              "grid w-full grid-cols-[18px_1fr] gap-x-2 gap-y-[3px] py-2 pl-3 pr-9 text-left rounded-md",
               isSelected ? "bg-primary text-primary-foreground" : "hover:bg-accent"
             )}
           >
@@ -82,6 +85,15 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat }: Rec
               {chat.clientId ? clientMap.get(chat.clientId) : 'No client'} · {formatTimeAgoCompact(chat.updatedAt)}
             </span>
           </button>
+          <div className="absolute right-1.5 top-1.5">
+            <ChatRowMenu
+              chatId={chat.id}
+              onRename={onRenameChat}
+              onDelete={onDeleteChat}
+              isSelected={isSelected}
+            />
+          </div>
+          </div>
         );
       })}
     </div>

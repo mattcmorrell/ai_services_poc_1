@@ -6,6 +6,7 @@ import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { formatTimeAgoCompact } from "@/lib/format-time";
 import { AgentStateIndicator } from "@/components/ui/agent-state-indicator";
+import { ChatRowMenu } from "./chat-row-menu";
 
 interface ChatTreeProps {
   chats: Chat[];
@@ -17,6 +18,8 @@ interface ChatTreeProps {
   onSelectClient: (clientId: string) => void;
   onNewChat: (clientId: string) => void;
   onToggleClient: (clientId: string) => void;
+  onRenameChat: (chatId: string) => void;
+  onDeleteChat: (chatId: string) => void;
 }
 
 export function ChatTree({
@@ -29,6 +32,8 @@ export function ChatTree({
   onSelectClient,
   onNewChat,
   onToggleClient,
+  onRenameChat,
+  onDeleteChat,
 }: ChatTreeProps) {
   const chatsByClient = useMemo(() => {
     const map = new Map<string, Chat[]>();
@@ -75,12 +80,12 @@ export function ChatTree({
                   "flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center rounded",
                   isActiveClient
                     ? "text-primary-foreground hover:bg-primary-foreground/20"
-                    : "text-muted-foreground hover:bg-foreground/15 hover:text-foreground"
+                    : "text-foreground hover:bg-foreground/15"
                 )}
                 aria-label={expanded ? "Collapse" : "Expand"}
               >
                 <CaretRight
-                  className={cn("h-3.5 w-3.5", expanded && "rotate-90")}
+                  className={cn("h-4 w-4", expanded && "rotate-90")}
                 />
               </button>
 
@@ -119,11 +124,11 @@ export function ChatTree({
               const isSelected = chat.id === selectedChatId;
               const showState = chat.state === 'running' || chat.state === 'needs-approval';
               return (
+                <div key={chat.id} className="group relative">
                 <button
-                  key={chat.id}
                   onClick={() => onSelectChat(chat.id)}
                   className={cn(
-                    "grid w-full grid-cols-[18px_1fr] gap-x-2 gap-y-[3px] py-2 pl-3 pr-2.5 text-left rounded-md",
+                    "grid w-full grid-cols-[18px_1fr] gap-x-2 gap-y-[3px] py-2 pl-3 pr-9 text-left rounded-md",
                     isSelected
                       ? "bg-primary text-primary-foreground"
                       : "hover:bg-accent/60"
@@ -172,6 +177,15 @@ export function ChatTree({
                     </span>
                   )}
                 </button>
+                <div className="absolute right-1.5 top-1.5">
+                  <ChatRowMenu
+                    chatId={chat.id}
+                    onRename={onRenameChat}
+                    onDelete={onDeleteChat}
+                    isSelected={isSelected}
+                  />
+                </div>
+                </div>
               );
             })}
 

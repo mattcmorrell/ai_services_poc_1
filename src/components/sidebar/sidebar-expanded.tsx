@@ -23,6 +23,8 @@ interface SidebarExpandedProps {
   onSelectClient: (id: string) => void;
   onNewChat: (clientId: string) => void;
   onToggleClient: (id: string) => void;
+  onRenameChat: (chatId: string) => void;
+  onDeleteChat: (chatId: string) => void;
 }
 
 export function SidebarExpanded({
@@ -41,6 +43,8 @@ export function SidebarExpanded({
   onSelectClient,
   onNewChat,
   onToggleClient,
+  onRenameChat,
+  onDeleteChat,
 }: SidebarExpandedProps) {
   return (
     <div className="flex h-full w-80 flex-col bg-sidebar text-sidebar-foreground overflow-hidden border-r border-sidebar-border">
@@ -98,6 +102,8 @@ export function SidebarExpanded({
           onSelectClient={onSelectClient}
           onNewChat={onNewChat}
           onToggleClient={onToggleClient}
+          onRenameChat={onRenameChat}
+          onDeleteChat={onDeleteChat}
         />
       </div>
 

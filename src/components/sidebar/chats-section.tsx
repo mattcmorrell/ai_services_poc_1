@@ -20,6 +20,8 @@ interface ChatsSectionProps {
   onSelectClient: (id: string) => void;
   onNewChat: (clientId: string) => void;
   onToggleClient: (id: string) => void;
+  onRenameChat: (chatId: string) => void;
+  onDeleteChat: (chatId: string) => void;
 }
 
 export function ChatsSection({
@@ -34,6 +36,8 @@ export function ChatsSection({
   onSelectClient,
   onNewChat,
   onToggleClient,
+  onRenameChat,
+  onDeleteChat,
 }: ChatsSectionProps) {
   return (
     <div className="flex flex-1 flex-col min-h-0">
@@ -89,6 +93,8 @@ export function ChatsSection({
             onSelectClient={onSelectClient}
             onNewChat={onNewChat}
             onToggleClient={onToggleClient}
+            onRenameChat={onRenameChat}
+            onDeleteChat={onDeleteChat}
           />
         ) : (
           <RecentList
@@ -96,6 +102,8 @@ export function ChatsSection({
             clients={clients}
             selectedChatId={selectedChatId}
             onSelectChat={onSelectChat}
+            onRenameChat={onRenameChat}
+            onDeleteChat={onDeleteChat}
           />
         )}
       </ScrollArea>

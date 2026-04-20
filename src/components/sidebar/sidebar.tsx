@@ -17,6 +17,8 @@ export interface SidebarProps {
   onSelectChat: (chatId: string) => void;
   onNewChat: (clientId: string) => void;
   onSelectClient: (clientId: string) => void;
+  onRenameChat: (chatId: string) => void;
+  onDeleteChat: (chatId: string) => void;
 }
 
 export function Sidebar({
@@ -29,6 +31,8 @@ export function Sidebar({
   onSelectChat,
   onNewChat,
   onSelectClient,
+  onRenameChat,
+  onDeleteChat,
 }: SidebarProps) {
   const {
     collapsed,
@@ -105,6 +109,8 @@ export function Sidebar({
               onViewChange("chats");
             }}
             onToggleClient={toggleClientExpanded}
+            onRenameChat={onRenameChat}
+            onDeleteChat={onDeleteChat}
             onClose={() => setPopoverOpen(false)}
             onViewChange={handleViewChange}
           />
@@ -130,6 +136,8 @@ export function Sidebar({
         onSelectClient={handleSelectClient}
         onNewChat={onNewChat}
         onToggleClient={toggleClientExpanded}
+        onRenameChat={onRenameChat}
+        onDeleteChat={onDeleteChat}
       />
     </div>
   );
