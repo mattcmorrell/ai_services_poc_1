@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
+import { CircleNotch } from "@phosphor-icons/react";
 import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { formatTimeAgoCompact } from "@/lib/format-time";
-import { AgentStateIndicator } from "@/components/ui/agent-state-indicator";
 import { ChatRowMenu } from "./chat-row-menu";
 
 interface RecentListProps {
@@ -37,7 +37,7 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat, onRen
   }
 
   return (
-    <div className="flex flex-col py-1 px-[14px]">
+    <div className="flex flex-col gap-y-2 py-1 px-[14px]">
       {sorted.map((chat) => {
         const isSelected = chat.id === selectedChatId;
         const hasState = chat.state && chat.state !== 'idle';
@@ -46,7 +46,7 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat, onRen
           <button
             onClick={() => onSelectChat(chat.id)}
             className={cn(
-              "relative flex w-full flex-col gap-y-[3px] py-2 pl-8 pr-9 text-left rounded-md",
+              "relative flex w-full flex-col gap-y-[2px] py-2 pl-8 pr-9 text-left rounded-md",
               isSelected ? "bg-primary text-primary-foreground" : "hover:bg-accent"
             )}
           >
@@ -76,9 +76,28 @@ export function RecentList({ chats, clients, selectedChatId, onSelectChat, onRen
               {chat.clientId ? clientMap.get(chat.clientId) : 'No client'} · {formatTimeAgoCompact(chat.updatedAt)}
             </span>
 
-            {/* Agent state indicator */}
+            {/* Agent state — inline text, not pill */}
             {hasState && (
-              <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
+              <span className={cn(
+                "inline-flex items-center gap-1 type-meta font-semibold",
+                isSelected
+                  ? "text-primary-foreground"
+                  : chat.state === 'running'
+                    ? "text-[var(--color-info)]"
+                    : "text-[var(--color-warning)]"
+              )}>
+                {chat.state === 'running' && (
+                  <CircleNotch weight="bold" className="h-[11px] w-[11px] flex-shrink-0 animate-spin" />
+                )}
+                {chat.state === 'running'
+                  ? (chat.stateDetail ? `Running · ${chat.stateDetail.charAt(0).toUpperCase() + chat.stateDetail.slice(1)}` : 'Running')
+                  : chat.state === 'needs-approval'
+                    ? (chat.stateDetail ? chat.stateDetail.charAt(0).toUpperCase() + chat.stateDetail.slice(1) : 'Needs approval')
+                    : chat.state === 'done'
+                      ? 'Done'
+                      : null
+                }
+              </span>
             )}
           </button>
           <div className="absolute right-1.5 top-1.5">
