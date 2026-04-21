@@ -96,7 +96,7 @@ export function ChatTree({
                   isActiveClient ? "text-primary-foreground" : "text-foreground"
                 )}
               >
-                <span className="type-client-name">{client.name}</span>
+                <span className="type-client-name font-semibold">{client.name}</span>
               </button>
 
               <button
@@ -149,25 +149,26 @@ export function ChatTree({
                     <span className="absolute left-[14px] top-[11px] h-[7px] w-[7px] rounded-full bg-primary" />
                   )}
 
-                  {/* Title · timestamp inline, wraps if long */}
+                  {/* Title */}
                   <span className={cn(
                     "type-chat-name leading-snug",
                     (isSelected || chat.hasUnread) && "font-semibold!",
                     isSelected ? "text-primary-foreground" : chat.hasUnread ? "text-foreground" : "text-muted-foreground"
                   )}>
                     {chat.title}
-                    <span className={cn(
-                      "font-normal type-meta",
-                      isSelected ? "text-primary-foreground/50" : "text-muted-foreground/60"
-                    )}>
-                      {"\u00A0\u00A0·\u00A0"}{formatTimeAgoCompact(chat.updatedAt)}
-                    </span>
                   </span>
-
                   {/* State indicator (only when active) */}
                   {showState && (
                     <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
                   )}
+
+                  {/* Timestamp on its own line */}
+                  <span className={cn(
+                    "font-normal type-meta",
+                    isSelected ? "text-primary-foreground/50" : "text-muted-foreground/60"
+                  )}>
+                    {formatTimeAgoCompact(chat.updatedAt)}
+                  </span>
                 </button>
                 <div className="absolute right-1.5 top-1">
                   <ChatRowMenu
