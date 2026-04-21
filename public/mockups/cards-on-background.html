@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Cards on Background — Layout Exploration</title>
+<style>
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #1A2830;
+    background: #F4F6F8;
+  }
+
+  /* ---------- tab switcher ---------- */
+  .tabs {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #FFFFFF;
+    border-bottom: 1px solid rgba(26,40,48,0.08);
+    padding: 10px 20px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .tabs .label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5A7080;
+    margin-right: 10px;
+  }
+  .tab {
+    appearance: none;
+    border: 1px solid rgba(26,40,48,0.12);
+    background: #F4F6F8;
+    color: #1A2830;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tab:hover { background: #E8ECF0; }
+  .tab .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(26,40,48,0.08);
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .tab.active {
+    background: #1A2830;
+    border-color: #1A2830;
+    color: #FFFFFF;
+  }
+  .tab.active .num {
+    background: rgba(255,255,255,0.18);
+    color: #FFFFFF;
+  }
+  .tab-tip {
+    margin-left: auto;
+    font-size: 12px;
+    color: #5A7080;
+  }
+
+  /* ---------- design panels ---------- */
+  .design-panel { display: none; }
+  .design-panel.active { display: block; }
+
+  /* ================================================================
+     ORBITAL LIGHT — cards-on-background
+     bg:    #DAE2E9 (pushed slightly darker/cooler)
+     card:  #ECEFF3 (sidebar, plan)
+     chat:  transparent (on bg)
+     msg:   #FFFFFF (content cards inside chat)
+     ================================================================ */
+  .variant-light {
+    background: #DAE2E9;
+    min-height: calc(100vh - 44px);
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 248px 1fr 320px;
+    gap: 14px;
+    padding: 14px;
+    min-height: calc(100vh - 44px);
+  }
+
+  /* sidebar card */
+  .side {
+    background: #ECEFF3;
+    border-radius: 14px;
+    padding: 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border: 1px solid rgba(26,40,48,0.04);
+  }
+  .brand {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    padding: 6px 10px 14px;
+    color: #1A2830;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #2A3A44;
+    cursor: pointer;
+  }
+  .nav-item:hover { background: rgba(26,40,48,0.05); }
+  .nav-item.active {
+    background: #3A6782;
+    color: #FFFFFF;
+    font-weight: 600;
+  }
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #5A7080;
+    flex: none;
+  }
+  .nav-item.active .nav-dot { background: #FFFFFF; }
+  .nav-sec {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6A8090;
+    padding: 14px 10px 6px;
+    margin-top: 8px;
+  }
+  .nav-meta {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    color: #5A7080;
+  }
+  .nav-item.active .nav-meta { color: rgba(255,255,255,0.85); }
+
+  /* plan card */
+  .plan {
+    background: #ECEFF3;
+    border-radius: 14px;
+    padding: 18px 16px;
+    border: 1px solid rgba(26,40,48,0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .plan-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .plan-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+  }
+  .plan-status {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #3A6782;
+  }
+  .plan-bar {
+    height: 6px;
+    background: rgba(26,40,48,0.08);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .plan-bar > span {
+    display: block;
+    height: 100%;
+    width: 38%;
+    background: #3A6782;
+    border-radius: 999px;
+  }
+  .plan-meta {
+    font-size: 12px;
+    color: #5A7080;
+  }
+  .plan-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #FFFFFF;
+    border: 1px solid rgba(26,40,48,0.05);
+  }
+  .plan-step .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #BFCAD2;
+    margin-top: 2px;
+    flex: none;
+  }
+  .plan-step.done .dot {
+    background: #3A6782;
+    border-color: #3A6782;
+  }
+  .plan-step.active .dot {
+    border-color: #3A6782;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(58,103,130,0.18);
+  }
+  .plan-step .step-title {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .plan-step .step-sub {
+    font-size: 12px;
+    color: #5A7080;
+    margin-top: 2px;
+  }
+
+  /* chat — edgeless, lives on background */
+  .chat {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .chat-head {
+    padding: 14px 8px 18px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .chat-head h1 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .chat-head .sub {
+    font-size: 12px;
+    color: #5A7080;
+    margin-top: 2px;
+  }
+  .chat-head .meta {
+    font-size: 12px;
+    color: #5A7080;
+  }
+  .chat-scroll {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 4px 8px 24px;
+  }
+
+  .msg-row { display: flex; gap: 10px; }
+  .msg-row.user { justify-content: flex-end; }
+  .avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #3A6782;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .avatar.user { background: #1A2830; }
+
+  .bubble {
+    background: #FFFFFF;
+    border: 1px solid rgba(26,40,48,0.05);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #2A3A44;
+    max-width: 640px;
+  }
+  .bubble.user {
+    background: #2A3A44;
+    color: #FFFFFF;
+    border-color: transparent;
+  }
+  .bubble p { margin: 0 0 8px; }
+  .bubble p:last-child { margin-bottom: 0; }
+
+  /* action plan card inside chat */
+  .ap {
+    background: #FFFFFF;
+    border: 1px solid rgba(26,40,48,0.05);
+    border-radius: 12px;
+    padding: 16px;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .ap-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .ap-title {
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .ap-chip {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #B8751A;
+    background: #FBEFD9;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .ap-desc {
+    font-size: 12.5px;
+    color: #5A7080;
+    line-height: 1.55;
+  }
+  .ap-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid rgba(26,40,48,0.06);
+    padding-top: 10px;
+  }
+  .ap-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+  }
+  .ap-step .ix {
+    width: 18px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #6A8090;
+    text-align: center;
+    padding-top: 1px;
+  }
+  .ap-step .t {
+    font-size: 13px;
+    color: #2A3A44;
+  }
+  .ap-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(26,40,48,0.06);
+  }
+  .btn {
+    appearance: none;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn.primary {
+    background: #3A6782;
+    color: #FFFFFF;
+  }
+  .btn.ghost {
+    background: transparent;
+    color: #3A6782;
+  }
+  .btn.ghost:hover { background: rgba(58,103,130,0.08); }
+
+  /* artifact row */
+  .artifact {
+    background: #FFFFFF;
+    border: 1px solid rgba(26,40,48,0.05);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 420px;
+  }
+  .artifact .ic {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    background: rgba(58,103,130,0.12);
+    color: #3A6782;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .artifact .a-title {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .artifact .a-sub {
+    font-size: 11.5px;
+    color: #5A7080;
+  }
+
+  /* input */
+  .composer {
+    margin-top: auto;
+    padding: 12px 8px 4px;
+  }
+  .composer-box {
+    background: #FFFFFF;
+    border: 1px solid rgba(26,40,48,0.08);
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 2px rgba(26,40,48,0.04);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .composer-input {
+    flex: 1;
+    font-size: 13px;
+    color: #5A7080;
+  }
+  .composer .send {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: #3A6782;
+    color: #FFFFFF;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  /* ================================================================
+     ORBITAL DARK
+     ================================================================ */
+  .variant-dark {
+    background: #10161C;
+    color: #E8EFF4;
+    min-height: calc(100vh - 44px);
+  }
+  .variant-dark .side,
+  .variant-dark .plan {
+    background: #1A2128;
+    border-color: rgba(232,239,244,0.06);
+  }
+  .variant-dark .brand { color: #E8EFF4; }
+  .variant-dark .nav-item { color: #BCC8D0; }
+  .variant-dark .nav-item:hover { background: rgba(232,239,244,0.04); }
+  .variant-dark .nav-item.active { background: #3A6782; color: #FFFFFF; }
+  .variant-dark .nav-sec { color: #7A8C98; }
+  .variant-dark .plan-title { color: #E8EFF4; }
+  .variant-dark .plan-status { color: #6FA8CA; }
+  .variant-dark .plan-bar { background: rgba(232,239,244,0.08); }
+  .variant-dark .plan-bar > span { background: #6FA8CA; }
+  .variant-dark .plan-meta { color: #9BADB8; }
+  .variant-dark .plan-step {
+    background: #242C34;
+    border-color: rgba(232,239,244,0.05);
+  }
+  .variant-dark .plan-step .dot { border-color: #4A5864; }
+  .variant-dark .plan-step.done .dot { background: #6FA8CA; border-color: #6FA8CA; }
+  .variant-dark .plan-step.active .dot {
+    border-color: #6FA8CA;
+    background: #1A2128;
+    box-shadow: 0 0 0 3px rgba(111,168,202,0.22);
+  }
+  .variant-dark .plan-step .step-title { color: #E8EFF4; }
+  .variant-dark .plan-step .step-sub { color: #9BADB8; }
+  .variant-dark .chat-head h1 { color: #E8EFF4; }
+  .variant-dark .chat-head .sub,
+  .variant-dark .chat-head .meta { color: #9BADB8; }
+  .variant-dark .bubble {
+    background: #1E252C;
+    border-color: rgba(232,239,244,0.05);
+    color: #D8E0E7;
+  }
+  .variant-dark .bubble.user {
+    background: #2E5F7E;
+    color: #FFFFFF;
+  }
+  .variant-dark .ap {
+    background: #1E252C;
+    border-color: rgba(232,239,244,0.05);
+  }
+  .variant-dark .ap-title { color: #E8EFF4; }
+  .variant-dark .ap-desc { color: #9BADB8; }
+  .variant-dark .ap-step .t { color: #D8E0E7; }
+  .variant-dark .ap-step .ix { color: #7A8C98; }
+  .variant-dark .ap-chip {
+    background: rgba(204,139,40,0.18);
+    color: #E4A955;
+  }
+  .variant-dark .ap-steps,
+  .variant-dark .ap-actions { border-color: rgba(232,239,244,0.08); }
+  .variant-dark .btn.primary { background: #3A6782; color: #FFFFFF; }
+  .variant-dark .btn.ghost { color: #6FA8CA; }
+  .variant-dark .btn.ghost:hover { background: rgba(111,168,202,0.1); }
+  .variant-dark .artifact {
+    background: #1E252C;
+    border-color: rgba(232,239,244,0.05);
+  }
+  .variant-dark .artifact .ic { background: rgba(111,168,202,0.16); color: #6FA8CA; }
+  .variant-dark .artifact .a-title { color: #E8EFF4; }
+  .variant-dark .artifact .a-sub { color: #9BADB8; }
+  .variant-dark .composer-box {
+    background: #1E252C;
+    border-color: rgba(232,239,244,0.08);
+    box-shadow: none;
+  }
+  .variant-dark .composer-input { color: #9BADB8; }
+  .variant-dark .nav-dot { background: #7A8C98; }
+  .variant-dark .avatar.user { background: #0A1015; }
+
+  /* ================================================================
+     V2: CARD-ON-CARD PROBLEM DEMO
+     same layout, but with chat inside a card too for comparison
+     ================================================================ */
+  .v-compare {
+    background: #DAE2E9;
+    min-height: calc(100vh - 44px);
+  }
+  .v-compare .chat-card {
+    background: #ECEFF3;
+    border-radius: 14px;
+    padding: 18px;
+    border: 1px solid rgba(26,40,48,0.04);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .v-compare .chat-card .chat-head { padding: 4px 4px 16px; }
+
+  /* cosmetic dividers for head */
+  .h-divider {
+    height: 1px;
+    background: rgba(26,40,48,0.08);
+    margin: 4px 8px 14px;
+  }
+  .variant-dark .h-divider { background: rgba(232,239,244,0.08); }
+
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <span class="label">Cards on bg</span>
+  <button class="tab active" data-panel="p1"><span class="num">1</span>Baseline</button>
+  <button class="tab" data-panel="p2"><span class="num">2</span>With conversation</button>
+  <button class="tab" data-panel="p3"><span class="num">3</span>Action plan stress test</button>
+  <button class="tab" data-panel="p4"><span class="num">4</span>Dark mode</button>
+  <button class="tab" data-panel="p5"><span class="num">5</span>Chat-in-card (contrast)</button>
+  <span class="tab-tip" id="tip">Edgeless chat, sidebar + plan as cards</span>
+</div>
+
+<!-- ============ P1: Baseline ============ -->
+<div class="design-panel active" id="p1">
+  <div class="variant-light">
+    <div class="app">
+      <aside class="side">
+        <div class="brand">PandaCommand</div>
+        <div class="nav-item active"><span class="nav-dot"></span>Dashboard</div>
+        <div class="nav-item"><span class="nav-dot"></span>Chats <span class="nav-meta">12</span></div>
+        <div class="nav-item"><span class="nav-dot"></span>Agents</div>
+        <div class="nav-item"><span class="nav-dot"></span>Clients</div>
+        <div class="nav-sec">Recent</div>
+        <div class="nav-item"><span class="nav-dot"></span>Acme benefits audit</div>
+        <div class="nav-item"><span class="nav-dot"></span>Northwind onboarding</div>
+        <div class="nav-item"><span class="nav-dot"></span>Globex payroll Q1</div>
+      </aside>
+
+      <section class="chat">
+        <div class="chat-head">
+          <div>
+            <h1>Good morning, Matt</h1>
+            <div class="sub">3 clients need review this week</div>
+          </div>
+          <div class="meta">Apr 20, 2026</div>
+        </div>
+
+        <div class="chat-scroll">
+          <div class="msg-row">
+            <div class="avatar">PC</div>
+            <div class="bubble">
+              <p>Here's what's on deck. I've already looked at Acme's open items — the ACA filing is the one that can't wait.</p>
+              <p>Want me to start there, or would you rather sweep the full Monday queue first?</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="composer">
+          <div class="composer-box">
+            <div class="composer-input">Ask PandaCommand…</div>
+            <div class="send">↑</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="plan">
+        <div class="plan-head">
+          <div class="plan-title">Plan</div>
+          <div class="plan-status">Ready</div>
+        </div>
+        <div class="plan-bar"><span></span></div>
+        <div class="plan-meta">No active plan. Agent will draft one when you kick off.</div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- ============ P2: With conversation ============ -->
+<div class="design-panel" id="p2">
+  <div class="variant-light">
+    <div class="app">
+      <aside class="side">
+        <div class="brand">PandaCommand</div>
+        <div class="nav-item"><span class="nav-dot"></span>Dashboard</div>
+        <div class="nav-item active"><span class="nav-dot"></span>Chats <span class="nav-meta">12</span></div>
+        <div class="nav-item"><span class="nav-dot"></span>Agents</div>
+        <div class="nav-item"><span class="nav-dot"></span>Clients</div>
+        <div class="nav-sec">Recent</div>
+        <div class="nav-item"><span class="nav-dot"></span>Acme benefits audit</div>
+        <div class="nav-item"><span class="nav-dot"></span>Northwind onboarding</div>
+        <div class="nav-item"><span class="nav-dot"></span>Globex payroll Q1</div>
+      </aside>
+
+      <section class="chat">
+        <div class="chat-head">
+          <div>
+            <h1>Acme benefits audit</h1>
+            <div class="sub">Benefits Architect · started 9:42 AM</div>
+          </div>
+          <div class="meta">2 artifacts</div>
+        </div>
+
+        <div class="chat-scroll">
+          <div class="msg-row user">
+            <div class="bubble user">Run the ACA filing check for Acme and pull the outstanding items.</div>
+            <div class="avatar user">MM</div>
+          </div>
+
+          <div class="msg-row">
+            <div class="avatar">BA</div>
+            <div class="bubble">
+              <p>Pulled the latest payroll snapshot and compared against their FTE threshold. Three items need a decision before I file.</p>
+            </div>
+          </div>
+
+          <div class="msg-row">
+            <div class="avatar" style="visibility:hidden">BA</div>
+            <div class="artifact">
+              <div class="ic">Σ</div>
+              <div>
+                <div class="a-title">Acme ACA — outstanding items</div>
+                <div class="a-sub">Table · 3 rows · just now</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="msg-row">
+            <div class="avatar">BA</div>
+            <div class="bubble">
+              <p>Want me to draft the filing with the current data, or wait until those three are resolved?</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="composer">
+          <div class="composer-box">
+            <div class="composer-input">Reply to Benefits Architect…</div>
+            <div class="send">↑</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="plan">
+        <div class="plan-head">
+          <div class="plan-title">Plan</div>
+          <div class="plan-status">Drafted</div>
+        </div>
+        <div class="plan-bar"><span style="width:0%"></span></div>
+        <div class="plan-meta">Waiting on 3 decisions before filing.</div>
+
+        <div class="plan-step active">
+          <div class="dot"></div>
+          <div>
+            <div class="step-title">Pull ACA snapshot</div>
+            <div class="step-sub">Complete · 3 discrepancies</div>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="dot"></div>
+          <div>
+            <div class="step-title">Resolve discrepancies</div>
+            <div class="step-sub">Needs your input</div>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="dot"></div>
+          <div>
+            <div class="step-title">File with IRS</div>
+            <div class="step-sub">Non-undoable</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- ============ P3: Action plan stress test ============ -->
+<div class="design-panel" id="p3">
+  <div class="variant-light">
+    <div class="app">
+      <aside class="side">
+        <div class="brand">PandaCommand</div>
+        <div class="nav-item"><span class="nav-dot"></span>Dashboard</div>
+        <div class="nav-item active"><span class="nav-dot"></span>Chats <span class="nav-meta">12</span></div>
+        <div class="nav-item"><span class="nav-dot"></span>Agents</div>
+        <div class="nav-item"><span class="nav-dot"></span>Clients</div>
+        <div class="nav-sec">Recent</div>
+        <div class="nav-item"><span class="nav-dot"></span>Northwind onboarding</div>
+      </aside>
+
+      <section class="chat">
+        <div class="chat-head">
+          <div>
+            <h1>Northwind onboarding</h1>
+            <div class="sub">Onboarding Specialist · proposing action plan</div>
+          </div>
+          <div class="meta">Apr 20, 2026</div>
+        </div>
+
+        <div class="chat-scroll">
+          <div class="msg-row user">
+            <div class="bubble user">Set up the new Northwind hire cohort — 14 people starting May 5.</div>
+            <div class="avatar user">MM</div>
+          </div>
+
+          <div class="msg-row">
+            <div class="avatar">OS</div>
+            <div class="bubble">
+              <p>Here's the plan I'd run for the 14-person cohort. Three steps touch payroll directly, so I'll pause before each for your approval.</p>
+            </div>
+          </div>
+
+          <div class="msg-row">
+            <div class="avatar" style="visibility:hidden">OS</div>
+            <div class="ap">
+              <div class="ap-head">
+                <div class="ap-title">Onboard Northwind May 5 cohort</div>
+                <div class="ap-chip">Needs approval</div>
+              </div>
+              <div class="ap-desc">14 new hires. Creates BambooHR records, provisions access, and schedules orientation.</div>
+              <ol class="ap-steps">
+                <li class="ap-step"><span class="ix">1</span><span class="t">Create employee records in BambooHR</span></li>
+                <li class="ap-step"><span class="ix">2</span><span class="t">Assign onboarding checklist &amp; buddy pairings</span></li>
+                <li class="ap-step"><span class="ix">3</span><span class="t">Provision email, Slack, and HRIS access</span></li>
+                <li class="ap-step"><span class="ix">4</span><span class="t">Add to May 5 orientation calendar invite</span></li>
+                <li class="ap-step"><span class="ix">5</span><span class="t">Kick off payroll setup — direct deposit, W-4</span></li>
+              </ol>
+              <div class="ap-actions">
+                <button class="btn primary">Approve &amp; run</button>
+                <button class="btn ghost">Review each step</button>
+                <button class="btn ghost">Edit plan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="composer">
+          <div class="composer-box">
+            <div class="composer-input">Reply…</div>
+            <div class="send">↑</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="plan">
+        <div class="plan-head">
+          <div class="plan-title">Plan</div>
+          <div class="plan-status">Awaiting approval</div>
+        </div>
+        <div class="plan-bar"><span style="width:0%"></span></div>
+        <div class="plan-meta">5 steps · 3 approval gates</div>
+
+        <div class="plan-step"><div class="dot"></div><div><div class="step-title">Create records</div><div class="step-sub">14 employees</div></div></div>
+        <div class="plan-step"><div class="dot"></div><div><div class="step-title">Assign checklist</div><div class="step-sub">Buddy pairings pending</div></div></div>
+        <div class="plan-step"><div class="dot"></div><div><div class="step-title">Provision access</div><div class="step-sub">Gate · non-undoable</div></div></div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- ============ P4: Dark mode ============ -->
+<div class="design-panel" id="p4">
+  <div class="variant-dark">
+    <div class="app">
+      <aside class="side">
+        <div class="brand">PandaCommand</div>
+        <div class="nav-item"><span class="nav-dot"></span>Dashboard</div>
+        <div class="nav-item active"><span class="nav-dot"></span>Chats <span class="nav-meta">12</span></div>
+        <div class="nav-item"><span class="nav-dot"></span>Agents</div>
+        <div class="nav-item"><span class="nav-dot"></span>Clients</div>
+        <div class="nav-sec">Recent</div>
+        <div class="nav-item"><span class="nav-dot"></span>Acme benefits audit</div>
+        <div class="nav-item"><span class="nav-dot"></span>Northwind onboarding</div>
+        <div class="nav-item"><span class="nav-dot"></span>Globex payroll Q1</div>
+      </aside>
+
+      <section class="chat">
+        <div class="chat-head">
+          <div>
+            <h1>Acme benefits audit</h1>
+            <div class="sub">Benefits Architect · started 9:42 AM</div>
+          </div>
+          <div class="meta">2 artifacts</div>
+        </div>
+
+        <div class="chat-scroll">
+          <div class="msg-row user">
+            <div class="bubble user">Run the ACA filing check for Acme and pull the outstanding items.</div>
+            <div class="avatar user">MM</div>
+          </div>
+
+          <div class="msg-row">
+            <div class="avatar">BA</div>
+            <div class="bubble">
+              <p>Pulled the latest payroll snapshot and compared against their FTE threshold. Three items need a decision before I file.</p>
+            </div>
+          </div>
+
+          <div class="msg-row">
+            <div class="avatar" style="visibility:hidden">BA</div>
+            <div class="ap">
+              <div class="ap-head">
+                <div class="ap-title">ACA filing · Acme Corp</div>
+                <div class="ap-chip">Needs approval</div>
+              </div>
+              <div class="ap-desc">Three discrepancies between snapshot and IRS form totals. Resolve before submit.</div>
+              <ol class="ap-steps">
+                <li class="ap-step"><span class="ix">1</span><span class="t">Reconcile FTE count — 142 vs 138</span></li>
+                <li class="ap-step"><span class="ix">2</span><span class="t">Confirm two COBRA-eligible terminations</span></li>
+                <li class="ap-step"><span class="ix">3</span><span class="t">Sign &amp; submit 1094-C / 1095-C</span></li>
+              </ol>
+              <div class="ap-actions">
+                <button class="btn primary">Approve &amp; run</button>
+                <button class="btn ghost">Review details</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="composer">
+          <div class="composer-box">
+            <div class="composer-input">Reply to Benefits Architect…</div>
+            <div class="send">↑</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="plan">
+        <div class="plan-head">
+          <div class="plan-title">Plan</div>
+          <div class="plan-status">Paused</div>
+        </div>
+        <div class="plan-bar"><span style="width:35%"></span></div>
+        <div class="plan-meta">3 steps · waiting on you</div>
+
+        <div class="plan-step done"><div class="dot"></div><div><div class="step-title">Pull ACA snapshot</div><div class="step-sub">Complete</div></div></div>
+        <div class="plan-step active"><div class="dot"></div><div><div class="step-title">Resolve discrepancies</div><div class="step-sub">Needs your input</div></div></div>
+        <div class="plan-step"><div class="dot"></div><div><div class="step-title">File with IRS</div><div class="step-sub">Non-undoable</div></div></div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- ============ P5: Chat-in-card (the "card-within-card" problem) ============ -->
+<div class="design-panel" id="p5">
+  <div class="v-compare">
+    <div class="app">
+      <aside class="side">
+        <div class="brand">PandaCommand</div>
+        <div class="nav-item"><span class="nav-dot"></span>Dashboard</div>
+        <div class="nav-item active"><span class="nav-dot"></span>Chats</div>
+        <div class="nav-item"><span class="nav-dot"></span>Agents</div>
+        <div class="nav-item"><span class="nav-dot"></span>Clients</div>
+      </aside>
+
+      <section class="chat-card">
+        <div class="chat-head">
+          <div>
+            <h1>Acme benefits audit</h1>
+            <div class="sub">Shown inside a card — compare to tab 2</div>
+          </div>
+        </div>
+        <div class="h-divider"></div>
+        <div class="chat-scroll">
+          <div class="msg-row user">
+            <div class="bubble user">Run the ACA filing check for Acme.</div>
+            <div class="avatar user">MM</div>
+          </div>
+          <div class="msg-row">
+            <div class="avatar">BA</div>
+            <div class="bubble">
+              <p>Pulled the latest payroll snapshot. Three items need a decision before I file.</p>
+            </div>
+          </div>
+          <div class="msg-row">
+            <div class="avatar" style="visibility:hidden">BA</div>
+            <div class="ap">
+              <div class="ap-head">
+                <div class="ap-title">ACA filing · Acme Corp</div>
+                <div class="ap-chip">Needs approval</div>
+              </div>
+              <div class="ap-desc">Card-inside-card-inside-card. Feel the stack.</div>
+              <ol class="ap-steps">
+                <li class="ap-step"><span class="ix">1</span><span class="t">Reconcile FTE count</span></li>
+                <li class="ap-step"><span class="ix">2</span><span class="t">Confirm terminations</span></li>
+                <li class="ap-step"><span class="ix">3</span><span class="t">Submit 1094-C</span></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="composer-box">
+            <div class="composer-input">Reply…</div>
+            <div class="send">↑</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="plan">
+        <div class="plan-head">
+          <div class="plan-title">Plan</div>
+          <div class="plan-status">Paused</div>
+        </div>
+        <div class="plan-bar"><span style="width:35%"></span></div>
+        <div class="plan-meta">3 steps · waiting on you</div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<script src="feedback-panel.js"></script>
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.design-panel');
+  const tip = document.getElementById('tip');
+  const tips = {
+    p1: 'Baseline — edgeless chat, sidebar + plan as cards',
+    p2: 'Real conversation with artifact — stress nested cards',
+    p3: 'Action plan inline — card-in-chat-on-bg',
+    p4: 'Same treatment in orbital dark',
+    p5: 'Chat also in a card — see the nesting compound'
+  };
+  function activate(id) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.panel === id));
+    panels.forEach(p => p.classList.toggle('active', p.id === id));
+    tip.textContent = tips[id] || '';
+  }
+  tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.panel)));
+  document.addEventListener('keydown', (e) => {
+    const n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 5) activate('p' + n);
+  });
+
+  if (window.initFeedbackPanel) {
+    window.initFeedbackPanel({
+      name: 'cards-on-background',
+      designs: ['Baseline', 'With conversation', 'Action plan stress test', 'Dark mode', 'Chat-in-card (contrast)']
+    });
+  }
+</script>
+</body>
+</html>
