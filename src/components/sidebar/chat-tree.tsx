@@ -1,11 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { CaretRight, Plus } from "@phosphor-icons/react";
+import { CaretRight, CircleNotch, Plus } from "@phosphor-icons/react";
 import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { formatTimeAgoCompact } from "@/lib/format-time";
-import { AgentStateIndicator } from "@/components/ui/agent-state-indicator";
 import { ChatRowMenu } from "./chat-row-menu";
 
 interface ChatTreeProps {
@@ -111,9 +110,9 @@ export function ChatTree({
                 {unreadCount > 0 && (
                   <span className={cn(
                     "group-hover:hidden flex h-5 min-w-5 items-center justify-center rounded-full px-1.5",
-                    isActiveClient ? "bg-primary-foreground text-primary" : "bg-primary text-primary-foreground"
+                    isActiveClient ? "bg-primary-foreground/70 text-primary" : "bg-[var(--color-info-muted)] text-primary"
                   )}>
-                    <span className="type-status">{unreadCount}</span>
+                    <span className="font-sans font-bold text-xs">{unreadCount}</span>
                   </span>
                 )}
                 {/* Plus circle — shown on row hover */}
@@ -130,7 +129,7 @@ export function ChatTree({
             </div>
 
             {/* Chat rows */}
-            {expanded && clientChats.map((chat) => {
+            {expanded && <div className="flex flex-col gap-y-2">{clientChats.map((chat) => {
               const isSelected = chat.id === selectedChatId;
               const showState = chat.state === 'running' || chat.state === 'needs-approval';
               return (
@@ -138,36 +137,52 @@ export function ChatTree({
                 <button
                   onClick={() => onSelectChat(chat.id)}
                   className={cn(
-                    "relative flex w-full flex-col gap-y-[3px] py-1.5 pl-8 pr-9 text-left rounded-md",
+                    "relative flex w-full flex-col gap-y-[2px] py-2 pl-8 pr-9 text-left rounded-md",
                     isSelected
                       ? "bg-primary text-primary-foreground"
-                      : "hover:bg-accent/60"
+                      : "hover:bg-accent"
                   )}
                 >
                   {/* Unread dot, positioned in the gutter */}
                   {chat.hasUnread && !isSelected && (
-                    <span className="absolute left-[14px] top-[11px] h-[7px] w-[7px] rounded-full bg-primary" />
+                    <span className="absolute left-[14px] top-[13px] h-[7px] w-[7px] rounded-full bg-primary" />
                   )}
 
                   {/* Title */}
                   <span className={cn(
-                    "type-chat-name leading-snug",
+                    "truncate type-chat-name",
                     (isSelected || chat.hasUnread) && "font-semibold!",
                     isSelected ? "text-primary-foreground" : chat.hasUnread ? "text-foreground" : "text-muted-foreground"
                   )}>
                     {chat.title}
                   </span>
-                  {/* State indicator (only when active) */}
-                  {showState && (
-                    <AgentStateIndicator state={chat.state} detail={chat.stateDetail} />
-                  )}
-
-                  {/* Timestamp on its own line */}
+                  {/* State + timestamp inline row */}
                   <span className={cn(
-                    "font-normal type-meta",
-                    isSelected ? "text-primary-foreground/50" : "text-muted-foreground/60"
+                    "flex items-center gap-1.5 type-meta",
+                    isSelected ? "text-primary-foreground/75" : "text-muted-foreground"
                   )}>
-                    {formatTimeAgoCompact(chat.updatedAt)}
+                    {showState && (
+                      <>
+                        <span className={cn(
+                          "inline-flex items-center gap-1 font-semibold",
+                          isSelected
+                            ? "text-primary-foreground"
+                            : chat.state === 'running'
+                              ? "text-[var(--color-info)]"
+                              : "text-[var(--color-warning)]"
+                        )}>
+                          {chat.state === 'running' && (
+                            <CircleNotch weight="bold" className="h-[11px] w-[11px] flex-shrink-0 animate-spin" />
+                          )}
+                          {chat.state === 'running'
+                            ? (chat.stateDetail ? `Running · ${chat.stateDetail.charAt(0).toUpperCase() + chat.stateDetail.slice(1)}` : 'Running')
+                            : (chat.stateDetail ? chat.stateDetail.charAt(0).toUpperCase() + chat.stateDetail.slice(1) : 'Needs approval')
+                          }
+                        </span>
+                        <span>·</span>
+                      </>
+                    )}
+                    <span className="font-normal">{formatTimeAgoCompact(chat.updatedAt)}</span>
                   </span>
                 </button>
                 <div className="absolute right-1.5 top-1">
@@ -180,7 +195,7 @@ export function ChatTree({
                 </div>
                 </div>
               );
-            })}
+            })}</div>}
 
             {expanded && clientChats.length === 0 && (
               <div className="py-1.5 pl-[46px] type-meta text-muted-foreground">
