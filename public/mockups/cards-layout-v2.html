@@ -1,0 +1,1577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Cards Layout v2 — Real Content Comparison</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #1A2830;
+    background: #F4F6F8;
+  }
+
+  /* ---------- tab switcher ---------- */
+  .tabs {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #FFFFFF;
+    border-bottom: 1px solid rgba(26,40,48,0.08);
+    padding: 10px 20px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .tabs .label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5A7080;
+    margin-right: 10px;
+  }
+  .tab {
+    appearance: none;
+    border: 1px solid rgba(26,40,48,0.12);
+    background: #F4F6F8;
+    color: #1A2830;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tab:hover { background: #E8ECF0; }
+  .tab .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: rgba(26,40,48,0.08);
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .tab.active {
+    background: #1A2830;
+    border-color: #1A2830;
+    color: #FFFFFF;
+  }
+  .tab.active .num {
+    background: rgba(255,255,255,0.18);
+    color: #FFFFFF;
+  }
+  .tab-tip {
+    margin-left: auto;
+    font-size: 12px;
+    color: #5A7080;
+  }
+
+  .design-panel { display: none; }
+  .design-panel.active { display: block; }
+
+  /* ================================================================
+     SHARED: ORBITAL LIGHT TOKENS
+     ================================================================ */
+  :root {
+    --bg-shell: #DAE2E9;
+    --bg-card: #ECEFF3;
+    --bg-content: #FFFFFF;
+    --bg-flush: #ECEEF3;
+    --border-light: rgba(26,40,48,0.04);
+    --border-med: rgba(26,40,48,0.08);
+    --border-dim: rgba(26,40,48,0.05);
+    --text-primary: #1A2830;
+    --text-body: #2A3A44;
+    --text-secondary: #5A7080;
+    --text-dim: #6A8090;
+    --accent: #3A6782;
+    --accent-light: rgba(58,103,130,0.12);
+    --accent-hover: rgba(58,103,130,0.08);
+    --warning: #B8751A;
+    --warning-bg: #FBEFD9;
+    --success: #2D8A5E;
+    --success-bg: #E6F5ED;
+    --radius-card: 14px;
+    --radius-inner: 10px;
+    --radius-bubble: 12px;
+    --gap: 14px;
+    --pad: 14px;
+  }
+
+  /* ================================================================
+     SHARED COMPONENT STYLES
+     ================================================================ */
+
+  /* -- Sidebar -- */
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+  }
+  .brand {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    padding: 6px 10px 14px;
+    color: var(--text-primary);
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-body);
+    cursor: pointer;
+  }
+  .nav-item:hover { background: rgba(26,40,48,0.05); }
+  .nav-item.active {
+    background: var(--accent);
+    color: #FFFFFF;
+    font-weight: 600;
+  }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    flex: none;
+  }
+  .nav-item.active .nav-dot { background: #FFFFFF; }
+  .nav-sec {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    padding: 14px 10px 6px;
+    margin-top: 4px;
+  }
+  .nav-meta {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .nav-item.active .nav-meta { color: rgba(255,255,255,0.85); }
+
+  /* grouped client list */
+  .client-group {
+    padding: 0 4px;
+  }
+  .client-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 6px 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+  .client-header .chevron {
+    font-size: 11px;
+    color: var(--text-dim);
+    width: 14px;
+    text-align: center;
+  }
+  .client-header .badge {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 700;
+    color: #FFFFFF;
+    background: var(--accent);
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .chat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 8px 6px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+  }
+  .chat-item:hover { background: rgba(26,40,48,0.04); }
+  .chat-item.selected {
+    background: var(--accent);
+    color: #FFFFFF;
+  }
+  .chat-item .dot-unread {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .chat-item.selected .dot-unread { background: #FFFFFF; }
+  .chat-item .chat-title {
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chat-item .chat-time {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .chat-item.selected .chat-time { color: rgba(255,255,255,0.75); }
+  .chat-item .chat-status {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+  }
+  .status-running {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+  .chat-item.selected .status-running {
+    background: rgba(255,255,255,0.18);
+    color: #FFFFFF;
+  }
+  .status-approve {
+    background: var(--warning-bg);
+    color: var(--warning);
+  }
+  .side-footer {
+    margin-top: auto;
+    padding: 12px 10px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .side-footer .nav-item {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* -- Plan panel -- */
+  .plan {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+  }
+  .plan-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .plan-title-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .plan-name {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+  }
+  .plan-status-chip {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+  }
+  .plan-status-chip.running {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+  .plan-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .plan-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .plan-stats strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .plan-bar {
+    height: 6px;
+    background: rgba(26,40,48,0.08);
+    border-radius: 999px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+  .plan-bar > span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+  }
+  .plan-bar-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: right;
+  }
+  .plan-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-inner);
+    cursor: pointer;
+  }
+  .plan-step:hover { background: rgba(26,40,48,0.03); }
+  .plan-step .step-num {
+    width: 18px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    padding-top: 1px;
+    flex: none;
+  }
+  .plan-step .step-icon {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex: none;
+  }
+  .step-icon.done {
+    background: var(--success);
+    color: #FFFFFF;
+  }
+  .step-icon.active {
+    border: 2px solid var(--accent);
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(58,103,130,0.15);
+  }
+  .step-icon.pending {
+    border: 2px solid rgba(26,40,48,0.15);
+    background: transparent;
+  }
+  .plan-step .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .plan-step .step-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-body);
+  }
+  .plan-step .step-sub {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 1px;
+  }
+  .gate-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--warning-bg);
+    color: var(--warning);
+    margin-left: 4px;
+  }
+  .plan-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 8px;
+  }
+  .btn {
+    appearance: none;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn.danger {
+    background: #D94040;
+    color: #FFFFFF;
+  }
+  .btn.warning {
+    background: #D97B0D;
+    color: #FFFFFF;
+  }
+
+  /* -- Chat area -- */
+  .chat {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .chat-head {
+    padding: 14px 8px 14px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .chat-head h1 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .chat-head .sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+  .chat-head .meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .chat-scroll {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 4px 8px 24px;
+    overflow-y: auto;
+  }
+
+  .msg-row { display: flex; gap: 10px; }
+  .msg-row.user { justify-content: flex-end; }
+  .avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent);
+    color: #FFFFFF;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .avatar.user { background: var(--text-primary); }
+
+  .bubble {
+    background: var(--bg-content);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius-bubble);
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-body);
+    max-width: 660px;
+  }
+  .bubble.user {
+    background: var(--text-body);
+    color: #FFFFFF;
+    border-color: transparent;
+  }
+  .bubble p { margin: 0 0 10px; }
+  .bubble p:last-child { margin-bottom: 0; }
+  .bubble strong { font-weight: 700; color: var(--text-primary); }
+
+  /* activity feed (compact status lines) */
+  .activity-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 660px;
+    padding: 6px 0 4px 36px;
+  }
+  .activity-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .activity-icon {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    flex: none;
+  }
+  .activity-icon.done {
+    background: var(--success);
+    color: #FFFFFF;
+  }
+  .activity-icon.spin {
+    border: 2px solid var(--accent);
+    border-top-color: transparent;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* clarifying questions card */
+  .cq-card {
+    background: var(--bg-content);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius-bubble);
+    padding: 18px 20px;
+    max-width: 660px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .cq-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border-med);
+  }
+  .cq-tab {
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .cq-tab.active {
+    color: var(--text-primary);
+    font-weight: 600;
+    border-bottom-color: var(--accent);
+  }
+  .cq-question {
+    font-size: 13px;
+    color: var(--text-body);
+    line-height: 1.55;
+  }
+  .cq-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cq-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-inner);
+    background: rgba(26,40,48,0.03);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .cq-option:hover { background: rgba(26,40,48,0.06); }
+  .cq-option .opt-num {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: rgba(26,40,48,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dim);
+    flex: none;
+  }
+  .cq-option .opt-body {
+    flex: 1;
+  }
+  .cq-option .opt-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .cq-option .opt-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    line-height: 1.45;
+  }
+  .cq-other {
+    padding: 10px 14px;
+    border-radius: var(--radius-inner);
+    background: rgba(26,40,48,0.03);
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+  .cq-next {
+    appearance: none;
+    border: none;
+    padding: 10px 0;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    background: var(--accent);
+    color: #FFFFFF;
+    opacity: 0.45;
+  }
+
+  /* composer */
+  .composer {
+    margin-top: auto;
+    padding: 12px 8px 4px;
+  }
+  .composer-box {
+    background: var(--bg-content);
+    border: 1px solid var(--border-med);
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 2px rgba(26,40,48,0.04);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .composer-input {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .composer .send {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #FFFFFF;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  /* ================================================================
+     LAYOUT: CARDS ON BACKGROUND
+     ================================================================ */
+  .layout-cards {
+    background: var(--bg-shell);
+    min-height: calc(100vh - 44px);
+  }
+  .app-cards {
+    display: grid;
+    grid-template-columns: 260px 1fr 320px;
+    gap: var(--gap);
+    padding: var(--pad);
+    min-height: calc(100vh - 44px);
+  }
+  .card-panel {
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-light);
+    padding: 18px 14px;
+  }
+
+  /* ================================================================
+     LAYOUT: FLUSH (current app — control)
+     ================================================================ */
+  .layout-flush {
+    background: var(--bg-flush);
+    min-height: calc(100vh - 44px);
+  }
+  .app-flush {
+    display: grid;
+    grid-template-columns: 260px 1fr 320px;
+    min-height: calc(100vh - 44px);
+  }
+  .flush-side {
+    background: #F5F6FA;
+    border-right: 1px solid var(--border-med);
+    padding: 18px 14px;
+  }
+  .flush-chat {
+    background: #FFFFFF;
+    border-right: 1px solid var(--border-med);
+  }
+  .flush-plan {
+    background: #F5F6FA;
+    padding: 18px 16px;
+  }
+
+  /* ================================================================
+     DARK MODE OVERRIDES
+     ================================================================ */
+  .dark {
+    --bg-shell: #10161C;
+    --bg-card: #1A2128;
+    --bg-content: #242C34;
+    --border-light: rgba(232,239,244,0.06);
+    --border-med: rgba(232,239,244,0.08);
+    --border-dim: rgba(232,239,244,0.05);
+    --text-primary: #E8EFF4;
+    --text-body: #D0D8E0;
+    --text-secondary: #9BADB8;
+    --text-dim: #7A8C98;
+    --accent: #5A96B8;
+    --accent-light: rgba(90,150,184,0.16);
+    --warning-bg: rgba(204,139,40,0.18);
+    --warning: #E4A955;
+    --success-bg: rgba(45,138,94,0.18);
+    --success: #5ACA8E;
+    color: var(--text-primary);
+  }
+  .dark .bubble.user {
+    background: #2E5F7E;
+    color: #FFFFFF;
+  }
+  .dark .cq-option { background: rgba(232,239,244,0.04); }
+  .dark .cq-option:hover { background: rgba(232,239,244,0.07); }
+  .dark .cq-option .opt-num { background: rgba(232,239,244,0.08); color: var(--text-secondary); }
+  .dark .cq-other { background: rgba(232,239,244,0.04); }
+  .dark .cq-next { background: var(--accent); }
+  .dark .composer-box { background: var(--bg-content); box-shadow: none; }
+  .dark .avatar.user { background: #0A1015; }
+  .dark .chat-item.selected .status-running {
+    background: rgba(255,255,255,0.15);
+    color: #FFFFFF;
+  }
+  .dark .plan-step:hover { background: rgba(232,239,244,0.03); }
+  .dark .gate-badge {
+    background: var(--warning-bg);
+    color: var(--warning);
+  }
+
+  /* ================================================================
+     VARIANT: TIGHTER GAPS (10px instead of 14px)
+     ================================================================ */
+  .tight-gap {
+    gap: 10px !important;
+    padding: 10px !important;
+  }
+  .tight-gap .card-panel {
+    border-radius: 12px;
+  }
+
+  /* ================================================================
+     ANNOTATION LABELS
+     ================================================================ */
+  .anno {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26,40,48,0.85);
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 999px;
+    z-index: 40;
+    pointer-events: none;
+  }
+  .dark .anno { background: rgba(232,239,244,0.15); }
+
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <span class="label">Cards v2</span>
+  <button class="tab active" data-panel="p1"><span class="num">1</span>Cards: Edgeless Chat</button>
+  <button class="tab" data-panel="p2"><span class="num">2</span>Cards: All Panels</button>
+  <button class="tab" data-panel="p3"><span class="num">3</span>Cards: Tight Gap</button>
+  <button class="tab" data-panel="p4"><span class="num">4</span>Dark Mode</button>
+  <button class="tab" data-panel="p5"><span class="num">5</span>Current (Control)</button>
+  <span class="tab-tip" id="tip">Sidebar + plan as cards, chat edgeless on background</span>
+</div>
+
+<!-- ============================================================
+     TAB 1: CARDS — EDGELESS CHAT (sidebar + plan are cards, chat is open)
+     ============================================================ -->
+<div class="design-panel active" id="p1">
+  <div class="layout-cards">
+    <div class="app-cards">
+
+      <!-- SIDEBAR CARD -->
+      <aside class="side card-panel">
+        <div class="brand">PandaCommand</div>
+        <div class="nav-item active"><span class="nav-dot"></span>Dashboard</div>
+
+        <div class="nav-sec">Chats</div>
+        <div style="display:flex;gap:6px;padding:0 6px 6px;">
+          <span style="font-size:12px;font-weight:600;color:var(--text-primary);border-bottom:2px solid var(--accent);padding-bottom:4px;">Grouped</span>
+          <span style="font-size:12px;color:var(--text-secondary);padding-bottom:4px;margin-left:8px;">Recent</span>
+        </div>
+
+        <div class="client-group">
+          <div class="client-header">
+            <span class="chevron">▾</span>
+            Aperture Science
+            <span class="badge">1</span>
+          </div>
+          <div class="chat-item">
+            <div class="dot-unread"></div>
+            <div class="chat-title">Portal Gun Safety Training</div>
+            <div class="chat-time">17h · <span class="chat-status status-approve">● Approve schedule</span></div>
+          </div>
+          <div class="chat-item">
+            <div class="chat-title" style="font-weight:500;color:var(--text-secondary)">GLaDOS Maintenance</div>
+            <div class="chat-time">19h</div>
+          </div>
+        </div>
+
+        <div class="client-group">
+          <div class="client-header">
+            <span class="chevron">▾</span>
+            Black Mesa
+            <span class="badge">2</span>
+          </div>
+          <div class="chat-item selected">
+            <div class="chat-title">January Payroll</div>
+            <div class="chat-time">16h · <span class="chat-status status-running">● Running</span></div>
+          </div>
+          <div class="chat-item">
+            <div class="dot-unread"></div>
+            <div class="chat-title">Benefits Enrollment Q1</div>
+            <div class="chat-time">17h</div>
+          </div>
+          <div class="chat-item">
+            <div class="chat-title" style="font-weight:500;color:var(--text-secondary)">Tax Forms Review 2024</div>
+            <div class="chat-time">Yesterday</div>
+          </div>
+          <div class="chat-item">
+            <div class="dot-unread"></div>
+            <div class="chat-title">New Hire: Dr. Freeman</div>
+            <div class="chat-time">Yesterday</div>
+          </div>
+        </div>
+
+        <div class="client-group">
+          <div class="client-header">
+            <span class="chevron">›</span>
+            Cyberdyne Systems
+          </div>
+        </div>
+
+        <div class="client-group">
+          <div class="client-header">
+            <span class="chevron">▾</span>
+            Tyrell Corporation
+            <span class="badge">1</span>
+          </div>
+        </div>
+
+        <div class="side-footer">
+          <div class="nav-item">⚙ Theme</div>
+          <div class="nav-item">◐ Light mode</div>
+        </div>
+      </aside>
+
+      <!-- CHAT — EDGELESS -->
+      <section class="chat">
+        <div class="chat-head">
+          <div>
+            <h1>January Payroll</h1>
+            <div class="sub">Black Mesa</div>
+          </div>
+          <div class="meta">···</div>
+        </div>
+
+        <div class="chat-scroll">
+          <!-- Activity feed (collapsed) -->
+          <div class="activity-feed">
+            <div class="activity-line"><span class="activity-icon done">✓</span>Pulled HRIS data for 47 employees</div>
+            <div class="activity-line"><span class="activity-icon done">✓</span>Compared against previous pay period</div>
+            <div class="activity-line"><span class="activity-icon spin"></span>Reviewing individual variances</div>
+          </div>
+
+          <div class="msg-row">
+            <div class="avatar">PA</div>
+            <div class="bubble">
+              <p>Jeff logged 0 hours this period. His last 3 periods: 84, 80, 82 hours (avg 82 hrs biweekly). There's no PTO request, no leave of absence, and no status change on file. This looks like a missing timesheet — but I want you to decide how to handle it.</p>
+              <p><strong>2. Dr. Eli Vance — 58 overtime hours</strong><br>
+              Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase. His base hours (80) are normal — it's the OT that's unusual. Could be a legitimate crunch period, but it's a $4,132.50 difference in gross pay.</p>
+              <p><strong>3. Barney Calhoun — new HSA deduction</strong><br>
+              Barney has a new HSA deduction of $125/pay period starting this run. This matches a benefits enrollment change effective Jan 15 — just flagging it so you're aware.</p>
+              <p>I need to know how to handle the first two before I can move on:</p>
+            </div>
+          </div>
+
+          <!-- CLARIFYING QUESTIONS CARD -->
+          <div class="msg-row">
+            <div class="avatar" style="visibility:hidden">PA</div>
+            <div class="cq-card">
+              <div class="cq-tabs">
+                <div class="cq-tab active">Hardy</div>
+                <div class="cq-tab">Vance OT</div>
+              </div>
+
+              <div class="cq-question">Jeff Hardy has 0 hours logged this period but averaged 82 hours over his last 3 pay periods. No PTO, leave, or status change on file. How should I handle this?</div>
+
+              <div class="cq-options">
+                <div class="cq-option">
+                  <div class="opt-num">1</div>
+                  <div class="opt-body">
+                    <div class="opt-title">Exclude from this run</div>
+                    <div class="opt-desc">Skip Jeff entirely — pay him in a supplemental run once his timesheet is submitted</div>
+                  </div>
+                </div>
+                <div class="cq-option">
+                  <div class="opt-num">2</div>
+                  <div class="opt-body">
+                    <div class="opt-title">Include at previous average</div>
+                    <div class="opt-desc">Use his 82-hour average as a placeholder and reconcile next period</div>
+                  </div>
+                </div>
+                <div class="cq-option">
+                  <div class="opt-num">3</div>
+                  <div class="opt-body">
+                    <div class="opt-title">Include with 0 hours</div>
+                    <div class="opt-desc">Process him at 0 hours — he'll get a $0 check (deductions may still apply)</div>
+                  </div>
+                </div>
+                <div class="cq-option">
+                  <div class="opt-num">4</div>
+                  <div class="opt-body">
+                    <div class="opt-title">Hold entire payroll</div>
+                    <div class="opt-desc">Pause the run until Jeff's timesheet is resolved</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cq-other">Other</div>
+              <div class="cq-next">Next</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="composer">
+          <div class="composer-box">
+            <div class="composer-input">Ask anything…</div>
+            <div class="send">↑</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PLAN CARD -->
+      <aside class="plan card-panel">
+        <div class="plan-header">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:14px;">☰</span>
+            <div class="plan-title-row">
+              <div class="plan-name">Run January Payroll for Black M…</div>
+              <div class="plan-status-chip running">● Running</div>
+            </div>
+          </div>
+          <span style="font-size:14px;color:var(--text-secondary);cursor:pointer">×</span>
+        </div>
+
+        <div class="plan-desc">End-to-end payroll processing for 47 active employees, pay period Jan 1–31, 2026.</div>
+
+        <div class="plan-stats">
+          <span><strong>47</strong> employees</span>
+          <span><strong>~10 min</strong></span>
+        </div>
+
+        <div class="plan-bar"><span style="width:25%"></span></div>
+        <div class="plan-bar-label">2 / 8</div>
+
+        <div class="plan-step">
+          <div class="step-icon done">✓</div>
+          <div class="step-body">
+            <div class="step-title">Create payroll run for Jan 1–31</div>
+            <div class="step-sub">Completed 5:06:10 PM</div>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="step-icon done">✓</div>
+          <div class="step-body">
+            <div class="step-title">Collect and validate employee hours and salary data</div>
+            <div class="step-sub">Completed 5:07:10 PM</div>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="step-icon active"></div>
+          <div class="step-body">
+            <div class="step-title">Review individual employees against previous payroll</div>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Review total payroll amounts against previous payrolls</div>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Approve payroll run <span class="gate-badge">⚠ Gate</span></div>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <div class="step-title">Approve fund transfer <span class="gate-badge">⚠ Gate</span></div>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="step-num">7</div>
+          <div class="step-body">
+            <div class="step-title">Process direct deposits and generate pay stubs <span class="gate-badge">⚠ Gate</span></div>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="step-num">8</div>
+          <div class="step-body">
+            <div class="step-title">Report and remit payroll taxes <span class="gate-badge">⚠ Gate</span></div>
+          </div>
+        </div>
+
+        <div class="plan-actions">
+          <button class="btn warning">⏸ Pause</button>
+          <button class="btn danger">⏹ Stop</button>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB 2: CARDS — ALL PANELS (chat also in a card)
+     ============================================================ -->
+<div class="design-panel" id="p2">
+  <div class="layout-cards">
+    <div class="app-cards">
+
+      <aside class="side card-panel">
+        <div class="brand">PandaCommand</div>
+        <div class="nav-item active"><span class="nav-dot"></span>Dashboard</div>
+        <div class="nav-sec">Chats</div>
+        <div style="display:flex;gap:6px;padding:0 6px 6px;">
+          <span style="font-size:12px;font-weight:600;color:var(--text-primary);border-bottom:2px solid var(--accent);padding-bottom:4px;">Grouped</span>
+          <span style="font-size:12px;color:var(--text-secondary);padding-bottom:4px;margin-left:8px;">Recent</span>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">▾</span>Aperture Science<span class="badge">1</span></div>
+          <div class="chat-item"><div class="dot-unread"></div><div class="chat-title">Portal Gun Safety Training</div><div class="chat-time">17h</div></div>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">▾</span>Black Mesa<span class="badge">2</span></div>
+          <div class="chat-item selected"><div class="chat-title">January Payroll</div><div class="chat-time">16h · <span class="chat-status status-running">● Running</span></div></div>
+          <div class="chat-item"><div class="dot-unread"></div><div class="chat-title">Benefits Enrollment Q1</div><div class="chat-time">17h</div></div>
+          <div class="chat-item"><div class="chat-title" style="font-weight:500;color:var(--text-secondary)">Tax Forms Review 2024</div><div class="chat-time">Yesterday</div></div>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">›</span>Cyberdyne Systems</div>
+        </div>
+        <div class="side-footer">
+          <div class="nav-item">⚙ Theme</div>
+          <div class="nav-item">◐ Light mode</div>
+        </div>
+      </aside>
+
+      <!-- CHAT — IN A CARD -->
+      <section class="chat card-panel" style="padding:14px 14px 8px;">
+        <div class="chat-head" style="padding:4px 4px 10px;">
+          <div>
+            <h1>January Payroll</h1>
+            <div class="sub">Black Mesa</div>
+          </div>
+          <div class="meta">···</div>
+        </div>
+        <div style="height:1px;background:var(--border-med);margin:0 4px 10px;"></div>
+
+        <div class="chat-scroll">
+          <div class="activity-feed" style="padding-left:0;">
+            <div class="activity-line"><span class="activity-icon done">✓</span>Pulled HRIS data for 47 employees</div>
+            <div class="activity-line"><span class="activity-icon done">✓</span>Compared against previous pay period</div>
+            <div class="activity-line"><span class="activity-icon spin"></span>Reviewing individual variances</div>
+          </div>
+
+          <div class="msg-row">
+            <div class="avatar">PA</div>
+            <div class="bubble">
+              <p>Jeff logged 0 hours this period. His last 3 periods: 84, 80, 82 hours (avg 82 hrs biweekly). There's no PTO request, no leave of absence, and no status change on file.</p>
+              <p><strong>2. Dr. Eli Vance — 58 overtime hours</strong><br>Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase.</p>
+              <p>I need to know how to handle the first two before I can move on:</p>
+            </div>
+          </div>
+
+          <div class="msg-row">
+            <div class="avatar" style="visibility:hidden">PA</div>
+            <div class="cq-card" style="border:none;background:rgba(26,40,48,0.03);box-shadow:none;">
+              <div class="cq-tabs">
+                <div class="cq-tab active">Hardy</div>
+                <div class="cq-tab">Vance OT</div>
+              </div>
+              <div class="cq-question">Jeff Hardy has 0 hours logged this period but averaged 82 hours over his last 3 pay periods. How should I handle this?</div>
+              <div class="cq-options">
+                <div class="cq-option" style="background:var(--bg-content);">
+                  <div class="opt-num">1</div>
+                  <div class="opt-body"><div class="opt-title">Exclude from this run</div><div class="opt-desc">Skip Jeff entirely — pay him in a supplemental run</div></div>
+                </div>
+                <div class="cq-option" style="background:var(--bg-content);">
+                  <div class="opt-num">2</div>
+                  <div class="opt-body"><div class="opt-title">Include at previous average</div><div class="opt-desc">Use his 82-hour average as a placeholder</div></div>
+                </div>
+                <div class="cq-option" style="background:var(--bg-content);">
+                  <div class="opt-num">3</div>
+                  <div class="opt-body"><div class="opt-title">Include with 0 hours</div><div class="opt-desc">Process at 0 hours — $0 check</div></div>
+                </div>
+                <div class="cq-option" style="background:var(--bg-content);">
+                  <div class="opt-num">4</div>
+                  <div class="opt-body"><div class="opt-title">Hold entire payroll</div><div class="opt-desc">Pause until Jeff's timesheet is resolved</div></div>
+                </div>
+              </div>
+              <div class="cq-other" style="background:var(--bg-content);">Other</div>
+              <div class="cq-next">Next</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="composer" style="padding:8px 4px 4px;">
+          <div class="composer-box">
+            <div class="composer-input">Ask anything…</div>
+            <div class="send">↑</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="plan card-panel">
+        <div class="plan-header">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:14px;">☰</span>
+            <div class="plan-title-row">
+              <div class="plan-name">Run January Payroll for Black M…</div>
+              <div class="plan-status-chip running">● Running</div>
+            </div>
+          </div>
+        </div>
+        <div class="plan-desc">End-to-end payroll processing for 47 active employees, pay period Jan 1–31, 2026.</div>
+        <div class="plan-stats"><span><strong>47</strong> employees</span><span><strong>~10 min</strong></span></div>
+        <div class="plan-bar"><span style="width:25%"></span></div>
+        <div class="plan-bar-label">2 / 8</div>
+
+        <div class="plan-step"><div class="step-icon done">✓</div><div class="step-body"><div class="step-title">Create payroll run for Jan 1–31</div><div class="step-sub">Completed 5:06 PM</div></div></div>
+        <div class="plan-step"><div class="step-icon done">✓</div><div class="step-body"><div class="step-title">Collect and validate hours</div><div class="step-sub">Completed 5:07 PM</div></div></div>
+        <div class="plan-step"><div class="step-icon active"></div><div class="step-body"><div class="step-title">Review individual employees</div></div></div>
+        <div class="plan-step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Review total payroll amounts</div></div></div>
+        <div class="plan-step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Approve payroll run <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Approve fund transfer <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-step"><div class="step-num">7</div><div class="step-body"><div class="step-title">Process deposits <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-step"><div class="step-num">8</div><div class="step-body"><div class="step-title">Remit payroll taxes <span class="gate-badge">⚠ Gate</span></div></div></div>
+
+        <div class="plan-actions">
+          <button class="btn warning">⏸ Pause</button>
+          <button class="btn danger">⏹ Stop</button>
+        </div>
+      </aside>
+
+    </div>
+    <div class="anno">All three panels in cards — note CQ card-in-card nesting</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB 3: CARDS — TIGHT GAP (10px)
+     ============================================================ -->
+<div class="design-panel" id="p3">
+  <div class="layout-cards">
+    <div class="app-cards tight-gap">
+
+      <aside class="side card-panel">
+        <div class="brand">PandaCommand</div>
+        <div class="nav-item active"><span class="nav-dot"></span>Dashboard</div>
+        <div class="nav-sec">Chats</div>
+        <div style="display:flex;gap:6px;padding:0 6px 6px;">
+          <span style="font-size:12px;font-weight:600;color:var(--text-primary);border-bottom:2px solid var(--accent);padding-bottom:4px;">Grouped</span>
+          <span style="font-size:12px;color:var(--text-secondary);padding-bottom:4px;margin-left:8px;">Recent</span>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">▾</span>Aperture Science<span class="badge">1</span></div>
+          <div class="chat-item"><div class="dot-unread"></div><div class="chat-title">Portal Gun Safety Training</div><div class="chat-time">17h</div></div>
+          <div class="chat-item"><div class="chat-title" style="font-weight:500;color:var(--text-secondary)">GLaDOS Maintenance</div><div class="chat-time">19h</div></div>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">▾</span>Black Mesa<span class="badge">2</span></div>
+          <div class="chat-item selected"><div class="chat-title">January Payroll</div><div class="chat-time">16h · <span class="chat-status status-running">● Running</span></div></div>
+          <div class="chat-item"><div class="dot-unread"></div><div class="chat-title">Benefits Enrollment Q1</div><div class="chat-time">17h</div></div>
+          <div class="chat-item"><div class="chat-title" style="font-weight:500;color:var(--text-secondary)">Tax Forms Review 2024</div><div class="chat-time">Yesterday</div></div>
+          <div class="chat-item"><div class="dot-unread"></div><div class="chat-title">New Hire: Dr. Freeman</div><div class="chat-time">Yesterday</div></div>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">›</span>Cyberdyne Systems</div>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">▾</span>Tyrell Corporation<span class="badge">1</span></div>
+        </div>
+        <div class="side-footer">
+          <div class="nav-item">⚙ Theme</div>
+          <div class="nav-item">◐ Light mode</div>
+        </div>
+      </aside>
+
+      <section class="chat">
+        <div class="chat-head">
+          <div><h1>January Payroll</h1><div class="sub">Black Mesa</div></div>
+          <div class="meta">···</div>
+        </div>
+        <div class="chat-scroll">
+          <div class="activity-feed">
+            <div class="activity-line"><span class="activity-icon done">✓</span>Pulled HRIS data for 47 employees</div>
+            <div class="activity-line"><span class="activity-icon done">✓</span>Compared against previous pay period</div>
+            <div class="activity-line"><span class="activity-icon spin"></span>Reviewing individual variances</div>
+          </div>
+          <div class="msg-row">
+            <div class="avatar">PA</div>
+            <div class="bubble">
+              <p>Jeff logged 0 hours this period. His last 3 periods: 84, 80, 82 hours. There's no PTO request, no leave of absence, and no status change on file. This looks like a missing timesheet — but I want you to decide how to handle it.</p>
+              <p><strong>2. Dr. Eli Vance — 58 overtime hours</strong><br>Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase. His base hours (80) are normal — it's the OT that's unusual.</p>
+              <p><strong>3. Barney Calhoun — new HSA deduction</strong><br>Barney has a new HSA deduction of $125/pay period starting this run. This matches a benefits enrollment change effective Jan 15.</p>
+              <p>I need to know how to handle the first two before I can move on:</p>
+            </div>
+          </div>
+          <div class="msg-row">
+            <div class="avatar" style="visibility:hidden">PA</div>
+            <div class="cq-card">
+              <div class="cq-tabs">
+                <div class="cq-tab active">Hardy</div>
+                <div class="cq-tab">Vance OT</div>
+              </div>
+              <div class="cq-question">Jeff Hardy has 0 hours logged this period but averaged 82 hours over his last 3 pay periods. No PTO, leave, or status change on file. How should I handle this?</div>
+              <div class="cq-options">
+                <div class="cq-option"><div class="opt-num">1</div><div class="opt-body"><div class="opt-title">Exclude from this run</div><div class="opt-desc">Skip Jeff entirely — pay him in a supplemental run once his timesheet is submitted</div></div></div>
+                <div class="cq-option"><div class="opt-num">2</div><div class="opt-body"><div class="opt-title">Include at previous average</div><div class="opt-desc">Use his 82-hour average as a placeholder and reconcile next period</div></div></div>
+                <div class="cq-option"><div class="opt-num">3</div><div class="opt-body"><div class="opt-title">Include with 0 hours</div><div class="opt-desc">Process him at 0 hours — he'll get a $0 check (deductions may still apply)</div></div></div>
+                <div class="cq-option"><div class="opt-num">4</div><div class="opt-body"><div class="opt-title">Hold entire payroll</div><div class="opt-desc">Pause the run until Jeff's timesheet is resolved</div></div></div>
+              </div>
+              <div class="cq-other">Other</div>
+              <div class="cq-next">Next</div>
+            </div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="composer-box">
+            <div class="composer-input">Ask anything…</div>
+            <div class="send">↑</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="plan card-panel">
+        <div class="plan-header">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:14px;">☰</span>
+            <div class="plan-title-row">
+              <div class="plan-name">Run January Payroll for Black M…</div>
+              <div class="plan-status-chip running">● Running</div>
+            </div>
+          </div>
+        </div>
+        <div class="plan-desc">End-to-end payroll processing for 47 active employees, pay period Jan 1–31, 2026.</div>
+        <div class="plan-stats"><span><strong>47</strong> employees</span><span><strong>~10 min</strong></span></div>
+        <div class="plan-bar"><span style="width:25%"></span></div>
+        <div class="plan-bar-label">2 / 8</div>
+        <div class="plan-step"><div class="step-icon done">✓</div><div class="step-body"><div class="step-title">Create payroll run for Jan 1–31</div><div class="step-sub">Completed 5:06 PM</div></div></div>
+        <div class="plan-step"><div class="step-icon done">✓</div><div class="step-body"><div class="step-title">Collect and validate hours</div><div class="step-sub">Completed 5:07 PM</div></div></div>
+        <div class="plan-step"><div class="step-icon active"></div><div class="step-body"><div class="step-title">Review individual employees</div></div></div>
+        <div class="plan-step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Review total payroll amounts</div></div></div>
+        <div class="plan-step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Approve payroll run <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Approve fund transfer <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-step"><div class="step-num">7</div><div class="step-body"><div class="step-title">Process deposits <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-step"><div class="step-num">8</div><div class="step-body"><div class="step-title">Remit payroll taxes <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-actions">
+          <button class="btn warning">⏸ Pause</button>
+          <button class="btn danger">⏹ Stop</button>
+        </div>
+      </aside>
+
+    </div>
+    <div class="anno">Tighter gaps (10px) — more content, less breathing room</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB 4: DARK MODE (edgeless chat variant)
+     ============================================================ -->
+<div class="design-panel" id="p4">
+  <div class="layout-cards dark">
+    <div class="app-cards">
+
+      <aside class="side card-panel">
+        <div class="brand">PandaCommand</div>
+        <div class="nav-item active"><span class="nav-dot"></span>Dashboard</div>
+        <div class="nav-sec">Chats</div>
+        <div style="display:flex;gap:6px;padding:0 6px 6px;">
+          <span style="font-size:12px;font-weight:600;color:var(--text-primary);border-bottom:2px solid var(--accent);padding-bottom:4px;">Grouped</span>
+          <span style="font-size:12px;color:var(--text-secondary);padding-bottom:4px;margin-left:8px;">Recent</span>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">▾</span>Aperture Science<span class="badge">1</span></div>
+          <div class="chat-item"><div class="dot-unread"></div><div class="chat-title">Portal Gun Safety Training</div><div class="chat-time">17h</div></div>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">▾</span>Black Mesa<span class="badge">2</span></div>
+          <div class="chat-item selected"><div class="chat-title">January Payroll</div><div class="chat-time">16h · <span class="chat-status status-running">● Running</span></div></div>
+          <div class="chat-item"><div class="dot-unread"></div><div class="chat-title">Benefits Enrollment Q1</div><div class="chat-time">17h</div></div>
+          <div class="chat-item"><div class="chat-title" style="font-weight:500;color:var(--text-dim)">Tax Forms Review 2024</div><div class="chat-time">Yesterday</div></div>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">›</span>Cyberdyne Systems</div>
+        </div>
+        <div class="side-footer">
+          <div class="nav-item">⚙ Theme</div>
+          <div class="nav-item">◑ Dark mode</div>
+        </div>
+      </aside>
+
+      <section class="chat">
+        <div class="chat-head">
+          <div><h1>January Payroll</h1><div class="sub">Black Mesa</div></div>
+          <div class="meta">···</div>
+        </div>
+        <div class="chat-scroll">
+          <div class="activity-feed">
+            <div class="activity-line"><span class="activity-icon done">✓</span>Pulled HRIS data for 47 employees</div>
+            <div class="activity-line"><span class="activity-icon done">✓</span>Compared against previous pay period</div>
+            <div class="activity-line"><span class="activity-icon spin"></span>Reviewing individual variances</div>
+          </div>
+          <div class="msg-row">
+            <div class="avatar">PA</div>
+            <div class="bubble">
+              <p>Jeff logged 0 hours this period. His last 3 periods: 84, 80, 82 hours. There's no PTO request, no leave of absence, and no status change on file. This looks like a missing timesheet — but I want you to decide how to handle it.</p>
+              <p><strong>2. Dr. Eli Vance — 58 overtime hours</strong><br>Dr. Vance has 58 overtime hours vs. a 3-period average of 12 hours. That's a 383% increase.</p>
+              <p><strong>3. Barney Calhoun — new HSA deduction</strong><br>New HSA deduction of $125/pay period. Matches a benefits enrollment change effective Jan 15.</p>
+              <p>I need to know how to handle the first two before I can move on:</p>
+            </div>
+          </div>
+          <div class="msg-row">
+            <div class="avatar" style="visibility:hidden">PA</div>
+            <div class="cq-card">
+              <div class="cq-tabs">
+                <div class="cq-tab active">Hardy</div>
+                <div class="cq-tab">Vance OT</div>
+              </div>
+              <div class="cq-question">Jeff Hardy has 0 hours logged this period but averaged 82 hours over his last 3 pay periods. How should I handle this?</div>
+              <div class="cq-options">
+                <div class="cq-option"><div class="opt-num">1</div><div class="opt-body"><div class="opt-title">Exclude from this run</div><div class="opt-desc">Skip Jeff entirely — pay him in a supplemental run</div></div></div>
+                <div class="cq-option"><div class="opt-num">2</div><div class="opt-body"><div class="opt-title">Include at previous average</div><div class="opt-desc">Use his 82-hour average as a placeholder</div></div></div>
+                <div class="cq-option"><div class="opt-num">3</div><div class="opt-body"><div class="opt-title">Include with 0 hours</div><div class="opt-desc">Process at 0 hours — $0 check</div></div></div>
+                <div class="cq-option"><div class="opt-num">4</div><div class="opt-body"><div class="opt-title">Hold entire payroll</div><div class="opt-desc">Pause until Jeff's timesheet is resolved</div></div></div>
+              </div>
+              <div class="cq-other">Other</div>
+              <div class="cq-next">Next</div>
+            </div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="composer-box">
+            <div class="composer-input">Ask anything…</div>
+            <div class="send">↑</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="plan card-panel">
+        <div class="plan-header">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:14px;">☰</span>
+            <div class="plan-title-row">
+              <div class="plan-name">Run January Payroll for Black M…</div>
+              <div class="plan-status-chip running">● Running</div>
+            </div>
+          </div>
+        </div>
+        <div class="plan-desc">End-to-end payroll processing for 47 active employees, pay period Jan 1–31, 2026.</div>
+        <div class="plan-stats"><span><strong>47</strong> employees</span><span><strong>~10 min</strong></span></div>
+        <div class="plan-bar"><span style="width:25%"></span></div>
+        <div class="plan-bar-label">2 / 8</div>
+        <div class="plan-step"><div class="step-icon done">✓</div><div class="step-body"><div class="step-title">Create payroll run for Jan 1–31</div><div class="step-sub">Completed 5:06 PM</div></div></div>
+        <div class="plan-step"><div class="step-icon done">✓</div><div class="step-body"><div class="step-title">Collect and validate hours</div><div class="step-sub">Completed 5:07 PM</div></div></div>
+        <div class="plan-step"><div class="step-icon active"></div><div class="step-body"><div class="step-title">Review individual employees</div></div></div>
+        <div class="plan-step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Review total payroll amounts</div></div></div>
+        <div class="plan-step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Approve payroll run <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Approve fund transfer <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-step"><div class="step-num">7</div><div class="step-body"><div class="step-title">Process deposits <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-step"><div class="step-num">8</div><div class="step-body"><div class="step-title">Remit payroll taxes <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-actions">
+          <button class="btn warning">⏸ Pause</button>
+          <button class="btn danger">⏹ Stop</button>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB 5: CURRENT FLUSH LAYOUT (control)
+     ============================================================ -->
+<div class="design-panel" id="p5">
+  <div class="layout-flush">
+    <div class="app-flush">
+
+      <aside class="side flush-side">
+        <div class="brand">PandaCommand</div>
+        <div class="nav-item active"><span class="nav-dot"></span>Dashboard</div>
+        <div class="nav-sec">Chats</div>
+        <div style="display:flex;gap:6px;padding:0 6px 6px;">
+          <span style="font-size:12px;font-weight:600;color:var(--text-primary);border-bottom:2px solid var(--accent);padding-bottom:4px;">Grouped</span>
+          <span style="font-size:12px;color:var(--text-secondary);padding-bottom:4px;margin-left:8px;">Recent</span>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">▾</span>Aperture Science<span class="badge">1</span></div>
+          <div class="chat-item"><div class="dot-unread"></div><div class="chat-title">Portal Gun Safety Training</div><div class="chat-time">17h · <span class="chat-status status-approve">● Approve schedule</span></div></div>
+          <div class="chat-item"><div class="chat-title" style="font-weight:500;color:var(--text-secondary)">GLaDOS Maintenance</div><div class="chat-time">19h</div></div>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">▾</span>Umbrella Corporation</div>
+          <div class="chat-item"><div class="chat-title" style="font-weight:500;color:var(--text-secondary)">Virus Containment Protocol</div><div class="chat-time">18h</div></div>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">▾</span>Weyland-Yutani<span class="badge">1</span></div>
+          <div class="chat-item"><div class="dot-unread"></div><div class="chat-title">Xenomorph Hazard Pay</div><div class="chat-time">20h</div></div>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">▾</span>Black Mesa<span class="badge">2</span></div>
+          <div class="chat-item selected"><div class="chat-title">January Payroll</div><div class="chat-time">16h · <span class="chat-status status-running">● Running · Pulling HRIS</span></div></div>
+          <div class="chat-item"><div class="dot-unread"></div><div class="chat-title">Benefits Enrollment Q1</div><div class="chat-time">17h</div></div>
+          <div class="chat-item"><div class="chat-title" style="font-weight:500;color:var(--text-secondary)">Tax Forms Review 2024</div><div class="chat-time">Yesterday</div></div>
+          <div class="chat-item"><div class="dot-unread"></div><div class="chat-title">New Hire: Dr. Freeman</div><div class="chat-time">Yesterday</div></div>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">›</span>Cyberdyne Systems</div>
+        </div>
+        <div class="client-group">
+          <div class="client-header"><span class="chevron">▾</span>Tyrell Corporation<span class="badge">1</span></div>
+        </div>
+        <div class="side-footer">
+          <div class="nav-item">⚙ Theme</div>
+          <div class="nav-item">◐ Light mode</div>
+        </div>
+      </aside>
+
+      <section class="chat flush-chat" style="padding:0 20px;">
+        <div class="chat-head" style="padding:18px 0 14px;">
+          <div><h1>January Payroll</h1><div class="sub">Black Mesa</div></div>
+          <div class="meta">···</div>
+        </div>
+        <div style="height:1px;background:var(--border-med);margin-bottom:14px;"></div>
+        <div class="chat-scroll">
+          <div class="activity-feed" style="padding-left:36px;">
+            <div class="activity-line"><span class="activity-icon done">✓</span>Pulled HRIS data for 47 employees</div>
+            <div class="activity-line"><span class="activity-icon done">✓</span>Compared against previous pay period</div>
+            <div class="activity-line"><span class="activity-icon spin"></span>Reviewing individual variances</div>
+          </div>
+          <div class="msg-row">
+            <div class="avatar">PA</div>
+            <div class="bubble">
+              <p>Jeff logged 0 hours this period. His last 3 periods: 84, 80, 82 hours (avg 82 hrs biweekly). There's no PTO request, no leave of absence, and no status change on file. This looks like a missing timesheet — but I want you to decide how to handle it.</p>
+              <p><strong>2. Dr. Eli Vance — 58 overtime hours</strong><br>Dr. Vance has 58 overtime hours this period vs. a 3-period average of 12 hours. That's a 383% increase. His base hours (80) are normal — it's the OT that's unusual. Could be a legitimate crunch period, but it's a $4,132.50 difference in gross pay.</p>
+              <p><strong>3. Barney Calhoun — new HSA deduction</strong><br>Barney has a new HSA deduction of $125/pay period starting this run. This matches a benefits enrollment change effective Jan 15 — just flagging it so you're aware.</p>
+              <p>I need to know how to handle the first two before I can move on:</p>
+            </div>
+          </div>
+          <div class="msg-row">
+            <div class="avatar" style="visibility:hidden">PA</div>
+            <div class="cq-card">
+              <div class="cq-tabs">
+                <div class="cq-tab active">Hardy</div>
+                <div class="cq-tab">Vance OT</div>
+              </div>
+              <div class="cq-question">Jeff Hardy has 0 hours logged this period but averaged 82 hours over his last 3 pay periods. No PTO, leave, or status change on file. How should I handle this?</div>
+              <div class="cq-options">
+                <div class="cq-option"><div class="opt-num">1</div><div class="opt-body"><div class="opt-title">Exclude from this run</div><div class="opt-desc">Skip Jeff entirely — pay him in a supplemental run once his timesheet is submitted</div></div></div>
+                <div class="cq-option"><div class="opt-num">2</div><div class="opt-body"><div class="opt-title">Include at previous average</div><div class="opt-desc">Use his 82-hour average as a placeholder and reconcile next period</div></div></div>
+                <div class="cq-option"><div class="opt-num">3</div><div class="opt-body"><div class="opt-title">Include with 0 hours</div><div class="opt-desc">Process him at 0 hours — he'll get a $0 check (deductions may still apply)</div></div></div>
+                <div class="cq-option"><div class="opt-num">4</div><div class="opt-body"><div class="opt-title">Hold entire payroll</div><div class="opt-desc">Pause the run until Jeff's timesheet is resolved</div></div></div>
+              </div>
+              <div class="cq-other">Other</div>
+              <div class="cq-next">Next</div>
+            </div>
+          </div>
+        </div>
+        <div class="composer" style="padding:12px 0 8px;">
+          <div class="composer-box">
+            <div class="composer-input">Ask anything…</div>
+            <div class="send">↑</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="plan flush-plan">
+        <div class="plan-header">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:14px;">☰</span>
+            <div class="plan-title-row">
+              <div class="plan-name">Run January Payroll for Black M…</div>
+              <div class="plan-status-chip running">● Running</div>
+            </div>
+          </div>
+          <span style="font-size:14px;color:var(--text-secondary);cursor:pointer">×</span>
+        </div>
+        <div class="plan-desc">End-to-end payroll processing for 47 active employees, pay period Jan 1–31, 2026.</div>
+        <div class="plan-stats"><span><strong>47</strong> employees</span><span><strong>~10 min</strong></span></div>
+        <div class="plan-bar"><span style="width:25%"></span></div>
+        <div class="plan-bar-label">2 / 8</div>
+        <div class="plan-step"><div class="step-icon done">✓</div><div class="step-body"><div class="step-title">Create payroll run for Jan 1–31</div><div class="step-sub">Completed 5:06:10 PM</div></div></div>
+        <div class="plan-step"><div class="step-icon done">✓</div><div class="step-body"><div class="step-title">Collect and validate employee hours and salary data</div><div class="step-sub">Completed 5:07:10 PM</div></div></div>
+        <div class="plan-step"><div class="step-icon active"></div><div class="step-body"><div class="step-title">Review individual employees against previous payroll</div></div></div>
+        <div class="plan-step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Review total payroll amounts against previous payrolls</div></div></div>
+        <div class="plan-step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Approve payroll run <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Approve fund transfer <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-step"><div class="step-num">7</div><div class="step-body"><div class="step-title">Process direct deposits and generate pay stubs <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-step"><div class="step-num">8</div><div class="step-body"><div class="step-title">Report and remit payroll taxes <span class="gate-badge">⚠ Gate</span></div></div></div>
+        <div class="plan-actions">
+          <button class="btn warning">⏸ Pause</button>
+          <button class="btn danger">⏹ Stop</button>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</div>
+
+<script src="feedback-panel.js"></script>
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.design-panel');
+  const tip = document.getElementById('tip');
+  const tips = {
+    p1: 'Sidebar + plan as cards, chat edgeless on background',
+    p2: 'All three panels in cards — watch the CQ card-in-card nesting',
+    p3: 'Tighter 10px gaps — more content density, less breathing room',
+    p4: 'Edgeless chat in dark mode — cards read clearly against shell',
+    p5: 'Current flush layout for direct comparison'
+  };
+  function activate(id) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.panel === id));
+    panels.forEach(p => p.classList.toggle('active', p.id === id));
+    tip.textContent = tips[id] || '';
+  }
+  tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.panel)));
+  document.addEventListener('keydown', (e) => {
+    const n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 5) activate('p' + n);
+  });
+
+  if (window.initFeedbackPanel) {
+    window.initFeedbackPanel({
+      name: 'cards-layout-v2',
+      designs: [
+        'Cards: Edgeless Chat',
+        'Cards: All Panels',
+        'Cards: Tight Gap',
+        'Dark Mode',
+        'Current (Control)'
+      ]
+    });
+  }
+</script>
+</body>
+</html>

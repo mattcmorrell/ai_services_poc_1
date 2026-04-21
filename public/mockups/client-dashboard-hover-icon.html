@@ -1,0 +1,1207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Client Dashboard — Hover-Reveal Icon</title>
+<style>
+  :root {
+    /* Mercury Light */
+    --sidebar-bg: #F5F6FA;
+    --sidebar-fg: #1A1C20;
+    --sidebar-fg-muted: #6E7178;
+    --sidebar-border: #DCDFE8;
+    --primary: #506098;
+    --primary-fg: #FFFFFF;
+    --accent: #E2E6F4;
+    --info-muted: #DBEAFE;
+    --info: #1D6B9A;
+    --warning: #B8860B;
+
+    /* Dark overrides */
+    --dark-sidebar-bg: #1D2024;
+    --dark-sidebar-fg: #E8E9ED;
+    --dark-sidebar-fg-muted: #8A8F99;
+    --dark-sidebar-border: #2A2F36;
+    --dark-primary: #6878B8;
+    --dark-primary-fg: #FFFFFF;
+    --dark-accent: #282A30;
+    --dark-info-muted: rgba(104,120,184,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: #E8E9ED;
+    font-family: "Inter", -apple-system, "SF Pro Text", system-ui, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    color: #1A1C20;
+  }
+
+  .app { display: flex; flex-direction: column; height: 100vh; }
+
+  /* ---------- Tab switcher ---------- */
+  .switcher {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    background: #1D2024;
+    border-bottom: 1px solid #2A2F36;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .switcher .brand {
+    font-size: 13px;
+    font-weight: 600;
+    color: #A8ADB8;
+    margin-right: 10px;
+    letter-spacing: 0.02em;
+  }
+  .switcher button {
+    background: transparent;
+    color: #A8ADB8;
+    border: 1px solid transparent;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .switcher button:hover { background: #22262C; color: #E8E9ED; }
+  .switcher button.active {
+    background: #22262C;
+    color: #E8E9ED;
+    border-color: #2A2F36;
+  }
+
+  /* ---------- Layout ---------- */
+  .panels {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+  .design-panel {
+    display: none;
+    flex: 1;
+    overflow: auto;
+  }
+  .design-panel.active { display: flex; }
+
+  /* ---------- Sidebar mockup ---------- */
+  .sidebar {
+    width: 320px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .sidebar.light {
+    background: var(--sidebar-bg);
+    color: var(--sidebar-fg);
+    border-right: 1px solid var(--sidebar-border);
+  }
+  .sidebar.dark {
+    background: var(--dark-sidebar-bg);
+    color: var(--dark-sidebar-fg);
+    border-right: 1px solid var(--dark-sidebar-border);
+  }
+
+  /* Sidebar header */
+  .sidebar-header {
+    padding: 20px 22px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sidebar-header .logo {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .light .logo { color: var(--sidebar-fg); }
+  .dark .logo { color: var(--dark-sidebar-fg); }
+
+  .section-label {
+    padding: 20px 22px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .light .section-label { color: var(--sidebar-fg-muted); }
+  .dark .section-label { color: var(--dark-sidebar-fg-muted); }
+
+  .chat-tree {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 14px 14px;
+  }
+
+  /* ---------- Client row ---------- */
+  .client-group { margin-bottom: 16px; }
+
+  .client-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px 4px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  /* Caret */
+  .caret {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .caret.expanded svg { transform: rotate(90deg); }
+  .light .caret { color: var(--sidebar-fg); }
+  .dark .caret { color: var(--dark-sidebar-fg); }
+  .light .caret:hover { background: rgba(0,0,0,0.08); }
+  .dark .caret:hover { background: rgba(255,255,255,0.08); }
+
+  /* Client name */
+  .client-name {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .light .client-name { color: var(--sidebar-fg); }
+  .dark .client-name { color: var(--dark-sidebar-fg); }
+
+  /* Trailing actions area */
+  .client-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  /* Unread badge */
+  .unread-badge {
+    display: flex;
+    height: 20px;
+    min-width: 20px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    padding: 0 6px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+  }
+  .light .unread-badge { background: var(--info-muted); color: var(--primary); }
+  .dark .unread-badge { background: var(--dark-info-muted); color: #8593D0; }
+
+  /* Dashboard icon button */
+  .dash-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.12s, background 0.12s;
+    flex-shrink: 0;
+    background: transparent;
+  }
+  .client-row:hover .dash-icon,
+  .client-row.force-hover .dash-icon {
+    opacity: 1;
+  }
+  .light .dash-icon { color: var(--sidebar-fg-muted); }
+  .dark .dash-icon { color: var(--dark-sidebar-fg-muted); }
+  .light .dash-icon:hover { background: rgba(0,0,0,0.08); color: var(--primary); }
+  .dark .dash-icon:hover { background: rgba(255,255,255,0.08); color: #8593D0; }
+
+  /* Plus button */
+  .plus-btn {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.12s, background 0.12s;
+    flex-shrink: 0;
+  }
+  .client-row:hover .plus-btn,
+  .client-row.force-hover .plus-btn {
+    opacity: 1;
+  }
+  .light .plus-btn { background: var(--primary); color: var(--primary-fg); }
+  .dark .plus-btn { background: var(--dark-primary); color: var(--dark-primary-fg); }
+  .light .plus-btn:hover { background: #3F4F87; }
+  .dark .plus-btn:hover { background: #5668A8; }
+
+  /* Badge hides on hover when plus shows */
+  .client-row:hover .unread-badge,
+  .client-row.force-hover .unread-badge { display: none; }
+
+  /* Active client row */
+  .client-row.active {
+    background: var(--primary);
+    color: var(--primary-fg);
+  }
+  .dark .client-row.active { background: var(--dark-primary); }
+  .client-row.active .client-name { color: #fff; }
+  .client-row.active .caret { color: #fff; }
+  .client-row.active .dash-icon { color: rgba(255,255,255,0.7); }
+  .client-row.active .dash-icon:hover { background: rgba(255,255,255,0.2); color: #fff; }
+  .client-row.active .plus-btn { background: #fff; color: var(--primary); }
+  .dark .client-row.active .plus-btn { background: #fff; color: var(--dark-primary); }
+
+  /* ---------- Chat rows ---------- */
+  .chat-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 8px 8px 32px;
+    border-radius: 10px;
+    cursor: pointer;
+    position: relative;
+  }
+  .light .chat-row:hover { background: var(--accent); }
+  .dark .chat-row:hover { background: var(--dark-accent); }
+  .chat-row.selected { background: var(--primary); color: var(--primary-fg); }
+  .dark .chat-row.selected { background: var(--dark-primary); }
+
+  .chat-title {
+    font-size: 14px;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .light .chat-title { color: var(--sidebar-fg-muted); }
+  .dark .chat-title { color: var(--dark-sidebar-fg-muted); }
+  .chat-title.unread { font-weight: 600; }
+  .light .chat-title.unread { color: var(--sidebar-fg); }
+  .dark .chat-title.unread { color: var(--dark-sidebar-fg); }
+  .chat-row.selected .chat-title { color: #fff; font-weight: 600; }
+
+  .chat-meta {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .light .chat-meta { color: var(--sidebar-fg-muted); }
+  .dark .chat-meta { color: var(--dark-sidebar-fg-muted); }
+  .chat-row.selected .chat-meta { color: rgba(255,255,255,0.75); }
+
+  .state-running { font-weight: 600; }
+  .light .state-running { color: var(--info); }
+  .dark .state-running { color: #8E9EE0; }
+  .chat-row.selected .state-running { color: #fff; }
+
+  .state-approval { font-weight: 600; }
+  .light .state-approval { color: var(--warning); }
+  .dark .state-approval { color: #D9A867; }
+  .chat-row.selected .state-approval { color: #fff; }
+
+  .unread-dot {
+    position: absolute;
+    left: 14px;
+    top: 13px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+  .light .unread-dot { background: var(--primary); }
+  .dark .unread-dot { background: var(--dark-primary); }
+
+  /* Spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { animation: spin 1s linear infinite; }
+
+  /* ---------- Main content placeholder ---------- */
+  .main-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+  .light .main-content { background: #fff; }
+  .dark .main-content { background: #101214; }
+
+  .placeholder-card {
+    padding: 32px 40px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 420px;
+  }
+  .light .placeholder-card { background: var(--sidebar-bg); }
+  .dark .placeholder-card { background: #1D2024; border: 1px solid #2A2F36; }
+  .placeholder-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .placeholder-card p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .light .placeholder-card p { color: var(--sidebar-fg-muted); }
+  .dark .placeholder-card p { color: var(--dark-sidebar-fg-muted); }
+
+  /* ---------- Annotation callouts ---------- */
+  .annotation {
+    position: absolute;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .light .annotation {
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+  }
+  .dark .annotation {
+    background: rgba(217,168,103,0.15);
+    color: #D9A867;
+    border: 1px solid rgba(217,168,103,0.3);
+  }
+  .annotation::before {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    transform: rotate(45deg);
+  }
+  .annotation.arrow-left::before {
+    left: -5px;
+    top: 50%;
+    margin-top: -4px;
+  }
+  .light .annotation.arrow-left::before {
+    background: #FEF3C7;
+    border-left: 1px solid #FDE68A;
+    border-bottom: 1px solid #FDE68A;
+  }
+  .dark .annotation.arrow-left::before {
+    background: rgba(217,168,103,0.15);
+    border-left: 1px solid rgba(217,168,103,0.3);
+    border-bottom: 1px solid rgba(217,168,103,0.3);
+  }
+
+  /* ---------- Variant layout ---------- */
+  .variant-container {
+    display: flex;
+    gap: 48px;
+    padding: 40px;
+    flex: 1;
+    overflow: auto;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .variant-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .variant-label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .variant-sublabel {
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .sidebar-frame {
+    width: 320px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    position: relative;
+  }
+  .dark .sidebar-frame { box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+
+  /* ---------- Tooltip for icon ---------- */
+  .dash-icon .tooltip {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 6px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 100;
+  }
+  .light .dash-icon .tooltip { background: #1A1C20; color: #fff; }
+  .dark .dash-icon .tooltip { background: #E8E9ED; color: #1A1C20; }
+  .dash-icon:hover .tooltip { display: block; }
+
+  /* ---------- Design B: larger hit area ---------- */
+  .dash-icon.large {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  /* ---------- Design C: text label variant ---------- */
+  .dash-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px 2px 6px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.12s, background 0.12s;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    background: transparent;
+    white-space: nowrap;
+  }
+  .client-row:hover .dash-label,
+  .client-row.force-hover .dash-label { opacity: 1; }
+  .light .dash-label { color: var(--sidebar-fg-muted); }
+  .dark .dash-label { color: var(--dark-sidebar-fg-muted); }
+  .light .dash-label:hover { background: rgba(0,0,0,0.08); color: var(--primary); }
+  .dark .dash-label:hover { background: rgba(255,255,255,0.08); color: #8593D0; }
+  .client-row.active .dash-label { color: rgba(255,255,255,0.7); }
+  .client-row.active .dash-label:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+  /* SVG icons inline */
+  .icon-sm { width: 14px; height: 14px; flex-shrink: 0; }
+  .icon-md { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* state label on hover */
+  .hover-state-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+    margin-bottom: 6px;
+    padding-left: 8px;
+  }
+  .light .hover-state-label { color: var(--primary); }
+  .dark .hover-state-label { color: #8593D0; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Tab switcher -->
+  <div class="switcher">
+    <span class="brand">Hover-Reveal Icon</span>
+    <button class="active" onclick="showTab(0)">A: Icon only</button>
+    <button onclick="showTab(1)">B: Icon + tooltip</button>
+    <button onclick="showTab(2)">C: Text label</button>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- DESIGN A: Small icon, no label -->
+  <!-- ============================================================ -->
+  <div class="design-panel active">
+    <div class="variant-container" style="background:#E8E9ED;">
+
+      <!-- Light mode -->
+      <div class="variant-column">
+        <div>
+          <div class="variant-label" style="color:#1A1C20;">Light — Mercury</div>
+          <div class="variant-sublabel" style="color:#6E7178;">LayoutGrid icon appears on hover, left of +</div>
+        </div>
+
+        <!-- Resting state -->
+        <div class="hover-state-label" style="color:#6E7178; font-weight:500; text-transform:none; font-size:13px;">Default (no hover)</div>
+        <div class="sidebar-frame">
+          <div class="sidebar light" style="height:auto;">
+            <div class="section-label">Chats</div>
+            <div class="chat-tree">
+              <!-- Client with unread -->
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret expanded">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Meridian Health</span>
+                  <div class="client-actions">
+                    <button class="dash-icon" style="opacity:0;">
+                      <svg class="icon-md" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                    </button>
+                    <span class="unread-badge">2</span>
+                    <button class="plus-btn" style="opacity:0;">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">Benefits enrollment review</span>
+                  <span class="chat-meta"><span class="state-running"><svg class="icon-sm spinner" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><circle cx="8" cy="8" r="6" stroke-dasharray="20 18"/></svg> Running · Pulling data</span> <span>·</span> 2m</span>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">PTO policy update</span>
+                  <span class="chat-meta">5m</span>
+                </div>
+              </div>
+              <!-- Client collapsed -->
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Apex Industries</span>
+                  <div class="client-actions">
+                    <button class="dash-icon" style="opacity:0;">
+                      <svg class="icon-md" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                    </button>
+                    <button class="plus-btn" style="opacity:0;">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hover state -->
+        <div class="hover-state-label">Hovered (icons revealed)</div>
+        <div class="sidebar-frame">
+          <div class="sidebar light" style="height:auto;">
+            <div class="section-label">Chats</div>
+            <div class="chat-tree">
+              <div class="client-group">
+                <div class="client-row force-hover" style="background:var(--accent);">
+                  <button class="caret expanded">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Meridian Health</span>
+                  <div class="client-actions">
+                    <button class="dash-icon" style="opacity:1; color:var(--sidebar-fg-muted);">
+                      <svg class="icon-md" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                    </button>
+                    <button class="plus-btn" style="opacity:1;">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">Benefits enrollment review</span>
+                  <span class="chat-meta"><span class="state-running"><svg class="icon-sm spinner" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><circle cx="8" cy="8" r="6" stroke-dasharray="20 18"/></svg> Running · Pulling data</span> <span>·</span> 2m</span>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">PTO policy update</span>
+                  <span class="chat-meta">5m</span>
+                </div>
+              </div>
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Apex Industries</span>
+                  <div class="client-actions">
+                    <button class="dash-icon" style="opacity:0;">
+                      <svg class="icon-md" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                    </button>
+                    <button class="plus-btn" style="opacity:0;">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active client row -->
+        <div class="hover-state-label">Active client + hovered</div>
+        <div class="sidebar-frame">
+          <div class="sidebar light" style="height:auto;">
+            <div class="section-label">Chats</div>
+            <div class="chat-tree">
+              <div class="client-group">
+                <div class="client-row active force-hover">
+                  <button class="caret expanded" style="color:#fff;">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name" style="color:#fff;">Meridian Health</span>
+                  <div class="client-actions">
+                    <button class="dash-icon" style="opacity:1; color:rgba(255,255,255,0.7);">
+                      <svg class="icon-md" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                    </button>
+                    <button class="plus-btn" style="opacity:1; background:#fff; color:var(--primary);">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row selected">
+                  <span class="chat-title" style="color:#fff; font-weight:600;">Benefits enrollment review</span>
+                  <span class="chat-meta" style="color:rgba(255,255,255,0.75);"><span class="state-running" style="color:#fff;"><svg class="icon-sm spinner" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><circle cx="8" cy="8" r="6" stroke-dasharray="20 18"/></svg> Running · Pulling data</span> <span>·</span> 2m</span>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">PTO policy update</span>
+                  <span class="chat-meta">5m</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dark mode -->
+      <div class="variant-column">
+        <div>
+          <div class="variant-label" style="color:#1A1C20;">Dark — Mercury</div>
+          <div class="variant-sublabel" style="color:#6E7178;">Same pattern, dark palette</div>
+        </div>
+
+        <!-- Resting -->
+        <div class="hover-state-label" style="color:#6E7178; font-weight:500; text-transform:none; font-size:13px;">Default (no hover)</div>
+        <div class="sidebar-frame">
+          <div class="sidebar dark" style="height:auto;">
+            <div class="section-label">Chats</div>
+            <div class="chat-tree">
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret expanded">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Meridian Health</span>
+                  <div class="client-actions">
+                    <span class="unread-badge">2</span>
+                  </div>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">Benefits enrollment review</span>
+                  <span class="chat-meta"><span class="state-running"><svg class="icon-sm spinner" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><circle cx="8" cy="8" r="6" stroke-dasharray="20 18"/></svg> Running · Pulling data</span> <span>·</span> 2m</span>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">PTO policy update</span>
+                  <span class="chat-meta">5m</span>
+                </div>
+              </div>
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Apex Industries</span>
+                  <div class="client-actions"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hover -->
+        <div class="hover-state-label" style="color:#8593D0;">Hovered (icons revealed)</div>
+        <div class="sidebar-frame">
+          <div class="sidebar dark" style="height:auto;">
+            <div class="section-label">Chats</div>
+            <div class="chat-tree">
+              <div class="client-group">
+                <div class="client-row force-hover" style="background:var(--dark-accent);">
+                  <button class="caret expanded">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Meridian Health</span>
+                  <div class="client-actions">
+                    <button class="dash-icon" style="opacity:1; color:var(--dark-sidebar-fg-muted);">
+                      <svg class="icon-md" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                    </button>
+                    <button class="plus-btn" style="opacity:1;">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">Benefits enrollment review</span>
+                  <span class="chat-meta"><span class="state-running"><svg class="icon-sm spinner" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><circle cx="8" cy="8" r="6" stroke-dasharray="20 18"/></svg> Running · Pulling data</span> <span>·</span> 2m</span>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">PTO policy update</span>
+                  <span class="chat-meta">5m</span>
+                </div>
+              </div>
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Apex Industries</span>
+                  <div class="client-actions"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active -->
+        <div class="hover-state-label" style="color:#8593D0;">Active client + hovered</div>
+        <div class="sidebar-frame">
+          <div class="sidebar dark" style="height:auto;">
+            <div class="section-label">Chats</div>
+            <div class="chat-tree">
+              <div class="client-group">
+                <div class="client-row active force-hover">
+                  <button class="caret expanded" style="color:#fff;">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name" style="color:#fff;">Meridian Health</span>
+                  <div class="client-actions">
+                    <button class="dash-icon" style="opacity:1; color:rgba(255,255,255,0.7);">
+                      <svg class="icon-md" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                    </button>
+                    <button class="plus-btn" style="opacity:1; background:#fff; color:var(--dark-primary);">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row selected" style="background:var(--dark-primary);">
+                  <span class="chat-title" style="color:#fff; font-weight:600;">Benefits enrollment review</span>
+                  <span class="chat-meta" style="color:rgba(255,255,255,0.75);"><span class="state-running" style="color:#fff;"><svg class="icon-sm spinner" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><circle cx="8" cy="8" r="6" stroke-dasharray="20 18"/></svg> Running · Pulling data</span> <span>·</span> 2m</span>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">PTO policy update</span>
+                  <span class="chat-meta">5m</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- DESIGN B: Icon + tooltip on hover -->
+  <!-- ============================================================ -->
+  <div class="design-panel">
+    <div class="variant-container" style="background:#E8E9ED;">
+
+      <div class="variant-column">
+        <div>
+          <div class="variant-label" style="color:#1A1C20;">B: Icon + Tooltip</div>
+          <div class="variant-sublabel" style="color:#6E7178;">Larger icon (28px) with tooltip label on hover — more discoverable</div>
+        </div>
+
+        <!-- Interactive sidebar (live hover) -->
+        <div class="hover-state-label" style="color:#6E7178; font-weight:500; text-transform:none; font-size:13px;">Interactive — hover the rows</div>
+        <div class="sidebar-frame">
+          <div class="sidebar light" style="height:auto;">
+            <div class="section-label">Chats</div>
+            <div class="chat-tree">
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret expanded">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Meridian Health</span>
+                  <div class="client-actions">
+                    <button class="dash-icon large" style="position:relative;">
+                      <svg class="icon-md" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                      <span class="tooltip">Client tasks</span>
+                    </button>
+                    <span class="unread-badge">2</span>
+                    <button class="plus-btn">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">Benefits enrollment review</span>
+                  <span class="chat-meta"><span class="state-running"><svg class="icon-sm spinner" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><circle cx="8" cy="8" r="6" stroke-dasharray="20 18"/></svg> Running · Pulling data</span> <span>·</span> 2m</span>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">PTO policy update</span>
+                  <span class="chat-meta">5m</span>
+                </div>
+              </div>
+
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret expanded">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Apex Industries</span>
+                  <div class="client-actions">
+                    <button class="dash-icon large" style="position:relative;">
+                      <svg class="icon-md" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                      <span class="tooltip">Client tasks</span>
+                    </button>
+                    <button class="plus-btn">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row">
+                  <span class="chat-title">Quarterly compliance check</span>
+                  <span class="chat-meta">1h</span>
+                </div>
+                <div class="chat-row">
+                  <span class="chat-title">New hire onboarding flow</span>
+                  <span class="chat-meta"><span class="state-approval">Needs approval</span> <span>·</span> 3h</span>
+                </div>
+              </div>
+
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Coastal Wellness</span>
+                  <div class="client-actions">
+                    <button class="dash-icon large" style="position:relative;">
+                      <svg class="icon-md" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                      <span class="tooltip">Client tasks</span>
+                    </button>
+                    <button class="plus-btn">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dark interactive -->
+        <div class="hover-state-label" style="color:#6E7178; font-weight:500; text-transform:none; font-size:13px; margin-top:16px;">Dark mode — hover the rows</div>
+        <div class="sidebar-frame">
+          <div class="sidebar dark" style="height:auto;">
+            <div class="section-label">Chats</div>
+            <div class="chat-tree">
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret expanded">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Meridian Health</span>
+                  <div class="client-actions">
+                    <button class="dash-icon large" style="position:relative;">
+                      <svg class="icon-md" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                      <span class="tooltip">Client tasks</span>
+                    </button>
+                    <span class="unread-badge">2</span>
+                    <button class="plus-btn">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">Benefits enrollment review</span>
+                  <span class="chat-meta"><span class="state-running"><svg class="icon-sm spinner" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><circle cx="8" cy="8" r="6" stroke-dasharray="20 18"/></svg> Running · Pulling data</span> <span>·</span> 2m</span>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">PTO policy update</span>
+                  <span class="chat-meta">5m</span>
+                </div>
+              </div>
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret expanded">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Apex Industries</span>
+                  <div class="client-actions">
+                    <button class="dash-icon large" style="position:relative;">
+                      <svg class="icon-md" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                      <span class="tooltip">Client tasks</span>
+                    </button>
+                    <button class="plus-btn">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row">
+                  <span class="chat-title">Quarterly compliance check</span>
+                  <span class="chat-meta">1h</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- DESIGN C: Text label that appears on hover -->
+  <!-- ============================================================ -->
+  <div class="design-panel">
+    <div class="variant-container" style="background:#E8E9ED;">
+
+      <div class="variant-column">
+        <div>
+          <div class="variant-label" style="color:#1A1C20;">C: "Tasks" text label</div>
+          <div class="variant-sublabel" style="color:#6E7178;">Icon + "Tasks" word appears on hover — most explicit, widest hit area</div>
+        </div>
+
+        <!-- Interactive -->
+        <div class="hover-state-label" style="color:#6E7178; font-weight:500; text-transform:none; font-size:13px;">Interactive — hover the rows</div>
+        <div class="sidebar-frame">
+          <div class="sidebar light" style="height:auto;">
+            <div class="section-label">Chats</div>
+            <div class="chat-tree">
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret expanded">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Meridian Health</span>
+                  <div class="client-actions">
+                    <button class="dash-label">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                      Tasks
+                    </button>
+                    <span class="unread-badge">2</span>
+                    <button class="plus-btn">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">Benefits enrollment review</span>
+                  <span class="chat-meta"><span class="state-running"><svg class="icon-sm spinner" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><circle cx="8" cy="8" r="6" stroke-dasharray="20 18"/></svg> Running · Pulling data</span> <span>·</span> 2m</span>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">PTO policy update</span>
+                  <span class="chat-meta">5m</span>
+                </div>
+              </div>
+
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret expanded">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Apex Industries</span>
+                  <div class="client-actions">
+                    <button class="dash-label">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                      Tasks
+                    </button>
+                    <button class="plus-btn">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row">
+                  <span class="chat-title">Quarterly compliance check</span>
+                  <span class="chat-meta">1h</span>
+                </div>
+                <div class="chat-row">
+                  <span class="chat-title">New hire onboarding flow</span>
+                  <span class="chat-meta"><span class="state-approval">Needs approval</span> <span>·</span> 3h</span>
+                </div>
+              </div>
+
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Coastal Wellness</span>
+                  <div class="client-actions">
+                    <button class="dash-label">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                      Tasks
+                    </button>
+                    <button class="plus-btn">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Frozen hover for comparison -->
+        <div class="hover-state-label">Hovered state (frozen)</div>
+        <div class="sidebar-frame">
+          <div class="sidebar light" style="height:auto;">
+            <div class="section-label">Chats</div>
+            <div class="chat-tree">
+              <div class="client-group">
+                <div class="client-row force-hover" style="background:var(--accent);">
+                  <button class="caret expanded">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Meridian Health</span>
+                  <div class="client-actions">
+                    <button class="dash-label" style="opacity:1;">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                      Tasks
+                    </button>
+                    <button class="plus-btn" style="opacity:1;">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">Benefits enrollment review</span>
+                  <span class="chat-meta"><span class="state-running"><svg class="icon-sm spinner" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><circle cx="8" cy="8" r="6" stroke-dasharray="20 18"/></svg> Running · Pulling data</span> <span>·</span> 2m</span>
+                </div>
+              </div>
+
+              <!-- Active row with label -->
+              <div class="client-group">
+                <div class="client-row active force-hover">
+                  <button class="caret expanded" style="color:#fff;">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name" style="color:#fff;">Apex Industries</span>
+                  <div class="client-actions">
+                    <button class="dash-label" style="opacity:1; color:rgba(255,255,255,0.7);">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                      Tasks
+                    </button>
+                    <button class="plus-btn" style="opacity:1; background:#fff; color:var(--primary);">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row selected">
+                  <span class="chat-title" style="color:#fff; font-weight:600;">Quarterly compliance check</span>
+                  <span class="chat-meta" style="color:rgba(255,255,255,0.75);">1h</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dark interactive -->
+        <div class="hover-state-label" style="color:#6E7178; font-weight:500; text-transform:none; font-size:13px; margin-top:16px;">Dark mode — hover the rows</div>
+        <div class="sidebar-frame">
+          <div class="sidebar dark" style="height:auto;">
+            <div class="section-label">Chats</div>
+            <div class="chat-tree">
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret expanded">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Meridian Health</span>
+                  <div class="client-actions">
+                    <button class="dash-label">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                      Tasks
+                    </button>
+                    <span class="unread-badge">2</span>
+                    <button class="plus-btn">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">Benefits enrollment review</span>
+                  <span class="chat-meta"><span class="state-running"><svg class="icon-sm spinner" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;"><circle cx="8" cy="8" r="6" stroke-dasharray="20 18"/></svg> Running · Pulling data</span> <span>·</span> 2m</span>
+                </div>
+                <div class="chat-row">
+                  <span class="unread-dot"></span>
+                  <span class="chat-title unread">PTO policy update</span>
+                  <span class="chat-meta">5m</span>
+                </div>
+              </div>
+              <div class="client-group">
+                <div class="client-row">
+                  <button class="caret">
+                    <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
+                  </button>
+                  <span class="client-name">Apex Industries</span>
+                  <div class="client-actions">
+                    <button class="dash-label">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                      Tasks
+                    </button>
+                    <button class="plus-btn">
+                      <svg class="icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.switcher button');
+  const panels = document.querySelectorAll('.design-panel');
+
+  function showTab(index) {
+    tabs.forEach((t, i) => t.classList.toggle('active', i === index));
+    panels.forEach((p, i) => p.classList.toggle('active', i === index));
+  }
+
+  // Keyboard shortcuts: 1, 2, 3
+  document.addEventListener('keydown', (e) => {
+    const n = parseInt(e.key);
+    if (n >= 1 && n <= panels.length) showTab(n - 1);
+  });
+</script>
+<script src="feedback-panel.js"></script>
+</body>
+</html>

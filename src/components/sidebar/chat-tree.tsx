@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { CaretRight, CircleNotch, Plus } from "@phosphor-icons/react";
+import { CaretRight, CircleNotch } from "@phosphor-icons/react";
 import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { formatTimeAgoCompact } from "@/lib/format-time";
@@ -99,24 +99,21 @@ export function ChatTree({
               </button>
 
               {unreadCount > 0 && !isActiveClient && (
-                <span className="group-hover:hidden ml-auto flex-shrink-0 text-[11px] font-semibold leading-none px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
+                <span className="group-hover:hidden ml-auto flex-shrink-0 text-[11px] font-bold leading-none px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
                   {unreadCount}
                 </span>
               )}
 
               <button
                 onClick={() => onNewChat(client.id)}
-                title={`New chat — ${client.name}`}
-                className="group/nc absolute right-2 flex-shrink-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <span className={cn(
-                  "flex h-6 w-6 items-center justify-center rounded-full transition-colors",
+                className={cn(
+                  "absolute right-2 flex-shrink-0 text-[11px] font-semibold leading-none px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity",
                   isActiveClient
-                    ? "bg-primary-foreground text-primary group-hover/nc:bg-primary-foreground/85"
-                    : "bg-primary text-primary-foreground group-hover/nc:bg-primary/85"
-                )}>
-                  <Plus weight="bold" className="h-3.5 w-3.5" />
-                </span>
+                    ? "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"
+                    : "bg-primary text-primary-foreground hover:bg-primary/85"
+                )}
+              >
+                New Chat
               </button>
             </div>
 
