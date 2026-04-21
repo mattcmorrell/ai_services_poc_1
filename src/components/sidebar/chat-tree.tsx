@@ -68,7 +68,7 @@ export function ChatTree({
           <div key={client.id} className="mb-4">
             {/* Client row */}
             <div className={cn(
-              "group relative flex items-center gap-1.5 py-1 pl-2 pr-1.5 rounded-md",
+              "group relative flex items-center gap-1.5 py-1 pl-2 pr-2 rounded-md",
               isActiveClient
                 ? "bg-primary text-primary-foreground"
                 : "hover:bg-accent"
@@ -91,34 +91,26 @@ export function ChatTree({
               <button
                 onClick={() => onSelectClient(client.id)}
                 className={cn(
-                  "flex-1 truncate text-left",
+                  "flex-1 min-w-0 text-left flex items-center gap-1.5",
                   isActiveClient ? "text-primary-foreground" : "text-foreground"
                 )}
               >
-                <span className="type-client-name font-semibold">{client.name}</span>
+                <span className="type-client-name font-semibold truncate">{client.name}</span>
               </button>
+
+              {unreadCount > 0 && !isActiveClient && (
+                <span className="group-hover:hidden ml-auto flex-shrink-0 text-[11px] font-semibold leading-none px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
+                  {unreadCount}
+                </span>
+              )}
 
               <button
                 onClick={() => onNewChat(client.id)}
                 title={`New chat — ${client.name}`}
-                className={cn(
-                  "group/nc ml-0.5 flex-shrink-0 flex items-center justify-center transition-opacity",
-                  unreadCount === 0 && "opacity-0 group-hover:opacity-100"
-                )}
+                className="group/nc absolute right-2 flex-shrink-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               >
-                {/* Count pill — hidden on row hover */}
-                {unreadCount > 0 && (
-                  <span className={cn(
-                    "group-hover:hidden flex h-5 min-w-5 items-center justify-center rounded-full px-1.5",
-                    isActiveClient ? "bg-primary-foreground/70 text-primary" : "bg-[var(--color-info-muted)] text-primary"
-                  )}>
-                    <span className="font-sans font-bold text-xs">{unreadCount}</span>
-                  </span>
-                )}
-                {/* Plus circle — shown on row hover */}
                 <span className={cn(
                   "flex h-6 w-6 items-center justify-center rounded-full transition-colors",
-                  unreadCount > 0 ? "hidden group-hover:flex" : "flex",
                   isActiveClient
                     ? "bg-primary-foreground text-primary group-hover/nc:bg-primary-foreground/85"
                     : "bg-primary text-primary-foreground group-hover/nc:bg-primary/85"
