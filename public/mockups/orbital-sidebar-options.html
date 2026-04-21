@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Orbital Light — Sidebar Options</title>
+<style>
+  :root {
+    --ink: #1A2830;
+    --mute: #5A7080;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    color: var(--ink);
+    background: #F6F7F8;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .sub {
+    font-size: 13px;
+    color: var(--mute);
+    margin: 0 0 32px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+  }
+
+  .card {
+    background: #FFFFFF;
+    border: 1px solid rgba(26, 40, 48, 0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(26, 40, 48, 0.04);
+  }
+
+  .card-head {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid rgba(26, 40, 48, 0.06);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .card-head .title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  .card-head .badge {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #4A7A98;
+  }
+  .card-head .desc {
+    font-size: 12px;
+    color: var(--mute);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  /* ------------ preview frame ------------ */
+  .preview {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    height: 220px;
+  }
+  .sidebar {
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1A2830;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .nav-item {
+    background: #4A7A98;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 10px;
+    border-radius: 7px;
+  }
+  .chat-row {
+    height: 10px;
+    border-radius: 4px;
+    background: rgba(26, 40, 48, 0.12);
+  }
+  .chat-row.w1 { width: 85%; }
+  .chat-row.w2 { width: 65%; }
+  .chat-row.w3 { width: 78%; }
+  .chat-row.w4 { width: 55%; }
+
+  .canvas {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .inner-card {
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 12px 14px;
+    border: 1px solid rgba(26, 40, 48, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .inner-line {
+    height: 8px;
+    border-radius: 3px;
+    background: rgba(26, 40, 48, 0.1);
+  }
+  .inner-line.w1 { width: 80%; }
+  .inner-line.w2 { width: 55%; }
+  .inner-line.w3 { width: 70%; }
+
+  /* ------------ swatches row ------------ */
+  .swatches {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid rgba(26, 40, 48, 0.06);
+  }
+  .swatch {
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11px;
+  }
+  .swatch + .swatch {
+    border-left: 1px solid rgba(26, 40, 48, 0.06);
+  }
+  .swatch .label {
+    color: var(--mute);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .swatch .hex {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1A2830;
+  }
+
+  /* --- the reference (current Inkwell-style harmony) --- */
+  .ref {
+    background: #EBE8E0;
+  }
+  .ref .sidebar { background: #F7F5F1; }
+
+  /* --- current Orbital (the problem) --- */
+  .now {
+    background: #E0EAF2;
+  }
+  .now .sidebar { background: #F0F2F5; }
+
+  /* A: sidebar pulled into blue family, EEF3F8 */
+  .opt-a { background: #E0EAF2; }
+  .opt-a .sidebar { background: #EEF3F8; }
+
+  /* A2: slightly less blue */
+  .opt-a2 { background: #E0EAF2; }
+  .opt-a2 .sidebar { background: #F0F4F8; }
+
+  /* B: desaturate bg to neutral */
+  .opt-b { background: #E4E8ED; }
+  .opt-b .sidebar { background: #F0F2F5; }
+
+  /* C: flip — white sidebar on blue canvas */
+  .opt-c { background: #E0EAF2; }
+  .opt-c .sidebar { background: #FFFFFF; }
+
+  /* D: both toned toward midpoint */
+  .opt-d { background: #DCE6EE; }
+  .opt-d .sidebar { background: #EAF0F5; }
+
+  /* Mercury light — for comparison vs Option B */
+  .mercury { background: #ECEEF3; }
+  .mercury .sidebar { background: #F5F6FA; }
+  .mercury .nav-item { background: #506098; }
+
+  .cols-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    margin-top: 28px;
+  }
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--mute);
+    margin: 36px 0 14px;
+  }
+  .legend {
+    font-size: 12px;
+    color: var(--mute);
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1>Orbital light — sidebar options</h1>
+    <p class="sub">Focus on the relationship between the two surface colors. Right column is the canvas bg; left column is the sidebar sitting on it.</p>
+
+    <div class="section-title">Reference · the problem</div>
+    <div class="grid">
+
+      <!-- Inkwell reference -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="title">Inkwell light <span class="badge" style="color:#5A7A58">works</span></div>
+            <div class="desc">Both surfaces live on the same warm cream axis. Sidebar reads as a lighter step of the same paper.</div>
+          </div>
+        </div>
+        <div class="preview ref">
+          <div class="sidebar">
+            <div class="logo">PandaCommand</div>
+            <div class="nav-item" style="background:#5A7A58">Dashboard</div>
+            <div class="chat-row w1"></div>
+            <div class="chat-row w2"></div>
+            <div class="chat-row w3"></div>
+            <div class="chat-row w4"></div>
+          </div>
+          <div class="canvas">
+            <div class="inner-card">
+              <div class="inner-line w1"></div>
+              <div class="inner-line w2"></div>
+            </div>
+            <div class="inner-card">
+              <div class="inner-line w3"></div>
+              <div class="inner-line w2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="swatches">
+          <div class="swatch"><span class="label">bg</span><span class="hex">#EBE8E0</span></div>
+          <div class="swatch"><span class="label">sidebar</span><span class="hex">#F7F5F1</span></div>
+        </div>
+      </div>
+
+      <!-- Orbital current -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="title">Orbital light <span class="badge" style="color:#C06828">current</span></div>
+            <div class="desc">Blue-saturated bg paired with a neutral-gray sidebar. Different hue families — they don't read as the same paper.</div>
+          </div>
+        </div>
+        <div class="preview now">
+          <div class="sidebar">
+            <div class="logo">PandaCommand</div>
+            <div class="nav-item">Dashboard</div>
+            <div class="chat-row w1"></div>
+            <div class="chat-row w2"></div>
+            <div class="chat-row w3"></div>
+            <div class="chat-row w4"></div>
+          </div>
+          <div class="canvas">
+            <div class="inner-card">
+              <div class="inner-line w1"></div>
+              <div class="inner-line w2"></div>
+            </div>
+            <div class="inner-card">
+              <div class="inner-line w3"></div>
+              <div class="inner-line w2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="swatches">
+          <div class="swatch"><span class="label">bg</span><span class="hex">#E0EAF2</span></div>
+          <div class="swatch"><span class="label">sidebar</span><span class="hex">#F0F2F5</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-title">Options</div>
+
+    <div class="cols-3">
+
+      <!-- Option A -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="title">A · sidebar to blue family</div>
+            <div class="desc">Keep the signature bg. Pull the sidebar onto the same blue axis. Lowest blast radius. Recommended.</div>
+          </div>
+        </div>
+        <div class="preview opt-a">
+          <div class="sidebar">
+            <div class="logo">PandaCommand</div>
+            <div class="nav-item">Dashboard</div>
+            <div class="chat-row w1"></div>
+            <div class="chat-row w2"></div>
+            <div class="chat-row w3"></div>
+            <div class="chat-row w4"></div>
+          </div>
+          <div class="canvas">
+            <div class="inner-card">
+              <div class="inner-line w1"></div>
+              <div class="inner-line w2"></div>
+            </div>
+            <div class="inner-card">
+              <div class="inner-line w3"></div>
+              <div class="inner-line w2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="swatches">
+          <div class="swatch"><span class="label">bg</span><span class="hex">#E0EAF2</span></div>
+          <div class="swatch"><span class="label">sidebar</span><span class="hex">#EEF3F8</span></div>
+        </div>
+      </div>
+
+      <!-- Option A2 -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="title">A2 · lighter blue sidebar</div>
+            <div class="desc">Same idea, a touch less blue in the sidebar. Slightly more contrast between surfaces.</div>
+          </div>
+        </div>
+        <div class="preview opt-a2">
+          <div class="sidebar">
+            <div class="logo">PandaCommand</div>
+            <div class="nav-item">Dashboard</div>
+            <div class="chat-row w1"></div>
+            <div class="chat-row w2"></div>
+            <div class="chat-row w3"></div>
+            <div class="chat-row w4"></div>
+          </div>
+          <div class="canvas">
+            <div class="inner-card">
+              <div class="inner-line w1"></div>
+              <div class="inner-line w2"></div>
+            </div>
+            <div class="inner-card">
+              <div class="inner-line w3"></div>
+              <div class="inner-line w2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="swatches">
+          <div class="swatch"><span class="label">bg</span><span class="hex">#E0EAF2</span></div>
+          <div class="swatch"><span class="label">sidebar</span><span class="hex">#F0F4F8</span></div>
+        </div>
+      </div>
+
+      <!-- Option B -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="title">B · desaturate the bg</div>
+            <div class="desc">Drop the bg toward neutral so the existing gray sidebar matches. Solves the clash but erases Orbital's identity.</div>
+          </div>
+        </div>
+        <div class="preview opt-b">
+          <div class="sidebar">
+            <div class="logo">PandaCommand</div>
+            <div class="nav-item">Dashboard</div>
+            <div class="chat-row w1"></div>
+            <div class="chat-row w2"></div>
+            <div class="chat-row w3"></div>
+            <div class="chat-row w4"></div>
+          </div>
+          <div class="canvas">
+            <div class="inner-card">
+              <div class="inner-line w1"></div>
+              <div class="inner-line w2"></div>
+            </div>
+            <div class="inner-card">
+              <div class="inner-line w3"></div>
+              <div class="inner-line w2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="swatches">
+          <div class="swatch"><span class="label">bg</span><span class="hex">#E4E8ED</span></div>
+          <div class="swatch"><span class="label">sidebar</span><span class="hex">#F0F2F5</span></div>
+        </div>
+      </div>
+
+      <!-- Option C -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="title">C · flip elevation</div>
+            <div class="desc">White sidebar on the blue canvas. Clean, but chat cards are also white — sidebar stops reading as a distinct surface.</div>
+          </div>
+        </div>
+        <div class="preview opt-c">
+          <div class="sidebar">
+            <div class="logo">PandaCommand</div>
+            <div class="nav-item">Dashboard</div>
+            <div class="chat-row w1"></div>
+            <div class="chat-row w2"></div>
+            <div class="chat-row w3"></div>
+            <div class="chat-row w4"></div>
+          </div>
+          <div class="canvas">
+            <div class="inner-card">
+              <div class="inner-line w1"></div>
+              <div class="inner-line w2"></div>
+            </div>
+            <div class="inner-card">
+              <div class="inner-line w3"></div>
+              <div class="inner-line w2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="swatches">
+          <div class="swatch"><span class="label">bg</span><span class="hex">#E0EAF2</span></div>
+          <div class="swatch"><span class="label">sidebar</span><span class="hex">#FFFFFF</span></div>
+        </div>
+      </div>
+
+      <!-- Option D -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="title">D · tone both toward middle</div>
+            <div class="desc">Bg a hair less saturated, sidebar a hair more blue. Harmonized, but softer overall — less Orbital punch.</div>
+          </div>
+        </div>
+        <div class="preview opt-d">
+          <div class="sidebar">
+            <div class="logo">PandaCommand</div>
+            <div class="nav-item">Dashboard</div>
+            <div class="chat-row w1"></div>
+            <div class="chat-row w2"></div>
+            <div class="chat-row w3"></div>
+            <div class="chat-row w4"></div>
+          </div>
+          <div class="canvas">
+            <div class="inner-card">
+              <div class="inner-line w1"></div>
+              <div class="inner-line w2"></div>
+            </div>
+            <div class="inner-card">
+              <div class="inner-line w3"></div>
+              <div class="inner-line w2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="swatches">
+          <div class="swatch"><span class="label">bg</span><span class="hex">#DCE6EE</span></div>
+          <div class="swatch"><span class="label">sidebar</span><span class="hex">#EAF0F5</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-title">Option B vs Mercury light — how close are they?</div>
+    <div class="grid">
+
+      <!-- Mercury -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="title">Mercury light <span class="badge" style="color:#506098">default</span></div>
+            <div class="desc">Faint lavender cast on the canvas, indigo primary. The default light theme.</div>
+          </div>
+        </div>
+        <div class="preview mercury">
+          <div class="sidebar">
+            <div class="logo">PandaCommand</div>
+            <div class="nav-item">Dashboard</div>
+            <div class="chat-row w1"></div>
+            <div class="chat-row w2"></div>
+            <div class="chat-row w3"></div>
+            <div class="chat-row w4"></div>
+          </div>
+          <div class="canvas">
+            <div class="inner-card">
+              <div class="inner-line w1"></div>
+              <div class="inner-line w2"></div>
+            </div>
+            <div class="inner-card">
+              <div class="inner-line w3"></div>
+              <div class="inner-line w2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="swatches">
+          <div class="swatch"><span class="label">bg</span><span class="hex">#ECEEF3</span></div>
+          <div class="swatch"><span class="label">sidebar</span><span class="hex">#F5F6FA</span></div>
+        </div>
+      </div>
+
+      <!-- Option B again, side-by-side -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="title">Orbital · Option B</div>
+            <div class="desc">Desaturated canvas, blue-steel primary. Canvas is close to Mercury — the primary is the main differentiator.</div>
+          </div>
+        </div>
+        <div class="preview opt-b">
+          <div class="sidebar">
+            <div class="logo">PandaCommand</div>
+            <div class="nav-item">Dashboard</div>
+            <div class="chat-row w1"></div>
+            <div class="chat-row w2"></div>
+            <div class="chat-row w3"></div>
+            <div class="chat-row w4"></div>
+          </div>
+          <div class="canvas">
+            <div class="inner-card">
+              <div class="inner-line w1"></div>
+              <div class="inner-line w2"></div>
+            </div>
+            <div class="inner-card">
+              <div class="inner-line w3"></div>
+              <div class="inner-line w2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="swatches">
+          <div class="swatch"><span class="label">bg</span><span class="hex">#E4E8ED</span></div>
+          <div class="swatch"><span class="label">sidebar</span><span class="hex">#F0F2F5</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="legend">Inner white cards simulate chat / artifact cards on the canvas so you can judge the surface stack at a glance.</p>
+  </div>
+</body>
+</html>
