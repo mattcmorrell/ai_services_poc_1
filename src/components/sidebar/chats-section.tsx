@@ -56,7 +56,7 @@ export function ChatsSection({
                 : "text-foreground/55 hover:text-foreground"
             )}
           >
-            Grouped
+            By Client
           </button>
           <button
             onClick={() => onFilterChange("recent")}
