@@ -44,6 +44,7 @@ export function Sidebar({
     setFilter,
     toggleCollapsed,
     toggleClientExpanded,
+    collapseAllClients,
     setPopoverOpen,
   } = useSidebarState();
 
@@ -117,6 +118,7 @@ export function Sidebar({
             onNewChat={handleNewChat}
             onNewChatRecent={onNewChatRecent}
             onToggleClient={toggleClientExpanded}
+            onCollapseAll={collapseAllClients}
             onRenameChat={onRenameChat}
             onDeleteChat={onDeleteChat}
             onClose={() => setPopoverOpen(false)}
@@ -145,6 +147,7 @@ export function Sidebar({
         onNewChat={handleNewChat}
         onNewChatRecent={onNewChatRecent}
         onToggleClient={toggleClientExpanded}
+        onCollapseAll={collapseAllClients}
         onRenameChat={onRenameChat}
         onDeleteChat={onDeleteChat}
       />

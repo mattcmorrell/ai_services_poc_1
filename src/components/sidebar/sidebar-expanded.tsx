@@ -24,6 +24,7 @@ interface SidebarExpandedProps {
   onNewChat: (clientId: string) => void;
   onNewChatRecent?: () => void;
   onToggleClient: (id: string) => void;
+  onCollapseAll?: () => void;
   onRenameChat: (chatId: string) => void;
   onDeleteChat: (chatId: string) => void;
 }
@@ -45,6 +46,7 @@ export function SidebarExpanded({
   onNewChat,
   onNewChatRecent,
   onToggleClient,
+  onCollapseAll,
   onRenameChat,
   onDeleteChat,
 }: SidebarExpandedProps) {
@@ -105,6 +107,7 @@ export function SidebarExpanded({
           onNewChat={onNewChat}
           onNewChatRecent={onNewChatRecent}
           onToggleClient={onToggleClient}
+          onCollapseAll={onCollapseAll}
           onRenameChat={onRenameChat}
           onDeleteChat={onDeleteChat}
         />

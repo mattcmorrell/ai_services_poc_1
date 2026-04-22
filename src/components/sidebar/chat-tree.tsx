@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Briefcase, CaretRight, CircleNotch } from "@phosphor-icons/react";
+import { Briefcase, CaretRight, CaretUp, CircleNotch } from "@phosphor-icons/react";
 import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { formatTimeAgoCompact } from "@/lib/format-time";
@@ -17,6 +17,7 @@ interface ChatTreeProps {
   onSelectClient: (clientId: string) => void;
   onNewChat: (clientId: string) => void;
   onToggleClient: (clientId: string) => void;
+  onCollapseAll?: () => void;
   onRenameChat: (chatId: string) => void;
   onDeleteChat: (chatId: string) => void;
 }
@@ -31,6 +32,7 @@ export function ChatTree({
   onSelectClient,
   onNewChat,
   onToggleClient,
+  onCollapseAll,
   onRenameChat,
   onDeleteChat,
 }: ChatTreeProps) {
@@ -83,14 +85,21 @@ export function ChatTree({
                 )}
                 aria-label={expanded ? "Collapse" : "Expand"}
               >
-                <Briefcase className="h-4 w-4 group-hover:hidden" />
+                <Briefcase className={cn("h-4 w-4", isActiveClient ? "hidden" : "group-hover:hidden")} />
                 <CaretRight
-                  className={cn("h-4 w-4 hidden group-hover:block", expanded && "rotate-90")}
+                  className={cn(
+                    "h-4 w-4",
+                    isActiveClient ? "block" : "hidden group-hover:block",
+                    expanded && "rotate-90"
+                  )}
                 />
               </button>
 
               <button
-                onClick={() => onSelectClient(client.id)}
+                onClick={() => {
+                  onSelectClient(client.id);
+                  if (!expanded) onToggleClient(client.id);
+                }}
                 className={cn(
                   "flex-1 min-w-0 text-left flex items-center gap-1.5",
                   isActiveClient ? "text-primary-foreground" : "text-foreground"
@@ -195,6 +204,18 @@ export function ChatTree({
           </div>
         );
       })}
+
+      {onCollapseAll && expandedClientIds.size > 0 && (
+        <button
+          onClick={onCollapseAll}
+          className="mt-1 mb-2 flex items-center gap-1.5 pl-2 pr-2.5 py-1.5 rounded-md type-meta text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        >
+          <span className="flex h-[18px] w-[18px] items-center justify-center flex-shrink-0">
+            <CaretUp className="h-3.5 w-3.5" />
+          </span>
+          Collapse all
+        </button>
+      )}
     </div>
   );
 }

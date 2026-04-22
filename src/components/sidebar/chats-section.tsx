@@ -21,6 +21,7 @@ interface ChatsSectionProps {
   onNewChat: (clientId: string) => void;
   onNewChatRecent?: () => void;
   onToggleClient: (id: string) => void;
+  onCollapseAll?: () => void;
   onRenameChat: (chatId: string) => void;
   onDeleteChat: (chatId: string) => void;
 }
@@ -38,6 +39,7 @@ export function ChatsSection({
   onNewChat,
   onNewChatRecent,
   onToggleClient,
+  onCollapseAll,
   onRenameChat,
   onDeleteChat,
 }: ChatsSectionProps) {
@@ -94,6 +96,7 @@ export function ChatsSection({
             onSelectClient={onSelectClient}
             onNewChat={onNewChat}
             onToggleClient={onToggleClient}
+            onCollapseAll={onCollapseAll}
             onRenameChat={onRenameChat}
             onDeleteChat={onDeleteChat}
           />

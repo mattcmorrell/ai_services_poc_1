@@ -71,6 +71,8 @@ export function useSidebarState() {
     });
   };
 
+  const collapseAllClients = () => setExpandedClientIds(new Set());
+
   return {
     collapsed,
     filter,
@@ -80,6 +82,7 @@ export function useSidebarState() {
     setFilter,
     toggleCollapsed,
     toggleClientExpanded,
+    collapseAllClients,
     setPopoverOpen,
   };
 }
