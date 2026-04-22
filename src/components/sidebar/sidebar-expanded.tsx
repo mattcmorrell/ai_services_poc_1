@@ -7,6 +7,7 @@ import { ChatsSection } from "./chats-section";
 import { SidebarFooter } from "./sidebar-footer";
 import { SidebarFilter } from "@/hooks/use-sidebar-state";
 import { BrandLogo } from "@/components/brand-logo";
+import { useTheme } from "@/components/theme-provider";
 
 interface SidebarExpandedProps {
   popoverMode?: boolean;
@@ -51,12 +52,15 @@ export function SidebarExpanded({
   onRenameChat,
   onDeleteChat,
 }: SidebarExpandedProps) {
+  const { colorway } = useTheme();
+  const isHSHQ = colorway === "human-services-hq";
+
   return (
     <div className="flex h-full w-80 flex-col bg-sidebar text-sidebar-foreground overflow-hidden border-r border-sidebar-border">
       {/* Header */}
       {!popoverMode && (
         <div className="flex flex-shrink-0 items-center justify-between pt-5 pb-3 px-[22px]">
-          <BrandLogo height={36} />
+          {isHSHQ ? <BrandLogo height={36} /> : <span className="type-logotype text-primary">PandaCommand</span>}
           {onCollapse && (
             <button
               onClick={onCollapse}

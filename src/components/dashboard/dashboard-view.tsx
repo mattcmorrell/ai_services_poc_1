@@ -9,6 +9,7 @@ import { AgentAttention, TodoItem, SuggestedAction } from "@/types/dashboard";
 import { Client } from "@/types/chat";
 import { Agent } from "@/types/agent";
 import { BrandLogo } from "@/components/brand-logo";
+import { useTheme } from "@/components/theme-provider";
 
 interface DashboardViewProps {
   clients: Client[];
@@ -31,6 +32,8 @@ export function DashboardView({
   onSendMessage,
   onAgentSelected,
 }: DashboardViewProps) {
+  const { colorway } = useTheme();
+  const isHSHQ = colorway === "human-services-hq";
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos);
 
   const handleToggleTodo = (id: string) => {
@@ -54,8 +57,19 @@ export function DashboardView({
     <div className="flex h-full min-w-0 flex-1 flex-col bg-background">
       <div className="flex flex-1 flex-col items-center overflow-auto px-6 py-8">
         {/* Logo */}
-        <div className="mb-8 flex justify-center">
-          <BrandLogo height={100} />
+        <div className="mb-8 text-center flex flex-col items-center">
+          {isHSHQ ? (
+            <BrandLogo height={100} />
+          ) : (
+            <>
+              <div className="text-[48px] font-extrabold tracking-[-0.04em] text-foreground leading-none">
+                PandaCommand
+              </div>
+              <div className="font-mono text-[18px] font-semibold tracking-[0.1em] uppercase text-primary mt-1">
+                Agent mission control
+              </div>
+            </>
+          )}
         </div>
 
         {/* Input */}
