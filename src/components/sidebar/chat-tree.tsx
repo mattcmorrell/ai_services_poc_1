@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { CaretRight, CircleNotch, Plus } from "@phosphor-icons/react";
+import { CaretRight, CircleNotch } from "@phosphor-icons/react";
 import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { formatTimeAgoCompact } from "@/lib/format-time";
@@ -68,7 +68,7 @@ export function ChatTree({
           <div key={client.id} className="mb-4">
             {/* Client row */}
             <div className={cn(
-              "group relative flex items-center gap-1.5 py-1 pl-2 pr-1.5 rounded-md",
+              "group relative flex items-center gap-1.5 py-2 pl-2 pr-2 rounded-md",
               isActiveClient
                 ? "bg-primary text-primary-foreground"
                 : "hover:bg-accent"
@@ -77,12 +77,14 @@ export function ChatTree({
                 onClick={() => onToggleClient(client.id)}
                 className={cn(
                   "flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center rounded",
-                  isActiveClient ? "text-primary-foreground" : "text-foreground"
+                  isActiveClient
+                    ? "text-primary-foreground hover:bg-primary-foreground/20"
+                    : "text-muted-foreground hover:bg-foreground/15"
                 )}
                 aria-label={expanded ? "Collapse" : "Expand"}
               >
                 <CaretRight
-                  className={cn("h-4 w-4", expanded && "rotate-90")}
+                  className={cn("h-4 w-4 transition-transform", expanded && "rotate-90")}
                 />
               </button>
 
@@ -96,38 +98,27 @@ export function ChatTree({
                 <span className="type-client-name font-semibold">{client.name}</span>
               </span>
 
+              {unreadCount > 0 && !isActiveClient && (
+                <span className="group-hover:hidden ml-auto flex-shrink-0 text-[11px] font-bold leading-none px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
+                  {unreadCount}
+                </span>
+              )}
+
               <button
                 onClick={() => onNewChat(client.id)}
-                title={`New chat — ${client.name}`}
                 className={cn(
-                  "group/nc ml-0.5 flex-shrink-0 flex items-center justify-center transition-opacity",
-                  unreadCount === 0 && "opacity-0 group-hover:opacity-100"
+                  "absolute right-2 flex-shrink-0 text-[11px] font-semibold leading-none px-2.5 py-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity",
+                  isActiveClient
+                    ? "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"
+                    : "bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground"
                 )}
               >
-                {/* Count pill — hidden on row hover */}
-                {unreadCount > 0 && (
-                  <span className={cn(
-                    "group-hover:hidden flex h-5 min-w-5 items-center justify-center rounded-full px-1.5",
-                    isActiveClient ? "bg-primary-foreground/70 text-primary" : "bg-[var(--color-info-muted)] text-primary"
-                  )}>
-                    <span className="font-sans font-bold text-xs">{unreadCount}</span>
-                  </span>
-                )}
-                {/* Plus circle — shown on row hover */}
-                <span className={cn(
-                  "flex h-6 w-6 items-center justify-center rounded-full transition-colors",
-                  unreadCount > 0 ? "hidden group-hover:flex" : "flex",
-                  isActiveClient
-                    ? "bg-primary-foreground text-primary group-hover/nc:bg-primary-foreground/85"
-                    : "bg-primary text-primary-foreground group-hover/nc:bg-primary/85"
-                )}>
-                  <Plus weight="bold" className="h-3.5 w-3.5" />
-                </span>
+                New Chat
               </button>
             </div>
 
             {/* Chat rows */}
-            {expanded && <div className="flex flex-col gap-y-2">{clientChats.map((chat) => {
+            {expanded && <div className="flex flex-col gap-y-1">{clientChats.map((chat) => {
               const isSelected = chat.id === selectedChatId;
               const showState = chat.state === 'running' || chat.state === 'needs-approval';
               return (

@@ -76,8 +76,8 @@ export function ChatsSection({
       {filter === "recent" && (
         <div className="flex-shrink-0 px-[14px] pb-1">
           <button onClick={onNewChatRecent} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-primary transition-colors hover:bg-accent rounded-md">
-            <Plus className="h-3.5 w-3.5 flex-shrink-0" />
-            <span className="type-meta">New chat</span>
+            <Plus className="h-4 w-4 flex-shrink-0" weight="bold" />
+            <span className="type-meta !font-semibold">New chat</span>
           </button>
         </div>
       )}

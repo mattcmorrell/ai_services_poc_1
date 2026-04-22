@@ -26,6 +26,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="mercury dark" suppressHydrationWarning>
       <head>
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var c=localStorage.getItem('theme-colorway')||'mercury';var m=localStorage.getItem('theme-mode')||'dark';document.documentElement.className=document.documentElement.className.replace(/\\b(mercury|inkwell|orbital|dark|light)\\b/g,'').trim()+' '+c+' '+m;}catch(e){}})();`,
