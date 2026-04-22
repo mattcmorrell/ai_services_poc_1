@@ -108,10 +108,10 @@ export function ChatTree({
               <button
                 onClick={() => onNewChat(client.id)}
                 className={cn(
-                  "absolute right-2 flex-shrink-0 text-[11px] font-semibold leading-none px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity",
+                  "absolute right-2 flex-shrink-0 text-[11px] font-semibold leading-none px-2.5 py-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity",
                   isActiveClient
                     ? "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"
-                    : "bg-primary text-primary-foreground hover:bg-primary/85"
+                    : "bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground"
                 )}
               >
                 New Chat
