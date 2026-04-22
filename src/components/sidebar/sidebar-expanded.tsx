@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { ChatsSection } from "./chats-section";
 import { SidebarFooter } from "./sidebar-footer";
 import { SidebarFilter } from "@/hooks/use-sidebar-state";
+import { BrandLogo } from "@/components/brand-logo";
 
 interface SidebarExpandedProps {
   popoverMode?: boolean;
@@ -55,7 +56,7 @@ export function SidebarExpanded({
       {/* Header */}
       {!popoverMode && (
         <div className="flex flex-shrink-0 items-center justify-between pt-5 pb-3 px-[22px]">
-          <span className="type-logotype text-primary">PandaCommand</span>
+          <BrandLogo height={36} />
           {onCollapse && (
             <button
               onClick={onCollapse}

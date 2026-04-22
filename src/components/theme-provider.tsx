@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { IconContext } from "@phosphor-icons/react";
 
-export type Colorway = "mercury" | "inkwell" | "orbital";
+export type Colorway = "mercury" | "inkwell" | "orbital" | "human-services-hq";
 export type Mode = "light" | "dark";
 
 interface ThemeContextValue {
@@ -18,7 +18,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const COLORWAY_KEY = "theme-colorway";
 const MODE_KEY = "theme-mode";
-const COLORWAYS: Colorway[] = ["mercury", "inkwell", "orbital"];
+const COLORWAYS: Colorway[] = ["mercury", "inkwell", "orbital", "human-services-hq"];
 
 function applyTheme(colorway: Colorway, mode: Mode) {
   const el = document.documentElement;
@@ -36,7 +36,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const storedColorway = localStorage.getItem(COLORWAY_KEY) as Colorway | null;
     const storedMode = localStorage.getItem(MODE_KEY) as Mode | null;
-    const c = storedColorway && COLORWAYS.includes(storedColorway) ? storedColorway : "mercury";
+    const c = storedColorway && COLORWAYS.includes(storedColorway) ? storedColorway : "human-services-hq";
     const m = storedMode === "light" || storedMode === "dark" ? storedMode : "dark";
     setColorwayState(c);
     setModeState(m);

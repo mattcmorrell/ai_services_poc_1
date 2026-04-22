@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 
 const colorways: { id: Colorway; label: string; dot: string }[] = [
+  { id: "human-services-hq", label: "HSHQ", dot: "#70A5D9" },
   { id: "mercury", label: "Mercury", dot: "#6878B8" },
   { id: "inkwell", label: "Inkwell", dot: "#7A9A78" },
   { id: "orbital", label: "Orbital", dot: "#8AAEC4" },
