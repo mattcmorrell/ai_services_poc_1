@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { CaretRight, CircleNotch } from "@phosphor-icons/react";
+import { Briefcase, CaretRight, CircleNotch } from "@phosphor-icons/react";
 import { Chat, Client } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { formatTimeAgoCompact } from "@/lib/format-time";
@@ -68,7 +68,7 @@ export function ChatTree({
           <div key={client.id} className="mb-4">
             {/* Client row */}
             <div className={cn(
-              "group relative flex items-center gap-1.5 py-1 pl-2 pr-2 rounded-md",
+              "group relative flex items-center gap-1.5 py-2 pl-2 pr-2 rounded-md",
               isActiveClient
                 ? "bg-primary text-primary-foreground"
                 : "hover:bg-accent"
@@ -79,12 +79,13 @@ export function ChatTree({
                   "flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center rounded",
                   isActiveClient
                     ? "text-primary-foreground hover:bg-primary-foreground/20"
-                    : "text-foreground hover:bg-foreground/15"
+                    : "text-muted-foreground hover:bg-foreground/15"
                 )}
                 aria-label={expanded ? "Collapse" : "Expand"}
               >
+                <Briefcase className="h-4 w-4 group-hover:hidden" />
                 <CaretRight
-                  className={cn("h-4 w-4", expanded && "rotate-90")}
+                  className={cn("h-4 w-4 hidden group-hover:block", expanded && "rotate-90")}
                 />
               </button>
 
@@ -118,7 +119,7 @@ export function ChatTree({
             </div>
 
             {/* Chat rows */}
-            {expanded && <div className="flex flex-col gap-y-2">{clientChats.map((chat) => {
+            {expanded && <div className="flex flex-col gap-y-1">{clientChats.map((chat) => {
               const isSelected = chat.id === selectedChatId;
               const showState = chat.state === 'running' || chat.state === 'needs-approval';
               return (
